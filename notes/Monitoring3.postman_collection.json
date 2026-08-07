@@ -1,0 +1,248 @@
+{
+  "info": {
+    "name": "Monitoring3 API Tests",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Auth Service",
+      "item": [
+        {
+          "name": "Login as superadmin",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"username\": \"superadmin\",\n    \"password\": \"admin123\"\n}"
+            },
+            "url": {
+              "raw": "{{auth_url}}/api/v1/auth/login",
+              "host": ["{{auth_url}}"],
+              "path": ["api", "v1", "auth", "login"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login as admin",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"username\": \"admin\",\n    \"password\": \"admin123\"\n}"
+            },
+            "url": {
+              "raw": "{{auth_url}}/api/v1/auth/login",
+              "host": ["{{auth_url}}"],
+              "path": ["api", "v1", "auth", "login"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "2. Admin Service - Public",
+      "item": [
+        {
+          "name": "Public endpoint (no auth)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{admin_url}}/api/v1/test/public",
+              "host": ["{{admin_url}}"],
+              "path": ["api", "v1", "test", "public"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "3. Admin Service - Authenticated",
+      "item": [
+        {
+          "name": "Authenticated endpoint",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{admin_url}}/api/v1/test/authenticated",
+              "host": ["{{admin_url}}"],
+              "path": ["api", "v1", "test", "authenticated"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "My permissions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{admin_url}}/api/v1/test/my-permissions",
+              "host": ["{{admin_url}}"],
+              "path": ["api", "v1", "test", "my-permissions"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "4. Admin Service - Permissions",
+      "item": [
+        {
+          "name": "Deviation approve (requires DEVIATION_APPROVE)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{admin_url}}/api/v1/test/deviation/approve",
+              "host": ["{{admin_url}}"],
+              "path": ["api", "v1", "test", "deviation", "approve"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Deviation check (programmatic)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{admin_url}}/api/v1/test/deviation/check",
+              "host": ["{{admin_url}}"],
+              "path": ["api", "v1", "test", "deviation", "check"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "5. Admin Service - Roles",
+      "item": [
+        {
+          "name": "System admin only",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{admin_url}}/api/v1/test/admin/system",
+              "host": ["{{admin_url}}"],
+              "path": ["api", "v1", "test", "admin", "system"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Organization admin only",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{admin_url}}/api/v1/test/admin/org",
+              "host": ["{{admin_url}}"],
+              "path": ["api", "v1", "test", "admin", "org"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Dispatcher only",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{admin_url}}/api/v1/test/dispatcher",
+              "host": ["{{admin_url}}"],
+              "path": ["api", "v1", "test", "dispatcher"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Dispatcher with approve",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{admin_url}}/api/v1/test/dispatcher/approve",
+              "host": ["{{admin_url}}"],
+              "path": ["api", "v1", "test", "dispatcher", "approve"]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "auth_url",
+      "value": "http://localhost:8083"
+    },
+    {
+      "key": "admin_url",
+      "value": "http://localhost:8082"
+    },
+    {
+      "key": "token",
+      "value": ""
+    }
+  ]
+}

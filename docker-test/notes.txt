@@ -1,0 +1,25 @@
+docker-compose build --no-cache nginx-frontend
+
+
+docker build -f mon-test/Dockerfile -t mon3-test-build ../
+docker run -d --name mon3-test-inspect mon3-test-build
+docker exec -it mon3-test-inspect sh
+docker stop mon3-test-inspect
+docker rm mon3-test-inspect
+docker rmi mon3-test-build
+
+
+docker rmi mon3-nginx-frontend
+docker run -d --name mon3-test-inspect mon3-nginx-frontend
+docker build -f nginx-frontend/Dockerfile -t mon3-nginx-frontend .\
+
+
+docker run -it --rm --entrypoint sh mon3-nginx-frontend
+
+docker start -ai mon3-nginx-frontend --entrypoint sh
+
+docker start mon3-nginx-frontend
+docker exec -it mon3-nginx-frontend sh
+
+
+http-server ./dist/mtest/browser -p 8701 -c-1 -P http://crm.host:8701? --spa

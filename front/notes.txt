@@ -1,0 +1,22 @@
+ng new front --create-application=false
+ng g application mtest --standalone --skip-tests  --no-ssr --style=scss   
+ng generate library common
+ng generate environments --project=mon-test
+
+ng new utest-04 --no-standalone --skip-tests --skip-git --no-ssr --style=scss
+
+ng g c qqq/qqq --project=my-app-name
+
+
+ng serve admin-test
+ng serve mon-test
+
+ng build shared --watch
+ng build admin-test
+ng build mon-test
+
+
+http-server ./dist/mon-test/browser -p 8701 -c-1 -P http://crm.host:8701? --spa
+http-server ./dist/admin-test/browser -p 8702 -c-1 -P http://admin.crm.host:8702? --spa
+
+

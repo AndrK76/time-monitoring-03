@@ -1,0 +1,50 @@
+erDiagram
+    USERS ||--o{ USER_AUTH_PROVIDERS : "имеет"
+    USERS ||--o{ USER_ROLES : "имеет"
+    USERS ||--o{ TELEGRAM_TOKENS : "генерирует"
+    
+    ROLES ||--o{ USER_ROLES : "содержит"
+    ROLES ||--o{ ROLE_PERMISSIONS : "имеет"
+    
+    PERMISSIONS ||--o{ ROLE_PERMISSIONS : "содержит"
+    
+    USERS {
+        string id PK
+        string username UK
+        string email UK
+        string password
+        string first_name
+        string last_name
+        string avatar_url
+        boolean is_active
+        boolean is_email_verified
+        timestamp last_login_at
+        timestamp created_at
+        timestamp updated_at
+    }
+    
+    USER_AUTH_PROVIDERS {
+        string id PK
+        string user_id FK
+        string provider_name
+        string provider_user_id
+        string provider_email
+        text access_token
+        text refresh_token
+        timestamp token_expires_at
+        timestamp linked_at
+        timestamp last_used_at
+        jsonb provider_data
+    }
+    
+    TELEGRAM_TOKENS {
+        string id PK
+        string token UK
+        string user_id FK
+        string telegram_user_id
+        timestamp expires_at
+        boolean is_used
+        timestamp used_at
+        timestamp created_at
+        string target_url
+    }

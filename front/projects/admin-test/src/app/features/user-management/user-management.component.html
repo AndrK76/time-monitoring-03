@@ -1,0 +1,118 @@
+<!-- projects/admin-test/src/app/features/user-management/user-management.component.html -->
+<div class="user-management">
+    <div class="header">
+        <div class="header-left">
+            <button class="btn-back" (click)="goBack()">← Назад</button>
+            <h2>👥 Управление пользователями</h2>
+        </div>
+        <button *ngIf="isAdmin" class="btn-refresh" (click)="loadUsers()">🔄 Обновить</button>
+    </div>
+
+    <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>
+    <div *ngIf="successMessage" class="success-message">{{ successMessage }}</div>
+
+    <div class="content">
+        <!-- Список пользователей -->
+        <div class="user-list">
+            <h3>Список пользователей</h3>
+            <div *ngIf="isLoading" class="loading">Загрузка...</div>
+            <div *ngIf="!isLoading && users.length === 0" class="empty">Нет пользователей</div>
+            <div class="user-item" *ngFor="let user of users" [class.selected]="selectedUser?.id === user.id"
+                (click)="selectUser(user)">
+                <div class="user-avatar">{{(user.displayName || user.username || '?').charAt(0)  }}</div>
+                <div class="user-info">
+                    <div class="user-name">{{ user.displayName || user.username }}</div>
+                    <div class="user-username">{{ user.username }}</div>
+                    <div class="user-roles">
+                        <span class="role-badge" *ngFor="let role of user.roles">{{ role }}</span>
+                    </div>
+                </div>
+                <div *ngIf="isCurrentUser(user.id)" class="user-badge">Вы</div>
+                <div *ngIf="!canEdit(user.id)" class="user-badge readonly">Только просмотр</div>
+            </div>
+        </div>
+
+        <!-- Редактор пользователя -->
+        <div class="user-editor" *ngIf="selectedUser">
+            <h3>Редактирование пользователя</h3>
+
+            <div *ngIf="editingUser">
+                <div class="editor-fields">
+                    <div class="field">
+                        <label>ID</label>
+                        <span class="field-value">{{ selectedUser.id }}</span>
+                    </div>
+
+                    <!-- Имя пользователя — только для админов -->
+                    <div class="field">
+                        <label>Имя пользователя</label>
+                        <input *ngIf="isAdmin" type="text" [(ngModel)]="editingUser.username" class="form-control" />
+                        <span *ngIf="!isAdmin" class="field-value">{{ selectedUser.username }}</span>
+                    </div>
+
+                    <!-- Email — только для админов -->
+                    <div class="field">
+                        <label>Email</label>
+                        <input *ngIf="isAdmin" type="email" [(ngModel)]="editingUser.email" class="form-control" />
+                        <span *ngIf="!isAdmin" class="field-value">{{ selectedUser.email }}</span>
+                    </div>
+
+                    <!-- Отображаемое имя — доступно всем -->
+                    <div class="field">
+                        <label>Отображаемое имя</label>
+                        <input *ngIf="canEditField('displayName')" type="text" [(ngModel)]="editingUser.displayName"
+                            class="form-control" />
+                        <span *ngIf="!canEditField('displayName')" class="field-value">{{ selectedUser.displayName
+                            }}</span>
+                    </div>
+
+                    <!-- Имя — доступно всем -->
+                    <div class="field">
+                        <label>Имя</label>
+                        <input *ngIf="canEditField('firstName')" type="text" [(ngModel)]="editingUser.firstName"
+                            class="form-control" />
+                        <span *ngIf="!canEditField('firstName')" class="field-value">{{ selectedUser.firstName }}</span>
+                    </div>
+
+                    <!-- Фамилия — доступно всем -->
+                    <div class="field">
+                        <label>Фамилия</label>
+                        <input *ngIf="canEditField('lastName')" type="text" [(ngModel)]="editingUser.lastName"
+                            class="form-control" />
+                        <span *ngIf="!canEditField('lastName')" class="field-value">{{ selectedUser.lastName }}</span>
+                    </div>
+
+                    <div class="field">
+                        <label>Роли</label>
+                        <span class="field-value">
+                            <span class="role-badge" *ngFor="let role of selectedUser.roles">{{ role }}</span>
+                        </span>
+                    </div>
+
+                    <div class="field">
+                        <label>Права</label>
+                        <span class="field-value">
+                            <span class="permission-badge" *ngFor="let perm of selectedUser.permissions">{{ perm
+                                }}</span>
+                            <span *ngIf="!selectedUser.permissions?.length">Нет прав</span>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="editor-actions" *ngIf="canEdit(selectedUser.id)">
+                    <button class="btn-save" (click)="saveUser()" [disabled]="isLoading">
+                        {{ isLoading ? '⏳ Сохранение...' : '💾 Сохранить' }}
+                    </button>
+                    <button class="btn-cancel" (click)="cancelEdit()">Отмена</button>
+                </div>
+                <div *ngIf="!canEdit(selectedUser.id)" class="readonly-notice">
+                    🔒 Только просмотр
+                </div>
+            </div>
+        </div>
+
+        <div class="user-editor-empty" *ngIf="!selectedUser">
+            <p>Выберите пользователя из списка слева</p>
+        </div>
+    </div>
+</div>

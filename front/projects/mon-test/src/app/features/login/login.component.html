@@ -1,0 +1,39 @@
+<div class="login-container">
+  <div class="login-card">
+    <h2>📊 Monitoring3</h2>
+    <p class="subtitle">Вход в систему мониторинга</p>
+    <p class="subtitle"><a [href]="otherAppUrl">Перейти в {{ otherAppName }} </a></p>
+
+    <form (ngSubmit)="onSubmit()" #loginForm="ngForm">
+      <div class="form-group">
+        <label for="username">Имя пользователя</label>
+        <input type="text" id="username" name="username" [(ngModel)]="username" required
+          placeholder="Введите имя пользователя" class="form-control" />
+      </div>
+
+      <div class="form-group">
+        <label for="password">Пароль</label>
+        <input type="password" id="password" name="password" [(ngModel)]="password" required
+          placeholder="Введите пароль" class="form-control" />
+      </div>
+
+      <div *ngIf="errorMessage" class="error-message">
+        {{ errorMessage }}
+      </div>
+
+      <button type="submit" [disabled]="isLoading" class="btn btn-primary">
+        {{ isLoading ? '⏳ Вход...' : 'Войти' }}
+      </button>
+    </form>
+
+    <div class="test-accounts">
+      <p class="hint">Тестовые аккаунты:</p>
+      <div class="accounts">
+        <span (click)="fillCredentials('superadmin', 'admin123')">🛡️ SuperAdmin</span>
+        <span (click)="fillCredentials('admin', 'admin123')">👤 Admin</span>
+        <span (click)="fillCredentials('dispatcher1', 'qwerty')">📋 Disp1</span>
+        <span (click)="fillCredentials('dispatcher2', 'qwerty')">📋 Disp2</span>
+      </div>
+    </div>
+  </div>
+</div>

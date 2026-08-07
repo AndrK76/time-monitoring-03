@@ -1,0 +1,137 @@
+spring:
+  application:
+    name: service-auth
+  config:
+    import: optional:file:.properties
+
+  web:
+    cors:
+      allowed-origins:
+        - "http://localhost:4301"
+        - "http://localhost:4302"
+        - "http://crm.host:4301"
+        - "http://admin.crm.host:4302"
+        - "http://crm.host:8701"
+        - "http://admin.crm.host:8702"
+        - "http://crm.host:8888"
+        - "http://admin.crm.host:8888"
+        - "http://crm.host:8881"
+        - "http://admin.crm.host:8882"
+      allowed-methods: "GET,POST,PUT,DELETE,OPTIONS,PATCH"
+      allowed-headers: "Authorization,Content-Type,X-Requested-With,Accept,Origin,Access-Control-Request-Method,Access-Control-Request-Headers"
+      exposed-headers: "Authorization,Set-Cookie"
+      allow-credentials: true
+      max-age: 3600
+
+  datasource:
+    url: jdbc:postgresql://localhost:5433/postgres
+    username: auth
+    password: test
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+      #ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        default_schema: auth
+        hbm2ddl.auto: validate
+        schema-validation: none
+
+  flyway:
+    enabled: true
+    #enabled: false
+    baseline-on-migrate: true
+    locations: classpath:db/migration
+    schemas: auth
+    baseline-version: 0
+
+  # ============================================================
+  # Redis - ОТКЛЮЧЕН (закомментирован)
+  # ============================================================
+  # data:
+  #   redis:
+  #     host: localhost
+  #     port: 6379
+  #     timeout: 2000ms
+  #     lettuce:
+  #       pool:
+  #         max-active: 8
+  #         max-idle: 8
+  #         min-idle: 0
+
+  # ============================================================
+  # RabbitMQ - ПОКА ОТКЛЮЧЕН
+  # ============================================================
+  rabbitmq:
+    dynamic: false
+  #   host: localhost
+  #   port: 5672
+  #   username: monitoring_service
+  #   password: monitoring_password_123
+  #   virtual-host: /
+    listener:
+      simple:
+        auto-startup: false
+  #       acknowledge-mode: auto
+  #       concurrency: 2
+  #       max-concurrency: 5
+  #       retry:
+  #         enabled: true
+  #         initial-interval: 1000
+  #         max-interval: 10000
+  #         multiplier: 2.0
+  #         max-attempts: 3
+
+
+
+server:
+  port: 8083
+
+# Cookie настройки для SSO
+cookie:
+  domain: crm.host           # ← общий домен для всех поддоменов
+  #domain: andrk-ninkear.host           # ← общий домен для всех поддоменов
+  #domain: host           # ← общий домен для всех поддоменов
+  secure: false               # false для HTTP, true для HTTPS
+  http-only: true
+  max-age: 86400              # 24 часа
+  path: /
+  name: auth_token
+
+security:
+  jwt:
+    secret: ${JWT_SECRET:your-256-bit-secret-key-change-in-production}
+    expiration: 86400000
+    refresh-expiration: 604800000
+  telegram:
+    token-ttl: 300
+
+logging:
+  level:
+    ru.igorit.monitoring: DEBUG
+    org.springframework.security: INFO
+    org.flywaydb: DEBUG
+    org.hibernate.SQL: DEBUG
+    me.paulschwarz.spring.dotenv: DEBUG
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  health:
+    rabbit:
+      enabled: false
+    redis:
+      enabled: false

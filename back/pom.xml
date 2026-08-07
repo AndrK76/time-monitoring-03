@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+         http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>ru.igorit.monitoring</groupId>
+    <artifactId>monitoring3</artifactId>
+    <version>1.0.0</version>
+    <packaging>pom</packaging>
+
+    <name>Monitoring3 Backend</name>
+    <description>Backend modules for monitoring system</description>
+
+    <modules>
+        <module>spring-boot-parent</module>
+        <module>core-common</module>
+        <module>core-persistence</module>
+        <module>core-security</module>
+        <module>core-telegram</module>
+        <module>core-web</module>
+        <module>service-monitoring</module>
+        <module>service-admin</module>
+        <module>service-auth</module>
+    </modules>
+
+</project>

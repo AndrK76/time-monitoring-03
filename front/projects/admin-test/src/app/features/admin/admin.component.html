@@ -1,0 +1,67 @@
+<!-- admin-test/src/app/features/admin/admin.component.html -->
+<div class="admin-dashboard">
+  <header class="header">
+    <div class="header-content">
+      <h1>⚙️ Admin Panel</h1>
+      <div class="user-info">
+        <span class="username">{{ user?.username }}</span>
+        <span class="badge" *ngFor="let role of user?.roles">{{ role }}</span>
+        <a routerLink="/admin/users" class="btn-link">👥 Пользователи</a>
+        <a [href]="otherAppUrl" class="btn-switch-app"> 🔄 {{ otherAppName }} </a>
+        <a routerLink="/profile/change-password" class="btn-link">🔑 Сменить пароль</a>
+        <button (click)="logout()" class="btn-logout">🚪 Выйти</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="main">
+    <div class="container">
+      <div class="card user-card">
+        <h3>👤 Информация о пользователе</h3>
+        <div class="info-grid">
+          <div><strong>Username:</strong> {{ user?.username }}</div>
+          <div><strong>Email:</strong> {{ user?.email }}</div>
+          <div><strong>Роли:</strong> {{ user?.roles?.join(', ') }}</div>
+          <div><strong>Права:</strong> {{ getPermissionsDisplay(user?.permissions) }}</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>🔐 Тестовые эндпоинты</h3>
+        <div class="test-grid">
+          <button (click)="callPublic()" class="btn btn-outline">Public</button>
+          <button (click)="callAuthenticated()" class="btn btn-outline">Authenticated</button>
+          <button (click)="callApproveDeviation()" class="btn btn-success">✅ Approve</button>
+          <button (click)="callSystemAdmin()" class="btn btn-danger">🛡️ System</button>
+          <button (click)="callOrgAdmin()" class="btn btn-warning">🏢 Org</button>
+          <button (click)="callDispatcher()" class="btn btn-info">📋 Disp</button>
+          <button (click)="callDispatcherApprove()" class="btn btn-primary">📋✅ Disp+</button>
+          <button (click)="callMyPermissions()" class="btn btn-secondary">🔑 My</button>
+        </div>
+      </div>
+
+      <div *ngIf="response" class="card response-card">
+        <h3>📤 Ответ сервера</h3>
+        <div [class]="response.success ? 'response-success' : 'response-error'">
+          <div><strong>Сообщение:</strong> {{ response.message }}</div>
+          <div><strong>Пользователь:</strong> {{ response.username || 'N/A' }}</div>
+          <div><strong>Роли:</strong> {{ response.roles || 'N/A' }}</div>
+          <div><strong>Права:</strong> {{ response.permissions || 'N/A' }}</div>
+          <div><strong>Успешно:</strong> {{ response.success ? '✅' : '❌' }}</div>
+        </div>
+      </div>
+
+      <!-- Информация о переходе -->
+      <div class="card info-card">
+        <h3>🔗 Переход между приложениями</h3>
+        <p>
+          Вы можете перейти в <strong>{{ otherAppName }}</strong> без повторного ввода пароля
+          (SSO - Single Sign-On).
+        </p>
+        <a [href]="otherAppUrl" class="btn btn-primary">
+          🚀 Перейти в {{ otherAppName }}
+        </a>
+      </div>
+    </div>
+  </main>
+</div>

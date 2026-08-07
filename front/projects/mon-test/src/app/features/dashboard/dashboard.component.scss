@@ -1,0 +1,244 @@
+/* mon-test/src/app/features/dashboard/dashboard.component.css */
+.dashboard {
+  min-height: 100vh;
+  background: #f5f7fa;
+}
+
+.header {
+  background: #2c3e50;
+  border-bottom: 1px solid #34495e;
+  padding: 16px 0;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.header-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-content h1 {
+  font-size: 24px;
+  margin: 0;
+  color: white;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.username {
+  font-weight: 600;
+  color: white;
+}
+
+.badge {
+  padding: 2px 12px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  background: #3498db;
+  color: white;
+}
+
+.badge:last-child {
+  background: #e74c3c;
+}
+
+.btn-switch-app {
+  padding: 6px 16px;
+  border: none;
+  border-radius: 6px;
+  background: #2ecc71;
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
+  text-decoration: none;
+  transition: background 0.3s;
+  display: inline-block;
+}
+
+.btn-switch-app:hover {
+  background: #27ae60;
+}
+
+.btn-logout {
+  padding: 6px 16px;
+  border: none;
+  border-radius: 6px;
+  background: #e74c3c;
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background 0.3s;
+}
+
+.btn-logout:hover {
+  background: #c0392b;
+}
+
+.main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.container {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+.card {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.card h3 {
+  margin: 0 0 16px 0;
+  color: #333;
+}
+
+.user-card .info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 24px;
+  font-size: 14px;
+}
+
+.test-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.btn-outline {
+  background: transparent;
+  border: 2px solid #667eea;
+  color: #667eea;
+}
+
+.btn-success {
+  background: #27ae60;
+  color: white;
+}
+
+.btn-danger {
+  background: #e74c3c;
+  color: white;
+}
+
+.btn-warning {
+  background: #f39c12;
+  color: white;
+}
+
+.btn-info {
+  background: #3498db;
+  color: white;
+}
+
+.btn-primary {
+  background: #667eea;
+  color: white;
+}
+
+.btn-secondary {
+  background: #95a5a6;
+  color: white;
+}
+
+.response-card .response-success {
+  border-left: 4px solid #27ae60;
+  padding: 12px 16px;
+  background: #f0faf4;
+  border-radius: 6px;
+}
+
+.response-card .response-error {
+  border-left: 4px solid #e74c3c;
+  padding: 12px 16px;
+  background: #fdf0f0;
+  border-radius: 6px;
+}
+
+.response-card div div {
+  margin: 4px 0;
+  font-size: 14px;
+}
+
+@media (max-width: 768px) {
+  .header-content {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .user-info {
+    justify-content: center;
+  }
+
+  .user-card .info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .test-grid {
+    flex-direction: column;
+  }
+
+  .btn {
+    width: 100%;
+  }
+
+  .btn-switch-app {
+    padding: 6px 16px;
+    border: none;
+    border-radius: 6px;
+    background: #2ecc71;
+    color: white;
+    cursor: pointer;
+    font-size: 14px;
+    text-decoration: none;
+    transition: background 0.3s;
+    display: inline-block;
+  }
+
+  .btn-switch-app:hover {
+    background: #27ae60;
+  }
+
+  .info-card {
+    background: #f0faff;
+    border: 1px solid #d6e9ff;
+  }
+
+  .info-card p {
+    margin: 0 0 16px 0;
+    color: #555;
+    font-size: 14px;
+  }
+}

@@ -1,0 +1,27 @@
+# ============================================
+# Backend specific ignores
+# ============================================
+
+# All Maven target directories
+**/target/
+
+# Spring Boot specific
+**/spring-boot-devtools.properties
+
+# Local configuration
+**/application-local.yml
+**/application-dev.yml
+**/application-*.yml
+!**/application-example.yml
+
+# Built JARs (they go to parent release dir)
+**/*.jar
+**/*.war
+
+# IDE files
+.idea/
+*.iml
+.vscode/
+.settings/
+.classpath
+.project

@@ -1,0 +1,10 @@
+# Проверить какие файлы будут проигнорированы
+git check-ignore -v **/*
+
+# Показать статус без игнорируемых файлов
+git status --ignored
+
+# Очистить кеш если .gitignore изменился
+git rm -r --cached .
+git add .
+git commit -m "Update .gitignore"

@@ -1,0 +1,42 @@
+# docker-test/docker-compose.yml
+services:
+  nginx-frontend:
+    build:
+      context: .
+      dockerfile: nginx-frontend/Dockerfile
+    container_name: mon3-nginx-frontend
+    ports:
+      - "8888:80"
+    networks:
+      - mon3-net
+    depends_on:
+      - mon-test
+      - admin-test
+    restart: unless-stopped
+
+  mon-test:
+    build:
+      context: ../
+      dockerfile: docker-test/mon-test/Dockerfile
+    container_name: mon3-mon-test
+    ports:
+      - "8881:80"
+    networks:
+      - mon3-net
+    restart: unless-stopped
+
+  admin-test:
+    build:
+      context: ../
+      dockerfile: docker-test/admin-test/Dockerfile
+    container_name: mon3-admin-test
+    ports:
+      - "8882:80"
+    networks:
+      - mon3-net
+    restart: unless-stopped
+
+networks:
+  mon3-net:
+    name: mon3-net
+    driver: bridge

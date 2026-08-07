@@ -1,0 +1,237 @@
+# ============================================
+# Java / Spring Boot
+# ============================================
+
+# Compiled class files
+*.class
+*.jar
+*.war
+*.ear
+
+# Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+# Gradle
+.gradle/
+build/
+gradle-app.setting
+!gradle-wrapper.jar
+
+# Log files
+*.log
+logs/
+
+# Spring Boot
+spring-boot-devtools.properties
+spring-boot-devtools.yml
+
+# ============================================
+# Angular / Frontend
+# ============================================
+
+# Angular CLI
+dist/
+tmp/
+out-tsc/
+node_modules/
+npm-debug.log
+yarn-error.log
+testem.log
+.angular/
+*.sln
+*.o
+*.obj
+*.pdb
+*.ilk
+*.ncb
+*.pdb
+*.suo
+*.idb
+*.opensdf
+*.sdf
+*.cachefile
+*.VC.db
+*.VC.VC.opendb
+
+# Angular JSON files
+.npmrc
+.yarnrc
+.editorconfig
+.prettierrc
+.angular.json
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# ============================================
+# Docker
+# ============================================
+
+# Docker files
+docker-compose.override.yml
+*.pid
+*.pid.lock
+*.env
+!.env.example
+
+# ============================================
+# IDE / Editor
+# ============================================
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+.idea_modules/
+.idea/**/workspace.xml
+.idea/**/tasks.xml
+.idea/**/dictionaries
+.idea/**/shelf
+
+# Eclipse
+.classpath
+.project
+.settings/
+bin/
+.metadata/
+*.tmp
+*.bak
+*.swp
+*~.nib
+.loadpath
+.factorypath
+
+# VS Code
+.vscode/
+*.code-workspace
+.history/
+*.log
+
+# NetBeans
+nbproject/
+nb-configuration.xml
+nbbuild/
+dist/
+nbdist/
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# ============================================
+# OS / System
+# ============================================
+
+# Mac OS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+.directory
+*.swp
+*.swo
+*~
+
+# ============================================
+# Project specific
+# ============================================
+
+# Release directory (built JARs)
+release/
+!release/.gitkeep
+
+# Local application properties
+application-local.yml
+application-dev.yml
+application-prod.yml
+application-*.yml
+bootstrap-local.yml
+bootstrap-*.yml
+.properties
+
+# Secret files
+*.p12
+*.jks
+*.keystore
+*.truststore
+secrets/
+credentials/
+
+# Database
+*.db
+*.sqlite
+*.h2.db
+*.mv.db
+*.trace.db
+
+# Redis
+dump.rdb
+appendonly.aof
+
+# ============================================
+# Testing
+# ============================================
+
+# Test coverage reports
+coverage/
+.nyc_output/
+.jacoco/
+test-output/
+*.test
+*.iml
+
+# ============================================
+# Misc
+# ============================================
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.temp
+*.cache
+*.swp
+*.swo
+*~
+
+# Backup files
+*.bak
+*.backup
+*.old
+
+# Package files
+*.zip
+*.tar.gz
+*.rar
+*.7z

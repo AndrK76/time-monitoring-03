@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  postgres:
+    build:
+      context: ./postgres
+      dockerfile: Dockerfile
+    container_name: ${CONTAINER_NAME}
+    image: ${IMAGE_NAME}
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      PGDATA: /var/lib/postgresql/data/pgdata
+      
+      AUTH_USER: ${AUTH_USER}
+      AUTH_PASSWORD: ${AUTH_PASSWORD}
+      AUTH_SCHEMA: ${AUTH_SCHEMA}
+      
+      MONITORING_USER: ${MONITORING_USER}
+      MONITORING_PASSWORD: ${MONITORING_PASSWORD}
+      MONITORING_SCHEMA: ${MONITORING_SCHEMA}
+      
+      ADMIN_USER: ${ADMIN_USER}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+      ADMIN_SCHEMA: ${ADMIN_SCHEMA}
+      
+      CONTAINER_NAME: ${CONTAINER_NAME}
+      NETWORK_NAME: ${NETWORK_NAME}
+      VOLUME_NAME: ${VOLUME_NAME}
+    ports:
+      - "${POSTGRES_PORT}:5432"
+    volumes:
+      - ${VOLUME_NAME}:/var/lib/postgresql/data
+    networks:
+      - ${NETWORK_NAME}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+networks:
+  mon3-net:
+    name: ${NETWORK_NAME}
+    driver: bridge
+
+volumes:
+  mon3-pg-data:
+    name: ${VOLUME_NAME}

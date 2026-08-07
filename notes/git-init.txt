@@ -1,0 +1,18 @@
+# Инициализация репозитория
+cd monitoring3
+git init
+
+# Добавление всех файлов (игнорируя .gitignore)
+git add .
+
+# Проверка что игнорируется
+git status
+
+# Первый коммит
+git commit -m "Initial commit: Multi-module project structure"
+
+# Добавление удаленного репозитория
+git remote add origin https://github.com/your-username/monitoring3.git
+
+# Пуш в GitHub
+git push -u origin main
