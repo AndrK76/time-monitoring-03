@@ -1,52 +1,69 @@
 version: '3.8'
 
 services:
-  postgres:
+  mon3-pg:
     build:
       context: ./postgres
       dockerfile: Dockerfile
-    container_name: ${CONTAINER_NAME}
-    image: ${IMAGE_NAME}
+    container_name: mon3-pg
+    image: mon3-pg:latest
     environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      PGDATA: /var/lib/postgresql/data/pgdata
+      POSTGRES_DB: ${PG_DB}
+      POSTGRES_USER: ${PG_USER}
+      POSTGRES_PASSWORD: ${PG_PASSWORD}
+      PGDATA: ${PG_DATA_PATH}
       
-      AUTH_USER: ${AUTH_USER}
-      AUTH_PASSWORD: ${AUTH_PASSWORD}
-      AUTH_SCHEMA: ${AUTH_SCHEMA}
-      
-      MONITORING_USER: ${MONITORING_USER}
-      MONITORING_PASSWORD: ${MONITORING_PASSWORD}
-      MONITORING_SCHEMA: ${MONITORING_SCHEMA}
-      
-      ADMIN_USER: ${ADMIN_USER}
-      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
-      ADMIN_SCHEMA: ${ADMIN_SCHEMA}
-      
-      CONTAINER_NAME: ${CONTAINER_NAME}
-      NETWORK_NAME: ${NETWORK_NAME}
-      VOLUME_NAME: ${VOLUME_NAME}
+      AUTH_USER: ${PG_AUTH_USER}
+      AUTH_PASSWORD: ${PG_AUTH_PASSWORD}
+      AUTH_SCHEMA: ${PG_AUTH_SCHEMA}
+      MONITORING_USER: ${PG_MONITORING_USER}
+      MONITORING_PASSWORD: ${PG_MONITORING_PASSWORD}
+      MONITORING_SCHEMA: ${PG_MONITORING_SCHEMA}
+      ADMIN_USER: ${PG_ADMIN_USER}
+      ADMIN_PASSWORD: ${PG_ADMIN_PASSWORD}
+      ADMIN_SCHEMA: ${PG_ADMIN_SCHEMA}
     ports:
-      - "${POSTGRES_PORT}:5432"
+      - "${PG_PORT}:5432"
     volumes:
-      - ${VOLUME_NAME}:/var/lib/postgresql/data
+      - mon3-pg-data:${PG_DATA_PATH}
     networks:
-      - ${NETWORK_NAME}
+      - mon3-net
     restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      test: ["CMD-SHELL", "pg_isready -U ${PG_USER} -d ${PG_DB}"]
       interval: 10s
       timeout: 5s
       retries: 5
       start_period: 10s
 
+  mon3-rabbit:
+    image: rabbitmq:3.13-management-alpine              # Образ с веб-интерфейсом управления
+    container_name: mon3-rabbit
+    hostname: mon3-rabbit                               # Важно: имя хоста внутри сети Docker
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBIT_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBIT_PASSWORD}
+      RABBITMQ_DEFAULT_VHOST: /
+    ports:
+      - "${RABBIT_PORT}:5672"                           # Основной порт для AMQP-соединений
+      - "${RABBIT_WEB_PORT}:15672"                      # Порт для веб-интерфейса управления
+    volumes:
+      - mon3-rabbit-data:${RABBIT_DATA_PATH}            # Сохранение данных между перезапусками
+    networks:
+      - mon3-net
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
 networks:
   mon3-net:
-    name: ${NETWORK_NAME}
+    name: mon3-net
     driver: bridge
 
 volumes:
   mon3-pg-data:
-    name: ${VOLUME_NAME}
+    name: mon3-pg-data
+  mon3-rabbit-data:
+    name: mon3-rabbit-data

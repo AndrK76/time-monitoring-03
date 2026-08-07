@@ -4,24 +4,6 @@ set -e
 
 echo "========================================"
 echo "  Initializing PostgreSQL schemas"
-echo "  Container: ${CONTAINER_NAME}"
-echo "  Network: ${NETWORK_NAME}"
-echo "  Volume: ${VOLUME_NAME}"
-echo "========================================"
-
-# Чтение переменных окружения (с значениями по умолчанию)
-AUTH_USER=${AUTH_USER}
-AUTH_PASSWORD=${AUTH_PASSWORD}
-AUTH_SCHEMA=${AUTH_SCHEMA}
-
-MONITORING_USER=${MONITORING_USER}
-MONITORING_PASSWORD=${MONITORING_PASSWORD}
-MONITORING_SCHEMA=${MONITORING_SCHEMA}
-
-ADMIN_USER=${ADMIN_USER}
-ADMIN_PASSWORD=${ADMIN_PASSWORD}
-ADMIN_SCHEMA=${ADMIN_SCHEMA}
-
 echo "Creating users..."
 psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-EOSQL
     -- Создание пользователей
@@ -52,17 +34,7 @@ psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-E
     -- Создание расширений
     CREATE EXTENSION IF NOT EXISTS "uuid-ossp" SCHEMA public;
 EOSQL
-
-echo "========================================"
 echo "  Initialization completed!"
-echo "========================================"
-echo "  Auth user: $AUTH_USER"
-echo "  Auth schema: $AUTH_SCHEMA"
-echo "  Monitoring user: $MONITORING_USER"
-echo "  Monitoring schema: $MONITORING_SCHEMA"
-echo "  Admin user: $ADMIN_USER"
-echo "  Admin schema: $ADMIN_SCHEMA"
-echo "========================================"
 
 # Проверка создания
 psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-EOSQL

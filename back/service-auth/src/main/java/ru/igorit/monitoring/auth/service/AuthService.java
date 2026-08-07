@@ -295,7 +295,7 @@ public class AuthService {
     }
 
     private String extractTokenFromCookie(HttpServletRequest request) {
-        log.debug("Extracting token from cookie ");
+        //log.debug("Extracting token from cookie ");
         Cookie[] cookies = request.getCookies();
         log.debug("Extracting token from cookie cookies count={}", cookies == null ? "null" : cookies.length);
         if (cookies != null) {

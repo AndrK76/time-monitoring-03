@@ -1,0 +1,1 @@
+docker-compose -p mon3 start
