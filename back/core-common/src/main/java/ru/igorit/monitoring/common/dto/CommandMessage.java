@@ -44,7 +44,7 @@ public class CommandMessage implements Serializable {
     /**
      * Создание команды с текущим SecurityContext
      */
-    public static CommandMessage createWithSecurityContext(String commandType, Object payload) {
+    public static CommandMessage createWithSecurityContext(String commandType, Object payload, String sourceService) {
         SecurityContext context = SecurityContextHolder.getContext();
         Authentication auth = context.getAuthentication();
 
@@ -55,7 +55,7 @@ public class CommandMessage implements Serializable {
                 .userContext(extractUserContext(auth))
                 .securityContext(SecurityContextDto.fromSecurityContext(context))
                 .timestamp(LocalDateTime.now())
-                .sourceService(System.getProperty("spring.application.name", "unknown-service"))
+                .sourceService(sourceService)
                 .correlationId(UUID.randomUUID().toString())
                 .build();
     }

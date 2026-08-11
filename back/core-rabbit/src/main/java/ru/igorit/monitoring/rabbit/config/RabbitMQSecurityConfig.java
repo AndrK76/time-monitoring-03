@@ -1,5 +1,5 @@
 // core-common/src/main/java/ru/igorit/monitoring/common/config/RabbitMQSecurityConfig.java
-package ru.igorit.monitoring.common.config;
+package ru.igorit.monitoring.rabbit.config;
 
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;

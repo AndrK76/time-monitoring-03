@@ -23,6 +23,7 @@
         <module>service-monitoring</module>
         <module>service-admin</module>
         <module>service-auth</module>
+        <module>core-rabbit</module>
     </modules>
 
 </project>

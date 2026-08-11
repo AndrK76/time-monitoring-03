@@ -5,6 +5,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import ru.igorit.monitoring.auth.dto.UpdateUserRequest;
 import ru.igorit.monitoring.auth.dto.UserResponse;
 import ru.igorit.monitoring.auth.mapper.UserMapper;
+import ru.igorit.monitoring.common.dto.UserUpdatedEvent;
+import ru.igorit.monitoring.rabbit.service.CommandSender;
 import ru.igorit.monitoring.persistence.entity.User;
 import ru.igorit.monitoring.persistence.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +15,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,6 +26,7 @@ public class UserManagementService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final CommandSender commandSender;
 
     // ============================================================
     // Публичные методы — Просмотр
@@ -52,8 +56,10 @@ public class UserManagementService {
     public UserResponse updateCurrentUser(UpdateUserRequest request) {
         User user = getCurrentUserEntity();
         updatePersonalFields(user, request);
+        User saved = userRepository.save(user);
+        sendUserUpdatedEvent(saved, false);
         log.info("User updated self-info: {}", user.getUsername());
-        return toResponse(userRepository.save(user));
+        return toResponse(saved);
     }
 
     @PreAuthorize("hasAuthority('USER_WRITE')")
@@ -61,8 +67,10 @@ public class UserManagementService {
     public UserResponse updateUser(String userId, UpdateUserRequest request) {
         User user = getUserEntityById(userId);
         updateAllFields(user, request);
+        User saved = userRepository.save(user);
+        sendUserUpdatedEvent(saved, true);
         log.info("User fully updated: {}", user.getUsername());
-        return toResponse(userRepository.save(user));
+        return toResponse(saved);
     }
 
     /**
@@ -111,5 +119,35 @@ public class UserManagementService {
         user.setFirstName(request.getFirstName());
         user.setLastName(request.getLastName());
         user.setDisplayName(request.getDisplayName());
+    }
+
+    /**
+     * Приватный метод для отправки события
+     */
+    private void sendUserUpdatedEvent(User user, boolean fullUpdate) {
+        try {
+            UserUpdatedEvent event = UserUpdatedEvent.builder()
+                    .userId(user.getId())
+                    .username(user.getUsername())
+                    .email(user.getEmail())
+                    .firstName(user.getFirstName())
+                    .lastName(user.getLastName())
+                    .displayName(user.getDisplayName())
+                    .updatedAt(LocalDateTime.now())
+                    .updatedBy(getCurrentUsername())
+                    .fullUpdate(fullUpdate)
+                    .build();
+
+            commandSender.sendUserUpdatedEvent(event);
+            log.info("User updated event sent for user: {}", user.getUsername());
+        } catch (Exception e) {
+            // Не даём упасть приложению, если RabbitMQ недоступен
+            log.error("Failed to send user updated event for user: {}", user.getUsername(), e);
+        }
+    }
+
+    private String getCurrentUsername() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        return auth != null ? auth.getName() : "system";
     }
 }

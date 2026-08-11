@@ -3,6 +3,7 @@
   <component name="Encoding">
     <file url="file://$PROJECT_DIR$/core-common/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/core-persistence/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/core-rabbit/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/core-security/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/core-telegram/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/core-web/src/main/java" charset="UTF-8" />

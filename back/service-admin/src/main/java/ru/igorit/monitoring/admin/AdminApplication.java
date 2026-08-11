@@ -15,7 +15,8 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
         "ru.igorit.monitoring.security",
         "ru.igorit.monitoring.web",
         "ru.igorit.monitoring.persistence",
-        "ru.igorit.monitoring.common"
+        "ru.igorit.monitoring.common",
+        "ru.igorit.monitoring.rabbit"
 })
 @EntityScan(basePackages = {"ru.igorit.monitoring.persistence.entity"})
 @EnableJpaRepositories(basePackages = {"ru.igorit.monitoring.persistence.repository"})

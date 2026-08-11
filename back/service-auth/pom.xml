@@ -40,6 +40,11 @@
             <artifactId>core-web</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>ru.igorit.monitoring</groupId>
+            <artifactId>core-rabbit</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
         <!-- Spring Boot -->
         <dependency>
