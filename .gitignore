@@ -88,13 +88,11 @@ docker-compose.override.yml
 # ============================================
 
 # IntelliJ IDEA
-.idea/
 *.iml
 *.iws
 *.ipr
 out/
 .idea_modules/
-.idea/**/workspace.xml
 .idea/**/tasks.xml
 .idea/**/dictionaries
 .idea/**/shelf
@@ -124,7 +122,6 @@ nb-configuration.xml
 nbbuild/
 dist/
 nbdist/
-.idea/
 *.iml
 *.ipr
 *.iws

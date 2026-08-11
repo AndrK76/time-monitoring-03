@@ -19,7 +19,6 @@
 **/*.war
 
 # IDE files
-.idea/
 *.iml
 .vscode/
 .settings/

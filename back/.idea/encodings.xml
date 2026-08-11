@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/core-common/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/core-persistence/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/core-security/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/core-telegram/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/core-web/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/service-admin/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/service-auth/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/service-monitoring/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/spring-boot-parent/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/spring-boot-parent/src/main/resources" charset="UTF-8" />
+  </component>
+</project>
