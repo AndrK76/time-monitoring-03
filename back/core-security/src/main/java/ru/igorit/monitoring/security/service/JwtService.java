@@ -1,4 +1,3 @@
-// core-security/src/main/java/ru/igorit/monitoring/security/service/JwtService.java
 package ru.igorit.monitoring.security.service;
 
 import io.jsonwebtoken.Claims;
@@ -14,6 +13,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -45,13 +45,15 @@ public class JwtService {
      * Генерация access токена с ролями и правами
      */
     public String generateToken(String userId, String username,
-                                java.util.List<String> roles,
-                                java.util.List<String> permissions) {
+                                List<String> roles,
+                                List<String> permissions,
+                                List<String> allowedOrganizations) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("userId", userId);
         claims.put("username", username);
-        claims.put("roles", roles != null ? roles : java.util.List.of());
-        claims.put("permissions", permissions != null ? permissions : java.util.List.of());
+        claims.put("roles", roles != null ? roles : List.of());
+        claims.put("permissions", permissions != null ? permissions : List.of());
+        claims.put("allowedOrganizations", allowedOrganizations != null ? allowedOrganizations : List.of());
 
         return Jwts.builder()
                 .claims(claims)
@@ -62,12 +64,6 @@ public class JwtService {
                 .compact();
     }
 
-    /**
-     * Генерация access токена (упрощенный вариант)
-     */
-    public String generateToken(String userId, String username) {
-        return generateToken(userId, username, java.util.List.of(), java.util.List.of());
-    }
 
     /**
      * Генерация refresh токена
@@ -104,16 +100,16 @@ public class JwtService {
      * Извлечение ролей из токена
      */
     @SuppressWarnings("unchecked")
-    public java.util.List<String> extractRoles(String token) {
+    public List<String> extractRoles(String token) {
         try {
             Claims claims = extractAllClaims(token);
             Object roles = claims.get("roles");
-            if (roles instanceof java.util.List) {
-                return (java.util.List<String>) roles;
+            if (roles instanceof List) {
+                return (List<String>) roles;
             }
-            return java.util.List.of();
+            return List.of();
         } catch (Exception e) {
-            return java.util.List.of();
+            return List.of();
         }
     }
 
@@ -121,16 +117,30 @@ public class JwtService {
      * Извлечение прав из токена
      */
     @SuppressWarnings("unchecked")
-    public java.util.List<String> extractPermissions(String token) {
+    public List<String> extractPermissions(String token) {
         try {
             Claims claims = extractAllClaims(token);
             Object permissions = claims.get("permissions");
-            if (permissions instanceof java.util.List) {
-                return (java.util.List<String>) permissions;
+            if (permissions instanceof List) {
+                return (List<String>) permissions;
             }
-            return java.util.List.of();
+            return List.of();
         } catch (Exception e) {
-            return java.util.List.of();
+            return List.of();
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<String> extractAllowedOrganizations(String token) {
+        try {
+            Claims claims = extractAllClaims(token);
+            Object organizations = claims.get("allowedOrganizations");
+            if (organizations instanceof List) {
+                return (List<String>) organizations;
+            }
+            return List.of();
+        } catch (Exception e) {
+            return List.of();
         }
     }
 

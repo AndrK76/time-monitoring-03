@@ -24,6 +24,9 @@ export interface UpdateUserRequest {
   firstName: string;
   lastName: string;
   displayName: string;
+  active?: boolean;
+  emailVerified?: boolean;
+  roles?: string[];
 }
 
 export interface UserResponse {
@@ -34,8 +37,27 @@ export interface UserResponse {
   lastName: string;
   displayName: string;
   avatarUrl?: string;
+  active: boolean;
+  emailVerified: boolean;
   roles: string[];
   permissions: string[];
+  anonymous: boolean;
+}
+
+export interface UserListItem {
+  id: string;
+  username: string;
+  displayName: string;
+}
+
+export interface RoleDto {
+  name: string;
+  description: string;
+}
+
+export interface PermissionDto {
+  name: string;
+  description: string;
 }
 
 export interface TokenResponse {

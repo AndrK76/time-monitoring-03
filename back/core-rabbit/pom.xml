@@ -26,6 +26,13 @@
             <version>${project.version}</version>
         </dependency>
 
+        <!-- Core security -->
+        <dependency>
+            <groupId>ru.igorit.monitoring</groupId>
+            <artifactId>core-security</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
         <!-- Spring AMQP -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

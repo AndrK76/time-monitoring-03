@@ -20,7 +20,10 @@ public class UserResponse {
     private String lastName;
     private String displayName;
     private String avatarUrl;
+    private boolean active;
+    private boolean emailVerified;
     private List<String> roles;
     private List<String> permissions;
     private boolean anonymous;
+
 }

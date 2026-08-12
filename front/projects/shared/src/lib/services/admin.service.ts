@@ -1,7 +1,7 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { AuthService } from './auth.service';
-import { TestResponse, UpdateUserRequest, UserResponse } from '../models/auth.models';
+import { PermissionDto, RoleDto, TestResponse, UpdateUserRequest, UserListItem, UserResponse } from '../models/auth.models';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -35,35 +35,72 @@ export class AdminService {
   // Управление пользователями
   // ============================================================
 
-  getAllUsers(): Observable<UserResponse[]> {
-    return this.http.get<UserResponse[]>(`${this.authApiUrl}/users`, {
-      headers: this.getHeaders()
-    });
-  }
-
-  getUserById(userId: string): Observable<UserResponse> {
-    return this.http.get<UserResponse>(`${this.authApiUrl}/users/${userId}`, {
-      headers: this.getHeaders()
-    });
-  }
-
   getCurrentUser(): Observable<UserResponse> {
-    return this.http.get<UserResponse>(`${this.authApiUrl}/users/me`, {
-      headers: this.getHeaders()
-    });
-  }
-
-  updateUser(userId: string, data: UpdateUserRequest): Observable<UserResponse> {
-    return this.http.put<UserResponse>(`${this.authApiUrl}/users/${userId}`, data, {
+    return this.http.get<UserResponse>(`${this.authApiUrl}/usermanage/users/me`, {
       headers: this.getHeaders()
     });
   }
 
   updateCurrentUser(data: UpdateUserRequest): Observable<UserResponse> {
-    return this.http.put<UserResponse>(`${this.authApiUrl}/users/me`, data, {
+    return this.http.put<UserResponse>(`${this.authApiUrl}/usermanage/users/me`, data, {
       headers: this.getHeaders()
     });
   }
+
+  getCurrentUserRoles(): Observable<RoleDto[]> {
+    return this.http.get<RoleDto[]>(`${this.authApiUrl}/usermanage/users/me/roles`, {
+      headers: this.getHeaders()
+    });
+  }
+
+  getCurrentUserPermissions(): Observable<PermissionDto[]> {
+    return this.http.get<PermissionDto[]>(`${this.authApiUrl}/usermanage/users/me/permissions`, {
+      headers: this.getHeaders()
+    });
+  }
+
+  getUsersList(): Observable<UserListItem[]> {
+    return this.http.get<UserListItem[]>(`${this.authApiUrl}/usermanage/users`, {
+      headers: this.getHeaders()
+    });
+  }
+
+  getUserById(userId: string): Observable<UserResponse> {
+    return this.http.get<UserResponse>(`${this.authApiUrl}/usermanage/users/${userId}`, {
+      headers: this.getHeaders()
+    });
+  }
+
+  updateUser(userId: string, data: UpdateUserRequest): Observable<UserResponse> {
+    return this.http.put<UserResponse>(`${this.authApiUrl}/usermanage/users/${userId}`, data, {
+      headers: this.getHeaders()
+    });
+  }
+
+  getUserRoles(userId: string): Observable<RoleDto[]> {
+    return this.http.get<RoleDto[]>(`${this.authApiUrl}/usermanage/users/${userId}/roles`, {
+      headers: this.getHeaders()
+    });
+  }
+
+  getUserPermissions(userId: string): Observable<PermissionDto[]> {
+    return this.http.get<PermissionDto[]>(`${this.authApiUrl}/usermanage/users/${userId}/permissions`, {
+      headers: this.getHeaders()
+    });
+  }
+
+  getAllRoles(): Observable<RoleDto[]> {
+    return this.http.get<RoleDto[]>(`${this.authApiUrl}/usermanage/roles`, {
+      headers: this.getHeaders()
+    });
+  }
+
+  getAllPermissions(): Observable<PermissionDto[]> {
+    return this.http.get<PermissionDto[]>(`${this.authApiUrl}/usermanage/permissions`, {
+      headers: this.getHeaders()
+    });
+  }
+
 
 
   // ============================================================

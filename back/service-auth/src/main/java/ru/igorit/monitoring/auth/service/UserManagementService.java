@@ -2,10 +2,13 @@ package ru.igorit.monitoring.auth.service;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import ru.igorit.monitoring.auth.dto.UpdateUserRequest;
-import ru.igorit.monitoring.auth.dto.UserResponse;
-import ru.igorit.monitoring.auth.mapper.UserMapper;
+import ru.igorit.monitoring.auth.dto.*;
+import ru.igorit.monitoring.auth.mapper.UserManagementMapper;
 import ru.igorit.monitoring.common.dto.UserUpdatedEvent;
+import ru.igorit.monitoring.common.enums.CommandType;
+import ru.igorit.monitoring.persistence.entity.Role;
+import ru.igorit.monitoring.persistence.repository.PermissionRepository;
+import ru.igorit.monitoring.persistence.repository.RoleRepository;
 import ru.igorit.monitoring.rabbit.service.CommandSender;
 import ru.igorit.monitoring.persistence.entity.User;
 import ru.igorit.monitoring.persistence.repository.UserRepository;
@@ -16,7 +19,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,31 +30,36 @@ import java.util.stream.Collectors;
 public class UserManagementService {
 
     private final UserRepository userRepository;
-    private final UserMapper userMapper;
+    private final RoleRepository roleRepository;
+    private final PermissionRepository permissionRepository;
+    private final UserManagementMapper userManagementMapper;
     private final CommandSender commandSender;
 
     // ============================================================
-    // Публичные методы — Просмотр
+    // Публичные методы. Пользователь — Просмотр
     // ============================================================
 
     @PreAuthorize("hasAuthority('USER_READ')")
-    public List<UserResponse> getAllUsers() {
+    @Transactional(readOnly = true)
+    public List<UserListItem> getUserList() {
         return userRepository.findAll().stream()
-                .map(userMapper::toResponse)
+                .map(userManagementMapper::toUserListItem)
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public UserResponse getCurrentUser() {
         return toResponse(getCurrentUserEntity());
     }
 
     @PreAuthorize("hasAuthority('USER_READ')")
+    @Transactional(readOnly = true)
     public UserResponse getUserById(String userId) {
         return toResponse(getUserEntityById(userId));
     }
 
     // ============================================================
-    // Публичные методы — Обновление
+    // Публичные методы. Пользователь — Обновление
     // ============================================================
 
     @Transactional
@@ -67,11 +77,80 @@ public class UserManagementService {
     public UserResponse updateUser(String userId, UpdateUserRequest request) {
         User user = getUserEntityById(userId);
         updateAllFields(user, request);
+        Optional.ofNullable(request.getActive()).ifPresent(user::setIsActive);
+        Optional.ofNullable(request.getEmailVerified()).ifPresent(user::setIsEmailVerified);
+        if (request.getRoles() != null) {
+            List<Role> roles = roleRepository.findByNameIn(request.getRoles());
+            user.setRoles(new HashSet<>(roles));
+        }
         User saved = userRepository.save(user);
         sendUserUpdatedEvent(saved, true);
         log.info("User fully updated: {}", user.getUsername());
         return toResponse(saved);
     }
+
+    // ============================================================
+    // Публичные методы. Роль — Просмотр
+    // ============================================================
+    @PreAuthorize("hasAuthority('USER_READ')")
+    @Transactional(readOnly = true)
+    public List<RoleDto> getAllRoles() {
+        return roleRepository.findAll().stream()
+                .map(role -> RoleDto.builder()
+                        .name(role.getName())
+                        .description(role.getDescription())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
+
+    @PreAuthorize("hasAuthority('USER_READ')")
+    @Transactional(readOnly = true)
+    public List<RoleDto> getUserRoles(String userId) {
+        User user = getUserEntityById(userId);
+        return user.getRoles().stream()
+                .map(userManagementMapper::toRoleDto)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<RoleDto> getCurrentUserRoles() {
+        User user = getCurrentUserEntity();
+        return user.getRoles().stream()
+                .map(userManagementMapper::toRoleDto)
+                .collect(Collectors.toList());
+    }
+
+    // ============================================================
+    // Публичные методы. Полномочия — Просмотр
+    // ============================================================
+    @PreAuthorize("hasAuthority('USER_READ')")
+    @Transactional(readOnly = true)
+    public List<PermissionDto> getAllPermissions() {
+        return permissionRepository.findAll().stream()
+                .map(userManagementMapper::toPermissionDto)
+                .collect(Collectors.toList());
+    }
+
+    @PreAuthorize("hasAuthority('USER_READ')")
+    @Transactional(readOnly = true)
+    public List<PermissionDto> getUserPermissions(String userId) {
+        User user = getUserEntityById(userId);
+        return user.getRoles().stream()
+                .flatMap(role -> role.getPermissions().stream())
+                .map(userManagementMapper::toPermissionDto)
+                .distinct().collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<PermissionDto> getCurrentUserPermissions() {
+        User user = getCurrentUserEntity();
+        return user.getRoles().stream()
+                .flatMap(role -> role.getPermissions().stream())
+                .map(userManagementMapper::toPermissionDto)
+                .distinct().collect(Collectors.toList());
+    }
+
 
     /**
      * Получение текущего пользователя из SecurityContext
@@ -98,7 +177,7 @@ public class UserManagementService {
      * Преобразование User в UserResponse
      */
     private UserResponse toResponse(User user) {
-        return userMapper.toResponse(user);
+        return userManagementMapper.toResponse(user);
     }
 
     /**
@@ -138,7 +217,7 @@ public class UserManagementService {
                     .fullUpdate(fullUpdate)
                     .build();
 
-            commandSender.sendUserUpdatedEvent(event);
+            commandSender.sendCommand(CommandType.USER_UPDATED, event);
             log.info("User updated event sent for user: {}", user.getUsername());
         } catch (Exception e) {
             // Не даём упасть приложению, если RabbitMQ недоступен

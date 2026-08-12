@@ -6,6 +6,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
 @Builder
@@ -20,8 +23,10 @@ public class UserContext implements Serializable {
     private String email;
     private String firstName;
     private String lastName;
+    private String displayName;
     private String roles;
     private String permissions;
+    private String allowedOrganizations;
     private String sessionId;
     private String ipAddress;
     private boolean authenticated;
@@ -91,5 +96,32 @@ public class UserContext implements Serializable {
             }
         }
         return false;
+    }
+
+    /**
+     * Проверка доступа к организации
+     */
+    public boolean isAllowedOrganization(String organizationId) {
+        if (allowedOrganizations == null || allowedOrganizations.isEmpty()) {
+            return false;
+        }
+        for (String org : allowedOrganizations.split(",")) {
+            if (org.trim().equals(organizationId)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Получить доступные организации списком
+     */
+    public List<String> getAllowedOrganizationsList() {
+        if (allowedOrganizations == null || allowedOrganizations.isEmpty()) {
+            return List.of();
+        }
+        return Arrays.stream(allowedOrganizations.split(","))
+                .map(String::trim)
+                .collect(Collectors.toList());
     }
 }

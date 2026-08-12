@@ -41,12 +41,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 String username = jwtService.extractUsername(token);
                 List<String> roles = jwtService.extractRoles(token);
                 List<String> permissions = jwtService.extractPermissions(token);
+                List<String> allowedOrganizations = jwtService.extractAllowedOrganizations(token);
 
                 JwtAuthenticationToken authentication = new JwtAuthenticationToken(
                         userId,
                         username,
                         roles != null ? roles : List.of(),
                         permissions != null ? permissions : List.of(),
+                        allowedOrganizations != null ? allowedOrganizations : List.of(),
                         token
                 );
 

@@ -18,16 +18,18 @@ public class JwtAuthenticationToken implements Authentication {
     private final String token;
     private final List<String> roles;
     private final List<String> permissions;
+    private final List<String> allowedOrganizations;
     private final Collection<? extends GrantedAuthority> authorities;
     private boolean authenticated = true;
 
     public JwtAuthenticationToken(String userId, String username,
-                                  List<String> roles, List<String> permissions,
+                                  List<String> roles, List<String> permissions, List<String> allowedOrganizations,
                                   String token) {
         this.userId = userId;
         this.username = username;
         this.roles = roles != null ? roles : List.of();
         this.permissions = permissions != null ? permissions : List.of();
+        this.allowedOrganizations = allowedOrganizations != null ? allowedOrganizations : List.of();
         this.token = token;
 
         // Объединяем роли и права в authorities
@@ -54,7 +56,7 @@ public class JwtAuthenticationToken implements Authentication {
 
     @Override
     public Object getPrincipal() {
-        return username;
+        return userId;
     }
 
     @Override
@@ -109,6 +111,13 @@ public class JwtAuthenticationToken implements Authentication {
             }
         }
         return false;
+    }
+
+    /**
+     * Проверка доступа к организации
+     */
+    public boolean isAllowedOrganization(String organizationId) {
+        return allowedOrganizations.contains(organizationId);
     }
 
     @Override

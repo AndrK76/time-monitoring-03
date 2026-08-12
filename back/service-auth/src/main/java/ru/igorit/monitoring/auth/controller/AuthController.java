@@ -24,8 +24,13 @@ public class AuthController {
     public ResponseEntity<TokenResponse> login(@Valid @RequestBody LoginRequest request,
                                                HttpServletResponse response) {
         log.info("Login attempt for user: {}", request.getUsername());
-        TokenResponse tokenResponse  = authService.login(request, response);
-        return ResponseEntity.ok(tokenResponse );
+        try {
+            TokenResponse tokenResponse  = authService.login(request, response);
+            return ResponseEntity.ok(tokenResponse );
+        } catch (Exception e) {
+            log.error("{}: {}",e.getClass().getName(), e.getMessage());
+            throw new RuntimeException(e);
+        }
     }
 
     @PostMapping("/register")

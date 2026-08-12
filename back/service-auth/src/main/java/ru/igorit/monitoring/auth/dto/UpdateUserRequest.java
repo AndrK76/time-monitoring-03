@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -27,4 +29,10 @@ public class UpdateUserRequest {
 
     @NotBlank(message = "Display name is required")
     private String displayName;
+
+
+    private Boolean active;
+    private Boolean emailVerified;
+
+    private List<String> roles;
 }

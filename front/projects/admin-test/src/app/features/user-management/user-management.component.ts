@@ -3,7 +3,15 @@ import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AdminService, UserResponse, UpdateUserRequest, AuthService } from '@mon3/shared';
+import {
+  AdminService,
+  UserResponse,
+  UserListItem,
+  UpdateUserRequest,
+  AuthService,
+  RoleDto,
+  PermissionDto
+} from '@mon3/shared';
 
 @Component({
   selector: 'app-user-management',
@@ -17,20 +25,40 @@ export class UserManagementComponent implements OnInit {
   private authService = inject(AuthService);
   private router = inject(Router);
 
-  users: UserResponse[] = [];
-  selectedUser: UserResponse | null = null;
+  // ============================================================
+  // Данные
+  // ============================================================
+
+  users: UserListItem[] = [];
+  selectedUser: UserListItem | null = null;
+  fullUser: UserResponse | null = null;
   editingUser: UserResponse | null = null;
+
+  // Справочники
+  rolesMap: Map<string, string> = new Map();
+  permissionsMap: Map<string, string> = new Map();
+  allRoles: RoleDto[] = [];
+
   isLoading = false;
+  isUserLoading = false;
   errorMessage = '';
   successMessage = '';
   isAdmin = false;
   currentUserId = '';
 
+  // ============================================================
+  // Жизненный цикл
+  // ============================================================
+
   ngOnInit(): void {
     this.currentUserId = this.authService.currentUser()?.id || '';
     this.checkPermissions();
-    this.loadUsers();
+    this.loadData();
   }
+
+  // ============================================================
+  // Методы
+  // ============================================================
 
   goBack(): void {
     this.router.navigate(['/admin']);
@@ -38,19 +66,18 @@ export class UserManagementComponent implements OnInit {
 
   checkPermissions(): void {
     const permissions = this.authService.currentUser()?.permissions || [];
-    this.isAdmin = permissions.includes('USER_WRITE');
+    this.isAdmin = permissions.includes('USER_READ') || permissions.includes('USER_WRITE');
   }
 
-  loadUsers(): void {
+  loadData(): void {
     this.isLoading = true;
     this.errorMessage = '';
 
-    // Если есть право USER_READ — загружаем всех
     const hasReadPermission = this.authService.currentUser()?.permissions?.includes('USER_READ') || false;
 
     if (hasReadPermission) {
-      // Админ — загружаем всех
-      this.adminService.getAllUsers().subscribe({
+      this.loadDictionaries();
+      this.adminService.getUsersList().subscribe({
         next: (users) => {
           this.users = users;
           this.isLoading = false;
@@ -61,13 +88,20 @@ export class UserManagementComponent implements OnInit {
         }
       });
     } else {
-      // Обычный пользователь — загружаем только себя
       this.adminService.getCurrentUser().subscribe({
         next: (user) => {
-          this.users = [user];
+          this.fullUser = user;
+          this.editingUser = { ...user };
+
+          const userListItem: UserListItem = {
+            id: user.id,
+            username: user.username,
+            displayName: user.displayName || user.username
+          };
+          this.users = [userListItem];
+          this.selectedUser = userListItem;
+
           this.isLoading = false;
-          // Автоматически выбираем себя
-          this.selectUser(user);
         },
         error: (err) => {
           this.errorMessage = err.error?.message || 'Ошибка загрузки пользователя';
@@ -77,18 +111,104 @@ export class UserManagementComponent implements OnInit {
     }
   }
 
-  selectUser(user: UserResponse): void {
+  loadDictionaries(): void {
+    if (!this.isAdmin) return;
+
+    this.adminService.getAllRoles().subscribe({
+      next: (roles: RoleDto[]) => {
+        this.allRoles = roles;
+        roles.forEach(r => this.rolesMap.set(r.name, r.description));
+      },
+      error: (err) => {
+        console.error('Failed to load roles:', err);
+      }
+    });
+
+    this.adminService.getAllPermissions().subscribe({
+      next: (permissions: PermissionDto[]) => {
+        permissions.forEach(p => this.permissionsMap.set(p.name, p.description));
+      },
+      error: (err) => {
+        console.error('Failed to load permissions:', err);
+      }
+    });
+  }
+
+  selectUser(user: UserListItem): void {
+    // Если уже выбран этот пользователь и есть данные — ничего не делаем
+    if (this.selectedUser?.id === user.id && this.fullUser) {
+      return;
+    }
+
     this.selectedUser = user;
-    this.editingUser = { ...user };
+    this.isUserLoading = true;
     this.errorMessage = '';
     this.successMessage = '';
+
+    const isSelf = this.isCurrentUser(user.id);
+    const hasReadPermission = this.authService.currentUser()?.permissions?.includes('USER_READ') || false;
+
+    if (!isSelf && !hasReadPermission) {
+      this.errorMessage = 'У вас нет прав для просмотра этого пользователя';
+      this.isUserLoading = false;
+      this.selectedUser = null;
+      return;
+    }
+
+    // ✅ Если это свои данные — всегда используем /me
+    if (isSelf) {
+      this.adminService.getCurrentUser().subscribe({
+        next: (full) => {
+          this.fullUser = full;
+          this.editingUser = { ...full };
+          this.isUserLoading = false;
+        },
+        error: (err) => {
+          this.errorMessage = err.error?.message || 'Ошибка загрузки данных пользователя';
+          this.isUserLoading = false;
+        }
+      });
+      return;
+    }
+
+    // Если это другие данные — загружаем через getUserById (только для админов)
+    this.adminService.getUserById(user.id).subscribe({
+      next: (full) => {
+        this.fullUser = full;
+        this.editingUser = { ...full };
+        this.isUserLoading = false;
+      },
+      error: (err) => {
+        this.errorMessage = err.error?.message || 'Ошибка загрузки данных пользователя';
+        this.isUserLoading = false;
+      }
+    });
   }
 
   cancelEdit(): void {
     this.editingUser = null;
     this.selectedUser = null;
+    this.fullUser = null;
     this.errorMessage = '';
     this.successMessage = '';
+
+    // ✅ Если это не админ — после отмены снова загружаем себя через /me
+    if (!this.isAdmin && this.users.length === 1) {
+      this.adminService.getCurrentUser().subscribe({
+        next: (user) => {
+          this.fullUser = user;
+          this.editingUser = { ...user };
+          this.selectedUser = {
+            id: user.id,
+            username: user.username,
+            displayName: user.displayName || user.username
+          };
+        },
+        error: (err) => {
+          console.error('Failed to reload user after cancel:', err);
+        }
+      });
+    }
   }
 
   saveUser(): void {
@@ -98,6 +218,14 @@ export class UserManagementComponent implements OnInit {
     this.errorMessage = '';
     this.successMessage = '';
 
+    const isSelf = this.isCurrentUser(this.editingUser.id);
+
+    if (!isSelf && !this.isAdmin) {
+      this.errorMessage = 'У вас нет прав для редактирования других пользователей';
+      this.isLoading = false;
+      return;
+    }
+
     const updateData: UpdateUserRequest = {
       username: this.editingUser.username,
       email: this.editingUser.email,
@@ -106,14 +234,16 @@ export class UserManagementComponent implements OnInit {
       displayName: this.editingUser.displayName
     };
 
-    const isSelf = this.isCurrentUser(this.editingUser.id);
+    if (this.isAdmin) {
+      updateData.active = this.editingUser.active;
+      updateData.emailVerified = this.editingUser.emailVerified;
+      updateData.roles = this.editingUser.roles;
+    }
 
     let request;
     if (isSelf) {
-      // Обновляем себя — доступно всем
       request = this.adminService.updateCurrentUser(updateData);
     } else {
-      // Обновляем другого — требует USER_WRITE
       request = this.adminService.updateUser(this.editingUser.id, updateData);
     }
 
@@ -121,9 +251,9 @@ export class UserManagementComponent implements OnInit {
       next: (updated) => {
         this.successMessage = '✅ Пользователь успешно обновлён';
         this.isLoading = false;
-        this.loadUsers();
-        this.selectedUser = updated;
+        this.fullUser = updated;
         this.editingUser = { ...updated };
+        this.loadData();
       },
       error: (err) => {
         this.errorMessage = err.error?.message || 'Ошибка обновления пользователя';
@@ -137,21 +267,41 @@ export class UserManagementComponent implements OnInit {
   }
 
   canEdit(userId: string): boolean {
-    // Админ может редактировать всех, пользователь — только себя
     return this.isAdmin || this.isCurrentUser(userId);
   }
 
-  // Определяем, можно ли редактировать поле
   canEditField(fieldName: string): boolean {
-    // Если админ — может редактировать всё
     if (this.isAdmin) return true;
+    if (!this.fullUser) return false;
+    if (!this.isCurrentUser(this.fullUser.id)) return false;
 
-    // Если обычный пользователь — только свои данные
-    if (!this.selectedUser) return false;
-    if (!this.isCurrentUser(this.selectedUser.id)) return false;
-
-    // Обычный пользователь может менять только: firstName, lastName, displayName
     const allowedFields = ['firstName', 'lastName', 'displayName'];
     return allowedFields.includes(fieldName);
+  }
+
+  isRoleSelected(roleName: string): boolean {
+    return this.editingUser?.roles?.includes(roleName) || false;
+  }
+
+  toggleRole(roleName: string): void {
+    if (!this.editingUser) return;
+    if (!this.editingUser.roles) {
+      this.editingUser.roles = [];
+    }
+
+    const index = this.editingUser.roles.indexOf(roleName);
+    if (index > -1) {
+      this.editingUser.roles.splice(index, 1);
+    } else {
+      this.editingUser.roles.push(roleName);
+    }
+  }
+
+  getRoleDescription(roleName: string): string {
+    return this.rolesMap.get(roleName) || roleName;
+  }
+
+  getPermissionDescription(permissionName: string): string {
+    return this.permissionsMap.get(permissionName) || permissionName;
   }
 }
