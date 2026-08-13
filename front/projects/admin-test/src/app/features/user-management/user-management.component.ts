@@ -39,12 +39,26 @@ export class UserManagementComponent implements OnInit {
   permissionsMap: Map<string, string> = new Map();
   allRoles: RoleDto[] = [];
 
+  // Состояние
   isLoading = false;
   isUserLoading = false;
   errorMessage = '';
   successMessage = '';
   isAdmin = false;
   currentUserId = '';
+
+  // ============================================================
+  // Модальное окно смены пароля
+  // ============================================================
+
+  showPasswordModal = false;
+  passwordModalUserId = '';
+  passwordModalUsername = '';
+  newPassword = '';
+  confirmPassword = '';
+  passwordError = '';
+  passwordSuccess = '';
+  isPasswordLoading = false;
 
   // ============================================================
   // Жизненный цикл
@@ -135,7 +149,6 @@ export class UserManagementComponent implements OnInit {
   }
 
   selectUser(user: UserListItem): void {
-    // Если уже выбран этот пользователь и есть данные — ничего не делаем
     if (this.selectedUser?.id === user.id && this.fullUser) {
       return;
     }
@@ -155,7 +168,6 @@ export class UserManagementComponent implements OnInit {
       return;
     }
 
-    // ✅ Если это свои данные — всегда используем /me
     if (isSelf) {
       this.adminService.getCurrentUser().subscribe({
         next: (full) => {
@@ -171,7 +183,6 @@ export class UserManagementComponent implements OnInit {
       return;
     }
 
-    // Если это другие данные — загружаем через getUserById (только для админов)
     this.adminService.getUserById(user.id).subscribe({
       next: (full) => {
         this.fullUser = full;
@@ -192,7 +203,6 @@ export class UserManagementComponent implements OnInit {
     this.errorMessage = '';
     this.successMessage = '';
 
-    // ✅ Если это не админ — после отмены снова загружаем себя через /me
     if (!this.isAdmin && this.users.length === 1) {
       this.adminService.getCurrentUser().subscribe({
         next: (user) => {
@@ -261,6 +271,86 @@ export class UserManagementComponent implements OnInit {
       }
     });
   }
+
+  // ============================================================
+  // Управление паролями (только для админов)
+  // ============================================================
+
+  openPasswordModal(user: UserListItem): void {
+    if (!this.isAdmin) return;
+    this.passwordModalUserId = user.id;
+    this.passwordModalUsername = user.displayName || user.username;
+    this.newPassword = '';
+    this.confirmPassword = '';
+    this.passwordError = '';
+    this.passwordSuccess = '';
+    this.showPasswordModal = true;
+  }
+
+  closePasswordModal(): void {
+    this.showPasswordModal = false;
+    this.passwordModalUserId = '';
+    this.passwordModalUsername = '';
+    this.newPassword = '';
+    this.confirmPassword = '';
+    this.passwordError = '';
+    this.passwordSuccess = '';
+    this.isPasswordLoading = false;
+  }
+
+  resetPassword(): void {
+    if (!this.passwordModalUserId) return;
+
+    this.isPasswordLoading = true;
+    this.passwordError = '';
+    this.passwordSuccess = '';
+
+    this.adminService.resetPassword(this.passwordModalUserId).subscribe({
+      next: () => {
+        this.passwordSuccess = '✅ Пароль успешно сброшен до значения по умолчанию';
+        this.isPasswordLoading = false;
+        setTimeout(() => this.closePasswordModal(), 2000);
+      },
+      error: (err) => {
+        this.passwordError = err.error?.message || 'Ошибка сброса пароля';
+        this.isPasswordLoading = false;
+      }
+    });
+  }
+
+  setNewPassword(): void {
+    if (!this.passwordModalUserId) return;
+
+    if (this.newPassword.length < 6) {
+      this.passwordError = 'Пароль должен быть не менее 6 символов';
+      return;
+    }
+
+    if (this.newPassword !== this.confirmPassword) {
+      this.passwordError = 'Пароли не совпадают';
+      return;
+    }
+
+    this.isPasswordLoading = true;
+    this.passwordError = '';
+    this.passwordSuccess = '';
+
+    this.adminService.setPassword(this.passwordModalUserId, this.newPassword).subscribe({
+      next: () => {
+        this.passwordSuccess = '✅ Пароль успешно установлен';
+        this.isPasswordLoading = false;
+        setTimeout(() => this.closePasswordModal(), 2000);
+      },
+      error: (err) => {
+        this.passwordError = err.error?.message || 'Ошибка установки пароля';
+        this.isPasswordLoading = false;
+      }
+    });
+  }
+
+  // ============================================================
+  // Вспомогательные методы
+  // ============================================================
 
   isCurrentUser(userId: string): boolean {
     return userId === this.currentUserId;

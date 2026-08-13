@@ -33,6 +33,8 @@
                 </div>
                 <div *ngIf="isCurrentUser(user.id)" class="user-badge">Вы</div>
                 <div *ngIf="!canEdit(user.id)" class="user-badge readonly">Только просмотр</div>
+                <!-- Кнопка смены пароля для админов -->
+                <button *ngIf="isAdmin" class="btn-password" (click)="openPasswordModal(user)">🔑</button>
             </div>
         </div>
 
@@ -88,9 +90,7 @@
                         <span *ngIf="!canEditField('lastName')" class="field-value">{{ fullUser.lastName }}</span>
                     </div>
 
-                    <!-- ════════════════════════════════════════════════ -->
-                    <!-- СТАТУСЫ — только для админов                    -->
-                    <!-- ════════════════════════════════════════════════ -->
+                    <!-- Статусы — только для админов -->
                     <div *ngIf="isAdmin" class="field field-checkbox">
                         <label>
                             <input type="checkbox" [(ngModel)]="editingUser.active" />
@@ -105,9 +105,7 @@
                         </label>
                     </div>
 
-                    <!-- ════════════════════════════════════════════════ -->
-                    <!-- РОЛИ — только для админов                        -->
-                    <!-- ════════════════════════════════════════════════ -->
+                    <!-- Роли — только для админов -->
                     <div *ngIf="isAdmin" class="field">
                         <label>Роли</label>
                         <div class="roles-select">
@@ -152,6 +150,47 @@
 
         <div class="user-editor-empty" *ngIf="!selectedUser">
             <p>Выберите пользователя из списка слева</p>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- Модальное окно смены пароля                                   -->
+<!-- ============================================================ -->
+
+<div class="modal-overlay" *ngIf="showPasswordModal" (click)="closePasswordModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h3>🔑 Смена пароля</h3>
+            <button class="modal-close" (click)="closePasswordModal()">✕</button>
+        </div>
+        <div class="modal-body">
+            <p>Пользователь: <strong>{{ passwordModalUsername }}</strong></p>
+
+            <div *ngIf="passwordError" class="error-message">{{ passwordError }}</div>
+            <div *ngIf="passwordSuccess" class="success-message">{{ passwordSuccess }}</div>
+
+            <div class="form-group">
+                <label>Новый пароль</label>
+                <input type="password" class="form-control" [(ngModel)]="newPassword"
+                    placeholder="Введите новый пароль (мин. 6 символов)" />
+            </div>
+
+            <div class="form-group">
+                <label>Подтверждение пароля</label>
+                <input type="password" class="form-control" [(ngModel)]="confirmPassword"
+                    placeholder="Повторите пароль" />
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn-reset" (click)="resetPassword()" [disabled]="isPasswordLoading">
+                    {{ isPasswordLoading ? '⏳ ...' : '🔄 Сбросить на дефолтный' }}
+                </button>
+                <button class="btn-set" (click)="setNewPassword()" [disabled]="isPasswordLoading">
+                    {{ isPasswordLoading ? '⏳ ...' : '💾 Установить пароль' }}
+                </button>
+                <button class="btn-cancel-modal" (click)="closePasswordModal()">Отмена</button>
+            </div>
         </div>
     </div>
 </div>

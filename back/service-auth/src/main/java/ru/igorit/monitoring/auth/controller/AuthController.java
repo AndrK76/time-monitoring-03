@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.igorit.monitoring.auth.dto.*;
+import ru.igorit.monitoring.auth.helper.AuthErrorHelper;
 import ru.igorit.monitoring.auth.service.AuthService;
 import ru.igorit.monitoring.security.service.JwtService;
 
@@ -18,18 +19,17 @@ import ru.igorit.monitoring.security.service.JwtService;
 public class AuthController {
 
     private final AuthService authService;
-    private final JwtService jwtService;
+    private final AuthErrorHelper authErrorHelper;
 
     @PostMapping("/login")
-    public ResponseEntity<TokenResponse> login(@Valid @RequestBody LoginRequest request,
-                                               HttpServletResponse response) {
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request,
+                                  HttpServletResponse response) {
         log.info("Login attempt for user: {}", request.getUsername());
         try {
-            TokenResponse tokenResponse  = authService.login(request, response);
-            return ResponseEntity.ok(tokenResponse );
+            TokenResponse tokenResponse = authService.login(request, response);
+            return ResponseEntity.ok(tokenResponse);
         } catch (Exception e) {
-            log.error("{}: {}",e.getClass().getName(), e.getMessage());
-            throw new RuntimeException(e);
+            return authErrorHelper.handleLoginError(e, request.getUsername());
         }
     }
 

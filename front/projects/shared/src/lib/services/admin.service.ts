@@ -101,6 +101,19 @@ export class AdminService {
     });
   }
 
+  resetPassword(userId: string): Observable<void> {
+    return this.http.put<void>(`${this.authApiUrl}/usermanage/users/${userId}/reset-password`, {}, {
+      headers: this.getHeaders()
+    });
+  }
+
+  setPassword(userId: string, newPassword: string): Observable<void> {
+    return this.http.put<void>(
+      `${this.authApiUrl}/usermanage/users/${userId}/set-password`,
+      { newPassword },
+      { headers: this.getHeaders() }
+    );
+  }
 
 
   // ============================================================

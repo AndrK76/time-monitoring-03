@@ -86,5 +86,21 @@ public class UserManageController {
         return ResponseEntity.ok(userManagementService.getAllPermissions());
     }
 
+    @PutMapping("/users/{userId}/reset-password")
+    public ResponseEntity<Void> resetPassword(@PathVariable String userId) {
+        log.info("Resetting password to default for user: {}", userId);
+        userManagementService.resetPasswordToDefault(userId);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/users/{userId}/set-password")
+    public ResponseEntity<Void> setPassword(
+            @PathVariable String userId,
+            @Valid @RequestBody ResetPasswordRequest request) {
+        log.info("Setting password for user: {}", userId);
+        userManagementService.setPassword(userId, request.getNewPassword());
+        return ResponseEntity.ok().build();
+    }
+
 
 }

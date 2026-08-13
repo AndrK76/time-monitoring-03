@@ -7,3 +7,4 @@ export * from './lib/services/auth.service';
 export * from './lib/services/admin.service';
 export * from './lib/guards/auth.guard';
 export * from './lib/interceptors/auth.interceptor.fn';
+export * from './lib/interceptors/language.interceptor.fn';

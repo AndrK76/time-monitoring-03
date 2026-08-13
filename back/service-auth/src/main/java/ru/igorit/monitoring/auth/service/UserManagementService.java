@@ -17,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.igorit.monitoring.security.service.ResetPasswordService;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -34,6 +35,8 @@ public class UserManagementService {
     private final PermissionRepository permissionRepository;
     private final UserManagementMapper userManagementMapper;
     private final CommandSender commandSender;
+    private final ResetPasswordService resetPasswordService;
+
 
     // ============================================================
     // Публичные методы. Пользователь — Просмотр
@@ -87,6 +90,20 @@ public class UserManagementService {
         sendUserUpdatedEvent(saved, true);
         log.info("User fully updated: {}", user.getUsername());
         return toResponse(saved);
+    }
+
+    @PreAuthorize("hasAuthority('USER_WRITE')")
+    @Transactional
+    public void resetPasswordToDefault(String userId) {
+        User user = getUserEntityById(userId);
+        resetPasswordService.setDefaultPassword(user);
+    }
+
+    @PreAuthorize("hasAuthority('USER_WRITE')")
+    @Transactional
+    public void setPassword(String userId, String newPassword) {
+        User user = getUserEntityById(userId);
+        resetPasswordService.setPassword(user, newPassword);
     }
 
     // ============================================================

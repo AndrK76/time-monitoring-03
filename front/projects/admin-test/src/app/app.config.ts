@@ -1,4 +1,5 @@
-import { APP_INITIALIZER, ApplicationConfig, inject } from '@angular/core';
+import { APP_INITIALIZER, ApplicationConfig, inject, LOCALE_ID } from '@angular/core';
+
 import { provideRouter } from '@angular/router';
 
 import { routes } from './app.routes';
@@ -31,6 +32,7 @@ export const appConfig: ApplicationConfig = {
       provide: APP_INITIALIZER,
       useFactory: initializeApp,
       multi: true
-    }
+    },
+    { provide: LOCALE_ID, useValue: 'ru' }
   ],
 };

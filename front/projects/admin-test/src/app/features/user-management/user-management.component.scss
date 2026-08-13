@@ -1,5 +1,3 @@
-// projects/admin-test/src/app/features/user-management/user-management.component.scss
-
 .user-management {
   padding: 24px;
   background: #f5f7fa;
@@ -196,6 +194,30 @@
   background: #95a5a6;
 }
 
+/* ============================================================
+   Кнопка смены пароля в списке пользователей
+   ============================================================ */
+
+.btn-password {
+  padding: 4px 8px;
+  background: transparent;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background 0.2s;
+  color: #555;
+  flex-shrink: 0;
+}
+
+.btn-password:hover {
+  background: #e8f0fe;
+}
+
+/* ============================================================
+   Редактор пользователя
+   ============================================================ */
+
 .user-editor {
   background: white;
   border-radius: 12px;
@@ -372,6 +394,153 @@
 }
 
 /* ============================================================
+   Модальное окно смены пароля
+   ============================================================ */
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  width: 100%;
+  max-width: 440px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  animation: modalFadeIn 0.3s ease;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.modal-header h3 {
+  margin: 0;
+  color: #2c3e50;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #888;
+  transition: color 0.2s;
+  padding: 0 8px;
+}
+
+.modal-close:hover {
+  color: #e74c3c;
+}
+
+.modal-body p {
+  margin: 0 0 16px 0;
+  color: #555;
+}
+
+.modal-body .form-group {
+  margin-bottom: 12px;
+}
+
+.modal-body .form-group label {
+  display: block;
+  font-weight: 600;
+  font-size: 13px;
+  color: #555;
+  margin-bottom: 4px;
+}
+
+.modal-body .form-control {
+  width: 100%;
+  padding: 8px 12px;
+  border: 2px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: border-color 0.3s;
+  box-sizing: border-box;
+}
+
+.modal-body .form-control:focus {
+  border-color: #2c3e50;
+  outline: none;
+}
+
+.modal-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.modal-actions button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: background 0.3s;
+  flex: 1;
+  min-width: 100px;
+}
+
+.modal-actions .btn-reset {
+  background: #f39c12;
+  color: white;
+}
+
+.modal-actions .btn-reset:hover:not(:disabled) {
+  background: #e67e22;
+}
+
+.modal-actions .btn-set {
+  background: #3498db;
+  color: white;
+}
+
+.modal-actions .btn-set:hover:not(:disabled) {
+  background: #2980b9;
+}
+
+.modal-actions .btn-cancel-modal {
+  background: #95a5a6;
+  color: white;
+}
+
+.modal-actions .btn-cancel-modal:hover {
+  background: #7f8c8d;
+}
+
+.modal-actions button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ============================================================
    Адаптив для маленьких экранов
    ============================================================ */
 
@@ -409,5 +578,26 @@
 
   .role-option label {
     width: 100%;
+  }
+
+  .modal {
+    margin: 16px;
+    padding: 16px;
+  }
+
+  .modal-actions {
+    flex-direction: column;
+  }
+
+  .modal-actions button {
+    width: 100%;
+  }
+
+  .user-item {
+    flex-wrap: wrap;
+  }
+
+  .btn-password {
+    margin-left: auto;
   }
 }

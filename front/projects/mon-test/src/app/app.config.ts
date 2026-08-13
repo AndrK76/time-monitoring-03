@@ -1,10 +1,10 @@
-import { APP_INITIALIZER, ApplicationConfig, inject } from '@angular/core';
+import { APP_INITIALIZER, ApplicationConfig, inject, LOCALE_ID } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideAnimations } from '@angular/platform-browser/animations';
 
-import { AdminService, authInterceptorFn, AuthService } from '@mon3/shared';
+import { AdminService, authInterceptorFn, AuthService, languageInterceptorFn } from '@mon3/shared';
 import { environment } from '../environments/environment';
 
 
@@ -24,13 +24,14 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(routes),
     provideHttpClient(
-      withInterceptors([authInterceptorFn]) // Подключаем функциональный интерцептор
+      withInterceptors([authInterceptorFn, languageInterceptorFn]) // Подключаем функциональный интерцептор
     ),
     provideAnimations(),
     {
       provide: APP_INITIALIZER,
       useFactory: initializeApp,
       multi: true
-    }
+    },
+    { provide: LOCALE_ID, useValue: 'en' }
   ],
 };
