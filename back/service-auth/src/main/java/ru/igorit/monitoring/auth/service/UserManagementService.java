@@ -18,12 +18,16 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.igorit.monitoring.security.service.ResetPasswordService;
+import ru.igorit.monitoring.security.util.AuthInfoUtils;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static ru.igorit.monitoring.security.util.AuthInfoUtils.extractUserId;
+import static ru.igorit.monitoring.security.util.AuthInfoUtils.getCurrentAuth;
 
 @Service
 @RequiredArgsConstructor
@@ -80,12 +84,7 @@ public class UserManagementService {
     public UserResponse updateUser(String userId, UpdateUserRequest request) {
         User user = getUserEntityById(userId);
         updateAllFields(user, request);
-        Optional.ofNullable(request.getActive()).ifPresent(user::setIsActive);
-        Optional.ofNullable(request.getEmailVerified()).ifPresent(user::setIsEmailVerified);
-        if (request.getRoles() != null) {
-            List<Role> roles = roleRepository.findByNameIn(request.getRoles());
-            user.setRoles(new HashSet<>(roles));
-        }
+
         User saved = userRepository.save(user);
         sendUserUpdatedEvent(saved, true);
         log.info("User fully updated: {}", user.getUsername());
@@ -173,7 +172,7 @@ public class UserManagementService {
      * Получение текущего пользователя из SecurityContext
      */
     private User getCurrentUserEntity() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Authentication auth = getCurrentAuth();
         if (auth == null || !auth.isAuthenticated()) {
             throw new RuntimeException("Not authenticated");
         }
@@ -201,11 +200,19 @@ public class UserManagementService {
      * Обновление полей пользователя из запроса (полный доступ)
      */
     private void updateAllFields(User user, UpdateUserRequest request) {
+        var updater = extractUserId(getCurrentAuth());
         user.setUsername(request.getUsername());
         user.setEmail(request.getEmail());
         user.setFirstName(request.getFirstName());
         user.setLastName(request.getLastName());
         user.setDisplayName(request.getDisplayName());
+        Optional.ofNullable(request.getActive()).ifPresent(user::setIsActive);
+        Optional.ofNullable(request.getEmailVerified()).ifPresent(user::setIsEmailVerified);
+        user.setUpdatedBy(updater);
+        if (request.getRoles() != null) {
+            List<Role> roles = roleRepository.findByNameIn(request.getRoles());
+            user.setRoles(new HashSet<>(roles));
+        }
     }
 
     /**
@@ -215,6 +222,7 @@ public class UserManagementService {
         user.setFirstName(request.getFirstName());
         user.setLastName(request.getLastName());
         user.setDisplayName(request.getDisplayName());
+        user.setUpdatedBy(user.getId());
     }
 
     /**
@@ -230,7 +238,6 @@ public class UserManagementService {
                     .lastName(user.getLastName())
                     .displayName(user.getDisplayName())
                     .updatedAt(LocalDateTime.now())
-                    .updatedBy(getCurrentUsername())
                     .fullUpdate(fullUpdate)
                     .build();
 
@@ -242,8 +249,4 @@ public class UserManagementService {
         }
     }
 
-    private String getCurrentUsername() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        return auth != null ? auth.getName() : "system";
-    }
 }

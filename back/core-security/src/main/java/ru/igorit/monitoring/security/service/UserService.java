@@ -24,7 +24,7 @@ public class UserService {
 
     @Transactional
     public User createLocalUser(String username, String email, String password,
-                                String firstName, String lastName, String displayName) {
+                                String firstName, String lastName, String displayName, String creatorId) {
         if (userRepository.existsByUsername(username)) {
             throw new IllegalArgumentException("Username already exists: " + username);
         }
@@ -41,6 +41,7 @@ public class UserService {
                 .displayName(displayName)
                 .isActive(true)
                 .isEmailVerified(false)
+                .createdBy(creatorId)
                 .build();
 
         UserAuthProvider localProvider = UserAuthProvider.builder()

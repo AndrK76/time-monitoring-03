@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static ru.igorit.monitoring.common.AuthConstants.ANONYMOUS_USER;
+import static ru.igorit.monitoring.common.AuthConstants.ANONYMOUS_USERID;
 
 @Entity
 @Table(name = "users")
@@ -62,9 +63,15 @@ public class User {
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
+    @Column(name = "created_by", updatable = false)
+    private String createdBy;
+
     @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    @Column(name = "updated_by")
+    private String updatedBy;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @Builder.Default
@@ -108,6 +115,7 @@ public class User {
     public static User anonymous() {
         var ret = new  User();
         ret.setUsername(ANONYMOUS_USER);
+        ret.setId(ANONYMOUS_USERID);
         ret.setDisplayName("Анонимный пользователь");
         return ret;
     }

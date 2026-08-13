@@ -8,9 +8,17 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
   flex-wrap: wrap;
   gap: 12px;
+  
+  /* 🔥 FIXED HEADER — прилипает сверху при скролле */
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: #f5f7fa;
+  padding: 12px 0;
+  margin-bottom: 16px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
 }
 
 .header-left {
@@ -194,10 +202,6 @@
   background: #95a5a6;
 }
 
-/* ============================================================
-   Кнопка смены пароля в списке пользователей
-   ============================================================ */
-
 .btn-password {
   padding: 4px 8px;
   background: transparent;
@@ -213,10 +217,6 @@
 .btn-password:hover {
   background: #e8f0fe;
 }
-
-/* ============================================================
-   Редактор пользователя
-   ============================================================ */
 
 .user-editor {
   background: white;
@@ -393,10 +393,6 @@
   border-color: #2c3e50;
 }
 
-/* ============================================================
-   Модальное окно смены пароля
-   ============================================================ */
-
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -425,7 +421,6 @@
     opacity: 0;
     transform: translateY(-20px);
   }
-
   to {
     opacity: 1;
     transform: translateY(0);
@@ -539,10 +534,6 @@
   opacity: 0.6;
   cursor: not-allowed;
 }
-
-/* ============================================================
-   Адаптив для маленьких экранов
-   ============================================================ */
 
 @media (max-width: 768px) {
   .content {

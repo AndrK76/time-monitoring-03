@@ -27,6 +27,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static ru.igorit.monitoring.common.AuthConstants.ANONYMOUS_USER;
+import static ru.igorit.monitoring.security.util.AuthInfoUtils.extractUserId;
+import static ru.igorit.monitoring.security.util.AuthInfoUtils.getCurrentAuth;
 
 @Service
 @RequiredArgsConstructor
@@ -60,16 +62,18 @@ public class AuthService {
     }
 
     @Transactional
-    public TokenResponse register(RegistrationRequest request) {
+    public TokenResponse register(RegistrationRequest request, HttpServletResponse response) {
         User user = userService.createLocalUser(
                 request.getUsername(),
                 request.getEmail(),
                 request.getPassword(),
                 request.getFirstName(),
                 request.getLastName(),
-                request.getDisplayName()
-        );
-        return buildTokenResponse(user);
+                request.getDisplayName(),
+                extractUserId(getCurrentAuth()));
+        TokenResponse tokenResponse = buildTokenResponse(user);
+        addAuthCookie(response, tokenResponse.getAccessToken());
+        return tokenResponse;
     }
 
     @Transactional
@@ -77,6 +81,7 @@ public class AuthService {
         User user = getCurrentUserEntity();
         validatePasswordChange(request, user);
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        user.setUpdatedBy(extractUserId(getCurrentAuth()));
         userRepository.save(user);
         log.info("Password changed for user: {}", user.getUsername());
     }

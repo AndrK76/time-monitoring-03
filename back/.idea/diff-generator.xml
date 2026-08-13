@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="DiffGenerationConfig" isInitGenerateDdl="true">
-    <option name="initGenerateDdl" value="true" />
-    <option name="sourceModelValue" value="core-web:core-web" />
+  <component name="DiffGenerationConfig">
+    <option name="sourceModelValue" value="service-auth:service-auth" />
     <option name="targetDbValue" value="52806131-91ea-4d67-b7db-deb01a5eed68" />
   </component>
 </project>

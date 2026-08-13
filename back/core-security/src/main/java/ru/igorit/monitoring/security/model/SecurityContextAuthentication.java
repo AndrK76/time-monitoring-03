@@ -1,4 +1,4 @@
-package ru.igorit.monitoring.security.mapper;
+package ru.igorit.monitoring.security.model;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;

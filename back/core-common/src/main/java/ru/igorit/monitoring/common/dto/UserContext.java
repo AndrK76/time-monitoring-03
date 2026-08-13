@@ -10,6 +10,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static ru.igorit.monitoring.common.AuthConstants.*;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -36,9 +38,9 @@ public class UserContext implements Serializable {
      */
     public static UserContext system() {
         return UserContext.builder()
-                .userId("SYSTEM")
-                .username("system")
-                .roles("ROLE_SYSTEM")
+                .userId(SYSTEM_USERID)
+                .username(SYSTEM_USER)
+                //.roles("ROLE_SYSTEM")
                 .permissions("ALL")
                 .authenticated(true)
                 .build();
@@ -49,8 +51,8 @@ public class UserContext implements Serializable {
      */
     public static UserContext anonymous() {
         return UserContext.builder()
-                .userId("ANONYMOUS")
-                .username("anonymous")
+                .userId(ANONYMOUS_USERID)
+                .username(ANONYMOUS_USER)
                 .authenticated(false)
                 .build();
     }

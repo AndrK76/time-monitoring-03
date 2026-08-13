@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AmplicodePersistenceUnitSettings">
+    <persistence-units>
+      <persistence-unit moduleName="service-admin" name="Default">
+        <packages>
+          <package value="ru.igorit.monitoring.persistence.entity" />
+        </packages>
+      </persistence-unit>
+      <persistence-unit moduleName="core-persistence" name="Default">
+        <packages>
+          <package value="ru.igorit.monitoring.persistence.entity" />
+        </packages>
+      </persistence-unit>
+      <persistence-unit moduleName="core-security" name="Default">
+        <packages>
+          <package value="ru.igorit.monitoring.security.config" />
+        </packages>
+      </persistence-unit>
+      <persistence-unit moduleName="core-web" name="Default" />
+      <persistence-unit moduleName="core-rabbit" name="Default">
+        <packages>
+          <package value="ru.igorit.monitoring.rabbit.config" />
+        </packages>
+      </persistence-unit>
+      <persistence-unit moduleName="service-auth" name="Default">
+        <packages>
+          <package value="ru.igorit.monitoring.persistence.entity" />
+        </packages>
+      </persistence-unit>
+      <persistence-unit moduleName="core-telegram" name="Default" />
+      <persistence-unit moduleName="service-monitoring" name="Default">
+        <packages>
+          <package value="ru.igorit.monitoring.persistence.entity" />
+        </packages>
+      </persistence-unit>
+    </persistence-units>
+  </component>
+</project>

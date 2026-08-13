@@ -41,11 +41,11 @@ spring:
       #ddl-auto: validate
     open-in-view: false
     show-sql: false
+    #show-sql: true
     properties:
       hibernate:
         #format_sql: true
         #dialect: org.hibernate.dialect.PostgreSQLDialect
-        #default_schema: auth
         hbm2ddl.auto: validate
         schema-validation: none
 

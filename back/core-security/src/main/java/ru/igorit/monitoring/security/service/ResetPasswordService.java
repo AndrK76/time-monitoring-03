@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.igorit.monitoring.persistence.entity.User;
 import ru.igorit.monitoring.persistence.repository.UserRepository;
+import ru.igorit.monitoring.security.util.AuthInfoUtils;
 
 @Service
 @RequiredArgsConstructor
@@ -64,6 +65,7 @@ public class ResetPasswordService {
         }
         String encoded = passwordEncoder.encode(password);
         user.setPassword(encoded);
+        user.setUpdatedBy(AuthInfoUtils.extractUserId(AuthInfoUtils.getCurrentAuth()));
         userRepository.save(user);
         log.info("{} password set for user: {}", isDefault?"Default":"New", user.getUsername());
     }

@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.igorit.monitoring.auth.dto.*;
 import ru.igorit.monitoring.auth.helper.AuthErrorHelper;
 import ru.igorit.monitoring.auth.service.AuthService;
-import ru.igorit.monitoring.security.service.JwtService;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -23,7 +22,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request,
-                                  HttpServletResponse response) {
+                                   HttpServletResponse response) {
         log.info("Login attempt for user: {}", request.getUsername());
         try {
             TokenResponse tokenResponse = authService.login(request, response);
@@ -34,17 +33,26 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<TokenResponse> register(@Valid @RequestBody RegistrationRequest request) {
+    public ResponseEntity<?> register(@Valid @RequestBody RegistrationRequest request,
+                                      HttpServletResponse response) {
         log.info("Registration attempt for user: {}", request.getUsername());
-        TokenResponse response = authService.register(request);
-        return ResponseEntity.ok(response);
+        try {
+            TokenResponse tokenResponse = authService.register(request, response);
+            return ResponseEntity.ok(tokenResponse);
+        } catch (Exception e) {
+            return authErrorHelper.handleLoginError(e, request.getUsername());
+        }
     }
 
     @PostMapping("/change-password")
-    public ResponseEntity<Void> changePassword(@Valid @RequestBody ChangePasswordRequest request) {
+    public ResponseEntity<?> changePassword(@Valid @RequestBody ChangePasswordRequest request) {
         log.info("Change password attempt");
-        authService.changePassword(request);
-        return ResponseEntity.ok().build();
+        try {
+            authService.changePassword(request);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return authErrorHelper.handleLoginError(e, "");
+        }
     }
 
     @PostMapping("/refresh")
