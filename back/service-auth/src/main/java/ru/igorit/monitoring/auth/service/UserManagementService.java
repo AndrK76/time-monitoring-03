@@ -1,26 +1,21 @@
 package ru.igorit.monitoring.auth.service;
 
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import ru.igorit.monitoring.auth.dto.*;
-import ru.igorit.monitoring.auth.mapper.UserManagementMapper;
-import ru.igorit.monitoring.common.dto.UserUpdatedEvent;
-import ru.igorit.monitoring.common.enums.CommandType;
-import ru.igorit.monitoring.persistence.entity.Role;
-import ru.igorit.monitoring.persistence.repository.PermissionRepository;
-import ru.igorit.monitoring.persistence.repository.RoleRepository;
-import ru.igorit.monitoring.rabbit.service.CommandSender;
-import ru.igorit.monitoring.persistence.entity.User;
-import ru.igorit.monitoring.persistence.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.igorit.monitoring.auth.dto.*;
+import ru.igorit.monitoring.auth.mapper.UserManagementMapper;
+import ru.igorit.monitoring.common.dto.UserInfoUpdatedEvent;
+import ru.igorit.monitoring.common.enums.CommandType;
+import ru.igorit.monitoring.persistence.entity.Role;
+import ru.igorit.monitoring.persistence.entity.User;
+import ru.igorit.monitoring.persistence.service.AuthManagementPersistService;
+import ru.igorit.monitoring.rabbit.service.CommandSender;
 import ru.igorit.monitoring.security.service.ResetPasswordService;
-import ru.igorit.monitoring.security.util.AuthInfoUtils;
 
-import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -34,9 +29,7 @@ import static ru.igorit.monitoring.security.util.AuthInfoUtils.getCurrentAuth;
 @Slf4j
 public class UserManagementService {
 
-    private final UserRepository userRepository;
-    private final RoleRepository roleRepository;
-    private final PermissionRepository permissionRepository;
+    private final AuthManagementPersistService persistService;
     private final UserManagementMapper userManagementMapper;
     private final CommandSender commandSender;
     private final ResetPasswordService resetPasswordService;
@@ -49,7 +42,7 @@ public class UserManagementService {
     @PreAuthorize("hasAuthority('USER_READ')")
     @Transactional(readOnly = true)
     public List<UserListItem> getUserList() {
-        return userRepository.findAll().stream()
+        return persistService.findAllUsers().stream()
                 .map(userManagementMapper::toUserListItem)
                 .collect(Collectors.toList());
     }
@@ -73,7 +66,7 @@ public class UserManagementService {
     public UserResponse updateCurrentUser(UpdateUserRequest request) {
         User user = getCurrentUserEntity();
         updatePersonalFields(user, request);
-        User saved = userRepository.save(user);
+        User saved = persistService.saveUser(user);
         sendUserUpdatedEvent(saved, false);
         log.info("User updated self-info: {}", user.getUsername());
         return toResponse(saved);
@@ -83,9 +76,8 @@ public class UserManagementService {
     @Transactional
     public UserResponse updateUser(String userId, UpdateUserRequest request) {
         User user = getUserEntityById(userId);
-        updateAllFields(user, request);
-
-        User saved = userRepository.save(user);
+        String updaterId = extractUserId(getCurrentAuth());
+        var saved = updateAllFields(user, request, updaterId);
         sendUserUpdatedEvent(saved, true);
         log.info("User fully updated: {}", user.getUsername());
         return toResponse(saved);
@@ -111,7 +103,7 @@ public class UserManagementService {
     @PreAuthorize("hasAuthority('USER_READ')")
     @Transactional(readOnly = true)
     public List<RoleDto> getAllRoles() {
-        return roleRepository.findAll().stream()
+        return persistService.findAllRoles().stream()
                 .map(role -> RoleDto.builder()
                         .name(role.getName())
                         .description(role.getDescription())
@@ -143,7 +135,7 @@ public class UserManagementService {
     @PreAuthorize("hasAuthority('USER_READ')")
     @Transactional(readOnly = true)
     public List<PermissionDto> getAllPermissions() {
-        return permissionRepository.findAll().stream()
+        return persistService.findAllPermissions().stream()
                 .map(userManagementMapper::toPermissionDto)
                 .collect(Collectors.toList());
     }
@@ -177,7 +169,7 @@ public class UserManagementService {
             throw new RuntimeException("Not authenticated");
         }
 
-        return userRepository.findByUsername(auth.getName())
+        return persistService.findByUsername(auth.getName())
                 .orElseThrow(() -> new RuntimeException("User not found"));
     }
 
@@ -185,7 +177,7 @@ public class UserManagementService {
      * Получение пользователя по ID
      */
     private User getUserEntityById(String userId) {
-        return userRepository.findById(userId)
+        return persistService.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found: " + userId));
     }
 
@@ -199,7 +191,7 @@ public class UserManagementService {
     /**
      * Обновление полей пользователя из запроса (полный доступ)
      */
-    private void updateAllFields(User user, UpdateUserRequest request) {
+    private User updateAllFields(User user, UpdateUserRequest request, String updaterId) {
         var updater = extractUserId(getCurrentAuth());
         user.setUsername(request.getUsername());
         user.setEmail(request.getEmail());
@@ -209,10 +201,13 @@ public class UserManagementService {
         Optional.ofNullable(request.getActive()).ifPresent(user::setIsActive);
         Optional.ofNullable(request.getEmailVerified()).ifPresent(user::setIsEmailVerified);
         user.setUpdatedBy(updater);
+        user = persistService.saveUser(user);
         if (request.getRoles() != null) {
-            List<Role> roles = roleRepository.findByNameIn(request.getRoles());
+            List<Role> roles = persistService.findByNameIn(request.getRoles());
+            persistService.updateUserRoles(user, request.getRoles(), updaterId);
             user.setRoles(new HashSet<>(roles));
         }
+        return persistService.findById(user.getId()).orElseThrow(() -> new RuntimeException("User not found"));
     }
 
     /**
@@ -230,18 +225,10 @@ public class UserManagementService {
      */
     private void sendUserUpdatedEvent(User user, boolean fullUpdate) {
         try {
-            UserUpdatedEvent event = UserUpdatedEvent.builder()
-                    .userId(user.getId())
-                    .username(user.getUsername())
-                    .email(user.getEmail())
-                    .firstName(user.getFirstName())
-                    .lastName(user.getLastName())
-                    .displayName(user.getDisplayName())
-                    .updatedAt(LocalDateTime.now())
-                    .fullUpdate(fullUpdate)
-                    .build();
+            UserInfoUpdatedEvent event = userManagementMapper.toUserUpdatedEvent(user);
+            event.setFullUpdate(fullUpdate);
 
-            commandSender.sendCommand(CommandType.USER_UPDATED, event);
+            commandSender.sendCommand(CommandType.USER_INFO_UPDATED, event);
             log.info("User updated event sent for user: {}", user.getUsername());
         } catch (Exception e) {
             // Не даём упасть приложению, если RabbitMQ недоступен

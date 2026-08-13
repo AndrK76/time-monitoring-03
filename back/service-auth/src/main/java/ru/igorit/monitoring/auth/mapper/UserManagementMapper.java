@@ -4,6 +4,7 @@ import ru.igorit.monitoring.auth.dto.PermissionDto;
 import ru.igorit.monitoring.auth.dto.RoleDto;
 import ru.igorit.monitoring.auth.dto.UserListItem;
 import ru.igorit.monitoring.auth.dto.UserResponse;
+import ru.igorit.monitoring.common.dto.UserInfoUpdatedEvent;
 import ru.igorit.monitoring.persistence.entity.Permission;
 import ru.igorit.monitoring.persistence.entity.Role;
 import ru.igorit.monitoring.persistence.entity.User;
@@ -28,4 +29,8 @@ public interface UserManagementMapper {
     RoleDto toRoleDto(Role role);
 
     PermissionDto toPermissionDto(Permission permission);
+
+    @Mapping(target = "userId", source = "id")
+    @Mapping(target = "fullUpdate", ignore = true)
+    UserInfoUpdatedEvent toUserUpdatedEvent(User user);
 }

@@ -1,9 +1,9 @@
 // service-admin/src/main/java/ru/igorit/monitoring/admin/listener/UserCommandListener.java
 package ru.igorit.monitoring.admin.listener;
 
+import ru.igorit.monitoring.common.dto.UserInfoUpdatedEvent;
 import ru.igorit.monitoring.rabbit.config.RabbitMQConfig;
 import ru.igorit.monitoring.common.dto.CommandMessage;
-import ru.igorit.monitoring.common.dto.UserUpdatedEvent;
 import ru.igorit.monitoring.common.enums.CommandType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,8 +26,8 @@ public class UserCommandListener {
 
         try {
             switch (CommandType.valueOf(command.getCommandType())) {
-                case USER_UPDATED:
-                    UserUpdatedEvent userEvent = commandReceiver.getPayload(command, UserUpdatedEvent.class);
+                case USER_INFO_UPDATED:
+                    UserInfoUpdatedEvent userEvent = commandReceiver.getPayload(command, UserInfoUpdatedEvent.class);
                     if (userEvent != null) {
                         cacheService.updateUser(userEvent, command.getUserContext(), command.getSourceService());
                     }

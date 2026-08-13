@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserUpdatedEvent implements Serializable {
+public class UserInfoUpdatedEvent implements Serializable {
 
     private static final long serialVersionUID = 1L;
 

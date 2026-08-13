@@ -1,4 +1,3 @@
-// service-auth/src/main/java/ru/igorit/monitoring/auth/service/AuthService.java
 package ru.igorit.monitoring.auth.service;
 
 import jakarta.servlet.http.Cookie;
@@ -17,8 +16,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import ru.igorit.monitoring.auth.dto.*;
 import ru.igorit.monitoring.auth.mapper.UserManagementMapper;
+import ru.igorit.monitoring.persistence.entity.Permission;
+import ru.igorit.monitoring.persistence.entity.Role;
 import ru.igorit.monitoring.persistence.entity.User;
-import ru.igorit.monitoring.persistence.repository.UserRepository;
+import ru.igorit.monitoring.persistence.service.AuthManagementPersistService;
 import ru.igorit.monitoring.security.config.CookieProperties;
 import ru.igorit.monitoring.security.service.JwtService;
 import ru.igorit.monitoring.security.service.UserService;
@@ -39,9 +40,9 @@ public class AuthService {
     private final UserService userService;
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
-    private final UserRepository userRepository;
     private final UserManagementMapper userManagementMapper;
     private final CookieProperties cookieProperties;
+    private final AuthManagementPersistService persistService;
 
     // ============================================================
     // ПУБЛИЧНЫЕ МЕТОДЫ
@@ -82,10 +83,11 @@ public class AuthService {
         validatePasswordChange(request, user);
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         user.setUpdatedBy(extractUserId(getCurrentAuth()));
-        userRepository.save(user);
+        persistService.saveUser(user);
         log.info("Password changed for user: {}", user.getUsername());
     }
 
+    @Transactional
     public TokenResponse refreshToken(String refreshToken) {
         if (!jwtService.validateRefreshToken(refreshToken)) {
             throw new RuntimeException("Invalid refresh token");
@@ -132,12 +134,14 @@ public class AuthService {
         SecurityContextHolder.clearContext();
     }
 
+    @Transactional
     public UserResponse getCurrentUser(HttpServletRequest request) {
         String username = extractUsernameFromContextOrCookie(request);
         User user = getUserByUsernameOrAnonymous(username);
         return userManagementMapper.toResponse(user);
     }
 
+    @Transactional
     public TokenResponse checkAuth(HttpServletRequest request) {
         String token = extractTokenFromCookie(request);
         if (token == null || !jwtService.isTokenValid(token)) {
@@ -191,12 +195,12 @@ public class AuthService {
     }
 
     private User getUserByUsername(String username) {
-        return userRepository.findByUsername(username)
+        return persistService.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found: " + username));
     }
 
     private User getUserById(String userId) {
-        return userRepository.findById(userId)
+        return persistService.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found: " + userId));
     }
 
@@ -230,14 +234,14 @@ public class AuthService {
 
     private List<String> extractRoles(User user) {
         return user.getRoles().stream()
-                .map(role -> role.getName())
+                .map(Role::getName)
                 .collect(Collectors.toList());
     }
 
     private List<String> extractPermissions(User user) {
         return user.getRoles().stream()
                 .flatMap(role -> role.getPermissions().stream())
-                .map(permission -> permission.getName())
+                .map(Permission::getName)
                 .collect(Collectors.toList());
     }
 
