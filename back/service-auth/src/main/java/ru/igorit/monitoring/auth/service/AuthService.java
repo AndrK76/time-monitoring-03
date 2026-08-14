@@ -16,10 +16,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import ru.igorit.monitoring.auth.dto.*;
 import ru.igorit.monitoring.auth.mapper.UserManagementMapper;
-import ru.igorit.monitoring.persistence.entity.Permission;
-import ru.igorit.monitoring.persistence.entity.Role;
-import ru.igorit.monitoring.persistence.entity.User;
-import ru.igorit.monitoring.persistence.service.AuthManagementPersistService;
+import ru.igorit.monitoring.persistence.entity.auth.Permission;
+import ru.igorit.monitoring.persistence.entity.auth.Role;
+import ru.igorit.monitoring.persistence.entity.auth.User;
+import ru.igorit.monitoring.persistence.service.auth.AuthManagementPersistService;
 import ru.igorit.monitoring.security.config.CookieProperties;
 import ru.igorit.monitoring.security.service.JwtService;
 import ru.igorit.monitoring.security.service.UserService;
@@ -49,21 +49,21 @@ public class AuthService {
     // ============================================================
 
     @Transactional
-    public TokenResponse login(LoginRequest request, HttpServletResponse response) {
+    public TokenResponseDto login(LoginRequestDto request, HttpServletResponse response) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
         );
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         User user = getUserByUsername(request.getUsername());
-        TokenResponse tokenResponse = buildTokenResponse(user);
+        TokenResponseDto tokenResponse = buildTokenResponse(user);
 
         addAuthCookie(response, tokenResponse.getAccessToken());
         return tokenResponse;
     }
 
     @Transactional
-    public TokenResponse register(RegistrationRequest request, HttpServletResponse response) {
+    public TokenResponseDto register(RegistrationRequestDto request, HttpServletResponse response) {
         User user = userService.createLocalUser(
                 request.getUsername(),
                 request.getEmail(),
@@ -72,13 +72,13 @@ public class AuthService {
                 request.getLastName(),
                 request.getDisplayName(),
                 extractUserId(getCurrentAuth()));
-        TokenResponse tokenResponse = buildTokenResponse(user);
+        TokenResponseDto tokenResponse = buildTokenResponse(user);
         addAuthCookie(response, tokenResponse.getAccessToken());
         return tokenResponse;
     }
 
     @Transactional
-    public void changePassword(ChangePasswordRequest request) {
+    public void changePassword(ChangePasswordRequestDto request) {
         User user = getCurrentUserEntity();
         validatePasswordChange(request, user);
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
@@ -88,7 +88,7 @@ public class AuthService {
     }
 
     @Transactional
-    public TokenResponse refreshToken(String refreshToken) {
+    public TokenResponseDto refreshToken(String refreshToken) {
         if (!jwtService.validateRefreshToken(refreshToken)) {
             throw new RuntimeException("Invalid refresh token");
         }
@@ -105,7 +105,7 @@ public class AuthService {
                 extractOrganizations(user)
         );
 
-        return TokenResponse.builder()
+        return TokenResponseDto.builder()
                 .accessToken(newAccessToken)
                 .refreshToken(refreshToken)
                 .tokenType("Bearer")
@@ -135,14 +135,14 @@ public class AuthService {
     }
 
     @Transactional
-    public UserResponse getCurrentUser(HttpServletRequest request) {
+    public UserResponseDto getCurrentUser(HttpServletRequest request) {
         String username = extractUsernameFromContextOrCookie(request);
         User user = getUserByUsernameOrAnonymous(username);
         return userManagementMapper.toResponse(user);
     }
 
     @Transactional
-    public TokenResponse checkAuth(HttpServletRequest request) {
+    public TokenResponseDto checkAuth(HttpServletRequest request) {
         String token = extractTokenFromCookie(request);
         if (token == null || !jwtService.isTokenValid(token)) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid or expired token");
@@ -160,7 +160,7 @@ public class AuthService {
                 extractOrganizations(user)
         );
 
-        return TokenResponse.builder()
+        return TokenResponseDto.builder()
                 .accessToken(newToken)
                 .tokenType("Bearer")
                 .expiresIn(86400L)
@@ -172,7 +172,7 @@ public class AuthService {
     // МЕТОДЫ ДЛЯ OAuth2 (заглушки)
     // ============================================================
 
-    public TokenResponse handleOAuth2Callback(String provider, String code) {
+    public TokenResponseDto handleOAuth2Callback(String provider, String code) {
         log.info("OAuth2 callback from provider: {}, code: {}", provider, code);
         throw new UnsupportedOperationException("OAuth2 authentication not yet implemented. Provider: " + provider);
     }
@@ -254,7 +254,7 @@ public class AuthService {
     // ПРИВАТНЫЕ МЕТОДЫ — ПОСТРОЕНИЕ ОТВЕТОВ
     // ============================================================
 
-    private TokenResponse buildTokenResponse(User user) {
+    private TokenResponseDto buildTokenResponse(User user) {
         String accessToken = jwtService.generateToken(
                 user.getId(),
                 user.getUsername(),
@@ -265,7 +265,7 @@ public class AuthService {
 
         String refreshToken = jwtService.generateRefreshToken(user.getId(), user.getUsername());
 
-        return TokenResponse.builder()
+        return TokenResponseDto.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .tokenType("Bearer")
@@ -274,7 +274,7 @@ public class AuthService {
                 .build();
     }
 
-    private void validatePasswordChange(ChangePasswordRequest request, User user) {
+    private void validatePasswordChange(ChangePasswordRequestDto request, User user) {
         if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
             throw new RuntimeException("Current password is incorrect");
         }

@@ -8,8 +8,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.igorit.monitoring.persistence.entity.User;
-import ru.igorit.monitoring.persistence.repository.UserRepository;
+import ru.igorit.monitoring.persistence.entity.auth.User;
+import ru.igorit.monitoring.persistence.repository.auth.UserRepository;
 import ru.igorit.monitoring.security.model.UserPrincipal;
 
 @Service

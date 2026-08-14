@@ -3,8 +3,8 @@ package ru.igorit.monitoring.admin.listener;
 
 import ru.igorit.monitoring.common.dto.UserInfoUpdatedEvent;
 import ru.igorit.monitoring.rabbit.config.RabbitMQConfig;
-import ru.igorit.monitoring.common.dto.CommandMessage;
-import ru.igorit.monitoring.common.enums.CommandType;
+import ru.igorit.monitoring.common.dto.command.CommandMessageDto;
+import ru.igorit.monitoring.common.enums.command.CommandType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -21,7 +21,7 @@ public class UserCommandListener {
     private final CommandReceiver commandReceiver;
 
     @RabbitListener(queues = RabbitMQConfig.QUEUE_NAME)
-    public void handleUserUpdated(CommandMessage command) {
+    public void handleUserUpdated(CommandMessageDto command) {
         log.info("Received command: {} from {}", command.getCommandType(), command.getSourceService());
 
         try {

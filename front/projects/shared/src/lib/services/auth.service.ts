@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
 import { BehaviorSubject, catchError, Observable, of, tap } from 'rxjs';
 
-import { ChangePasswordRequest, LoginRequest, RegistrationRequest, TokenResponse, UserResponse } from '../models/auth.models';
+import { ChangePasswordRequestDto, LoginRequestDto, RegistrationRequestDto, TokenResponseDto, UserResponseDto } from '../models/auth.models';
 
 @Injectable({
   providedIn: 'root'
@@ -15,7 +15,7 @@ export class AuthService {
   // ============================================================
   // Состояние
   // ============================================================
-  private currentUserSignal = signal<UserResponse | null>(null);
+  private currentUserSignal = signal<UserResponseDto | null>(null);
   private tokenSignal = signal<string | null>(null);
 
   // ============================================================
@@ -68,8 +68,8 @@ export class AuthService {
   // Аутентификация
   // ============================================================
 
-  login(credentials: LoginRequest): Observable<TokenResponse> {
-    return this.http.post<TokenResponse>(`${this.authApiUrl}/auth/login`, credentials, {
+  login(credentials: LoginRequestDto): Observable<TokenResponseDto> {
+    return this.http.post<TokenResponseDto>(`${this.authApiUrl}/auth/login`, credentials, {
       withCredentials: true
     }).pipe(
       tap(response => {
@@ -80,8 +80,8 @@ export class AuthService {
     );
   }
 
-  register(data: RegistrationRequest): Observable<TokenResponse> {
-    return this.http.post<TokenResponse>(`${this.authApiUrl}/auth/register`, data, {
+  register(data: RegistrationRequestDto): Observable<TokenResponseDto> {
+    return this.http.post<TokenResponseDto>(`${this.authApiUrl}/auth/register`, data, {
       withCredentials: true
     }).pipe(
       tap(response => {
@@ -104,9 +104,9 @@ export class AuthService {
     );
   }
 
-  refreshToken(): Observable<TokenResponse> {
+  refreshToken(): Observable<TokenResponseDto> {
     const refreshToken = localStorage.getItem('refreshToken') || '';
-    return this.http.post<TokenResponse>(
+    return this.http.post<TokenResponseDto>(
       `${this.authApiUrl}/auth/refresh`,
       {},
       { params: { refreshToken }, withCredentials: true }
@@ -117,7 +117,7 @@ export class AuthService {
     );
   }
 
-  changePassword(data: ChangePasswordRequest): Observable<void> {
+  changePassword(data: ChangePasswordRequestDto): Observable<void> {
     return this.http.post<void>(`${this.authApiUrl}/auth/change-password`, data, {
       withCredentials: true
     });
@@ -132,8 +132,8 @@ export class AuthService {
    * Используется при переходе между приложениями (SSO)
    * Возвращает TokenResponse, чтобы сохранить токен в localStorage
    */
-  checkAuth(): Observable<TokenResponse | null> {
-    return this.http.get<TokenResponse>(`${this.authApiUrl}/auth/check`, {
+  checkAuth(): Observable<TokenResponseDto | null> {
+    return this.http.get<TokenResponseDto>(`${this.authApiUrl}/auth/check`, {
       withCredentials: true
     }).pipe(
       tap(response => {
@@ -157,13 +157,13 @@ export class AuthService {
    * Получение текущего пользователя (без восстановления сессии)
    * Используется, когда токен уже есть в localStorage
    */
-  getCurrentUser(): Observable<UserResponse | null> {
+  getCurrentUser(): Observable<UserResponseDto | null> {
     const token = localStorage.getItem('accessToken');
     if (!token) {
       return of(null);
     }
 
-    return this.http.get<UserResponse>(`${this.authApiUrl}/users/me`, {
+    return this.http.get<UserResponseDto>(`${this.authApiUrl}/users/me`, {
       headers: { Authorization: `Bearer ${token}` },
       withCredentials: true
     }).pipe(
@@ -193,7 +193,7 @@ export class AuthService {
   // Приватные методы
   // ============================================================
 
-  private setSession(response: TokenResponse): void {
+  private setSession(response: TokenResponseDto): void {
     localStorage.setItem('user', JSON.stringify(response.user));
     localStorage.setItem('refreshToken', response.refreshToken || '');
     localStorage.setItem('accessToken', response.accessToken);

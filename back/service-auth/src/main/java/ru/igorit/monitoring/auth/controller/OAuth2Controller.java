@@ -1,6 +1,6 @@
 package ru.igorit.monitoring.auth.controller;
 
-import ru.igorit.monitoring.auth.dto.TokenResponse;
+import ru.igorit.monitoring.auth.dto.TokenResponseDto;
 import ru.igorit.monitoring.auth.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +18,7 @@ public class OAuth2Controller {
     private final AuthService authService;
 
     @GetMapping("/callback")
-    public TokenResponse handleOAuth2Callback(
+    public TokenResponseDto handleOAuth2Callback(
             @RequestParam String code,
             @RequestParam String provider) {
         log.info("OAuth2 callback from provider: {}", provider);

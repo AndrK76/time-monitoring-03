@@ -1,8 +1,7 @@
-// service-auth/src/main/java/ru/igorit/monitoring/auth/service/AdminService.java
 package ru.igorit.monitoring.auth.service;
 
-import ru.igorit.monitoring.persistence.entity.User;
-import ru.igorit.monitoring.persistence.repository.UserRepository;
+import ru.igorit.monitoring.persistence.entity.auth.User;
+import ru.igorit.monitoring.persistence.repository.auth.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;

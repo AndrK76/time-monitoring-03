@@ -105,6 +105,18 @@
                         </label>
                     </div>
 
+                    <!-- Статус подтверждения — виден всем, редактируют только админы -->
+                    <div class="field field-checkbox">
+                        <label>
+                            <input type="checkbox" [checked]="fullUser.approved"
+                                [disabled]="!isAdmin || fullUser.approved" (change)="toggleApproved()" />
+                            Подтверждён
+                            <span *ngIf="!isAdmin" class="field-hint">(только для просмотра)</span>
+                            <span *ngIf="isAdmin && fullUser.approved" class="field-hint">(подтверждён, изменение
+                                невозможно)</span>
+                        </label>
+                    </div>
+
                     <!-- Роли — только для админов -->
                     <div *ngIf="isAdmin" class="field">
                         <label>Роли</label>

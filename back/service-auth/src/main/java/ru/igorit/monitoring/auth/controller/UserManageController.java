@@ -19,33 +19,33 @@ public class UserManageController {
     private final UserManagementService userManagementService;
 
     @GetMapping("/users")
-    public ResponseEntity<List<UserListItem>> getUserList() {
+    public ResponseEntity<List<UserListItemDto>> getUserList() {
         log.info("Getting users list");
         return ResponseEntity.ok(userManagementService.getUserList());
     }
 
     @GetMapping("users/me")
-    public ResponseEntity<UserResponse> getCurrentUser() {
+    public ResponseEntity<UserResponseDto> getCurrentUser() {
         log.info("Getting current user");
         return ResponseEntity.ok(userManagementService.getCurrentUser());
     }
 
     @GetMapping("/users/{userId}")
-    public UserResponse getUserById(@PathVariable String userId) {
+    public UserResponseDto getUserById(@PathVariable String userId) {
         log.info("Getting user by id: {}", userId);
         return userManagementService.getUserById(userId);
     }
 
     @PutMapping("/users/me")
-    public ResponseEntity<UserResponse> updateCurrentUser(
-            @Valid @RequestBody UpdateUserRequest request) {
+    public ResponseEntity<UserResponseDto> updateCurrentUser(
+            @Valid @RequestBody UpdateUserRequestDto request) {
         log.info("Updating current user");
         return ResponseEntity.ok(userManagementService.updateCurrentUser(request));
     }
 
     @PutMapping("/users/{userId}")
-    public UserResponse updateUser(@PathVariable String userId,
-                                   @Valid @RequestBody UpdateUserRequest request) {
+    public UserResponseDto updateUser(@PathVariable String userId,
+                                      @Valid @RequestBody UpdateUserRequestDto request) {
         log.info("Updating user: {}", userId);
         return userManagementService.updateUser(userId, request);
     }
@@ -96,7 +96,7 @@ public class UserManageController {
     @PutMapping("/users/{userId}/set-password")
     public ResponseEntity<Void> setPassword(
             @PathVariable String userId,
-            @Valid @RequestBody ResetPasswordRequest request) {
+            @Valid @RequestBody ResetPasswordRequestDto request) {
         log.info("Setting password for user: {}", userId);
         userManagementService.setPassword(userId, request.getNewPassword());
         return ResponseEntity.ok().build();

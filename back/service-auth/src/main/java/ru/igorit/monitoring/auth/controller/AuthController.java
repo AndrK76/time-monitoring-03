@@ -21,11 +21,11 @@ public class AuthController {
     private final AuthErrorHelper authErrorHelper;
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request,
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequestDto request,
                                    HttpServletResponse response) {
         log.info("Login attempt for user: {}", request.getUsername());
         try {
-            TokenResponse tokenResponse = authService.login(request, response);
+            TokenResponseDto tokenResponse = authService.login(request, response);
             return ResponseEntity.ok(tokenResponse);
         } catch (Exception e) {
             return authErrorHelper.handleLoginError(e, request.getUsername());
@@ -33,11 +33,11 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@Valid @RequestBody RegistrationRequest request,
+    public ResponseEntity<?> register(@Valid @RequestBody RegistrationRequestDto request,
                                       HttpServletResponse response) {
         log.info("Registration attempt for user: {}", request.getUsername());
         try {
-            TokenResponse tokenResponse = authService.register(request, response);
+            TokenResponseDto tokenResponse = authService.register(request, response);
             return ResponseEntity.ok(tokenResponse);
         } catch (Exception e) {
             return authErrorHelper.handleLoginError(e, request.getUsername());
@@ -45,7 +45,7 @@ public class AuthController {
     }
 
     @PostMapping("/change-password")
-    public ResponseEntity<?> changePassword(@Valid @RequestBody ChangePasswordRequest request) {
+    public ResponseEntity<?> changePassword(@Valid @RequestBody ChangePasswordRequestDto request) {
         log.info("Change password attempt");
         try {
             authService.changePassword(request);
@@ -56,9 +56,9 @@ public class AuthController {
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<TokenResponse> refresh(@RequestParam String refreshToken) {
+    public ResponseEntity<TokenResponseDto> refresh(@RequestParam String refreshToken) {
         log.info("Refresh token attempt");
-        TokenResponse response = authService.refreshToken(refreshToken);
+        TokenResponseDto response = authService.refreshToken(refreshToken);
         return ResponseEntity.ok(response);
     }
 
@@ -79,16 +79,16 @@ public class AuthController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<UserResponse> getCurrentUser(HttpServletRequest request) {
+    public ResponseEntity<UserResponseDto> getCurrentUser(HttpServletRequest request) {
         log.info("Get current user");
-        UserResponse user = authService.getCurrentUser(request);
+        UserResponseDto user = authService.getCurrentUser(request);
         return ResponseEntity.ok(user);
     }
 
     @GetMapping("/check")
-    public ResponseEntity<TokenResponse> checkAuth(HttpServletRequest request) {
+    public ResponseEntity<TokenResponseDto> checkAuth(HttpServletRequest request) {
         log.info("Check auth via cookie");
-        TokenResponse response = authService.checkAuth(request);
+        TokenResponseDto response = authService.checkAuth(request);
         return ResponseEntity.ok(response);
     }
 }

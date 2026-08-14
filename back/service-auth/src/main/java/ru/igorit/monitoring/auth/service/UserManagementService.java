@@ -9,10 +9,10 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.igorit.monitoring.auth.dto.*;
 import ru.igorit.monitoring.auth.mapper.UserManagementMapper;
 import ru.igorit.monitoring.common.dto.UserInfoUpdatedEvent;
-import ru.igorit.monitoring.common.enums.CommandType;
-import ru.igorit.monitoring.persistence.entity.Role;
-import ru.igorit.monitoring.persistence.entity.User;
-import ru.igorit.monitoring.persistence.service.AuthManagementPersistService;
+import ru.igorit.monitoring.common.enums.command.CommandType;
+import ru.igorit.monitoring.persistence.entity.auth.Role;
+import ru.igorit.monitoring.persistence.entity.auth.User;
+import ru.igorit.monitoring.persistence.service.auth.AuthManagementPersistService;
 import ru.igorit.monitoring.rabbit.service.CommandSender;
 import ru.igorit.monitoring.security.service.ResetPasswordService;
 
@@ -41,20 +41,20 @@ public class UserManagementService {
 
     @PreAuthorize("hasAuthority('USER_READ')")
     @Transactional(readOnly = true)
-    public List<UserListItem> getUserList() {
+    public List<UserListItemDto> getUserList() {
         return persistService.findAllUsers().stream()
                 .map(userManagementMapper::toUserListItem)
                 .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
-    public UserResponse getCurrentUser() {
+    public UserResponseDto getCurrentUser() {
         return toResponse(getCurrentUserEntity());
     }
 
     @PreAuthorize("hasAuthority('USER_READ')")
     @Transactional(readOnly = true)
-    public UserResponse getUserById(String userId) {
+    public UserResponseDto getUserById(String userId) {
         return toResponse(getUserEntityById(userId));
     }
 
@@ -63,7 +63,7 @@ public class UserManagementService {
     // ============================================================
 
     @Transactional
-    public UserResponse updateCurrentUser(UpdateUserRequest request) {
+    public UserResponseDto updateCurrentUser(UpdateUserRequestDto request) {
         User user = getCurrentUserEntity();
         updatePersonalFields(user, request);
         User saved = persistService.saveUser(user);
@@ -74,7 +74,7 @@ public class UserManagementService {
 
     @PreAuthorize("hasAuthority('USER_WRITE')")
     @Transactional
-    public UserResponse updateUser(String userId, UpdateUserRequest request) {
+    public UserResponseDto updateUser(String userId, UpdateUserRequestDto request) {
         User user = getUserEntityById(userId);
         User oldState = user.clone();
         String updaterId = extractUserId(getCurrentAuth());
@@ -185,14 +185,14 @@ public class UserManagementService {
     /**
      * Преобразование User в UserResponse
      */
-    private UserResponse toResponse(User user) {
+    private UserResponseDto toResponse(User user) {
         return userManagementMapper.toResponse(user);
     }
 
     /**
      * Обновление полей пользователя из запроса (полный доступ)
      */
-    private User updateAllFields(User user, UpdateUserRequest request, String updaterId) {
+    private User updateAllFields(User user, UpdateUserRequestDto request, String updaterId) {
         var updater = extractUserId(getCurrentAuth());
         user.setUsername(request.getUsername());
         user.setEmail(request.getEmail());
@@ -201,23 +201,34 @@ public class UserManagementService {
         user.setDisplayName(request.getDisplayName());
         Optional.ofNullable(request.getActive()).ifPresent(user::setIsActive);
         Optional.ofNullable(request.getEmailVerified()).ifPresent(user::setIsEmailVerified);
-        if (user.getIsApproved()==null || !user.getIsApproved() && request.getUserApproved()) {
+        log.debug("Before: isApproved={}, request.getUserApproved={}", user.getIsApproved(), request.getUserApproved());
+        if (request.getUserApproved() != null && request.getUserApproved() &&
+                (user.getIsApproved() == null || !user.getIsApproved())) {
             user.setIsApproved(true);
         }
         user.setUpdatedBy(updater);
+        log.debug("after: isApproved={}, request.getUserApproved={}", user.getIsApproved(), request.getUserApproved());
         user = persistService.saveUser(user);
+        log.debug("after save: isApproved={}, request.getUserApproved={}", user.getIsApproved(), request.getUserApproved());
         if (request.getRoles() != null) {
-            List<Role> roles = persistService.findByNameIn(request.getRoles());
-            persistService.updateUserRoles(user, request.getRoles(), updaterId);
-            user.setRoles(new HashSet<>(roles));
+            var currRoles = user.getRoles().stream().map(Role::getName).collect(Collectors.toSet());
+            var newRoles = new HashSet<>(request.getRoles());
+            if (!currRoles.equals(newRoles)) {
+                //List<Role> roles = persistService.findByNameIn(request.getRoles());
+                persistService.updateUserRoles(user, request.getRoles(), updaterId);
+                user.setRoles(new HashSet<>(persistService.findByNameIn(request.getRoles())));
+                user = persistService.findById(user.getId())
+                        .orElseThrow(() -> new RuntimeException("User not found"));
+            }
         }
-        return persistService.findById(user.getId()).orElseThrow(() -> new RuntimeException("User not found"));
+        log.debug("result method: isApproved={}", user.getIsApproved());
+        return user;
     }
 
     /**
      * Обновление только личных полей пользователя (без прав)
      */
-    private void updatePersonalFields(User user, UpdateUserRequest request) {
+    private void updatePersonalFields(User user, UpdateUserRequestDto request) {
         user.setFirstName(request.getFirstName());
         user.setLastName(request.getLastName());
         user.setDisplayName(request.getDisplayName());

@@ -6,10 +6,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import ru.igorit.monitoring.common.dto.CommandMessage;
-import ru.igorit.monitoring.common.dto.SecurityContextDto;
-import ru.igorit.monitoring.common.dto.UserContext;
-import ru.igorit.monitoring.common.enums.CommandType;
+import ru.igorit.monitoring.common.dto.command.CommandMessageDto;
+import ru.igorit.monitoring.common.dto.command.auth.SecurityContextDto;
+import ru.igorit.monitoring.common.dto.command.auth.UserContextDto;
+import ru.igorit.monitoring.common.enums.command.CommandType;
 import ru.igorit.monitoring.rabbit.config.RabbitMQConfig;
 import ru.igorit.monitoring.security.mapper.SecurityContextMapper;
 
@@ -28,16 +28,16 @@ public class CommandSender {
     private String serviceName;
 
     public void sendCommand(CommandType commandType, Object payload) {
-        UserContext userContext = securityContextMapper.toUserContextFromCurrent();
+        UserContextDto userContextDto = securityContextMapper.toUserContextFromCurrent();
         SecurityContextDto securityContext = securityContextMapper.toDto(
                 org.springframework.security.core.context.SecurityContextHolder.getContext()
         );
 
-        CommandMessage command = CommandMessage.builder()
+        CommandMessageDto command = CommandMessageDto.builder()
                 .commandId(UUID.randomUUID().toString())
                 .commandType(commandType.name())
                 .payload(payload)
-                .userContext(userContext)
+                .userContext(userContextDto)
                 .securityContext(securityContext)
                 .timestamp(LocalDateTime.now())
                 .sourceService(serviceName)
@@ -45,7 +45,7 @@ public class CommandSender {
                 .build();
 
         log.info("Sending command: {} from service: {} by user: {}",
-                commandType, serviceName, userContext.getUsername());
+                commandType, serviceName, userContextDto.getUsername());
 
         rabbitTemplate.convertAndSend(
                 RabbitMQConfig.EXCHANGE_NAME,

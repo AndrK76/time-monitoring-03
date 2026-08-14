@@ -1,9 +1,9 @@
-export interface LoginRequest {
+export interface LoginRequestDto {
   username: string;
   password: string;
 }
 
-export interface RegistrationRequest {
+export interface RegistrationRequestDto {
   username: string;
   email: string;
   password: string;
@@ -12,24 +12,25 @@ export interface RegistrationRequest {
   displayName: string;
 }
 
-export interface ChangePasswordRequest {
+export interface ChangePasswordRequestDto {
   currentPassword: string;
   newPassword: string;
   confirmPassword: string;
 }
 
-export interface UpdateUserRequest {
+export interface UpdateUserRequestDto {
   username: string;
   email: string;
   firstName: string;
   lastName: string;
   displayName: string;
   active?: boolean;
+  userApproved?: boolean;
   emailVerified?: boolean;
   roles?: string[];
 }
 
-export interface UserResponse {
+export interface UserResponseDto {
   id: string;
   username: string;
   email: string;
@@ -38,13 +39,14 @@ export interface UserResponse {
   displayName: string;
   avatarUrl?: string;
   active: boolean;
+  approved: boolean;
   emailVerified: boolean;
   roles: string[];
   permissions: string[];
   anonymous: boolean;
 }
 
-export interface UserListItem {
+export interface UserListItemDto {
   id: string;
   username: string;
   displayName: string;
@@ -60,12 +62,12 @@ export interface PermissionDto {
   description: string;
 }
 
-export interface TokenResponse {
+export interface TokenResponseDto {
   accessToken: string;
   refreshToken: string;
   tokenType: string;
   expiresIn: number;
-  user: UserResponse;
+  user: UserResponseDto;
 }
 
 export interface TestResponse {

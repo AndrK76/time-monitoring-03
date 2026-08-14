@@ -5,9 +5,9 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import {
   AdminService,
-  UserResponse,
-  UserListItem,
-  UpdateUserRequest,
+  UserResponseDto,
+  UserListItemDto,
+  UpdateUserRequestDto,
   AuthService,
   RoleDto,
   PermissionDto
@@ -29,10 +29,10 @@ export class UserManagementComponent implements OnInit {
   // Данные
   // ============================================================
 
-  users: UserListItem[] = [];
-  selectedUser: UserListItem | null = null;
-  fullUser: UserResponse | null = null;
-  editingUser: UserResponse | null = null;
+  users: UserListItemDto[] = [];
+  selectedUser: UserListItemDto | null = null;
+  fullUser: UserResponseDto | null = null;
+  editingUser: UserResponseDto | null = null;
 
   // Справочники
   rolesMap: Map<string, string> = new Map();
@@ -107,7 +107,7 @@ export class UserManagementComponent implements OnInit {
           this.fullUser = user;
           this.editingUser = { ...user };
 
-          const userListItem: UserListItem = {
+          const userListItem: UserListItemDto = {
             id: user.id,
             username: user.username,
             displayName: user.displayName || user.username
@@ -148,7 +148,7 @@ export class UserManagementComponent implements OnInit {
     });
   }
 
-  selectUser(user: UserListItem): void {
+  selectUser(user: UserListItemDto): void {
     if (this.selectedUser?.id === user.id && this.fullUser) {
       return;
     }
@@ -236,7 +236,7 @@ export class UserManagementComponent implements OnInit {
       return;
     }
 
-    const updateData: UpdateUserRequest = {
+    const updateData: UpdateUserRequestDto = {
       username: this.editingUser.username,
       email: this.editingUser.email,
       firstName: this.editingUser.firstName,
@@ -248,6 +248,9 @@ export class UserManagementComponent implements OnInit {
       updateData.active = this.editingUser.active;
       updateData.emailVerified = this.editingUser.emailVerified;
       updateData.roles = this.editingUser.roles;
+      if (this.editingUser.approved === true && this.fullUser?.approved === false) {
+        updateData.userApproved = true;
+      }
     }
 
     let request;
@@ -276,7 +279,7 @@ export class UserManagementComponent implements OnInit {
   // Управление паролями (только для админов)
   // ============================================================
 
-  openPasswordModal(user: UserListItem): void {
+  openPasswordModal(user: UserListItemDto): void {
     if (!this.isAdmin) return;
     this.passwordModalUserId = user.id;
     this.passwordModalUsername = user.displayName || user.username;
@@ -393,5 +396,12 @@ export class UserManagementComponent implements OnInit {
 
   getPermissionDescription(permissionName: string): string {
     return this.permissionsMap.get(permissionName) || permissionName;
+  }
+
+  toggleApproved(): void {
+    if (!this.editingUser) {
+      return;
+    }
+    this.editingUser.approved = true;
   }
 }

@@ -1,11 +1,11 @@
 // monitoring3/back/core-security/src/main/java/ru/igorit/monitoring/security/model/CustomOAuth2User.java
 package ru.igorit.monitoring.security.model;
 
-import ru.igorit.monitoring.persistence.entity.User;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.core.user.OAuth2User;
+import ru.igorit.monitoring.persistence.entity.auth.User;
 
 import java.util.Collection;
 import java.util.Map;

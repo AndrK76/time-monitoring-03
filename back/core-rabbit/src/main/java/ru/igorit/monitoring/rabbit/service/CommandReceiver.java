@@ -5,9 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import ru.igorit.monitoring.common.dto.CommandMessage;
-import ru.igorit.monitoring.common.dto.SecurityContextDto;
-import ru.igorit.monitoring.common.dto.UserContext;
+import ru.igorit.monitoring.common.dto.command.CommandMessageDto;
+import ru.igorit.monitoring.common.dto.command.auth.SecurityContextDto;
+import ru.igorit.monitoring.common.dto.command.auth.UserContextDto;
 import ru.igorit.monitoring.security.mapper.SecurityContextMapper;
 
 @Service
@@ -25,7 +25,7 @@ public class CommandReceiver {
         this.securityContextMapper = securityContextMapper;
     }
 
-    public <T> T getPayload(CommandMessage command, Class<T> targetClass) {
+    public <T> T getPayload(CommandMessageDto command, Class<T> targetClass) {
         Object payload = command.getPayload();
 
         if (payload == null) {
@@ -45,11 +45,11 @@ public class CommandReceiver {
         }
     }
 
-    public UserContext getUserContext(CommandMessage command) {
+    public UserContextDto getUserContext(CommandMessageDto command) {
         return command.getUserContext();
     }
 
-    public SecurityContextDto getSecurityContext(CommandMessage command) {
+    public SecurityContextDto getSecurityContext(CommandMessageDto command) {
         return command.getSecurityContext();
     }
 }

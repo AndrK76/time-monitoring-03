@@ -5,8 +5,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-import ru.igorit.monitoring.common.dto.SecurityContextDto;
-import ru.igorit.monitoring.common.dto.UserContext;
+import ru.igorit.monitoring.common.dto.command.auth.SecurityContextDto;
+import ru.igorit.monitoring.common.dto.command.auth.UserContextDto;
 import ru.igorit.monitoring.security.model.SecurityContextAuthentication;
 
 import java.util.stream.Collectors;
@@ -62,12 +62,12 @@ public class SecurityContextMapper {
     // Authentication → UserContext
     // ============================================================
 
-    public UserContext toUserContext(Authentication auth) {
+    public UserContextDto toUserContext(Authentication auth) {
         if (auth == null || !auth.isAuthenticated()) {
-            return UserContext.anonymous();
+            return UserContextDto.anonymous();
         }
 
-        return UserContext.builder()
+        return UserContextDto.builder()
                 .userId(extractUserId(auth))
                 .username(auth.getName())
                 .email(extractEmail(auth))
@@ -81,7 +81,7 @@ public class SecurityContextMapper {
                 .build();
     }
 
-    public UserContext toUserContextFromCurrent() {
+    public UserContextDto toUserContextFromCurrent() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         return toUserContext(auth);
     }

@@ -1,7 +1,7 @@
 // service-admin/src/main/java/ru/igorit/monitoring/admin/service/AdminUserCacheService.java
 package ru.igorit.monitoring.admin.service;
 
-import ru.igorit.monitoring.common.dto.UserContext;
+import ru.igorit.monitoring.common.dto.command.auth.UserContextDto;
 import ru.igorit.monitoring.common.dto.UserInfoUpdatedEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -15,7 +15,7 @@ public class AdminUserCacheService {
 
     private final Map<String, UserInfoUpdatedEvent> userCache = new ConcurrentHashMap<>();
 
-    public void updateUser(UserInfoUpdatedEvent event, UserContext userContext, String sourceService) {
+    public void updateUser(UserInfoUpdatedEvent event, UserContextDto userContextDto, String sourceService) {
         userCache.put(event.getUserId(), event);
         log.info("User cached: {} (fullUpdate={})", event.getUsername(), event.isFullUpdate());
     }

@@ -1,7 +1,7 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { AuthService } from './auth.service';
-import { PermissionDto, RoleDto, TestResponse, UpdateUserRequest, UserListItem, UserResponse } from '../models/auth.models';
+import { PermissionDto, RoleDto, TestResponse, UpdateUserRequestDto, UserListItemDto, UserResponseDto } from '../models/auth.models';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -35,14 +35,14 @@ export class AdminService {
   // Управление пользователями
   // ============================================================
 
-  getCurrentUser(): Observable<UserResponse> {
-    return this.http.get<UserResponse>(`${this.authApiUrl}/usermanage/users/me`, {
+  getCurrentUser(): Observable<UserResponseDto> {
+    return this.http.get<UserResponseDto>(`${this.authApiUrl}/usermanage/users/me`, {
       headers: this.getHeaders()
     });
   }
 
-  updateCurrentUser(data: UpdateUserRequest): Observable<UserResponse> {
-    return this.http.put<UserResponse>(`${this.authApiUrl}/usermanage/users/me`, data, {
+  updateCurrentUser(data: UpdateUserRequestDto): Observable<UserResponseDto> {
+    return this.http.put<UserResponseDto>(`${this.authApiUrl}/usermanage/users/me`, data, {
       headers: this.getHeaders()
     });
   }
@@ -59,20 +59,20 @@ export class AdminService {
     });
   }
 
-  getUsersList(): Observable<UserListItem[]> {
-    return this.http.get<UserListItem[]>(`${this.authApiUrl}/usermanage/users`, {
+  getUsersList(): Observable<UserListItemDto[]> {
+    return this.http.get<UserListItemDto[]>(`${this.authApiUrl}/usermanage/users`, {
       headers: this.getHeaders()
     });
   }
 
-  getUserById(userId: string): Observable<UserResponse> {
-    return this.http.get<UserResponse>(`${this.authApiUrl}/usermanage/users/${userId}`, {
+  getUserById(userId: string): Observable<UserResponseDto> {
+    return this.http.get<UserResponseDto>(`${this.authApiUrl}/usermanage/users/${userId}`, {
       headers: this.getHeaders()
     });
   }
 
-  updateUser(userId: string, data: UpdateUserRequest): Observable<UserResponse> {
-    return this.http.put<UserResponse>(`${this.authApiUrl}/usermanage/users/${userId}`, data, {
+  updateUser(userId: string, data: UpdateUserRequestDto): Observable<UserResponseDto> {
+    return this.http.put<UserResponseDto>(`${this.authApiUrl}/usermanage/users/${userId}`, data, {
       headers: this.getHeaders()
     });
   }

@@ -1,33 +1,30 @@
-package ru.igorit.monitoring.common.dto;
+package ru.igorit.monitoring.auth.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserInfoUpdatedEvent implements Serializable {
+public class UserResponseDto {
 
-    private static final long serialVersionUID = 1L;
-
-    private String userId;
+    private String id;
     private String username;
     private String email;
     private String firstName;
     private String lastName;
     private String displayName;
+    private String avatarUrl;
     private boolean active;
     private boolean approved;
+    private boolean emailVerified;
+    private List<String> roles;
+    private List<String> permissions;
+    private boolean anonymous;
 
-
-    private LocalDateTime updatedAt;
-    private String updatedBy;
-    private boolean fullUpdate;
-    private String[] roles;
 }

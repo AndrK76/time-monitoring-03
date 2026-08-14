@@ -1,8 +1,8 @@
 package ru.igorit.monitoring.security.service;
 
-import ru.igorit.monitoring.persistence.entity.TelegramToken;
-import ru.igorit.monitoring.persistence.entity.User;
-import ru.igorit.monitoring.persistence.repository.TelegramTokenRepository;
+import ru.igorit.monitoring.persistence.entity.auth.TelegramToken;
+import ru.igorit.monitoring.persistence.entity.auth.User;
+import ru.igorit.monitoring.persistence.repository.auth.TelegramTokenRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;

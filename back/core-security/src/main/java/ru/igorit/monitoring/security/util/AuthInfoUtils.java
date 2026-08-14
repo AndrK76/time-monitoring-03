@@ -3,7 +3,7 @@ package ru.igorit.monitoring.security.util;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import ru.igorit.monitoring.persistence.entity.User;
+import ru.igorit.monitoring.persistence.entity.auth.User;
 import ru.igorit.monitoring.security.model.JwtAuthenticationToken;
 import ru.igorit.monitoring.security.model.UserPrincipal;
 
