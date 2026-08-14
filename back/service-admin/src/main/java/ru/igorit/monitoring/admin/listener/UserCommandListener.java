@@ -1,15 +1,16 @@
 // service-admin/src/main/java/ru/igorit/monitoring/admin/listener/UserCommandListener.java
 package ru.igorit.monitoring.admin.listener;
 
-import ru.igorit.monitoring.common.dto.UserInfoUpdatedEvent;
+import ru.igorit.monitoring.admin.service.UserEventsReceiveService;
+import ru.igorit.monitoring.common.dto.command.auth.UserCreatedEventCommandDto;
+import ru.igorit.monitoring.common.dto.command.auth.UserInfoUpdatedEventCommandDto;
 import ru.igorit.monitoring.rabbit.config.RabbitMQConfig;
 import ru.igorit.monitoring.common.dto.command.CommandMessageDto;
-import ru.igorit.monitoring.common.enums.command.CommandType;
+import ru.igorit.monitoring.common.enums.command.CommandMessageType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
-import ru.igorit.monitoring.admin.service.AdminUserCacheService;
 import ru.igorit.monitoring.rabbit.service.CommandReceiver;
 
 @Component
@@ -17,7 +18,7 @@ import ru.igorit.monitoring.rabbit.service.CommandReceiver;
 @Slf4j
 public class UserCommandListener {
 
-    private final AdminUserCacheService cacheService;
+    private final UserEventsReceiveService userService;
     private final CommandReceiver commandReceiver;
 
     @RabbitListener(queues = RabbitMQConfig.QUEUE_NAME)
@@ -25,14 +26,19 @@ public class UserCommandListener {
         log.info("Received command: {} from {}", command.getCommandType(), command.getSourceService());
 
         try {
-            switch (CommandType.valueOf(command.getCommandType())) {
+            switch (CommandMessageType.valueOf(command.getCommandType())) {
                 case USER_INFO_UPDATED:
-                    UserInfoUpdatedEvent userEvent = commandReceiver.getPayload(command, UserInfoUpdatedEvent.class);
+                    UserInfoUpdatedEventCommandDto userEvent = commandReceiver.getPayload(command, UserInfoUpdatedEventCommandDto.class);
                     if (userEvent != null) {
-                        cacheService.updateUser(userEvent, command.getUserContext(), command.getSourceService());
+                        userService.updateUser(userEvent, command.getUserContext(), command.getSourceService());
                     }
                     break;
-
+                case USER_CREATED:
+                    UserCreatedEventCommandDto userCEvent = commandReceiver.getPayload(command, UserCreatedEventCommandDto.class);
+                    if (userCEvent != null) {
+                        userService.createUser(userCEvent,command.getUserContext(), command.getSourceService());
+                    }
+                    break;
                 default:
                     log.warn("Unknown command type: {}", command.getCommandType());
             }

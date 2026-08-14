@@ -1,7 +1,7 @@
 package ru.igorit.monitoring.auth.service;
 
 import ru.igorit.monitoring.persistence.entity.auth.User;
-import ru.igorit.monitoring.persistence.repository.auth.UserRepository;
+import ru.igorit.monitoring.auth.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;

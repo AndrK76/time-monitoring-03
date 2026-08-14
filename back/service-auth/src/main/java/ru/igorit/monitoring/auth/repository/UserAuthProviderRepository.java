@@ -1,4 +1,4 @@
-package ru.igorit.monitoring.persistence.repository.auth;
+package ru.igorit.monitoring.auth.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

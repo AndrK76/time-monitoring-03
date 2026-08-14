@@ -5,7 +5,8 @@ import ru.igorit.monitoring.auth.dto.PermissionDto;
 import ru.igorit.monitoring.auth.dto.RoleDto;
 import ru.igorit.monitoring.auth.dto.UserListItemDto;
 import ru.igorit.monitoring.auth.dto.UserResponseDto;
-import ru.igorit.monitoring.common.dto.UserInfoUpdatedEvent;
+import ru.igorit.monitoring.common.dto.command.auth.UserCreatedEventCommandDto;
+import ru.igorit.monitoring.common.dto.command.auth.UserInfoUpdatedEventCommandDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import ru.igorit.monitoring.persistence.entity.auth.Permission;
@@ -38,7 +39,7 @@ public interface UserManagementMapper {
     @Mapping(target = "userId", source = "id")
     @Mapping(target = "fullUpdate", ignore = true)
     @Mapping(target = "roles", source = "roles", qualifiedByName = "rolesToArray")
-    UserInfoUpdatedEvent toUserUpdatedEvent(User user);
+    UserInfoUpdatedEventCommandDto toUserUpdatedEvent(User user);
 
 
     @Named("rolesToArray")
@@ -48,4 +49,8 @@ public interface UserManagementMapper {
         }
         return roles.stream().map(Role::getName).toArray(String[]::new);
     }
+
+    @Mapping(target = "userId", source = "id")
+    @Mapping(target = "active", source = "isActive")
+    UserCreatedEventCommandDto toUserCreatedEvent(User user);
 }

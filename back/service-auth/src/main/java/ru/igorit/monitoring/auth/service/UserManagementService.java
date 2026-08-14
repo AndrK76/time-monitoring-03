@@ -8,13 +8,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.igorit.monitoring.auth.dto.*;
 import ru.igorit.monitoring.auth.mapper.UserManagementMapper;
-import ru.igorit.monitoring.common.dto.UserInfoUpdatedEvent;
-import ru.igorit.monitoring.common.enums.command.CommandType;
+import ru.igorit.monitoring.common.dto.command.auth.UserInfoUpdatedEventCommandDto;
+import ru.igorit.monitoring.common.enums.command.CommandMessageType;
 import ru.igorit.monitoring.persistence.entity.auth.Role;
 import ru.igorit.monitoring.persistence.entity.auth.User;
-import ru.igorit.monitoring.persistence.service.auth.AuthManagementPersistService;
 import ru.igorit.monitoring.rabbit.service.CommandSender;
-import ru.igorit.monitoring.security.service.ResetPasswordService;
 
 import java.util.HashSet;
 import java.util.List;
@@ -240,10 +238,10 @@ public class UserManagementService {
      */
     private void sendUserUpdatedEvent(User user, boolean fullUpdate) {
         try {
-            UserInfoUpdatedEvent event = userManagementMapper.toUserUpdatedEvent(user);
+            UserInfoUpdatedEventCommandDto event = userManagementMapper.toUserUpdatedEvent(user);
             event.setFullUpdate(fullUpdate);
 
-            commandSender.sendCommand(CommandType.USER_INFO_UPDATED, event);
+            commandSender.sendCommand(CommandMessageType.USER_INFO_UPDATED, event);
             log.info("User updated event sent for user: {}", user.getUsername());
         } catch (Exception e) {
             // Не даём упасть приложению, если RabbitMQ недоступен

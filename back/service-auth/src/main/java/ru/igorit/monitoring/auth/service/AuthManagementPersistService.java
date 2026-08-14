@@ -1,4 +1,4 @@
-package ru.igorit.monitoring.persistence.service.auth;
+package ru.igorit.monitoring.auth.service;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -9,9 +9,9 @@ import org.springframework.stereotype.Service;
 import ru.igorit.monitoring.persistence.entity.auth.Permission;
 import ru.igorit.monitoring.persistence.entity.auth.Role;
 import ru.igorit.monitoring.persistence.entity.auth.User;
-import ru.igorit.monitoring.persistence.repository.auth.PermissionRepository;
-import ru.igorit.monitoring.persistence.repository.auth.RoleRepository;
-import ru.igorit.monitoring.persistence.repository.auth.UserRepository;
+import ru.igorit.monitoring.auth.repository.PermissionRepository;
+import ru.igorit.monitoring.auth.repository.RoleRepository;
+import ru.igorit.monitoring.auth.repository.UserRepository;
 
 import java.util.*;
 import java.util.stream.Collectors;

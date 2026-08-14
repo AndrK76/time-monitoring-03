@@ -1,4 +1,3 @@
-// service-admin/src/main/java/ru/igorit/monitoring/admin/service/TestService.java
 package ru.igorit.monitoring.admin.service;
 
 import ru.igorit.monitoring.admin.dto.TestResponse;

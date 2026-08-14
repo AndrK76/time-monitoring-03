@@ -1,4 +1,4 @@
-package ru.igorit.monitoring.security.service;
+package ru.igorit.monitoring.auth.service;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -8,7 +8,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.igorit.monitoring.persistence.entity.auth.User;
-import ru.igorit.monitoring.persistence.repository.auth.UserRepository;
+import ru.igorit.monitoring.auth.repository.UserRepository;
 import ru.igorit.monitoring.security.util.AuthInfoUtils;
 
 @Service

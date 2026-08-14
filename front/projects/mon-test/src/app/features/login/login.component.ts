@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
 
-import { AuthService } from '@mon3/shared';
+import { AuthService } from '@mon3/shared-test';
 import { environment } from '../../../environments/environment';
 
 @Component({

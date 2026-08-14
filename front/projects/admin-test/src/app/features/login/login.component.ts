@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
-import { AuthService } from '@mon3/shared';
+import { AuthService } from '@mon3/shared-test';
 import { environment } from '../../../environments/environment';
 
 @Component({

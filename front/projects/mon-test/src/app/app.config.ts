@@ -4,7 +4,7 @@ import { routes } from './app.routes';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideAnimations } from '@angular/platform-browser/animations';
 
-import { AdminService, authInterceptorFn, AuthService, languageInterceptorFn } from '@mon3/shared';
+import { AdminService, authInterceptorFn, AuthService, languageInterceptorFn } from '@mon3/shared-test';
 import { environment } from '../environments/environment';
 
 

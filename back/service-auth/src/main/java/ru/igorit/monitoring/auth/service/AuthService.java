@@ -16,13 +16,13 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import ru.igorit.monitoring.auth.dto.*;
 import ru.igorit.monitoring.auth.mapper.UserManagementMapper;
+import ru.igorit.monitoring.common.enums.command.CommandMessageType;
 import ru.igorit.monitoring.persistence.entity.auth.Permission;
 import ru.igorit.monitoring.persistence.entity.auth.Role;
 import ru.igorit.monitoring.persistence.entity.auth.User;
-import ru.igorit.monitoring.persistence.service.auth.AuthManagementPersistService;
+import ru.igorit.monitoring.rabbit.service.CommandSender;
 import ru.igorit.monitoring.security.config.CookieProperties;
 import ru.igorit.monitoring.security.service.JwtService;
-import ru.igorit.monitoring.security.service.UserService;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -43,6 +43,7 @@ public class AuthService {
     private final UserManagementMapper userManagementMapper;
     private final CookieProperties cookieProperties;
     private final AuthManagementPersistService persistService;
+    private final CommandSender commandSender;
 
     // ============================================================
     // ПУБЛИЧНЫЕ МЕТОДЫ
@@ -74,6 +75,7 @@ public class AuthService {
                 extractUserId(getCurrentAuth()));
         TokenResponseDto tokenResponse = buildTokenResponse(user);
         addAuthCookie(response, tokenResponse.getAccessToken());
+        sendUserCreateEvent(user);
         return tokenResponse;
     }
 
@@ -331,5 +333,20 @@ public class AuthService {
             }
         }
         return null;
+    }
+
+    /**
+     * Приватный метод для отправки события
+     */
+    private void sendUserCreateEvent(User user) {
+        try {
+            var event = userManagementMapper.toUserCreatedEvent(user);
+
+            commandSender.sendCommand(CommandMessageType.USER_CREATED, event);
+            log.info("User created event sent for user: {}", user.getUsername());
+        } catch (Exception e) {
+            // Не даём упасть приложению, если RabbitMQ недоступен
+            log.error("Failed to send user created event for user: {}", user.getUsername(), e);
+        }
     }
 }

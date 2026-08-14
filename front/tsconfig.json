@@ -2,8 +2,8 @@
   "compileOnSave": false,
   "compilerOptions": {
     "paths": {
-      "@mon3/shared": [
-        "./projects/shared/src/public-api.ts"
+      "@mon3/shared-test": [
+        "./projects/shared-test/src/public-api.ts"
       ]
     },
     "rootDir": ".",

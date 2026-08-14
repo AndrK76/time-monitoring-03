@@ -11,7 +11,7 @@ import {
   AuthService,
   RoleDto,
   PermissionDto
-} from '@mon3/shared';
+} from '@mon3/shared-test';
 
 @Component({
   selector: 'app-user-management',

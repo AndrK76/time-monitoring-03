@@ -1,9 +1,8 @@
-// projects/admin-test/src/app/features/auth/register.component.ts
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { AuthService } from '@mon3/shared';
+import { AuthService } from '@mon3/shared-test';
 
 @Component({
   selector: 'app-register',

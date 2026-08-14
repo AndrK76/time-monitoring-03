@@ -1,4 +1,3 @@
-// service-admin/src/main/java/ru/igorit/monitoring/admin/AdminApplication.java
 package ru.igorit.monitoring.admin;
 
 import org.springframework.boot.SpringApplication;
@@ -18,8 +17,8 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
         "ru.igorit.monitoring.common",
         "ru.igorit.monitoring.rabbit"
 })
-@EntityScan(basePackages = {"ru.igorit.monitoring.persistence.entity"})
-@EnableJpaRepositories(basePackages = {"ru.igorit.monitoring.persistence.repository"})
+@EntityScan(basePackages = {"ru.igorit.monitoring.persistence.entity.admin"})
+@EnableJpaRepositories()
 public class AdminApplication {
     public static void main(String[] args) {
         SpringApplication.run(AdminApplication.class, args);

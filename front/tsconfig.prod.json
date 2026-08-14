@@ -2,8 +2,8 @@
   "compileOnSave": false,
   "compilerOptions": {
     "paths": {
-      "@mon3/shared": [
-        "./dist/shared"
+      "@mon3/shared-test": [
+        "./dist/shared-test"
       ]
     },
     "rootDir": ".",

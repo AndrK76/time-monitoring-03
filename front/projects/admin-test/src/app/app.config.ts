@@ -3,7 +3,7 @@ import { APP_INITIALIZER, ApplicationConfig, inject, LOCALE_ID } from '@angular/
 import { provideRouter } from '@angular/router';
 
 import { routes } from './app.routes';
-import { AdminService, authInterceptorFn, AuthService } from '@mon3/shared';
+import { AdminService, authInterceptorFn, AuthService } from '@mon3/shared-test';
 import { environment } from '../environments/environment';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideAnimations } from '@angular/platform-browser/animations';

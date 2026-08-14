@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import ru.igorit.monitoring.common.dto.command.CommandMessageDto;
 import ru.igorit.monitoring.common.dto.command.auth.SecurityContextDto;
 import ru.igorit.monitoring.common.dto.command.auth.UserContextDto;
-import ru.igorit.monitoring.common.enums.command.CommandType;
+import ru.igorit.monitoring.common.enums.command.CommandMessageType;
 import ru.igorit.monitoring.rabbit.config.RabbitMQConfig;
 import ru.igorit.monitoring.security.mapper.SecurityContextMapper;
 
@@ -27,7 +27,7 @@ public class CommandSender {
     @Value("${spring.application.name:unknown-service}")
     private String serviceName;
 
-    public void sendCommand(CommandType commandType, Object payload) {
+    public void sendCommand(CommandMessageType commandType, Object payload) {
         UserContextDto userContextDto = securityContextMapper.toUserContextFromCurrent();
         SecurityContextDto securityContext = securityContextMapper.toDto(
                 org.springframework.security.core.context.SecurityContextHolder.getContext()

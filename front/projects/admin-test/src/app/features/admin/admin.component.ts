@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import { AdminService, AuthService, TestResponse } from '@mon3/shared';
+import { AdminService, AuthService, TestResponse } from '@mon3/shared-test';
 import { environment } from '../../../environments/environment';
 
 @Component({

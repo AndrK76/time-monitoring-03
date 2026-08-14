@@ -19,8 +19,8 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
         "ru.igorit.monitoring.common",
         "ru.igorit.monitoring.rabbit"
 })
-@EntityScan(basePackages = {"ru.igorit.monitoring.persistence.entity"})
-@EnableJpaRepositories(basePackages = {"ru.igorit.monitoring.persistence.repository"})
+@EntityScan(basePackages = {"ru.igorit.monitoring.persistence.entity.auth"})
+@EnableJpaRepositories()
 public class AuthApplication {
     public static void main(String[] args) {
         SpringApplication.run(AuthApplication.class, args);

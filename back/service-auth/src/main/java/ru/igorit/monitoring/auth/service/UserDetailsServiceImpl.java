@@ -1,4 +1,4 @@
-package ru.igorit.monitoring.security.service;
+package ru.igorit.monitoring.auth.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -9,7 +9,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.igorit.monitoring.persistence.entity.auth.User;
-import ru.igorit.monitoring.persistence.repository.auth.UserRepository;
+import ru.igorit.monitoring.auth.repository.UserRepository;
 import ru.igorit.monitoring.security.model.UserPrincipal;
 
 @Service

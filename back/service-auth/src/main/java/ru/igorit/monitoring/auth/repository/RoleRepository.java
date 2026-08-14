@@ -1,4 +1,4 @@
-package ru.igorit.monitoring.persistence.repository.auth;
+package ru.igorit.monitoring.auth.repository;
 
 import ru.igorit.monitoring.persistence.entity.auth.Role;
 import org.springframework.data.jpa.repository.JpaRepository;

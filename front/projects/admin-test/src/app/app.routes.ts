@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { authGuard } from '@mon3/shared';
+import { authGuard } from '@mon3/shared-test';
 
 import { LoginComponent } from './features/login/login.component';
 import { AdminComponent } from './features/admin/admin.component';
