@@ -76,6 +76,7 @@ public class UserManagementService {
     @Transactional
     public UserResponse updateUser(String userId, UpdateUserRequest request) {
         User user = getUserEntityById(userId);
+        User oldState = user.clone();
         String updaterId = extractUserId(getCurrentAuth());
         var saved = updateAllFields(user, request, updaterId);
         sendUserUpdatedEvent(saved, true);
@@ -200,6 +201,9 @@ public class UserManagementService {
         user.setDisplayName(request.getDisplayName());
         Optional.ofNullable(request.getActive()).ifPresent(user::setIsActive);
         Optional.ofNullable(request.getEmailVerified()).ifPresent(user::setIsEmailVerified);
+        if (user.getIsApproved()==null || !user.getIsApproved() && request.getUserApproved()) {
+            user.setIsApproved(true);
+        }
         user.setUpdatedBy(updater);
         user = persistService.saveUser(user);
         if (request.getRoles() != null) {

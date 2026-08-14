@@ -16,6 +16,7 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface UserManagementMapper {
 
+    @Mapping(target = "approved", source = "isApproved")
     @Mapping(target = "emailVerified", source = "isEmailVerified")
     @Mapping(target = "active", source = "isActive")
     @Mapping(target = "roles", expression = "java(user.getRoles().stream().map(Role::getName).collect(java.util.stream.Collectors.toList()))")

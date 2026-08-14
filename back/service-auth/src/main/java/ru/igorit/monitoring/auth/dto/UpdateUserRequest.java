@@ -33,6 +33,7 @@ public class UpdateUserRequest {
 
     private Boolean active;
     private Boolean emailVerified;
+    private Boolean userApproved;
 
     private List<String> roles;
 }

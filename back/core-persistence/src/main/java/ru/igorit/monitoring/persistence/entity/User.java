@@ -2,6 +2,7 @@ package ru.igorit.monitoring.persistence.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.LazyInitializationException;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -19,7 +20,7 @@ import static ru.igorit.monitoring.common.AuthConstants.ANONYMOUS_USERID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class User {
+public class User implements Cloneable{
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -55,6 +56,10 @@ public class User {
     @Column(name = "is_email_verified")
     @Builder.Default
     private Boolean isEmailVerified = false;
+
+    @Column(name = "is_approved")
+    @Builder.Default
+    private Boolean isApproved = true;
 
     @Column(name = "last_login_at")
     private LocalDateTime lastLoginAt;
@@ -122,5 +127,19 @@ public class User {
 
     public boolean isAnonymous() {
         return this.id == null && ANONYMOUS_USER.equals(this.username);
+    }
+
+
+    @Override
+    public User clone() {
+        try {
+            var ret=  (User) super.clone();
+            try {
+                ret.setRoles(new HashSet<>(this.roles));
+            } catch (LazyInitializationException ignored) {}
+            return ret;
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
     }
 }

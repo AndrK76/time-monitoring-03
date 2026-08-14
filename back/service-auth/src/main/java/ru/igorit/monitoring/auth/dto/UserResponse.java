@@ -21,6 +21,7 @@ public class UserResponse {
     private String displayName;
     private String avatarUrl;
     private boolean active;
+    private boolean approved;
     private boolean emailVerified;
     private List<String> roles;
     private List<String> permissions;
