@@ -3,7 +3,13 @@
 {
   "extends": "./tsconfig.lib.json",
   "compilerOptions": {
-    "declarationMap": false
+    "declarationMap": false,
+    "baseUrl": "../../",
+    "paths": {
+      "@mon3/sa": [
+        "./dist/shared-auth"
+      ]
+    }
   },
   "angularCompilerOptions": {
     "compilationMode": "partial"

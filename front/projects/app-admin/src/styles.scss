@@ -8,12 +8,9 @@
 @import 'material-icons/iconfont/material-icons.css';
 
 // 3. Инициализация Material core
-//@include mat.m2-core();
-//@include mat.all-component-internals();
-@include mat.core(); 
+@include mat.core();
 
 // 4. Определяем кастомную серую палитру
-//    Берём оттенок 600 (это #6c757d, ваш цвет rgb(108, 117, 125))
 $custom-grey: (
   50: #f8f9fa,
   100: #f1f3f5,
@@ -22,7 +19,7 @@ $custom-grey: (
   400: #ced4da,
   500: #adb5bd,
   600: #6c757d,
-  // ваш цвет!
+  // ваш цвет rgb(108, 117, 125)
   700: #495057,
   800: #343a40,
   900: #212529,
@@ -30,12 +27,12 @@ $custom-grey: (
   )
 );
 
-// 5. Определяем палитры с префиксом m2-
+// 5. Определяем палитры (используем старый API, он всё ещё работает)
 $my-primary: mat.m2-define-palette(mat.$m2-indigo-palette);
 $my-accent: mat.m2-define-palette($custom-grey, 600);
 $my-warn: mat.m2-define-palette(mat.$m2-red-palette);
 
-// 6. Создаём тему (также с префиксом m2-)
+// 6. Создаём тему
 $my-theme: mat.m2-define-light-theme((color: (primary: $my-primary,
         accent: $my-accent,
         warn: $my-warn,
@@ -44,10 +41,9 @@ $my-theme: mat.m2-define-light-theme((color: (primary: $my-primary,
     ));
 
 // 7. Применяем тему ко всем компонентам
-//@include mat.m2-all-component-themes($my-theme);
 @include mat.all-component-themes($my-theme);
 
-// 8. Глобальные стили
+// 8. Глобальные сбросы
 * {
   margin: 0;
   padding: 0;
@@ -59,4 +55,19 @@ body {
   height: 100%;
   font-family: Roboto, "Helvetica Neue", sans-serif;
   background: #f5f7fa;
+}
+
+// ============================================================
+// 9. Переопределение высоты полей ввода (глобально)
+// ============================================================
+:root {
+  --mat-form-field-container-height: 36px;
+  --mat-form-field-filled-label-display: block;
+}
+
+// Уменьшаем внутренние отступы для компактности
+.mat-mdc-form-field-infix {
+  padding-top: 10px !important;
+  padding-bottom: 6px !important;
+  min-height: 28px !important;
 }

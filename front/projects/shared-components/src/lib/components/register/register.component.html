@@ -1,0 +1,48 @@
+<div class="auth-container">
+  <mat-card class="auth-card" style="padding-left: 4px; padding-right: 4px;">
+    <mat-card-header>
+      <mat-card-title>Регистрация</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <form (ngSubmit)="onSubmit()" #registerForm="ngForm">
+        <mat-form-field appearance="fill" class="full-width compact-field">
+          <mat-label>Имя пользователя</mat-label>
+          <input matInput type="text" [(ngModel)]="userData.username" name="username" required>
+        </mat-form-field>
+        <mat-form-field appearance="fill" class="full-width compact-field">
+          <mat-label>Email</mat-label>
+          <input matInput type="email" [(ngModel)]="userData.email" name="email" required>
+        </mat-form-field>
+        <mat-form-field appearance="fill" class="full-width compact-field">
+          <mat-label>Пароль</mat-label>
+          <input matInput type="password" [(ngModel)]="userData.password" name="password" required>
+        </mat-form-field>
+        <mat-form-field appearance="fill" class="full-width compact-field">
+          <mat-label>Имя</mat-label>
+          <input matInput type="text" [(ngModel)]="userData.firstName" name="firstName">
+        </mat-form-field>
+        <mat-form-field appearance="fill" class="full-width compact-field">
+          <mat-label>Фамилия</mat-label>
+          <input matInput type="text" [(ngModel)]="userData.lastName" name="lastName">
+        </mat-form-field>
+        <mat-form-field appearance="fill" class="full-width compact-field">
+          <mat-label>Отображаемое имя</mat-label>
+          <input matInput type="text" [(ngModel)]="userData.displayName" name="displayName">
+        </mat-form-field>
+
+        <div class="button-row">
+          <button mat-raised-button color="primary" type="submit" class="action-button"
+            [disabled]="registerForm.invalid || isLoading">
+            {{ isLoading ? 'Регистрация...' : 'Зарегистрироваться' }}
+          </button>
+          <button mat-raised-button color="accent" type="button" class="action-button" routerLink="/home">
+            Отмена
+          </button>
+        </div>
+        <div class="auth-links">
+          <a routerLink="/login">Уже есть аккаунт? Войти</a>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

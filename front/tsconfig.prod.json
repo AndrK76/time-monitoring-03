@@ -10,7 +10,7 @@
       ],
       "@mon3/sc": [
         "./dist/shared-components"
-      ],
+      ]
     },
     "rootDir": ".",
     "outDir": "./dist/out-tsc",

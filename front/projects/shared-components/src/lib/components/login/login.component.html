@@ -1,0 +1,31 @@
+<div class="auth-container">
+  <mat-card class="auth-card">
+    <mat-card-header>
+      <mat-card-title>Вход в систему</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <form (ngSubmit)="onSubmit()" #loginForm="ngForm">
+        <mat-form-field appearance="fill" class="full-width compact-field">
+          <mat-label>Имя пользователя</mat-label>
+          <input matInput type="text" [(ngModel)]="credentials.username" name="username" required>
+        </mat-form-field>
+        <mat-form-field appearance="fill" class="full-width compact-field">
+          <mat-label>Пароль</mat-label>
+          <input matInput type="password" [(ngModel)]="credentials.password" name="password" required>
+        </mat-form-field>
+        <div class="button-row">
+          <button mat-raised-button color="primary" type="submit" class="action-button"
+            [disabled]="loginForm.invalid || isLoading">
+            {{ isLoading ? 'Вход...' : 'Войти' }}
+          </button>
+          <button mat-raised-button color="accent" type="button" class="action-button" routerLink="/home">
+            Отмена
+          </button>
+        </div>
+        <div class="auth-links">
+          <a routerLink="/register">Нет аккаунта? Зарегистрироваться</a>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>
