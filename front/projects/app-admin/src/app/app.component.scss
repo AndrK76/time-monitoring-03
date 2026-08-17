@@ -1,0 +1,14 @@
+:host {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+app-header {
+    flex-shrink: 0;
+}
+
+app-main {
+    flex: 1;
+    overflow: hidden;
+}

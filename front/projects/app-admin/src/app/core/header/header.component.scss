@@ -1,0 +1,20 @@
+.header-toolbar {
+    height: 48px;
+    min-height: 48px;
+    padding: 0 12px;
+}
+
+.brand-container {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.brand {
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+
+.spacer {
+    flex: 1 1 auto;
+}

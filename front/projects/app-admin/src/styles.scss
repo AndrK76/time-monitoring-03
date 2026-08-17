@@ -1,4 +1,62 @@
-/* You can add global styles to this file, and also import other style files */
+// 1. Импорт Material (обязательно первым)
+@use '@angular/material' as mat;
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+// 2. Импорт локальных шрифтов и иконок
+@import '@fontsource/roboto/300.css';
+@import '@fontsource/roboto/400.css';
+@import '@fontsource/roboto/500.css';
+@import 'material-icons/iconfont/material-icons.css';
+
+// 3. Инициализация Material core
+//@include mat.m2-core();
+//@include mat.all-component-internals();
+@include mat.core(); 
+
+// 4. Определяем кастомную серую палитру
+//    Берём оттенок 600 (это #6c757d, ваш цвет rgb(108, 117, 125))
+$custom-grey: (
+  50: #f8f9fa,
+  100: #f1f3f5,
+  200: #e9ecef,
+  300: #dee2e6,
+  400: #ced4da,
+  500: #adb5bd,
+  600: #6c757d,
+  // ваш цвет!
+  700: #495057,
+  800: #343a40,
+  900: #212529,
+  contrast: (600: white,
+  )
+);
+
+// 5. Определяем палитры с префиксом m2-
+$my-primary: mat.m2-define-palette(mat.$m2-indigo-palette);
+$my-accent: mat.m2-define-palette($custom-grey, 600);
+$my-warn: mat.m2-define-palette(mat.$m2-red-palette);
+
+// 6. Создаём тему (также с префиксом m2-)
+$my-theme: mat.m2-define-light-theme((color: (primary: $my-primary,
+        accent: $my-accent,
+        warn: $my-warn,
+      ),
+      density: -2,
+    ));
+
+// 7. Применяем тему ко всем компонентам
+//@include mat.m2-all-component-themes($my-theme);
+@include mat.all-component-themes($my-theme);
+
+// 8. Глобальные стили
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  background: #f5f7fa;
+}
