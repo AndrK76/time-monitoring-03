@@ -17,7 +17,7 @@ COPY ../../front/projects/admin-test ./projects/admin-test
 
 # 4. Собираем shared и admin-test
 RUN npx ng build shared-test
-RUN npx ng build admin-test --configuration prod
+RUN npx ng build admin-test --configuration production
 
 
 FROM nginx:alpine

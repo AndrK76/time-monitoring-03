@@ -17,7 +17,7 @@ COPY ../../front/projects/mon-test ./projects/mon-test
 
 # 4. Собираем shared и mon-test
 RUN npx ng build shared-test
-RUN npx ng build mon-test --configuration prod
+RUN npx ng build mon-test --configuration production
 
 FROM nginx:alpine
 

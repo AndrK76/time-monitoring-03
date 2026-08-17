@@ -57,6 +57,37 @@
             "scripts": []
           },
           "configurations": {
+            "development": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "fileReplacements": []
+            },
+            "staging": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "500kb",
+                  "maximumError": "1mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "2kb",
+                  "maximumError": "4kb"
+                }
+              ],
+              "outputHashing": "all",
+              "fileReplacements": [
+                {
+                  "replace": "projects/mon-test/src/environments/environment.ts",
+                  "with": "projects/mon-test/src/environments/environment.staging.ts"
+                },
+                {
+                  "replace": "tsconfig.json",
+                  "with": "tsconfig.prod.json"
+                }
+              ]
+            },
             "production": {
               "budgets": [
                 {
@@ -75,47 +106,15 @@
                 {
                   "replace": "tsconfig.json",
                   "with": "tsconfig.prod.json"
-                }
-              ]
-            },
-            "development": {
-              "optimization": false,
-              "extractLicenses": false,
-              "sourceMap": true,
-              "fileReplacements": [
-                {
-                  "replace": "projects/mon-test/src/environments/environment.ts",
-                  "with": "projects/mon-test/src/environments/environment.development.ts"
-                }
-              ]
-            },
-            "prod": {
-              "budgets": [
-                {
-                  "type": "initial",
-                  "maximumWarning": "500kb",
-                  "maximumError": "1mb"
-                },
-                {
-                  "type": "anyComponentStyle",
-                  "maximumWarning": "2kb",
-                  "maximumError": "4kb"
-                }
-              ],
-              "outputHashing": "all",
-              "fileReplacements": [
-                {
-                  "replace": "tsconfig.json",
-                  "with": "tsconfig.prod.json"
                 },
                 {
                   "replace": "projects/mon-test/src/environments/environment.ts",
-                  "with": "projects/mon-test/src/environments/environment.prod.ts"
+                  "with": "projects/mon-test/src/environments/environment.production.ts"
                 }
               ]
             }
           },
-          "defaultConfiguration": "production"
+          "defaultConfiguration": "staging"
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
@@ -124,14 +123,14 @@
             "port": 4301
           },
           "configurations": {
-            "production": {
-              "buildTarget": "mon-test:build:production"
-            },
             "development": {
               "buildTarget": "mon-test:build:development"
             },
-            "prod": {
-              "buildTarget": "mon-test:build:prod"
+            "staging": {
+              "buildTarget": "mon-test:build:staging"
+            },
+            "production": {
+              "buildTarget": "mon-test:build:production"
             }
           },
           "defaultConfiguration": "development"
@@ -217,7 +216,13 @@
             "scripts": []
           },
           "configurations": {
-            "production": {
+            "development": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "fileReplacements": []
+            },
+            "staging": {
               "budgets": [
                 {
                   "type": "initial",
@@ -233,23 +238,16 @@
               "outputHashing": "all",
               "fileReplacements": [
                 {
+                  "replace": "projects/admin-test/src/environments/environment.ts",
+                  "with": "projects/admin-test/src/environments/environment.staging.ts"
+                },
+                {
                   "replace": "tsconfig.json",
                   "with": "tsconfig.prod.json"
                 }
               ]
             },
-            "development": {
-              "optimization": false,
-              "extractLicenses": false,
-              "sourceMap": true,
-              "fileReplacements": [
-                {
-                  "replace": "projects/admin-test/src/environments/environment.ts",
-                  "with": "projects/admin-test/src/environments/environment.development.ts"
-                }
-              ]
-            },
-            "prod": {
+            "production": {
               "budgets": [
                 {
                   "type": "initial",
@@ -270,12 +268,12 @@
                 },
                 {
                   "replace": "projects/admin-test/src/environments/environment.ts",
-                  "with": "projects/admin-test/src/environments/environment.prod.ts"
+                  "with": "projects/admin-test/src/environments/environment.production.ts"
                 }
               ]
             }
           },
-          "defaultConfiguration": "production"
+          "defaultConfiguration": "staging"
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
@@ -284,14 +282,14 @@
             "port": 4302
           },
           "configurations": {
-            "production": {
-              "buildTarget": "admin-test:build:production"
-            },
             "development": {
               "buildTarget": "admin-test:build:development"
             },
-            "prod": {
-              "buildTarget": "admin-test:build:prod"
+            "staging": {
+              "buildTarget": "admin-test:build:staging"
+            },
+            "production": {
+              "buildTarget": "admin-test:build:production"
             }
           },
           "defaultConfiguration": "development"
@@ -352,6 +350,234 @@
               "zone.js",
               "zone.js/testing"
             ]
+          }
+        }
+      }
+    },
+    "shared-auth": {
+      "projectType": "library",
+      "root": "projects/shared-auth",
+      "sourceRoot": "projects/shared-auth/src",
+      "prefix": "sa",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "options": {
+            "project": "projects/shared-auth/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/shared-auth/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/shared-auth/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "tsConfig": "projects/shared-auth/tsconfig.spec.json",
+            "polyfills": [
+              "zone.js",
+              "zone.js/testing"
+            ]
+          }
+        }
+      }
+    },
+    "shared-components": {
+      "projectType": "library",
+      "root": "projects/shared-components",
+      "sourceRoot": "projects/shared-components/src",
+      "prefix": "sc",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "options": {
+            "project": "projects/shared-components/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/shared-components/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/shared-components/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "tsConfig": "projects/shared-components/tsconfig.spec.json",
+            "polyfills": [
+              "zone.js",
+              "zone.js/testing"
+            ]
+          }
+        }
+      }
+    },
+    "app-admin": {
+      "projectType": "application",
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss",
+          "skipTests": true
+        },
+        "@schematics/angular:class": {
+          "skipTests": true
+        },
+        "@schematics/angular:directive": {
+          "skipTests": true
+        },
+        "@schematics/angular:guard": {
+          "skipTests": true
+        },
+        "@schematics/angular:interceptor": {
+          "skipTests": true
+        },
+        "@schematics/angular:pipe": {
+          "skipTests": true
+        },
+        "@schematics/angular:resolver": {
+          "skipTests": true
+        },
+        "@schematics/angular:service": {
+          "skipTests": true
+        }
+      },
+      "root": "projects/app-admin",
+      "sourceRoot": "projects/app-admin/src",
+      "prefix": "app",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:application",
+          "options": {
+            "outputPath": "dist/app-admin",
+            "index": "projects/app-admin/src/index.html",
+            "browser": "projects/app-admin/src/main.ts",
+            "polyfills": [
+              "zone.js"
+            ],
+            "tsConfig": "projects/app-admin/tsconfig.app.json",
+            "inlineStyleLanguage": "scss",
+            "assets": [
+              {
+                "glob": "**/*",
+                "input": "projects/app-admin/public"
+              }
+            ],
+            "styles": [
+              "@angular/material/prebuilt-themes/azure-blue.css",
+              "projects/app-admin/src/styles.scss"
+            ],
+            "scripts": []
+          },
+          "configurations": {
+            "development": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "fileReplacements": []
+            },
+            "staging": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "500kB",
+                  "maximumError": "1MB"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "2kB",
+                  "maximumError": "4kB"
+                }
+              ],
+              "outputHashing": "all",
+              "fileReplacements": [
+                {
+                  "replace": "projects/app-admin/src/environments/environment.ts",
+                  "with": "projects/app-admin/src/environments/environment.staging.ts"
+                },
+                {
+                  "replace": "tsconfig.json",
+                  "with": "tsconfig.prod.json"
+                }
+              ]
+            },
+            "production": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "500kB",
+                  "maximumError": "1MB"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "2kB",
+                  "maximumError": "4kB"
+                }
+              ],
+              "outputHashing": "all",
+              "fileReplacements": [
+                {
+                  "replace": "tsconfig.json",
+                  "with": "tsconfig.prod.json"
+                },
+                {
+                  "replace": "projects/app-admin/src/environments/environment.ts",
+                  "with": "projects/app-admin/src/environments/environment.production.ts"
+                }
+              ]
+            }
+          },
+          "defaultConfiguration": "staging"
+        },
+        "serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "host": "admin.crm.host",
+            "port": 4311
+          },
+          "configurations": {
+            "development": {
+              "buildTarget": "app-admin:build:development"
+            },
+            "staging": {
+              "buildTarget": "app-admin:build:staging"
+            },
+            "production": {
+              "buildTarget": "app-admin:build:production"
+            }
+          },
+          "defaultConfiguration": "development"
+        },
+        "extract-i18n": {
+          "builder": "@angular-devkit/build-angular:extract-i18n"
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "polyfills": [
+              "zone.js",
+              "zone.js/testing"
+            ],
+            "tsConfig": "projects/app-admin/tsconfig.spec.json",
+            "inlineStyleLanguage": "scss",
+            "assets": [
+              {
+                "glob": "**/*",
+                "input": "projects/app-admin/public"
+              }
+            ],
+            "styles": [
+              "@angular/material/prebuilt-themes/azure-blue.css",
+              "projects/app-admin/src/styles.scss"
+            ],
+            "scripts": []
           }
         }
       }

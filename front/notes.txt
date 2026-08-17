@@ -20,3 +20,11 @@ http-server ./dist/mon-test/browser -p 8701 -c-1 -P http://crm.host:8701? --spa
 http-server ./dist/admin-test/browser -p 8702 -c-1 -P http://admin.crm.host:8702? --spa
 
 
+# Создаем библиотеку shared-auth
+ng g library shared-auth --prefix=sa
+
+# Создаем библиотеку shared-components
+ng g library shared-components --prefix=sc
+
+# Создаем приложение admin
+ng g application admin --routing --style=scss

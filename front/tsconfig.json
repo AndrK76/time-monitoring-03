@@ -4,6 +4,12 @@
     "paths": {
       "@mon3/shared-test": [
         "./projects/shared-test/src/public-api.ts"
+      ],
+      "@mon3/sa": [
+        "./projects/shared-auth/src/public-api.ts"
+      ],
+      "@mon3/sc": [
+        "./projects/shared-components/src/public-api.ts"
       ]
     },
     "rootDir": ".",
