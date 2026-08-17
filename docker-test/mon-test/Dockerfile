@@ -12,11 +12,11 @@ COPY ../../front/tsconfig*.json .
 
 
 # 3. Копируем библиотеку shared и приложение mon-test
-COPY ../../front/projects/shared ./projects/shared
+COPY ../../front/projects/shared-test ./projects/shared-test
 COPY ../../front/projects/mon-test ./projects/mon-test
 
 # 4. Собираем shared и mon-test
-RUN npx ng build shared
+RUN npx ng build shared-test
 RUN npx ng build mon-test --configuration prod
 
 FROM nginx:alpine

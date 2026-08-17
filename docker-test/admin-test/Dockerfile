@@ -12,11 +12,11 @@ COPY ../../front/tsconfig*.json .
 
 
 # 3. Копируем библиотеку shared и приложение admin-test
-COPY ../../front/projects/shared ./projects/shared
+COPY ../../front/projects/shared-test ./projects/shared-test
 COPY ../../front/projects/admin-test ./projects/admin-test
 
 # 4. Собираем shared и admin-test
-RUN npx ng build shared
+RUN npx ng build shared-test
 RUN npx ng build admin-test --configuration prod
 
 

@@ -14,13 +14,16 @@
 |   |   |                           |-- config
 |   |   |                           |   `-- JacksonConfig.java
 |   |   |                           |-- dto
-|   |   |                           |   |-- CommandMessage.java
-|   |   |                           |   |-- SecurityContextAuthentication.java
-|   |   |                           |   |-- SecurityContextDto.java
-|   |   |                           |   |-- UserContext.java
-|   |   |                           |   `-- UserInfoUpdatedEvent.java
+|   |   |                           |   `-- command
+|   |   |                           |       |-- auth
+|   |   |                           |       |   |-- SecurityContextDto.java
+|   |   |                           |       |   |-- UserContextDto.java
+|   |   |                           |       |   |-- UserCreatedEventCommandDto.java
+|   |   |                           |       |   `-- UserInfoUpdatedEventCommandDto.java
+|   |   |                           |       `-- CommandMessageDto.java
 |   |   |                           |-- enums
-|   |   |                           |   `-- CommandType.java
+|   |   |                           |   `-- command
+|   |   |                           |       `-- CommandMessageType.java
 |   |   |                           |-- exception
 |   |   |                           |-- service
 |   |   |                           `-- AuthConstants.java
@@ -35,20 +38,15 @@
 |   |   |       |               `-- persistence
 |   |   |       |                   |-- config
 |   |   |       |                   |   `-- PersistenceConfig.java
-|   |   |       |                   |-- entity
-|   |   |       |                   |   |-- Permission.java
-|   |   |       |                   |   |-- Role.java
-|   |   |       |                   |   |-- TelegramToken.java
-|   |   |       |                   |   |-- User.java
-|   |   |       |                   |   `-- UserAuthProvider.java
-|   |   |       |                   |-- repository
-|   |   |       |                   |   |-- PermissionRepository.java
-|   |   |       |                   |   |-- RoleRepository.java
-|   |   |       |                   |   |-- TelegramTokenRepository.java
-|   |   |       |                   |   |-- UserAuthProviderRepository.java
-|   |   |       |                   |   `-- UserRepository.java
-|   |   |       |                   `-- service
-|   |   |       |                       `-- AuthManagementPersistService.java
+|   |   |       |                   `-- entity
+|   |   |       |                       |-- admin
+|   |   |       |                       |   `-- AppUser.java
+|   |   |       |                       `-- auth
+|   |   |       |                           |-- Permission.java
+|   |   |       |                           |-- Role.java
+|   |   |       |                           |-- TelegramToken.java
+|   |   |       |                           |-- User.java
+|   |   |       |                           `-- UserAuthProvider.java
 |   |   |       `-- resources
 |   |   `-- pom.xml
 |   |-- core-rabbit
@@ -97,10 +95,7 @@
 |   |   |       |                   |   `-- UserPrincipal.java
 |   |   |       |                   |-- service
 |   |   |       |                   |   |-- JwtService.java
-|   |   |       |                   |   |-- ResetPasswordService.java
-|   |   |       |                   |   |-- TelegramTokenService.java
-|   |   |       |                   |   |-- UserDetailsServiceImpl.java
-|   |   |       |                   |   `-- UserService.java
+|   |   |       |                   |   `-- TelegramTokenService.java
 |   |   |       |                   `-- util
 |   |   |       |                       `-- AuthInfoUtils.java
 |   |   |       `-- resources
@@ -139,15 +134,20 @@
 |   |   |       |                   |   `-- TestResponse.java
 |   |   |       |                   |-- listener
 |   |   |       |                   |   `-- UserCommandListener.java
+|   |   |       |                   |-- mapper
+|   |   |       |                   |   `-- UserEventCommandMapper.java
+|   |   |       |                   |-- repository
+|   |   |       |                   |   `-- AppUserRepository.java
 |   |   |       |                   |-- service
-|   |   |       |                   |   |-- AdminUserCacheService.java
-|   |   |       |                   |   `-- TestService.java
+|   |   |       |                   |   |-- TestService.java
+|   |   |       |                   |   `-- UserEventsReceiveService.java
 |   |   |       |                   `-- AdminApplication.java
 |   |   |       `-- resources
 |   |   |           |-- db
 |   |   |           |   `-- migration
-|   |   |           |       `-- V1__init_admin_schema.sql
+|   |   |           |       `-- V01.01__init_admin_schema.sql
 |   |   |           `-- application.yml
+|   |   |-- .properties
 |   |   `-- pom.xml
 |   |-- service-auth
 |   |   |-- src
@@ -166,35 +166,44 @@
 |   |   |       |                   |   |-- OAuth2Controller.java
 |   |   |       |                   |   `-- UserManageController.java
 |   |   |       |                   |-- dto
-|   |   |       |                   |   |-- ChangePasswordRequest.java
-|   |   |       |                   |   |-- LoginRequest.java
+|   |   |       |                   |   |-- ChangePasswordRequestDto.java
+|   |   |       |                   |   |-- LoginRequestDto.java
 |   |   |       |                   |   |-- PermissionDto.java
-|   |   |       |                   |   |-- RegistrationRequest.java
-|   |   |       |                   |   |-- ResetPasswordRequest.java
+|   |   |       |                   |   |-- RegistrationRequestDto.java
+|   |   |       |                   |   |-- ResetPasswordRequestDto.java
 |   |   |       |                   |   |-- RoleDto.java
-|   |   |       |                   |   |-- TokenResponse.java
-|   |   |       |                   |   |-- UpdateUserRequest.java
-|   |   |       |                   |   |-- UserListItem.java
-|   |   |       |                   |   `-- UserResponse.java
+|   |   |       |                   |   |-- TokenResponseDto.java
+|   |   |       |                   |   |-- UpdateUserRequestDto.java
+|   |   |       |                   |   |-- UserListItemDto.java
+|   |   |       |                   |   `-- UserResponseDto.java
 |   |   |       |                   |-- helper
 |   |   |       |                   |   |-- AuthErrorHelper.java
 |   |   |       |                   |   |-- LocaleHelper.java
 |   |   |       |                   |   `-- LoginMessageHelper.java
 |   |   |       |                   |-- mapper
 |   |   |       |                   |   `-- UserManagementMapper.java
+|   |   |       |                   |-- repository
+|   |   |       |                   |   |-- PermissionRepository.java
+|   |   |       |                   |   |-- RoleRepository.java
+|   |   |       |                   |   |-- TelegramTokenRepository.java
+|   |   |       |                   |   |-- UserAuthProviderRepository.java
+|   |   |       |                   |   `-- UserRepository.java
 |   |   |       |                   |-- service
 |   |   |       |                   |   |-- AdminService.java
+|   |   |       |                   |   |-- AuthManagementPersistService.java
 |   |   |       |                   |   |-- AuthService.java
-|   |   |       |                   |   `-- UserManagementService.java
+|   |   |       |                   |   |-- ResetPasswordService.java
+|   |   |       |                   |   |-- TelegramTokenServiceImpl.java
+|   |   |       |                   |   |-- UserDetailsServiceImpl.java
+|   |   |       |                   |   |-- UserManagementService.java
+|   |   |       |                   |   `-- UserService.java
 |   |   |       |                   `-- AuthApplication.java
 |   |   |       `-- resources
 |   |   |           |-- db
 |   |   |           |   `-- migration
-|   |   |           |       |-- V1__init_auth_schema.sql
-|   |   |           |       |-- V2__add_telegram_support.sql
-|   |   |           |       |-- V3__add_initial_data.sql
-|   |   |           |       |-- V4__add_user_action.sql
-|   |   |           |       `-- V5__add_user_action2.sql
+|   |   |           |       |-- V01.01__init_auth_schema.sql
+|   |   |           |       |-- V01.02__add_telegram_support.sql
+|   |   |           |       `-- V01.03__add_initial_data.sql
 |   |   |           |-- org
 |   |   |           |   `-- springframework
 |   |   |           |       `-- security
@@ -233,6 +242,8 @@
 |   |-- remove.cmd
 |   `-- start.cmd
 |-- docker-test
+|   |-- .gigacode
+|   |   `-- plans
 |   |-- admin-test
 |   |   `-- Dockerfile
 |   |-- mon-test
@@ -241,95 +252,12 @@
 |   |   `-- nginx.conf
 |   |-- nginx-frontend
 |   |   `-- Dockerfile
-|   |-- shared-src
-|   |   |-- guards
-|   |   |   `-- auth.guard.ts
-|   |   |-- interceptors
-|   |   |   |-- auth.interceptor.fn.ts
-|   |   |   `-- auth.interceptor.ts
-|   |   |-- models
-|   |   |   `-- auth.models.ts
-|   |   |-- services
-|   |   |   |-- admin.service.ts
-|   |   |   |-- auth.service copy.ts
-|   |   |   `-- auth.service.ts
-|   |   |-- index.ts
-|   |   |-- package-lock.json
-|   |   `-- package.json
 |   |-- build.bat
 |   |-- docker-compose.yml
 |   |-- notes.txt
 |   |-- start.bat
 |   `-- stop.bat
 |-- front
-|   |-- .angular
-|   |   `-- cache
-|   |       `-- 17.3.17
-|   |           |-- admin-test
-|   |           |   `-- .tsbuildinfo
-|   |           |-- mon-test
-|   |           |   `-- .tsbuildinfo
-|   |           |-- ng-packagr
-|   |           |   |-- content-v2
-|   |           |   |   `-- sha512
-|   |           |   |       |-- 1e
-|   |           |   |       |   `-- 71
-|   |           |   |       |       `-- f0873e76c2707c9b3afa2ea6ebe35fb2c4359e4ea3d49ecf6c5aa8c2a04cdc256a8d4fe45165c140e60d26099ad57418e75504684b541aa10d9bfaafcaa9
-|   |           |   |       |-- 35
-|   |           |   |       |   `-- 43
-|   |           |   |       |       `-- 6a70b741e2f4d542df40f6192d11f8451e0cb85f83a990a94b892f2670b9ff5f822c0b60373d633fc5c6b6bede1c2920fcf20c6b31d80775062ac1ab1b76
-|   |           |   |       |-- 57
-|   |           |   |       |   `-- a1
-|   |           |   |       |       `-- 6a5b25d91ece86b20c21c2180bcf34c4cfc0bc94fab8c46c5c984264a965f3f2699ab17a2533feb11e937ed750f0d21cd5c0d857d8a975ee9fe356f65e57
-|   |           |   |       `-- 90
-|   |           |   |           `-- a9
-|   |           |   |               `-- 82d554d8f39888f8839b2c0b8c553e52ed1cad185d7e786b523691b6a39952312e15d034c09bd43ceda3ae37b2286006d244ca36231743e9b576826de0c7
-|   |           |   |-- index-v5
-|   |           |   |   |-- 0a
-|   |           |   |   |   `-- b2
-|   |           |   |   |       `-- 87830e05b9fdae60f94e065814bb36580fc919e6c291dd5b2a763d394ba4
-|   |           |   |   `-- e0
-|   |           |   |       `-- cf
-|   |           |   |           `-- 0aed935b321fe0aadf19af55e82c57edeb68d6a620f8b6b88fdc9aaf39fe
-|   |           |   |-- tmp
-|   |           |   `-- tsbuildinfo
-|   |           |       `-- shared.tsbuildinfo
-|   |           `-- vite
-|   |               `-- deps
-|   |                   |-- @angular_common.js
-|   |                   |-- @angular_common.js.map
-|   |                   |-- @angular_common_http.js
-|   |                   |-- @angular_common_http.js.map
-|   |                   |-- @angular_core.js
-|   |                   |-- @angular_core.js.map
-|   |                   |-- @angular_forms.js
-|   |                   |-- @angular_forms.js.map
-|   |                   |-- @angular_platform-browser.js
-|   |                   |-- @angular_platform-browser.js.map
-|   |                   |-- @angular_platform-browser_animations.js
-|   |                   |-- @angular_platform-browser_animations.js.map
-|   |                   |-- @angular_router.js
-|   |                   |-- @angular_router.js.map
-|   |                   |-- _metadata.json
-|   |                   |-- chunk-2DJJH5CC.js
-|   |                   |-- chunk-2DJJH5CC.js.map
-|   |                   |-- chunk-APQJ6POP.js
-|   |                   |-- chunk-APQJ6POP.js.map
-|   |                   |-- chunk-CONQKHOI.js
-|   |                   |-- chunk-CONQKHOI.js.map
-|   |                   |-- chunk-FGIJWRIL.js
-|   |                   |-- chunk-FGIJWRIL.js.map
-|   |                   |-- chunk-GC5FLHL6.js
-|   |                   |-- chunk-GC5FLHL6.js.map
-|   |                   |-- chunk-IGJZNA3K.js
-|   |                   |-- chunk-IGJZNA3K.js.map
-|   |                   |-- chunk-V4GYEGQC.js
-|   |                   |-- chunk-V4GYEGQC.js.map
-|   |                   |-- package.json
-|   |                   |-- rxjs.js
-|   |                   |-- rxjs.js.map
-|   |                   |-- rxjs_operators.js
-|   |                   `-- rxjs_operators.js.map
 |   |-- .gigacode
 |   |   `-- plans
 |   |-- projects
@@ -405,7 +333,7 @@
 |   |   |   |   `-- styles.scss
 |   |   |   |-- tsconfig.app.json
 |   |   |   `-- tsconfig.spec.json
-|   |   `-- shared
+|   |   `-- shared-test
 |   |       |-- src
 |   |       |   |-- lib
 |   |       |   |   |-- guards
@@ -448,4 +376,4 @@
 |-- README.md
 `-- tree.txt
 
-189 directories, 259 files
+167 directories, 209 files
