@@ -4,7 +4,13 @@
     "paths": {
       "@mon3/shared-test": [
         "./dist/shared-test"
-      ]
+      ],
+      "@mon3/sa": [
+        "./dist/shared-auth"
+      ],
+      "@mon3/sc": [
+        "./dist/shared-components"
+      ],
     },
     "rootDir": ".",
     "outDir": "./dist/out-tsc",
