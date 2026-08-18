@@ -5,3 +5,5 @@
 export * from './lib/components/login/login.component';
 export * from './lib/components/register/register.component';
 export * from './lib/components/logout/logout.component';
+export * from './lib/components/view-current-profile/view-current-profile.component';
+

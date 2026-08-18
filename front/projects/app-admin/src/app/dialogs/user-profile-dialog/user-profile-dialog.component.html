@@ -1,0 +1,10 @@
+<h2 mat-dialog-title>Информация о пользователе</h2>
+<mat-dialog-content>
+  <sc-view-current-profile></sc-view-current-profile>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button (click)="close()">Закрыть</button>
+  <a mat-raised-button color="primary" routerLink="/profile/edit" (click)="close()">
+    <mat-icon>edit</mat-icon> Редактировать профиль
+  </a>
+</mat-dialog-actions>

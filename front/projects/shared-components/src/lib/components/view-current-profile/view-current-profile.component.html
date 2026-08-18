@@ -1,0 +1,77 @@
+<div class="profile-container">
+    <!-- Состояние загрузки -->
+    <div *ngIf="loading()" class="state-container loading-state">
+        <mat-spinner diameter="40"></mat-spinner>
+        <p>Загрузка профиля...</p>
+    </div>
+
+    <!-- Ошибка -->
+    <div *ngIf="error()" class="state-container error-state">
+        <mat-icon color="warn">error_outline</mat-icon>
+        <p>{{ error() }}</p>
+    </div>
+
+    <!-- Данные -->
+    <ng-container *ngIf="!loading() && !error() && user()">
+        <!-- Tile: аватар + displayName -->
+        <div class="tile-section">
+            <div class="avatar">
+                {{ getUserInitials() }}
+            </div>
+            <div class="display-name">{{ user()!.displayName || user()!.username }}</div>
+        </div>
+
+        <mat-divider></mat-divider>
+
+        <!-- Info grid (вертикальные строки) -->
+        <div class="info-grid">
+            <div class="info-row">
+                <span class="label">Активен</span>
+                <span class="value">
+                    <span class="status-badge" [class.active]="user()!.active" [class.inactive]="!user()!.active">
+                        {{ user()!.active ? 'Да' : 'Нет' }}
+                    </span>
+                </span>
+            </div>
+
+            <div class="info-row">
+                <span class="label">Логин</span>
+                <span class="value">{{ user()!.username }}</span>
+            </div>
+
+            <div class="info-row">
+                <span class="label">Email</span>
+                <span class="value email-value" [class.warn]="!user()!.emailVerified">
+                    {{ user()!.email || '—' }}
+                    <mat-icon *ngIf="!user()!.emailVerified" class="warn-icon" [matTooltip]="'Email не подтверждён'"
+                        matTooltipPosition="above">
+                        warning
+                    </mat-icon>
+                </span>
+            </div>
+
+            <div class="info-row">
+                <span class="label">Имя</span>
+                <span class="value">{{ user()!.firstName || '—' }}</span>
+            </div>
+
+            <div class="info-row">
+                <span class="label">Фамилия</span>
+                <span class="value">{{ user()!.lastName || '—' }}</span>
+            </div>
+        </div>
+
+        <mat-divider></mat-divider>
+
+        <!-- Роли -->
+        <div class="roles-section">
+            <div class="roles-label">Роли</div>
+            <div class="roles-list">
+                <span class="role-badge" *ngFor="let role of user()!.roles">
+                    {{ role }}
+                </span>
+                <span *ngIf="!user()!.roles.length" class="no-roles">—</span>
+            </div>
+        </div>
+    </ng-container>
+</div>

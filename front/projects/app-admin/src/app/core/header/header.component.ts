@@ -8,6 +8,8 @@ import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '@mon3/sa';
 import { NgIf } from '@angular/common';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import { MatDialog } from '@angular/material/dialog';
+import { UserProfileDialogComponent } from '../../dialogs/user-profile-dialog/user-profile-dialog.component';
 
 @Component({
   selector: 'app-header',
@@ -116,6 +118,17 @@ export class HeaderComponent implements OnInit {
         // Даже при ошибке пробуем перенаправить на логин
         this.router.navigate(['/']);
       }
+    });
+  }
+
+  //Диалог для отображения
+  private dialog = inject(MatDialog);
+
+  openUserProfile(): void {
+    this.dialog.open(UserProfileDialogComponent, {
+      width: '420px',
+      autoFocus: false,
+      panelClass: 'user-profile-dialog'
     });
   }
 }

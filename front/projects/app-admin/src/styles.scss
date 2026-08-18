@@ -1,49 +1,29 @@
-// 1. Импорт Material (обязательно первым)
+//Импорт Material (обязательно первым)
 @use '@angular/material' as mat;
+@use 'theme-variables' as vars;
+//@use '@mon3/sc/styles/theme-variables.scss' as vars;
 
-// 2. Импорт локальных шрифтов и иконок
+//Импорт локальных шрифтов и иконок
 @import '@fontsource/roboto/300.css';
 @import '@fontsource/roboto/400.css';
 @import '@fontsource/roboto/500.css';
 @import 'material-icons/iconfont/material-icons.css';
 
-// 3. Инициализация Material core
+//Инициализация Material core
 @include mat.core();
 
-// 4. Определяем кастомную серую палитру
-$custom-grey: (
-  50: #f8f9fa,
-  100: #f1f3f5,
-  200: #e9ecef,
-  300: #dee2e6,
-  400: #ced4da,
-  500: #adb5bd,
-  600: #6c757d,
-  // ваш цвет rgb(108, 117, 125)
-  700: #495057,
-  800: #343a40,
-  900: #212529,
-  contrast: (600: white,
-  )
-);
 
-// 5. Определяем палитры (используем старый API, он всё ещё работает)
-$my-primary: mat.m2-define-palette(mat.$m2-indigo-palette);
-$my-accent: mat.m2-define-palette($custom-grey, 600);
-$my-warn: mat.m2-define-palette(mat.$m2-red-palette);
-
-// 6. Создаём тему
-$my-theme: mat.m2-define-light-theme((color: (primary: $my-primary,
-        accent: $my-accent,
-        warn: $my-warn,
-      ),
+//Создаём тему
+$my-theme: mat.m2-define-light-theme((color: (primary: vars.$my-primary,
+        accent: vars.$my-accent,
+        warn: vars.$my-warn, ),
       density: -2,
     ));
 
-// 7. Применяем тему ко всем компонентам
+//Применяем тему ко всем компонентам
 @include mat.all-component-themes($my-theme);
 
-// 8. Глобальные сбросы
+//Глобальные сбросы
 * {
   margin: 0;
   padding: 0;
@@ -57,17 +37,30 @@ body {
   background: #f5f7fa;
 }
 
-// ============================================================
-// 9. Переопределение высоты полей ввода (глобально)
-// ============================================================
+//Переопределение высоты полей ввода
 :root {
   --mat-form-field-container-height: 36px;
   --mat-form-field-filled-label-display: block;
 }
 
-// Уменьшаем внутренние отступы для компактности
+//Уменьшаем внутренние отступы для компактности
 .mat-mdc-form-field-infix {
   padding-top: 10px !important;
   padding-bottom: 6px !important;
   min-height: 28px !important;
+}
+
+//Экспорт цветов темы в CSS-переменные (для использования в библиотеках)
+:root {
+  --primary-color: #{vars.$primary-500};
+  --primary-contrast: #{vars.$primary-contrast};
+  --warn-color: #{vars.$warn-500};
+  --warn-light-bg: #{vars.$warn-50};
+}
+
+//Fallback для warn-light-bg, если оттенок 50 не определён
+@if not vars.$warn-50 {
+  :root {
+    --warn-light-bg: #{rgba(vars.$warn-500, 0.1)};
+  }
 }
