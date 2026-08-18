@@ -3,8 +3,10 @@
   <sc-view-current-profile></sc-view-current-profile>
 </mat-dialog-content>
 <mat-dialog-actions align="end">
-  <button mat-button (click)="close()">Закрыть</button>
-  <a mat-raised-button color="primary" routerLink="/profile/edit" (click)="close()">
-    <mat-icon>edit</mat-icon> Редактировать профиль
-  </a>
+  <button mat-raised-button color="primary" [routerLink]="'/profile/edit'" (click)="close()">
+    <mat-icon>edit</mat-icon> {{ isXSmall() ? 'Редактировать' : 'Редактировать профиль' }}
+  </button>
+  <button mat-raised-button color="accent" (click)="close()">
+    Отмена
+  </button>
 </mat-dialog-actions>

@@ -33,7 +33,7 @@
         <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>
 
         <div class="button-row">
-          <button mat-raised-button color="primary" type="submit" class="action-button"
+          <button mat-raised-button color="primary" type="submit" class="action-button btn-wide-on-small"
             [disabled]="registerForm.invalid || isLoading">
             {{ isLoading ? 'Регистрация...' : 'Зарегистрироваться' }}
           </button>

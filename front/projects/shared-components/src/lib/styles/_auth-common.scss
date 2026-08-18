@@ -77,3 +77,21 @@
         font-size: 0.9rem;
     }
 }
+
+// Адаптив для мобильных устройств (XSmall по стандартам Angular Material)
+@media (max-width: 599.98px) {
+    .action-button {
+        font-size: 0.8rem; // уменьшаем шрифт
+        padding: 6px 0; // уменьшаем вертикальные отступы
+        height: 32px; // уменьшаем высоту кнопки
+        white-space: nowrap; // сохраняем текст в одну строку
+
+        &.btn-wide-on-small {
+            flex: 2;
+        }
+    }
+
+    .button-row {
+        gap: 8px; // уменьшаем расстояние между кнопками
+    }
+}

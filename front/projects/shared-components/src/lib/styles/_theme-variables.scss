@@ -34,6 +34,11 @@ $primary-contrast: map.get($my-primary, 'contrast', 500);
 $accent-contrast: map.get($my-accent, 'contrast', 500);
 $warn-contrast: map.get($my-warn, 'contrast', 500);
 
+// Цвета для фона и скроллбара (из кастомной серой палитры)
+$bg-color: map.get($custom-grey, 100);
+$scrollbar-track-color: map.get($custom-grey, 300);
+$scrollbar-thumb-color: map.get($custom-grey, 400);
+$scrollbar-thumb-hover-color: map.get($custom-grey, 500);
 
 
 
