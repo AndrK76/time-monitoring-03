@@ -17,6 +17,7 @@ spring:
         - "http://admin.crm.host:8888"
         - "http://crm.host:8881"
         - "http://admin.crm.host:8882"
+        - "http://admin.crm.host:4311"
       allowed-methods: "GET,POST,PUT,DELETE,OPTIONS,PATCH"
       allowed-headers: "Authorization,Content-Type,X-Requested-With,Accept,Origin,Access-Control-Request-Method,Access-Control-Request-Headers"
       exposed-headers: "Authorization,Set-Cookie"

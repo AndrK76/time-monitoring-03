@@ -20,11 +20,11 @@ export const authGuard: CanActivateFn = (route, state) => {
         // ✅ Токен сохранён через setSession(response)
         return true;
       }
-      router.navigate(['/login']);
+      //router.navigate(['/login']);
       return false;
     }),
     catchError(() => {
-      router.navigate(['/login']);
+      //router.navigate(['/login']);
       return of(false);
     })
   );

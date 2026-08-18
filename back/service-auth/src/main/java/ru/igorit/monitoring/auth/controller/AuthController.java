@@ -85,6 +85,13 @@ public class AuthController {
         return ResponseEntity.ok(user);
     }
 
+    @GetMapping("/anonymous")
+    public ResponseEntity<UserResponseDto> getAnonymous(HttpServletRequest request) {
+        log.info("Get anonymous user");
+        UserResponseDto user = authService.getCurrentUser(request);
+        return ResponseEntity.ok(user);
+    }
+
     @GetMapping("/check")
     public ResponseEntity<TokenResponseDto> checkAuth(HttpServletRequest request) {
         log.info("Check auth via cookie");
