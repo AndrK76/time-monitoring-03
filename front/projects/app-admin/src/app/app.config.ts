@@ -5,6 +5,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { routes } from './app.routes';
 import { AdminService, AuthService } from '@mon3/sa';
 import { environment } from '../environments/environment';
+import { lastValueFrom } from 'rxjs';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -28,5 +29,17 @@ function initializeApp() {
     authService.setApiUrl(environment.authApiUrl);
     adminService.setAdminApiUrl(environment.adminApiUrl);
     adminService.setAuthApiUrl(environment.authApiUrl);
+
+    return lastValueFrom(authService.checkAuth())
+      .then((response) => {
+        // Сессия восстановлена (токен сохранён в сервисе)
+        //console.log('Session restored:', response);
+        return true; // успешно
+      })
+      .catch((error) => {
+        // Ошибка восстановления (например, нет куки или токен невалидный)
+        //console.warn('Session restoration failed, continuing as anonymous:', error);
+        return true; // всё равно продолжаем загрузку
+      });
   };
 }

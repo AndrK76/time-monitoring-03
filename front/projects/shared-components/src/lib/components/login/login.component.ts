@@ -31,13 +31,18 @@ export class LoginComponent implements OnInit {
 
   credentials: LoginRequestDto = { username: '', password: '' };
   isLoading = false;
+  errorMessage: string | null = null;
 
   ngOnInit(): void {
-    console.log(`Authentificated: {}`, this.authService.isAuthenticated);
+    //console.log(`Authentificated: {}`, this.authService.isAuthenticated);
+    // Если пользователь уже авторизован, перенаправляем на главную
+    if (this.authService.isAuthenticated) {
+      this.router.navigate(['/']);
+    }
   }
 
-
   onSubmit() {
+    this.errorMessage = null; // очищаем предыдущую ошибку
     this.isLoading = true;
     this.authService.login(this.credentials).subscribe({
       next: () => {
@@ -47,7 +52,8 @@ export class LoginComponent implements OnInit {
       error: (err: any) => {
         this.isLoading = false;
         console.error('Login failed', err);
-        // Здесь можно добавить отображение ошибки
+        // Извлекаем сообщение из ответа сервера
+        this.errorMessage = err.error?.message || err.message || 'Ошибка входа. Попробуйте позже.';
       }
     });
   }

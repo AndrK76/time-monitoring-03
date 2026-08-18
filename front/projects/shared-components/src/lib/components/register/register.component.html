@@ -1,6 +1,6 @@
 <div class="auth-container">
-  <mat-card class="auth-card" style="padding-left: 4px; padding-right: 4px;">
-    <mat-card-header>
+  <mat-card class="auth-card">
+    <mat-card-header class="auth-title">
       <mat-card-title>Регистрация</mat-card-title>
     </mat-card-header>
     <mat-card-content>
@@ -29,6 +29,8 @@
           <mat-label>Отображаемое имя</mat-label>
           <input matInput type="text" [(ngModel)]="userData.displayName" name="displayName">
         </mat-form-field>
+
+        <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>
 
         <div class="button-row">
           <button mat-raised-button color="primary" type="submit" class="action-button"

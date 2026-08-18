@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -23,7 +23,7 @@ import { AuthService, RegistrationRequestDto } from '@mon3/sa';
   templateUrl: './register.component.html',
   styleUrl: './register.component.scss'
 })
-export class RegisterComponent {
+export class RegisterComponent implements OnInit {
   private authService = inject(AuthService);
   private router = inject(Router);
 
@@ -36,8 +36,17 @@ export class RegisterComponent {
     displayName: ''
   };
   isLoading = false;
+  errorMessage: string | null = null;
+
+  ngOnInit(): void {
+    if (this.authService.isAuthenticated) {
+      this.router.navigate(['/']);
+    }
+  }
+
 
   onSubmit() {
+    this.errorMessage = null;
     this.isLoading = true;
     this.authService.register(this.userData).subscribe({
       next: () => {
@@ -47,7 +56,7 @@ export class RegisterComponent {
       error: (err: any) => {
         this.isLoading = false;
         console.error('Registration failed', err);
-        // Здесь можно добавить отображение ошибки
+        this.errorMessage = err.error?.message || err.message || 'Ошибка регистрации. Попробуйте позже.';
       }
     });
   }

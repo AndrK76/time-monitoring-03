@@ -1,7 +1,31 @@
-<mat-toolbar color="accent" class="header-toolbar">
+<!-- projects/app-admin/src/app/core/header/header.component.html -->
+<mat-toolbar color="primary" class="header-toolbar">
+    <!-- Левая часть: логотип и название -->
     <div class="brand-container">
         <img src="logo.svg" width="30" height="24" alt="Логотип" class="logo">
         <span class="brand">Мониторинг</span>
     </div>
+
     <span class="spacer"></span>
+
+    <!-- Правая часть: пользователь (только если авторизован) -->
+    <div *ngIf="isAuthenticated()" class="user-section">
+        <!-- Инициалы пользователя (аватар-заглушка) -->
+        <div class="user-avatar" [matTooltip]="getFullName()" matTooltipPosition="below">
+            {{ getUserInitials() }}
+        </div>
+
+        <!-- Имя пользователя с обрезанием и всплывающей подсказкой -->
+        <span *ngIf="showName()" class="user-name" [matTooltip]="getFullName()" matTooltipPosition="below">
+            {{ displayName() }}
+        </span>
+
+        <!-- Разделитель -->
+        <span class="divider">|</span>
+
+        <!-- Ссылка на выход -->
+        <a mat-button class="logout-link" routerLink="/logout">
+            Выйти
+        </a>
+    </div>
 </mat-toolbar>

@@ -8,9 +8,6 @@
       "@mon3/sa": [
         "./projects/shared-auth/src/public-api.ts"
       ],
-      "@mon3/salib": [
-        "./dist/shared-auth"
-      ],
       "@mon3/sc": [
         "./projects/shared-components/src/public-api.ts"
       ]

@@ -1,0 +1,22 @@
+<div class="auth-container">
+    <mat-card class="auth-card">
+        <mat-card-header class="auth-title">
+            <mat-card-title>Выйти из системы</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+            <p class="logout-message">Вы действительно хотите выйти?</p>
+
+            <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>
+
+            <div class="button-row">
+                <button mat-raised-button color="primary" class="action-button" (click)="confirmLogout()"
+                    [disabled]="isLoading">
+                    {{ isLoading ? 'Выход...' : 'Да, выйти' }}
+                </button>
+                <button mat-raised-button color="accent" class="action-button" (click)="cancel()">
+                    Отмена
+                </button>
+            </div>
+        </mat-card-content>
+    </mat-card>
+</div>
