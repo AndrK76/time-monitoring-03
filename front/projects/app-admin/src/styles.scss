@@ -1,7 +1,7 @@
 //Импорт Material (обязательно первым)
 @use '@angular/material' as mat;
 @use 'theme-variables' as vars;
-//@use '@mon3/sc/styles/theme-variables.scss' as vars;
+//@use '@mon3/sc/styles/theme-variables' as vars;
 
 //Импорт локальных шрифтов и иконок
 @import '@fontsource/roboto/300.css';

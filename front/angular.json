@@ -528,6 +528,11 @@
               "@angular/material/prebuilt-themes/azure-blue.css",
               "projects/app-admin/src/styles.scss"
             ],
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "projects/shared-components/src/lib/styles"
+              ]
+            },
             "scripts": []
           },
           "configurations": {

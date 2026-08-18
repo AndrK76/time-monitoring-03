@@ -10,7 +10,8 @@
       ],
       "@mon3/sc": [
         "./projects/shared-components/src/public-api.ts"
-      ]
+      ],
+       "@mon3/sc/styles/*": ["./projects/shared-components/src/lib/styles/*"]
     },
     "rootDir": ".",
     "outDir": "./dist/out-tsc",
