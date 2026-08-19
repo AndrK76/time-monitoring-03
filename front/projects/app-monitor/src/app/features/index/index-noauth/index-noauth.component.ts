@@ -2,16 +2,15 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { RouterLink, RouterModule } from '@angular/router';
 import { AuthService } from '@mon3/sa';
-import { MainComponent } from "../main/main.component";
 
 @Component({
-  selector: 'app-index',
+  selector: 'app-index-noauth',
   standalone: true,
-  imports: [MatButtonModule, RouterLink, RouterModule, MainComponent],
-  templateUrl: './index.component.html',
-  styleUrl: './index.component.scss'
+  imports: [MatButtonModule, RouterLink, RouterModule],
+  templateUrl: './index-noauth.component.html',
+  styleUrl: './index-noauth.component.scss'
 })
-export class IndexComponent implements OnInit {
+export class IndexNoAuthComponent implements OnInit {
 
   private authService = inject(AuthService);
   isAuthenticated = signal(false);

@@ -1,10 +1,16 @@
 <!-- projects/app-admin/src/app/core/header/header.component.html -->
 <mat-toolbar color="accent" class="header-toolbar">
     <!-- Левая часть: логотип и название -->
-    <div class="brand-container">
+    <a mat-button class="brand-container toolbar-item" routerLink="/">
         <img src="logo.svg" width="30" height="24" alt="Логотип" class="logo">
         <span class="brand">Мониторинг</span>
-    </div>
+    </a>
+
+    @if (isAuthenticated()) {
+    <a mat-button class="toolbar-item" routerLink="/test-table">
+        Таблица
+    </a>
+    }
 
     <span class="spacer"></span>
 

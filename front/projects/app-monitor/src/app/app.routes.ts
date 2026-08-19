@@ -1,9 +1,10 @@
 import { Routes } from '@angular/router';
+import { authGuard } from '@mon3/sa';
 
 export const routes: Routes = [
   {
     path: '',
-    loadComponent: () => import('./core/index/index.component').then(m => m.IndexComponent)
+    loadComponent: () => import('./features/index/index.component').then(m => m.IndexComponent)
   },
   {
     path: 'login',
@@ -16,6 +17,12 @@ export const routes: Routes = [
   {
     path: 'logout',
     loadComponent: () => import('@mon3/sc').then(m => m.LogoutComponent)
+  },
+
+  {
+    path: 'test-table',
+    loadComponent: () => import('./features/test-table/test-table.component').then(m => m.TestTableComponent),
+    canActivate: [authGuard]
   },
   { path: '**', redirectTo: '/' }
 

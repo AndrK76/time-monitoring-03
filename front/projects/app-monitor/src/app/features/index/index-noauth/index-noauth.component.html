@@ -1,8 +1,4 @@
 <div class="root-area">
-
-    @if (isAuthenticated() ) {
-    <app-main></app-main>
-    } @else {
     <h1>Мониторинг</h1>
     <p>Пожалуйста, войдите или зарегистрируйтесь</p>
     <div class="auth-actions">
@@ -10,5 +6,4 @@
         <span class="separator">или</span>
         <a routerLink="/register" class="link-button">Зарегистрироваться</a>
     </div>
-    }
 </div>
