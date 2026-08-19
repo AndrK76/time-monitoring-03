@@ -28,3 +28,5 @@ ng g library shared-components --prefix=sc
 
 # Создаем приложение admin
 ng g application admin --routing --style=scss
+
+ng g application app-monitor --routing --skip-tests  --no-ssr --style=scss

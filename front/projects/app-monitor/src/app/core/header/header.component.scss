@@ -1,0 +1,89 @@
+@use 'sass:map';
+//@use '../../../theme-variables' as vars;
+//@use '@mon3/sc/styles/theme-variables' as vars;
+@use 'theme-variables' as vars;
+
+.header-toolbar {
+    height: 48px;
+    min-height: 48px;
+    padding: 0 12px;
+}
+
+.brand-container {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.logo {
+    display: block;
+}
+
+.brand {
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+
+.spacer {
+    flex: 1 1 auto;
+}
+
+.user-section {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: vars.$primary-contrast;
+
+    .user-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background-color: vars.$primary-color;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        font-weight: 600;
+        color: vars.$primary-contrast;
+        cursor: default;
+        user-select: none;
+        transition: filter 0.2s;
+
+        &:hover {
+            filter: brightness(0.85);
+        }
+    }
+
+    .user-name {
+        font-size: 0.95rem;
+        font-weight: 400;
+        cursor: pointer;
+        border-bottom: 1px dashed rgba(vars.$primary-contrast, 0.3);
+        transition: border-color 0.2s;
+
+        &:hover {
+            border-color: rgba(vars.$primary-contrast, 0.7);
+        }
+    }
+
+    .divider {
+        color: rgba(vars.$primary-contrast, 0.3);
+    }
+
+    .logout-link {
+        color: rgba(vars.$primary-contrast, 0.8);
+        font-size: 0.85rem;
+        padding: 0 8px;
+        min-width: auto;
+        line-height: 32px;
+        text-decoration: underline;
+        text-underline-offset: 2px;
+        text-decoration-color: rgba(vars.$primary-contrast, 0.3);
+        transition: color 0.2s, text-decoration-color 0.2s;
+
+        &:hover {
+            color: vars.$primary-contrast;
+            text-decoration-color: vars.$primary-contrast;
+        }
+    }
+}

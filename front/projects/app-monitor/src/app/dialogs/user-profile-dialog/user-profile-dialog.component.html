@@ -1,0 +1,12 @@
+<h2 mat-dialog-title>Информация о пользователе</h2>
+<mat-dialog-content>
+  <sc-view-current-profile></sc-view-current-profile>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-raised-button color="primary" [routerLink]="'/profile/edit'" (click)="close()">
+    <mat-icon>edit</mat-icon> {{ isXSmall() ? 'Редактировать' : 'Редактировать профиль' }}
+  </button>
+  <button mat-raised-button color="accent" (click)="close()">
+    Отмена
+  </button>
+</mat-dialog-actions>
