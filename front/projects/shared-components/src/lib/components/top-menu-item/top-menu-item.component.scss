@@ -1,0 +1,63 @@
+:host {
+  display: contents;
+}
+
+::ng-deep .mat-mdc-menu-panel {
+  background: var(--menu-bg) !important;
+}
+
+// Корневые пункты (в тулбаре)
+.root-item {
+
+  a,
+  button {
+    color: var(--menu-text);
+    font-size: 0.9rem;
+    min-width: auto;
+    padding: 0 12px;
+    line-height: 32px;
+    white-space: nowrap;
+    background: transparent;
+
+    &:hover {
+      background: var(--menu-hover-bg);
+    }
+
+    // Активный пункт — усиленный селектор + !important
+    &.active {
+      color: var(--menu-active-text, --menu-text) !important;
+      background: var(-menu-active-bg, -menu-bg, 0.15) !important;
+      border-radius: 10px;
+    }
+  }
+}
+
+// Пункты внутри выпадающего меню (подменю)
+.submenu-item {
+
+  a,
+  button {
+    color: var(--menu-text) !important;
+    background: transparent !important;
+    //padding: 0 16px !important;
+    font-size: 0.9rem !important;
+    //line-height: 20px !important;
+    width: 100%;
+    text-align: left;
+
+    &:hover {
+      background: var(--menu-hover-bg) !important;
+    }
+
+    // Активный пункт подменю
+    //&.active {
+    //  background: var(--menu-active-bg) !important;
+    //  color: var(--menu-active-text) !important;
+    //  font-weight: 500;
+    //}
+
+    //.mat-icon {
+    //  color: var(--menu-icon-color, #666) !important;
+    //}
+  }
+}

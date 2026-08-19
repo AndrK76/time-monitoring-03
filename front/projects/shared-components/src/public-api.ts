@@ -8,5 +8,5 @@ export * from './lib/components/login/login.component';
 export * from './lib/components/register/register.component';
 export * from './lib/components/logout/logout.component';
 export * from './lib/components/view-current-profile/view-current-profile.component';
-export * from './lib/components/menu-item/menu-item.component';
+export * from './lib/components/top-menu-item/top-menu-item.component';
 

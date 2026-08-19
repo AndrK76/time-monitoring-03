@@ -7,13 +7,13 @@ import { RouterModule } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 
 @Component({
-  selector: 'sc-menu-item',
+  selector: 'sc-top-menu-item',
   standalone: true,
   imports: [CommonModule, MatButtonModule, MatMenuModule, RouterModule, MatIconModule],
-  templateUrl: './menu-item.component.html',
-  styleUrl: './menu-item.component.scss'
+  templateUrl: './top-menu-item.component.html',
+  styleUrl: './top-menu-item.component.scss'
 })
-export class MenuItemComponent {
+export class TopMenuItemComponent {
   @Input({ required: true }) item!: MenuItem;
   @Input() isSubmenu = false;
 

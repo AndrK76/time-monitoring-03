@@ -9,29 +9,35 @@
     align-items: center;
     gap: 8px;
     flex-wrap: nowrap;
+    color: var(--menu-text);
+
+    .mat-mdc-menu-panel {
+        background: var(--menu-bg) !important;
+    }
 }
 
 .brand-container {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-shrink: 0;
-  white-space: nowrap;
-  text-decoration: none;
-  color: vars.$primary-contrast;
-  padding: 0 8px;
-  min-width: auto;
-  flex-wrap: nowrap; // запрещаем перенос
-
-  .logo {
-    display: block;
+    display: flex;
+    align-items: center;
+    gap: 12px;
     flex-shrink: 0;
-  }
-  .brand {
-    font-size: 1.1rem;
-    font-weight: 500;
     white-space: nowrap;
-  }
+    text-decoration: none;
+    color: var(--menu-active-text);
+    padding: 0 8px;
+    min-width: auto;
+    flex-wrap: nowrap; // запрещаем перенос
+
+    .logo {
+        display: block;
+        flex-shrink: 0;
+    }
+
+    .brand {
+        font-size: 1.1rem;
+        font-weight: 500;
+        white-space: nowrap;
+    }
 }
 
 .nav-container {
@@ -54,8 +60,12 @@
 }
 
 .hamburger-button {
-    color: white;
+    color: var(--menu-text);
     margin-left: 4px;
+
+    &:hover {
+        background: var(--menu-hover-bg);
+    }
 }
 
 .spacer {
@@ -66,7 +76,7 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    color: vars.$primary-contrast;
+    color: var(--menu-text);
     flex-shrink: 0;
     margin-left: auto;
 
@@ -103,6 +113,7 @@
 
         &:hover {
             border-color: rgba(vars.$primary-contrast, 0.7);
+            background: var(--menu-hover-bg);
         }
     }
 
@@ -112,7 +123,7 @@
     }
 
     .logout-link {
-        color: rgba(vars.$primary-contrast, 0.8);
+        color: var(--menu-text);
         font-size: 0.85rem;
         padding: 0 8px;
         min-width: auto;
@@ -123,8 +134,9 @@
         transition: color 0.2s, text-decoration-color 0.2s;
 
         &:hover {
-            color: vars.$primary-contrast;
-            text-decoration-color: vars.$primary-contrast;
+            background: var(--menu-hover-bg);
+            //color: vars.$primary-contrast;
+            //text-decoration-color: vars.$primary-contrast;
         }
     }
 }

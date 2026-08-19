@@ -11,7 +11,7 @@ import { NgIf } from '@angular/common';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { MatDialog } from '@angular/material/dialog';
 import { UserProfileDialogComponent } from '../../dialogs/user-profile-dialog/user-profile-dialog.component';
-import { MenuItem, MenuItemComponent } from '@mon3/sc';
+import { MenuItem, TopMenuItemComponent } from '@mon3/sc';
 
 @Component({
   selector: 'app-header',
@@ -19,7 +19,7 @@ import { MenuItem, MenuItemComponent } from '@mon3/sc';
   imports: [
     RouterLink, NgIf,
     MatToolbarModule, MatIconModule, MatButtonModule, MatTooltipModule, MatMenuModule,
-    MenuItemComponent
+    TopMenuItemComponent
   ],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss'
@@ -50,7 +50,7 @@ export class HeaderComponent implements OnInit {
 
   // Структура меню (можно вынести в сервис позже)
   menuItems: MenuItem[] = [
-    { label: 'Главная', route: '/' },
+    { label: 'Главная', route: '/', exact: true },
     { label: 'Таблица', route: '/test-table' },
     {
       label: 'Администрирование',

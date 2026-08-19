@@ -14,22 +14,9 @@
         @if (!isSmallScreen()) {
         <div class="nav-links">
             @for (item of menuItems; track item.label) {
-            <sc-menu-item [item]="item"></sc-menu-item>
+            <sc-top-menu-item [item]="item"></sc-top-menu-item>
             }
         </div>
-        }
-
-        <!-- Гамбургер (на маленьких экранах) -->
-        @if (isSmallScreen()) {
-        <button mat-icon-button class="hamburger-button" [matMenuTriggerFor]="mobileMenu">
-            <mat-icon>menu</mat-icon>
-        </button>
-        <mat-menu #mobileMenu="matMenu">
-            @for (item of menuItems; track item.label) {
-            <!-- Для мобильного меню используем тот же компонент, но с флагом isSubmenu -->
-            <sc-menu-item [item]="item" [isSubmenu]="true"></sc-menu-item>
-            }
-        </mat-menu>
         }
     </nav>
     }
@@ -56,5 +43,18 @@
         <a mat-button class="logout-link" routerLink="/logout">
             Выйти
         </a>
+
+        <!-- Гамбургер (на маленьких экранах) -->
+        @if (isSmallScreen()) {
+        <button mat-icon-button class="hamburger-button" [matMenuTriggerFor]="mobileMenu">
+            <mat-icon>menu</mat-icon>
+        </button>
+        <mat-menu #mobileMenu="matMenu">
+            @for (item of menuItems; track item.label) {
+            <!-- Для мобильного меню используем тот же компонент, но с флагом isSubmenu -->
+            <sc-top-menu-item [item]="item" [isSubmenu]="true"></sc-top-menu-item>
+            }
+        </mat-menu>
+        }
     </div>
 </mat-toolbar>

@@ -1,7 +1,7 @@
 //Импорт Material (обязательно первым)
 @use '@angular/material' as mat;
 @use 'theme-variables' as vars;
-//@use '@mon3/sc/styles/theme-variables' as vars;
+@use 'sass:map';
 
 //Импорт локальных шрифтов и иконок
 @import '@fontsource/roboto/300.css';
@@ -66,15 +66,24 @@ body {
 }
 
 :root {
-  --menu-bg: #{vars.$accent-color-600};
-  --menu-text: #{vars.$primary-contrast};
-  --menu-hover-bg: #{vars.$accent-color};
-  --menu-icon-color: #{vars.$primary-contrast};
-  --menu-divider-color: #{vars.$primary-contrast};
-  --mat-menu-item-icon-color: var(--menu-icon-color, #{vars.$primary-contrast});
-  --menu-active-text: var(--primary-color); 
-  --menu-active-bg: var(--menu-hover-bg); 
+  --menu-bg: #{mat.m2-get-color-from-palette(vars.$my-accent, 600)};
+  --menu-text: #{mat.m2-get-color-from-palette(vars.$my-accent, 300)};
 
+  --menu-hover-bg: #{
+ mix(mat.m2-get-color-from-palette(vars.$my-accent, 500), mat.m2-get-color-from-palette(vars.$my-accent, 600), 50%)
 }
 
-@import 'menu-common';
+;
+
+
+--menu-icon-color: #{vars.$primary-contrast};
+
+--menu-divider-color: #{vars.$primary-contrast};
+--mat-menu-item-icon-color: var(--menu-icon-color, #{vars.$primary-contrast});
+
+--toolbar-active-text: #ffffff;
+--toolbar-active-bg: rgba(255, 255, 255, 0.15);
+
+--menu-active-bg: var(--menu-bg);
+--menu-active-text: #{map.get(vars.$my-accent, 'contrast', 600)};
+}
