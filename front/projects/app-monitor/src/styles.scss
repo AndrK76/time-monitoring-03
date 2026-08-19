@@ -1,29 +1,29 @@
-//Импорт Material (обязательно первым)
+//РРјРїРѕСЂС‚ Material (РѕР±СЏР·Р°С‚РµР»СЊРЅРѕ РїРµСЂРІС‹Рј)
 @use '@angular/material' as mat;
 @use 'theme-variables' as vars;
 //@use '@mon3/sc/styles/theme-variables' as vars;
 
-//Импорт локальных шрифтов и иконок
+//РРјРїРѕСЂС‚ Р»РѕРєР°Р»СЊРЅС‹С… С€СЂРёС„С‚РѕРІ Рё РёРєРѕРЅРѕРє
 @import '@fontsource/roboto/300.css';
 @import '@fontsource/roboto/400.css';
 @import '@fontsource/roboto/500.css';
 @import 'material-icons/iconfont/material-icons.css';
 
-//Инициализация Material core
+//РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ Material core
 @include mat.core();
 
 
-//Создаём тему
+//РЎРѕР·РґР°С‘Рј С‚РµРјСѓ
 $my-theme: mat.m2-define-light-theme((color: (primary: vars.$my-primary,
         accent: vars.$my-accent,
         warn: vars.$my-warn, ),
       density: -2,
     ));
 
-//Применяем тему ко всем компонентам
+//РџСЂРёРјРµРЅСЏРµРј С‚РµРјСѓ РєРѕ РІСЃРµРј РєРѕРјРїРѕРЅРµРЅС‚Р°Рј
 @include mat.all-component-themes($my-theme);
 
-//Глобальные сбросы
+//Р“Р»РѕР±Р°Р»СЊРЅС‹Рµ СЃР±СЂРѕСЃС‹
 * {
   margin: 0;
   padding: 0;
@@ -37,20 +37,20 @@ body {
   background: #f5f7fa;
 }
 
-//Переопределение высоты полей ввода
+//РџРµСЂРµРѕРїСЂРµРґРµР»РµРЅРёРµ РІС‹СЃРѕС‚С‹ РїРѕР»РµР№ РІРІРѕРґР°
 :root {
   --mat-form-field-container-height: 36px;
   --mat-form-field-filled-label-display: block;
 }
 
-//Уменьшаем внутренние отступы для компактности
+//РЈРјРµРЅСЊС€Р°РµРј РІРЅСѓС‚СЂРµРЅРЅРёРµ РѕС‚СЃС‚СѓРїС‹ РґР»СЏ РєРѕРјРїР°РєС‚РЅРѕСЃС‚Рё
 .mat-mdc-form-field-infix {
   padding-top: 10px !important;
   padding-bottom: 6px !important;
   min-height: 28px !important;
 }
 
-//Экспорт цветов темы в CSS-переменные (для использования в библиотеках)
+//Р­РєСЃРїРѕСЂС‚ С†РІРµС‚РѕРІ С‚РµРјС‹ РІ CSS-РїРµСЂРµРјРµРЅРЅС‹Рµ (РґР»СЏ РёСЃРїРѕР»СЊР·РѕРІР°РЅРёСЏ РІ Р±РёР±Р»РёРѕС‚РµРєР°С…)
 :root {
   --primary-color: #{vars.$primary-500};
   --primary-contrast: #{vars.$primary-contrast};
@@ -58,9 +58,23 @@ body {
   --warn-light-bg: #{vars.$warn-50};
 }
 
-//Fallback для warn-light-bg, если оттенок 50 не определён
+//Fallback РґР»СЏ warn-light-bg, РµСЃР»Рё РѕС‚С‚РµРЅРѕРє 50 РЅРµ РѕРїСЂРµРґРµР»С‘РЅ
 @if not vars.$warn-50 {
   :root {
     --warn-light-bg: #{rgba(vars.$warn-500, 0.1)};
   }
 }
+
+:root {
+  --menu-bg: #{vars.$accent-color-600};
+  --menu-text: #{vars.$primary-contrast};
+  --menu-hover-bg: #{vars.$accent-color};
+  --menu-icon-color: #{vars.$primary-contrast};
+  --menu-divider-color: #{vars.$primary-contrast};
+  --mat-menu-item-icon-color: var(--menu-icon-color, #{vars.$primary-contrast});
+  --menu-active-text: var(--primary-color); 
+  --menu-active-bg: var(--menu-hover-bg); 
+
+}
+
+@import 'menu-common';

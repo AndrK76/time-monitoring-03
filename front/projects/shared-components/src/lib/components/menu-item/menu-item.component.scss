@@ -1,0 +1,55 @@
+:host {
+  display: contents;
+}
+
+// Корневые пункты в тулбаре (isSubmenu = false)
+.root-item {
+  a, button {
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 0.9rem;
+    min-width: auto;
+    padding: 0 12px;
+    line-height: 32px;
+    white-space: nowrap;
+    background: transparent;
+
+    &.active {
+      color: var(--toolbar-active-text, white);
+      background: var(--toolbar-active-bg, rgba(255, 255, 255, 0.15));
+      border-radius: 4px;
+    }
+
+    &:hover {
+      color: white;
+      background: rgba(255, 255, 255, 0.1);
+    }
+  }
+}
+
+// Пункты внутри выпадающего меню (isSubmenu = true)
+.submenu-item {
+
+  a,
+  button {
+    color: var(--menu-text, #333) !important;
+    background: transparent !important;
+    padding: 0 16px !important;
+    font-size: 0.9rem !important;
+    line-height: 40px !important;
+    width: 100%;
+    text-align: left;
+
+    &:hover {
+      background: var(--menu-hover-bg, rgba(0, 0, 0, 0.04)) !important;
+    }
+
+    &.active {
+      background: var(--menu-hover-bg, rgba(0, 0, 0, 0.04)) !important;
+      color: var(--menu-text, #333) !important;
+    }
+
+    .mat-icon {
+      color: var(--menu-icon-color, #666) !important;
+    }
+  }
+}

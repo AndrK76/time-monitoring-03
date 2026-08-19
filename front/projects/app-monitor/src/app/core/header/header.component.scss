@@ -5,21 +5,57 @@
     height: 48px;
     min-height: 48px;
     padding: 0 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: nowrap;
 }
 
 .brand-container {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-}
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+  white-space: nowrap;
+  text-decoration: none;
+  color: vars.$primary-contrast;
+  padding: 0 8px;
+  min-width: auto;
+  flex-wrap: nowrap; // запрещаем перенос
 
-.logo {
+  .logo {
     display: block;
-}
-
-.brand {
+    flex-shrink: 0;
+  }
+  .brand {
     font-size: 1.1rem;
     font-weight: 500;
+    white-space: nowrap;
+  }
+}
+
+.nav-container {
+    display: flex;
+    align-items: center;
+    flex: 0 1 auto;
+    overflow: hidden;
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-wrap: nowrap;
+
+    // Стили для пунктов меню (переопределены внутри компонента, но оставим на всякий)
+    app-menu-item {
+        display: contents;
+    }
+}
+
+.hamburger-button {
+    color: white;
+    margin-left: 4px;
 }
 
 .spacer {
@@ -29,8 +65,10 @@
 .user-section {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 8px;
     color: vars.$primary-contrast;
+    flex-shrink: 0;
+    margin-left: auto;
 
     .user-avatar {
         width: 32px;
@@ -43,7 +81,7 @@
         font-size: 14px;
         font-weight: 600;
         color: vars.$primary-contrast;
-        cursor: default;
+        cursor: pointer;
         user-select: none;
         transition: filter 0.2s;
 
@@ -58,6 +96,10 @@
         cursor: pointer;
         border-bottom: 1px dashed rgba(vars.$primary-contrast, 0.3);
         transition: border-color 0.2s;
+        white-space: nowrap;
+        max-width: 200px;
+        overflow: hidden;
+        text-overflow: ellipsis;
 
         &:hover {
             border-color: rgba(vars.$primary-contrast, 0.7);
@@ -66,6 +108,7 @@
 
     .divider {
         color: rgba(vars.$primary-contrast, 0.3);
+        margin: 0 4px;
     }
 
     .logout-link {
@@ -83,5 +126,16 @@
             color: vars.$primary-contrast;
             text-decoration-color: vars.$primary-contrast;
         }
+    }
+}
+
+// Адаптив для маленьких экранов
+@media (max-width: 480px) {
+    .brand {
+        font-size: 0.95rem;
+    }
+
+    .user-name {
+        max-width: 100px;
     }
 }

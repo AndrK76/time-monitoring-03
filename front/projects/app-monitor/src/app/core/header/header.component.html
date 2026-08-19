@@ -1,15 +1,37 @@
 <!-- projects/app-admin/src/app/core/header/header.component.html -->
 <mat-toolbar color="accent" class="header-toolbar">
-    <!-- Левая часть: логотип и название -->
-    <a mat-button class="brand-container toolbar-item" routerLink="/">
+
+    <!-- Левая часть: бренд -->
+    <a class="brand-container" routerLink="/">
         <img src="logo.svg" width="30" height="24" alt="Логотип" class="logo">
         <span class="brand">Мониторинг</span>
     </a>
 
+
     @if (isAuthenticated()) {
-    <a mat-button class="toolbar-item" routerLink="/test-table">
-        Таблица
-    </a>
+    <nav class="nav-container">
+        <!-- Горизонтальное меню (на больших экранах) -->
+        @if (!isSmallScreen()) {
+        <div class="nav-links">
+            @for (item of menuItems; track item.label) {
+            <sc-menu-item [item]="item"></sc-menu-item>
+            }
+        </div>
+        }
+
+        <!-- Гамбургер (на маленьких экранах) -->
+        @if (isSmallScreen()) {
+        <button mat-icon-button class="hamburger-button" [matMenuTriggerFor]="mobileMenu">
+            <mat-icon>menu</mat-icon>
+        </button>
+        <mat-menu #mobileMenu="matMenu">
+            @for (item of menuItems; track item.label) {
+            <!-- Для мобильного меню используем тот же компонент, но с флагом isSubmenu -->
+            <sc-menu-item [item]="item" [isSubmenu]="true"></sc-menu-item>
+            }
+        </mat-menu>
+        }
+    </nav>
     }
 
     <span class="spacer"></span>

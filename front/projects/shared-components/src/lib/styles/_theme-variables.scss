@@ -23,6 +23,7 @@ $my-warn: mat.m2-define-palette(mat.$m2-red-palette);
 // Основные цвета (SCSS-переменные для использования в стилях компонентов)
 $primary-color: mat.m2-get-color-from-palette($my-primary, 500);
 $accent-color: mat.m2-get-color-from-palette($my-accent, 500);
+$accent-color-600: mat.m2-get-color-from-palette($my-accent, 600);
 $warn-color: mat.m2-get-color-from-palette($my-warn, 500);
 $primary-500: mat.m2-get-color-from-palette($my-primary, 500);
 $warn-500: mat.m2-get-color-from-palette($my-warn, 500);

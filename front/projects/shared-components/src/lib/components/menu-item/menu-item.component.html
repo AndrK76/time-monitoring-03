@@ -1,0 +1,30 @@
+@if (item.children && item.children.length) {
+@if (isSubmenu) {
+<!-- Внутри подменю используем mat-menu-item -->
+<button mat-menu-item [matMenuTriggerFor]="menu">
+    {{ item.label }}
+    <mat-icon>arrow_right</mat-icon>
+</button>
+} @else {
+<!-- Корневой пункт использует mat-button -->
+<button mat-button [matMenuTriggerFor]="menu">
+    {{ item.label }}
+    <mat-icon>arrow_drop_down</mat-icon>
+</button>
+}
+<mat-menu #menu="matMenu">
+    @for (child of item.children; track child.label) {
+    <sc-menu-item [item]="child" [isSubmenu]="true"></sc-menu-item>
+    }
+</mat-menu>
+} @else {
+@if (isSubmenu) {
+<a mat-menu-item [routerLink]="item.route" routerLinkActive="active">
+    {{ item.label }}
+</a>
+} @else {
+<a mat-button [routerLink]="item.route" routerLinkActive="active">
+    {{ item.label }}
+</a>
+}
+}

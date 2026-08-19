@@ -4,23 +4,22 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatMenuModule } from '@angular/material/menu';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '@mon3/sa';
 import { NgIf } from '@angular/common';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { MatDialog } from '@angular/material/dialog';
 import { UserProfileDialogComponent } from '../../dialogs/user-profile-dialog/user-profile-dialog.component';
+import { MenuItem, MenuItemComponent } from '@mon3/sc';
 
 @Component({
   selector: 'app-header',
   standalone: true,
   imports: [
-    MatToolbarModule,
-    MatIconModule,
-    MatButtonModule,
-    MatTooltipModule,
-    RouterLink,
-    NgIf
+    RouterLink, NgIf,
+    MatToolbarModule, MatIconModule, MatButtonModule, MatTooltipModule, MatMenuModule,
+    MenuItemComponent
   ],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss'
@@ -35,6 +34,7 @@ export class HeaderComponent implements OnInit {
   isAuthenticated = signal(false);
 
   // Сигналы для адаптивности
+  isSmallScreen = signal(false);
   showName = signal<boolean>(true);
   limit = signal<number>(20);
 
@@ -48,6 +48,27 @@ export class HeaderComponent implements OnInit {
     return fullName;
   });
 
+  // Структура меню (можно вынести в сервис позже)
+  menuItems: MenuItem[] = [
+    { label: 'Главная', route: '/' },
+    { label: 'Таблица', route: '/test-table' },
+    {
+      label: 'Администрирование',
+      children: [
+        { label: 'Пользователи', route: '/users' },
+        { label: 'Настройки', route: '/settings' },
+        {
+          label: 'Журналы',
+          children: [
+            { label: 'Логи доступа', route: '/logs/access' },
+            { label: 'Логи ошибок', route: '/logs/errors' }
+          ]
+        }
+      ]
+    }
+  ]
+
+
   ngOnInit(): void {
     // Подписываемся на изменения состояния аутентификации
     this.authService.onAuthChange((authenticated) => {
@@ -58,12 +79,12 @@ export class HeaderComponent implements OnInit {
     this.isAuthenticated.set(this.authService.isAuthenticated);
 
     // Отслеживаем размер экрана
+    this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small])
+      .subscribe(result => {
+        this.isSmallScreen.set(result.matches);
+      });
     this.breakpointObserver.observe([
-      Breakpoints.XSmall,
-      Breakpoints.Small,
-      Breakpoints.Medium,
-      Breakpoints.Large,
-      Breakpoints.XLarge
+      Breakpoints.XSmall, Breakpoints.Small, Breakpoints.Medium, Breakpoints.Large, Breakpoints.XLarge
     ]).subscribe(() => {
       if (this.breakpointObserver.isMatched(Breakpoints.XSmall)) {
         this.showName.set(false);
