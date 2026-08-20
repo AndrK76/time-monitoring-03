@@ -18,19 +18,25 @@ export interface EventData {
     booking_id?: string;
 }
 
-export interface PlaceEventGroup {
-    start: string;
-    end: string;
-    bars: PlaceEvents[];
-}
 
 export interface PlaceEvents {
     place: string;
     events: EventData[];
 }
 
+export interface PlaceEventGroup {
+    start: string;
+    end: string;
+    bars: PlaceEvents[];
+}
+
+
+export interface ContentItem {
+    group: PlaceEventGroup;
+}
+
 export interface SampleData {
     places: Place[];
     statuses: EventStatus[];
-    content: PlaceEvents[];
+    content: ContentItem[];
 }

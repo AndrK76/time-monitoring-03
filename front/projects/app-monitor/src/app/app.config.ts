@@ -17,7 +17,7 @@ export const appConfig: ApplicationConfig = {
       useFactory: initializeApp,
       multi: true
     },
-    { provide: LOCALE_ID, useValue: 'ru' }
+    { provide: LOCALE_ID, useValue: 'ru' },
   ]
 };
 
@@ -32,14 +32,14 @@ function initializeApp() {
 
     return lastValueFrom(authService.checkAuth())
       .then((response) => {
-        // Сессия восстановлена (токен сохранён в сервисе)
+        // РЎРµСЃСЃРёСЏ РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅР° (С‚РѕРєРµРЅ СЃРѕС…СЂР°РЅС‘РЅ РІ СЃРµСЂРІРёСЃРµ)
         //console.log('Session restored:', response);
-        return true; // успешно
+        return true; // СѓСЃРїРµС€РЅРѕ
       })
       .catch((error) => {
-        // Ошибка восстановления (например, нет куки или токен невалидный)
+        // РћС€РёР±РєР° РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёСЏ (РЅР°РїСЂРёРјРµСЂ, РЅРµС‚ РєСѓРєРё РёР»Рё С‚РѕРєРµРЅ РЅРµРІР°Р»РёРґРЅС‹Р№)
         //console.warn('Session restoration failed, continuing as anonymous:', error);
-        return true; // всё равно продолжаем загрузку
+        return true; // РІСЃС‘ СЂР°РІРЅРѕ РїСЂРѕРґРѕР»Р¶Р°РµРј Р·Р°РіСЂСѓР·РєСѓ
       });
   };
 }
