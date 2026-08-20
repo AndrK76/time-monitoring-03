@@ -1,1 +1,4 @@
-<p>index-auth works!</p>
+<div class="index-auth-container">
+  <daypilot-scheduler [config]="schedulerConfig()" [resources]="schedulerResources" [events]="schedulerEvents"
+    viewType="Week" (eventClick)="onEventClick($event)"></daypilot-scheduler>
+</div>

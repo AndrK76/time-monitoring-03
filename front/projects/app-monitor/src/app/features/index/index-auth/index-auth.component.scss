@@ -1,0 +1,15 @@
+.index-auth-container {
+    width: 100%;
+    height: 100%;
+    padding: 16px;
+    box-sizing: border-box;
+    background: #f5f7fa;
+    overflow: auto;
+    /* прокрутка и по вертикали, и по горизонтали */
+}
+
+.test-scroll-block {
+    width: 100%;
+    height: 100%;
+    min-height: 100%;
+}
