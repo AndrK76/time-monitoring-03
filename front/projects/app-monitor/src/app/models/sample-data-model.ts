@@ -1,0 +1,36 @@
+export interface Place {
+    id: string;
+    name: string;
+}
+
+export interface EventStatus {
+    code: string;
+    warning: string;
+    name: string;
+    display: string;
+    color?: string;
+}
+
+export interface EventData {
+    start: string;
+    end: string;
+    status: string;
+    booking_id?: string;
+}
+
+export interface PlaceEventGroup {
+    start: string;
+    end: string;
+    bars: PlaceEvents[];
+}
+
+export interface PlaceEvents {
+    place: string;
+    events: EventData[];
+}
+
+export interface SampleData {
+    places: Place[];
+    statuses: EventStatus[];
+    content: PlaceEvents[];
+}

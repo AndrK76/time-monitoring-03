@@ -1,0 +1,259 @@
+.
+|-- .gigacode
+|   `-- plans
+|-- projects
+|   |-- .gigacode
+|   |   `-- plans
+|   |-- admin-test
+|   |   |-- src
+|   |   |   |-- app
+|   |   |   |   |-- features
+|   |   |   |   |   |-- admin
+|   |   |   |   |   |   |-- admin.component.html
+|   |   |   |   |   |   |-- admin.component.scss
+|   |   |   |   |   |   `-- admin.component.ts
+|   |   |   |   |   |-- change-password
+|   |   |   |   |   |   |-- change-password.component.html
+|   |   |   |   |   |   |-- change-password.component.scss
+|   |   |   |   |   |   `-- change-password.component.ts
+|   |   |   |   |   |-- login
+|   |   |   |   |   |   |-- login.component.html
+|   |   |   |   |   |   |-- login.component.scss
+|   |   |   |   |   |   `-- login.component.ts
+|   |   |   |   |   |-- register
+|   |   |   |   |   |   |-- register.component.html
+|   |   |   |   |   |   |-- register.component.scss
+|   |   |   |   |   |   `-- register.component.ts
+|   |   |   |   |   `-- user-management
+|   |   |   |   |       |-- user-management.component.html
+|   |   |   |   |       |-- user-management.component.scss
+|   |   |   |   |       `-- user-management.component.ts
+|   |   |   |   |-- app.component.html
+|   |   |   |   |-- app.component.scss
+|   |   |   |   |-- app.component.ts
+|   |   |   |   |-- app.config.ts
+|   |   |   |   `-- app.routes.ts
+|   |   |   |-- assets
+|   |   |   |   `-- .gitkeep
+|   |   |   |-- environments
+|   |   |   |   |-- environment-interface.ts
+|   |   |   |   |-- environment.production.ts
+|   |   |   |   |-- environment.staging.ts
+|   |   |   |   `-- environment.ts
+|   |   |   |-- favicon.ico
+|   |   |   |-- index.html
+|   |   |   |-- main.ts
+|   |   |   `-- styles.scss
+|   |   `-- tsconfig.app.json
+|   |-- app-admin
+|   |   |-- public
+|   |   |   |-- favicon.ico
+|   |   |   `-- logo.svg
+|   |   |-- src
+|   |   |   |-- app
+|   |   |   |   |-- core
+|   |   |   |   |   |-- header
+|   |   |   |   |   |   |-- header.component.html
+|   |   |   |   |   |   |-- header.component.scss
+|   |   |   |   |   |   `-- header.component.ts
+|   |   |   |   |   |-- index
+|   |   |   |   |   |   |-- index.component.html
+|   |   |   |   |   |   |-- index.component.scss
+|   |   |   |   |   |   `-- index.component.ts
+|   |   |   |   |   `-- main
+|   |   |   |   |       |-- main.component.html
+|   |   |   |   |       |-- main.component.scss
+|   |   |   |   |       `-- main.component.ts
+|   |   |   |   |-- dialogs
+|   |   |   |   |   `-- user-profile-dialog
+|   |   |   |   |       |-- user-profile-dialog.component.html
+|   |   |   |   |       |-- user-profile-dialog.component.scss
+|   |   |   |   |       `-- user-profile-dialog.component.ts
+|   |   |   |   |-- features
+|   |   |   |   |-- app.component.html
+|   |   |   |   |-- app.component.scss
+|   |   |   |   |-- app.component.ts
+|   |   |   |   |-- app.config.ts
+|   |   |   |   `-- app.routes.ts
+|   |   |   |-- environments
+|   |   |   |   |-- environment-interface.ts
+|   |   |   |   |-- environment-prod.ts
+|   |   |   |   |-- environment.production.ts
+|   |   |   |   |-- environment.staging.ts
+|   |   |   |   `-- environment.ts
+|   |   |   |-- index.html
+|   |   |   |-- main.ts
+|   |   |   `-- styles.scss
+|   |   `-- tsconfig.app.json
+|   |-- app-monitor
+|   |   |-- public
+|   |   |   |-- favicon.ico
+|   |   |   |-- logo.svg
+|   |   |   |-- sample-nosplit-data.json
+|   |   |   `-- sample_split_data.json
+|   |   |-- src
+|   |   |   |-- app
+|   |   |   |   |-- core
+|   |   |   |   |   |-- header
+|   |   |   |   |   |   |-- header.component.html
+|   |   |   |   |   |   |-- header.component.scss
+|   |   |   |   |   |   `-- header.component.ts
+|   |   |   |   |   `-- main
+|   |   |   |   |       |-- main.component.html
+|   |   |   |   |       |-- main.component.scss
+|   |   |   |   |       `-- main.component.ts
+|   |   |   |   |-- dialogs
+|   |   |   |   |   `-- user-profile-dialog
+|   |   |   |   |       |-- user-profile-dialog.component.html
+|   |   |   |   |       |-- user-profile-dialog.component.scss
+|   |   |   |   |       `-- user-profile-dialog.component.ts
+|   |   |   |   |-- features
+|   |   |   |   |   |-- index
+|   |   |   |   |   |   |-- index-auth
+|   |   |   |   |   |   |   |-- index-auth.component.html
+|   |   |   |   |   |   |   |-- index-auth.component.scss
+|   |   |   |   |   |   |   `-- index-auth.component.ts
+|   |   |   |   |   |   |-- index-noauth
+|   |   |   |   |   |   |   |-- index-noauth.component.html
+|   |   |   |   |   |   |   |-- index-noauth.component.scss
+|   |   |   |   |   |   |   `-- index-noauth.component.ts
+|   |   |   |   |   |   |-- index.component.html
+|   |   |   |   |   |   |-- index.component.scss
+|   |   |   |   |   |   `-- index.component.ts
+|   |   |   |   |   `-- test-table
+|   |   |   |   |       |-- test-table.component.html
+|   |   |   |   |       |-- test-table.component.scss
+|   |   |   |   |       `-- test-table.component.ts
+|   |   |   |   |-- models
+|   |   |   |   |   `-- sample-data-model.ts
+|   |   |   |   |-- services
+|   |   |   |   |   `-- sample-data.service.ts
+|   |   |   |   |-- app.component.html
+|   |   |   |   |-- app.component.scss
+|   |   |   |   |-- app.component.ts
+|   |   |   |   |-- app.config.ts
+|   |   |   |   `-- app.routes.ts
+|   |   |   |-- environments
+|   |   |   |   |-- environment-interface.ts
+|   |   |   |   |-- environment-prod.ts
+|   |   |   |   |-- environment.production.ts
+|   |   |   |   |-- environment.staging.ts
+|   |   |   |   `-- environment.ts
+|   |   |   |-- index.html
+|   |   |   |-- main.ts
+|   |   |   `-- styles.scss
+|   |   `-- tsconfig.app.json
+|   |-- mon-test
+|   |   |-- src
+|   |   |   |-- app
+|   |   |   |   |-- features
+|   |   |   |   |   |-- dashboard
+|   |   |   |   |   |   |-- dashboard.component.html
+|   |   |   |   |   |   |-- dashboard.component.scss
+|   |   |   |   |   |   `-- dashboard.component.ts
+|   |   |   |   |   `-- login
+|   |   |   |   |       |-- login.component.html
+|   |   |   |   |       |-- login.component.scss
+|   |   |   |   |       `-- login.component.ts
+|   |   |   |   |-- app.component.html
+|   |   |   |   |-- app.component.scss
+|   |   |   |   |-- app.component.ts
+|   |   |   |   |-- app.config.ts
+|   |   |   |   `-- app.routes.ts
+|   |   |   |-- assets
+|   |   |   |   `-- .gitkeep
+|   |   |   |-- environments
+|   |   |   |   |-- environment-interface.ts
+|   |   |   |   |-- environment.production.ts
+|   |   |   |   |-- environment.staging.ts
+|   |   |   |   `-- environment.ts
+|   |   |   |-- favicon.ico
+|   |   |   |-- index.html
+|   |   |   |-- main.ts
+|   |   |   `-- styles.scss
+|   |   `-- tsconfig.app.json
+|   |-- shared-auth
+|   |   |-- src
+|   |   |   |-- lib
+|   |   |   |   |-- guards
+|   |   |   |   |   `-- auth.guard.ts
+|   |   |   |   |-- interceptors
+|   |   |   |   |   |-- auth.interceptor.fn.ts
+|   |   |   |   |   `-- language.interceptor.fn.ts
+|   |   |   |   |-- models
+|   |   |   |   |   `-- auth.models.ts
+|   |   |   |   `-- services
+|   |   |   |       |-- admin.service.ts
+|   |   |   |       `-- auth.service.ts
+|   |   |   `-- public-api.ts
+|   |   |-- README.md
+|   |   |-- ng-package.json
+|   |   |-- package.json
+|   |   |-- tsconfig.lib.json
+|   |   `-- tsconfig.lib.prod.json
+|   |-- shared-components
+|   |   |-- src
+|   |   |   |-- lib
+|   |   |   |   |-- components
+|   |   |   |   |   |-- login
+|   |   |   |   |   |   |-- login.component.html
+|   |   |   |   |   |   |-- login.component.scss
+|   |   |   |   |   |   `-- login.component.ts
+|   |   |   |   |   |-- logout
+|   |   |   |   |   |   |-- logout.component.html
+|   |   |   |   |   |   |-- logout.component.scss
+|   |   |   |   |   |   `-- logout.component.ts
+|   |   |   |   |   |-- register
+|   |   |   |   |   |   |-- register.component.html
+|   |   |   |   |   |   |-- register.component.scss
+|   |   |   |   |   |   `-- register.component.ts
+|   |   |   |   |   |-- top-menu-item
+|   |   |   |   |   |   |-- top-menu-item.component.html
+|   |   |   |   |   |   |-- top-menu-item.component.scss
+|   |   |   |   |   |   `-- top-menu-item.component.ts
+|   |   |   |   |   `-- view-current-profile
+|   |   |   |   |       |-- view-current-profile.component.html
+|   |   |   |   |       |-- view-current-profile.component.scss
+|   |   |   |   |       `-- view-current-profile.component.ts
+|   |   |   |   |-- models
+|   |   |   |   |   `-- menu-item.ts
+|   |   |   |   `-- styles
+|   |   |   |       |-- _auth-common.scss
+|   |   |   |       `-- _theme-variables.scss
+|   |   |   `-- public-api.ts
+|   |   |-- README.md
+|   |   |-- ng-package.json
+|   |   |-- package.json
+|   |   |-- tsconfig.lib.json
+|   |   `-- tsconfig.lib.prod.json
+|   `-- shared-test
+|       |-- src
+|       |   |-- lib
+|       |   |   |-- guards
+|       |   |   |   `-- auth.guard.ts
+|       |   |   |-- interceptors
+|       |   |   |   |-- auth.interceptor.fn.ts
+|       |   |   |   `-- language.interceptor.fn.ts
+|       |   |   |-- models
+|       |   |   |   `-- auth.models.ts
+|       |   |   `-- services
+|       |   |       |-- admin.service.ts
+|       |   |       `-- auth.service.ts
+|       |   `-- public-api.ts
+|       |-- README.md
+|       |-- ng-package.json
+|       |-- package.json
+|       |-- tsconfig.lib.json
+|       `-- tsconfig.lib.prod.json
+|-- .editorconfig
+|-- .gitignore
+|-- README.md
+|-- angular.json
+|-- notes.txt
+|-- package-lock.json
+|-- package.json
+|-- tree.txt
+|-- tsconfig.json
+`-- tsconfig.prod.json
+
+78 directories, 178 files
