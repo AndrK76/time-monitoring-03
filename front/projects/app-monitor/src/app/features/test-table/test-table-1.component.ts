@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, computed, inject, OnInit, signal, ViewChild, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SampleDataService } from '../../services/sample-data.service';
 import { Place, EventStatus, PlaceEvents, EventData } from '../../models/sample-data-model';
@@ -10,6 +10,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
 import { EventsEditorInplaceComponent } from '../events-editor-inplace/events-editor-inplace.component';
 import { EventRow } from '../event-row';
+import { addModifyChangeToState, addNewChangeToState, formatTableChanges, hasTableChanges, newTableDataChanges, TableDataChanges, updateDataSourceItem } from '@mon3/sc';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 
 @Component({
@@ -22,7 +24,8 @@ import { EventRow } from '../event-row';
     MatButtonModule,
     MatProgressSpinnerModule,
     MatIconModule,
-    EventsEditorInplaceComponent
+    EventsEditorInplaceComponent,
+    MatTooltipModule
   ],
   templateUrl: './test-table-1.component.html',
   styleUrl: './test-table-1.component.scss',
@@ -39,6 +42,9 @@ export class TestTable1Component implements OnInit {
   @ViewChild(MatTable) table!: MatTable<EventRow>;
   displayedColumns = ['expand', 'placeName', 'statusName', 'start', 'end', 'booking_id', 'details'];
   dataSource = new MatTableDataSource<EventRow>([]);
+  dataState = signal<TableDataChanges>(newTableDataChanges());
+  hasChanges = computed(() => hasTableChanges(this.dataState()));
+  changesSummary = computed(() => formatTableChanges(this.dataState()));
 
 
   ngOnInit(): void {
@@ -137,35 +143,45 @@ export class TestTable1Component implements OnInit {
     return (row as any)._expanded === true;
   }
 
-  // test-table.component.ts
+
   updateEvent(updatedEvent: EventRow): void {
-    const index = this.dataSource.data.findIndex(e => e.id === updatedEvent.id);
-    if (index === -1) return;
+    // Функция пересчёта производных полей
+    const updateDerived = (row: EventRow): void => {
+      const placesMap = new Map(this.places().map(p => [p.id, p.name]));
+      const statusesMap = new Map(this.statuses().map(s => [s.code, s]));
 
-    // Получаем справочники
-    const placesMap = new Map(this.places().map(p => [p.id, p.name]));
-    const statusesMap = new Map(this.statuses().map(s => [s.code, s]));
+      const placeName = placesMap.get(row.placeId) || row.placeId;
+      const status = statusesMap.get(row.statusCode);
+      const statusName = status?.name || row.statusCode;
+      const statusColor = status?.color;
 
-    // Пересчитываем имена и цвета
-    const placeName = placesMap.get(updatedEvent.placeId) || updatedEvent.placeId;
-    const status = statusesMap.get(updatedEvent.statusCode);
-    const statusName = status?.name || updatedEvent.statusCode;
-    const statusColor = status?.color;
+      row.placeName = placeName;
+      row.statusName = statusName;
+      row.statusColor = statusColor;
 
-    // Формируем обновлённую строку
-    const newRow: EventRow = {
-      ...updatedEvent,
-      placeName,
-      statusName,
-      statusColor,
-      details: `Место: ${placeName} | Статус: ${statusName} | ${updatedEvent.start.replace('T', ' ').slice(0, 16)} – ${updatedEvent.end.replace('T', ' ').slice(0, 16)} | ID: ${updatedEvent.booking_id || '—'}`
+      // Безопасное форматирование дат
+      const startStr = row.start ? row.start.replace('T', ' ').slice(0, 16) : '';
+      const endStr = row.end ? row.end.replace('T', ' ').slice(0, 16) : '';
+      row.details = `Место: ${placeName} | Статус: ${statusName} | ${startStr} – ${endStr} | ID: ${row.booking_id || '—'}`;
     };
 
-    // Обновляем dataSource
-    const newData = [...this.dataSource.data];
-    newData[index] = newRow;
-    this.dataSource.data = newData;
-    this.table.renderRows();
+    updateDerived(updatedEvent);
+
+    const result = updateDataSourceItem(
+      this.dataSource.data,
+      updatedEvent,
+      (item: EventRow) => item.id,
+    );
+
+    if (result.updated) {
+      this.dataSource.data = result.data;
+      this.table.renderRows();
+      this.dataState.update(state => {
+        addModifyChangeToState(state, updatedEvent.id);
+        return state;
+      });
+      console.log('Строка обновлена');
+    }
   }
 
 }

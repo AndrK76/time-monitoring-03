@@ -108,6 +108,10 @@
 |   |   |   |   |       |-- user-profile-dialog.component.scss
 |   |   |   |   |       `-- user-profile-dialog.component.ts
 |   |   |   |   |-- features
+|   |   |   |   |   |-- events-editor-inplace
+|   |   |   |   |   |   |-- events-editor-inplace.component.html
+|   |   |   |   |   |   |-- events-editor-inplace.component.scss
+|   |   |   |   |   |   `-- events-editor-inplace.component.ts
 |   |   |   |   |   |-- index
 |   |   |   |   |   |   |-- index-auth
 |   |   |   |   |   |   |   |-- index-auth.component.html
@@ -120,10 +124,11 @@
 |   |   |   |   |   |   |-- index.component.html
 |   |   |   |   |   |   |-- index.component.scss
 |   |   |   |   |   |   `-- index.component.ts
-|   |   |   |   |   `-- test-table
-|   |   |   |   |       |-- test-table.component.html
-|   |   |   |   |       |-- test-table.component.scss
-|   |   |   |   |       `-- test-table.component.ts
+|   |   |   |   |   |-- test-table
+|   |   |   |   |   |   |-- test-table-1.component.html
+|   |   |   |   |   |   |-- test-table-1.component.scss
+|   |   |   |   |   |   `-- test-table-1.component.ts
+|   |   |   |   |   `-- event-row.ts
 |   |   |   |   |-- models
 |   |   |   |   |   `-- sample-data-model.ts
 |   |   |   |   |-- services
@@ -219,6 +224,7 @@
 |   |   |   |   |   `-- menu-item.ts
 |   |   |   |   `-- styles
 |   |   |   |       |-- _auth-common.scss
+|   |   |   |       |-- _table-extensions.scss
 |   |   |   |       `-- _theme-variables.scss
 |   |   |   `-- public-api.ts
 |   |   |-- README.md
@@ -256,4 +262,4 @@
 |-- tsconfig.json
 `-- tsconfig.prod.json
 
-78 directories, 178 files
+79 directories, 183 files

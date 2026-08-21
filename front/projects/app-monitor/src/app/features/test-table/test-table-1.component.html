@@ -2,7 +2,16 @@
     <mat-card>
         <mat-card-header>
             <mat-card-title>Список событий</mat-card-title>
-            <mat-card-subtitle>Все события по всем местам ({{ dataSource.data.length }} записей)</mat-card-subtitle>
+            <mat-card-subtitle>
+                Все события по всем местам ({{ dataSource.data.length }} записей)
+                @if (hasChanges()) {
+                <span class="changes-summary">
+                    | Добавлено: {{ dataState().added.length }},
+                    Изменено: {{ dataState().modified.length }},
+                    Удалено: {{ dataState().deleted.length }}
+                </span>
+                }
+            </mat-card-subtitle>
         </mat-card-header>
 
         <mat-card-actions align="end">
@@ -35,7 +44,11 @@
                 <table mat-table [dataSource]="dataSource" class="mat-elevation-z0" multiTemplateDataRows>
 
                     <ng-container matColumnDef="expand">
-                        <th mat-header-cell *matHeaderCellDef> </th>
+                        <th mat-header-cell *matHeaderCellDef>
+                            @if (hasChanges()) {
+                            <span matTooltip="{{ changesSummary() }}">*</span>
+                            }
+                        </th>
                         <td mat-cell *matCellDef="let row">
                             <button mat-icon-button (click)="toggleRow(row)">
                                 <mat-icon>{{ row._expanded ? 'expand_less' : 'expand_more' }}</mat-icon>
