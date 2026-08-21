@@ -1,0 +1,44 @@
+<div class="editor-container" *ngIf="eventData()">
+    <form #editorForm="ngForm" class="editor-form">
+        <div class="form-row">
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>ID</mat-label>
+                <input matInput [value]="eventData().id" readonly>
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>ID брони</mat-label>
+                <input matInput [(ngModel)]="eventData().booking_id" name="booking_id">
+            </mat-form-field>
+        </div>
+        <div class="form-row">
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Место</mat-label>
+                <mat-select [(ngModel)]="eventData().placeId" name="placeId" required
+                    (ngModelChange)="onFieldChange('placeId', $event)">
+                    <mat-option *ngFor="let place of places()" [value]="place.id">
+                        {{ place.name }}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Статус</mat-label>
+                <mat-select [(ngModel)]="eventData().statusCode" name="statusCode" required
+                    (ngModelChange)="onFieldChange('statusCode', $event)">
+                    <mat-option *ngFor="let status of statuses()" [value]="status.code">
+                        {{ status.name }}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+        <div class="form-row">
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Начало</mat-label>
+                <input matInput type="datetime-local" [(ngModel)]="eventData().start" name="start" required>
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Окончание</mat-label>
+                <input matInput type="datetime-local" [(ngModel)]="eventData().end" name="end" required>
+            </mat-form-field>
+        </div>
+    </form>
+</div>

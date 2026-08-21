@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { map, Observable } from 'rxjs';
+import { map, Observable, of } from 'rxjs';
 import { EventStatus, Place, PlaceEvents, SampleData } from '../models/sample-data-model';
 
 @Injectable({
@@ -35,4 +35,15 @@ export class SampleDataService {
     );
   }
 
+  updatePlaceEvent(event: PlaceEvents): Observable<PlaceEvents> {
+    return of(event);
+  }
+
+  addPlaceEvents(event: PlaceEvents): Observable<PlaceEvents> {
+    return of(event);
+  }
+
+  removePlaceEvents(event: PlaceEvents): Observable<void> {
+    return of();
+  }
 }

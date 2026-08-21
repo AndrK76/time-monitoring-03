@@ -1,28 +1,19 @@
-import { Component, inject, OnInit, signal, ViewEncapsulation } from '@angular/core';
+import { Component, inject, OnInit, signal, ViewChild, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SampleDataService } from '../../services/sample-data.service';
 import { Place, EventStatus, PlaceEvents, EventData } from '../../models/sample-data-model';
 import { catchError, finalize, forkJoin, Observable, of } from 'rxjs';
-import { MatTableModule } from '@angular/material/table';
+import { MatTable, MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
+import { EventsEditorInplaceComponent } from '../events-editor-inplace/events-editor-inplace.component';
+import { EventRow } from '../event-row';
 
-export interface EventRow {
-  placeId: string;
-  placeName: string;
-  statusCode: string;
-  statusName: string;
-  statusColor?: string;
-  start: string;
-  end: string;
-  booking_id?: string;
-  details: string; // длинная "мусорная" колонка
-}
 
 @Component({
-  selector: 'app-test-table',
+  selector: 'app-test-table-1',
   standalone: true,
   imports: [
     CommonModule,
@@ -30,22 +21,25 @@ export interface EventRow {
     MatCardModule,
     MatButtonModule,
     MatProgressSpinnerModule,
-    MatIconModule
+    MatIconModule,
+    EventsEditorInplaceComponent
   ],
-  templateUrl: './test-table.component.html',
-  styleUrl: './test-table.component.scss',
-  //encapsulation: ViewEncapsulation.None
+  templateUrl: './test-table-1.component.html',
+  styleUrl: './test-table-1.component.scss',
 })
-export class TestTableComponent implements OnInit {
+export class TestTable1Component implements OnInit {
   private dataService = inject(SampleDataService);
 
   places = signal<Place[]>([]);
   statuses = signal<EventStatus[]>([]);
-  eventRows = signal<EventRow[]>([]);
+  //eventRows = signal<EventRow[]>([]);
   isLoading = signal(false);
   error = signal<string | null>(null);
 
-  displayedColumns = ['placeName', 'statusName', 'start', 'end', 'booking_id', 'details'];
+  @ViewChild(MatTable) table!: MatTable<EventRow>;
+  displayedColumns = ['expand', 'placeName', 'statusName', 'start', 'end', 'booking_id', 'details'];
+  dataSource = new MatTableDataSource<EventRow>([]);
+
 
   ngOnInit(): void {
     this.initializeData();
@@ -103,6 +97,7 @@ export class TestTableComponent implements OnInit {
               const startStr = evt.start.replace('T', ' ').slice(0, 16);
               const endStr = evt.end.replace('T', ' ').slice(0, 16);
               rows.push({
+                id: evt.id,
                 placeId: pe.place,
                 placeName: placeName,
                 statusCode: evt.status,
@@ -116,7 +111,8 @@ export class TestTableComponent implements OnInit {
             });
           });
 
-          this.eventRows.set(rows);
+          //this.eventRows.set(rows);
+          this.dataSource.data = rows;
         }
       });
   }
@@ -124,4 +120,52 @@ export class TestTableComponent implements OnInit {
   refreshData(): void {
     this.loadEvents();
   }
+
+  toggleRow(row: any): void {
+    const updatedRows = this.dataSource.data.map(r => {
+      const rowAny = r as any;
+      if (rowAny.id === row.id) {
+        const expanded = rowAny._expanded === undefined ? true : !rowAny._expanded;
+        return { ...r, _expanded: expanded };
+      }
+      return r;
+    });
+    this.dataSource.data = updatedRows;
+  }
+
+  isExpanded = (index: number, row: any): boolean => {
+    return (row as any)._expanded === true;
+  }
+
+  // test-table.component.ts
+  updateEvent(updatedEvent: EventRow): void {
+    const index = this.dataSource.data.findIndex(e => e.id === updatedEvent.id);
+    if (index === -1) return;
+
+    // Получаем справочники
+    const placesMap = new Map(this.places().map(p => [p.id, p.name]));
+    const statusesMap = new Map(this.statuses().map(s => [s.code, s]));
+
+    // Пересчитываем имена и цвета
+    const placeName = placesMap.get(updatedEvent.placeId) || updatedEvent.placeId;
+    const status = statusesMap.get(updatedEvent.statusCode);
+    const statusName = status?.name || updatedEvent.statusCode;
+    const statusColor = status?.color;
+
+    // Формируем обновлённую строку
+    const newRow: EventRow = {
+      ...updatedEvent,
+      placeName,
+      statusName,
+      statusColor,
+      details: `Место: ${placeName} | Статус: ${statusName} | ${updatedEvent.start.replace('T', ' ').slice(0, 16)} – ${updatedEvent.end.replace('T', ' ').slice(0, 16)} | ID: ${updatedEvent.booking_id || '—'}`
+    };
+
+    // Обновляем dataSource
+    const newData = [...this.dataSource.data];
+    newData[index] = newRow;
+    this.dataSource.data = newData;
+    this.table.renderRows();
+  }
+
 }

@@ -12,6 +12,7 @@ export interface EventStatus {
 }
 
 export interface EventData {
+    id: string;
     start: string;
     end: string;
     status: string;

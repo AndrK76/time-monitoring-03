@@ -82,29 +82,34 @@
               {
                 "start": "2025-02-24T00:00:00.000",
                 "end": "2025-02-24T09:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "8eee05c4-f3ac-4730-8b28-94e5bd9a43a9"
               },
               {
                 "start": "2025-02-24T09:00:00.000",
                 "end": "2025-02-24T09:30:00.000",
                 "status": "booked",
-                "booking_id": "123456"
+                "booking_id": "123456",
+                "id": "35d791d8-413f-44ce-9a24-06ad615608a6"
               },
               {
                 "start": "2025-02-24T09:30:00.000",
                 "end": "2025-02-24T11:00:00.000",
                 "status": "booked-use",
-                "booking_id": "123456"
+                "booking_id": "123456",
+                "id": "7d2dc2f7-9f8e-47bb-8716-506f74681a14"
               },
               {
                 "start": "2025-02-24T11:00:00.000",
                 "end": "2025-02-24T22:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "10a9ea6e-7963-48c7-baaa-3bb68becddd4"
               },
               {
                 "start": "2025-02-24T22:00:00.000",
                 "end": "2025-02-26T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "bb4f3c07-0a93-4962-a1a9-af3f31a3ef6b"
               }
             ]
           },
@@ -114,7 +119,8 @@
               {
                 "start": "2025-02-24T00:00:00.000",
                 "end": "2025-02-26T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "40cd3467-5279-4264-b297-5e2acea10972"
               }
             ]
           },
@@ -124,34 +130,40 @@
               {
                 "start": "2025-02-24T00:00:00.000",
                 "end": "2025-02-24T09:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "f554df7b-f35f-439f-a7e8-36c5c50f9298"
               },
               {
                 "start": "2025-02-24T09:00:00.000",
                 "end": "2025-02-24T09:15:00.000",
                 "status": "booked",
-                "booking_id": "234567"
+                "booking_id": "234567",
+                "id": "ed631f54-3516-48db-8464-419b2c1a1d9d"
               },
               {
                 "start": "2025-02-24T09:15:00.000",
                 "end": "2025-02-24T11:45:00.000",
                 "status": "booked-use",
-                "booking_id": "234567"
+                "booking_id": "234567",
+                "id": "3c8e378b-390e-4880-9274-cc7d4a21141b"
               },
               {
                 "start": "2025-02-24T11:45:00.000",
                 "end": "2025-02-24T11:55:00.000",
-                "status": "nobooked-use"
+                "status": "nobooked-use",
+                "id": "70011fa6-aab0-4756-a3ea-cbc2d8c2bd41"
               },
               {
                 "start": "2025-02-24T11:55:00.000",
                 "end": "2025-02-24T22:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "a8273d9d-0a88-4977-b314-8d82400ef62d"
               },
               {
                 "start": "2025-02-24T22:00:00.000",
                 "end": "2025-02-26T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "12acd774-0aa0-4452-8e2b-6ff80c9ac431"
               }
             ]
           },
@@ -161,29 +173,34 @@
               {
                 "start": "2025-02-24T00:00:00.000",
                 "end": "2025-02-24T09:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "14997435-f2c5-4315-89e3-12af675e98c3"
               },
               {
                 "start": "2025-02-24T09:00:00.000",
                 "end": "2025-02-24T12:00:00.000",
                 "status": "booked",
-                "booking_id": "345678"
+                "booking_id": "345678",
+                "id": "451a2b4e-eca4-4d28-a167-e13ad6adfe3f"
               },
               {
                 "start": "2025-02-24T12:00:00.000",
                 "end": "2025-02-24T14:30:00.000",
                 "status": "booked-use",
-                "booking_id": "345678"
+                "booking_id": "345678",
+                "id": "173a323e-47eb-4034-a21c-ee835cb094ea"
               },
               {
                 "start": "2025-02-24T14:30:00.000",
                 "end": "2025-02-24T22:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "a985b4da-b3c2-417e-8824-0377db9becde"
               },
               {
                 "start": "2025-02-24T22:00:00.000",
                 "end": "2025-02-26T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "1f7c45c6-6121-4be0-ab61-5c7c78b18019"
               }
             ]
           },
@@ -193,7 +210,8 @@
               {
                 "start": "2025-02-24T00:00:00.000",
                 "end": "2025-02-26T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "1424fb7a-1735-467d-bb4a-6ce32ee807e9"
               }
             ]
           },
@@ -203,29 +221,34 @@
               {
                 "start": "2025-02-24T00:00:00.000",
                 "end": "2025-02-24T09:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "3c8ba328-1fa6-4152-afcb-7095fd6c73bc"
               },
               {
                 "start": "2025-02-24T09:00:00.000",
                 "end": "2025-02-24T10:00:00.000",
                 "status": "booked",
-                "booking_id": "456789"
+                "booking_id": "456789",
+                "id": "4e341aa6-0419-4176-80c9-4f788da92804"
               },
               {
                 "start": "2025-02-24T10:00:00.000",
                 "end": "2025-02-24T12:00:00.000",
                 "status": "booked-use",
-                "booking_id": "456789"
+                "booking_id": "456789",
+                "id": "a4e7d608-1ccd-486f-bdc7-242a82a37b64"
               },
               {
                 "start": "2025-02-24T12:00:00.000",
                 "end": "2025-02-24T22:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "b895fd4f-c53b-4694-a447-96953d568fa9"
               },
               {
                 "start": "2025-02-24T22:00:00.000",
                 "end": "2025-02-26T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "14d12b14-4906-4c63-aa00-0ae062da7c47"
               }
             ]
           },
@@ -235,7 +258,8 @@
               {
                 "start": "2025-02-24T00:00:00.000",
                 "end": "2025-02-26T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "9ac09cec-1c32-43e5-bfdf-851f9faafc32"
               }
             ]
           },
@@ -245,29 +269,34 @@
               {
                 "start": "2025-02-24T00:00:00.000",
                 "end": "2025-02-24T09:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "2b537f30-0b89-4c7a-91eb-30e6d2eb7a10"
               },
               {
                 "start": "2025-02-24T09:00:00.000",
                 "end": "2025-02-24T09:20:00.000",
                 "status": "booked",
-                "booking_id": "567890"
+                "booking_id": "567890",
+                "id": "b72928ec-e7ef-43db-8d05-c6a4b3406cac"
               },
               {
                 "start": "2025-02-24T09:20:00.000",
                 "end": "2025-02-24T11:50:00.000",
                 "status": "booked-use",
-                "booking_id": "567890"
+                "booking_id": "567890",
+                "id": "aa9cd773-9c97-489e-80ba-f528f5af465c"
               },
               {
                 "start": "2025-02-24T11:50:00.000",
                 "end": "2025-02-24T22:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "8a1e7986-ace3-4460-a68c-37fb1607cb52"
               },
               {
                 "start": "2025-02-24T22:00:00.000",
                 "end": "2025-02-26T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "9540c962-4ac3-4000-b8d3-bbebf9f9d3dc"
               }
             ]
           },
@@ -277,7 +306,8 @@
               {
                 "start": "2025-02-24T00:00:00.000",
                 "end": "2025-02-26T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "f380dc93-091f-47b8-8698-27868dc6cb61"
               }
             ]
           },
@@ -287,29 +317,34 @@
               {
                 "start": "2025-02-24T00:00:00.000",
                 "end": "2025-02-24T09:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "8fbcc1f0-33e4-4629-bbb6-3b2798c50c91"
               },
               {
                 "start": "2025-02-24T09:00:00.000",
                 "end": "2025-02-24T09:30:00.000",
                 "status": "booked",
-                "booking_id": "678901"
+                "booking_id": "678901",
+                "id": "c6e66647-2eff-4dfe-bdf4-70d1ded3af0f"
               },
               {
                 "start": "2025-02-24T09:30:00.000",
                 "end": "2025-02-24T12:00:00.000",
                 "status": "booked-use",
-                "booking_id": "678901"
+                "booking_id": "678901",
+                "id": "04a8cef6-1e77-462f-97dc-5071c54e68f5"
               },
               {
                 "start": "2025-02-24T12:00:00.000",
                 "end": "2025-02-24T22:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "a0b34544-b06a-48a6-96d4-ebdfb1c73d8c"
               },
               {
                 "start": "2025-02-24T22:00:00.000",
                 "end": "2025-02-26T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "1ba2f695-3b4d-4bec-988d-d365e37c4ab7"
               }
             ]
           }
@@ -327,7 +362,8 @@
               {
                 "start": "2025-02-25T00:00:00.000",
                 "end": "2025-02-27T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "e7fc6683-a722-4289-b95d-b4106e7d09b7"
               }
             ]
           },
@@ -337,34 +373,40 @@
               {
                 "start": "2025-02-25T00:00:00.000",
                 "end": "2025-02-25T09:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "fe369edc-e9ab-4fa6-8244-32fb19e15226"
               },
               {
                 "start": "2025-02-25T09:00:00.000",
                 "end": "2025-02-25T09:15:00.000",
                 "status": "booked",
-                "booking_id": "789012"
+                "booking_id": "789012",
+                "id": "6c518ad3-0975-4e48-a4e4-b07a5285347a"
               },
               {
                 "start": "2025-02-25T09:15:00.000",
                 "end": "2025-02-25T11:45:00.000",
                 "status": "booked-use",
-                "booking_id": "789012"
+                "booking_id": "789012",
+                "id": "e9dc467b-3574-485e-b895-8032e47d1537"
               },
               {
                 "start": "2025-02-25T11:45:00.000",
                 "end": "2025-02-25T11:55:00.000",
-                "status": "nobooked-use"
+                "status": "nobooked-use",
+                "id": "45d3ee72-53c3-4505-9823-3423c76b0165"
               },
               {
                 "start": "2025-02-25T11:55:00.000",
                 "end": "2025-02-25T22:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "83a2f46a-8567-45f3-9a0b-10ca9a1bb0f7"
               },
               {
                 "start": "2025-02-25T22:00:00.000",
                 "end": "2025-02-27T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "4675ac09-b60e-4ec9-bbf6-e91654fb5ef6"
               }
             ]
           },
@@ -374,7 +416,8 @@
               {
                 "start": "2025-02-25T00:00:00.000",
                 "end": "2025-02-27T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "ac38b25c-5bb6-4a2f-8511-f12dc2419106"
               }
             ]
           },
@@ -384,29 +427,34 @@
               {
                 "start": "2025-02-25T00:00:00.000",
                 "end": "2025-02-25T09:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "4574eca9-20d7-48bb-81f5-90d84ebdde22"
               },
               {
                 "start": "2025-02-25T09:00:00.000",
                 "end": "2025-02-25T11:30:00.000",
                 "status": "booked",
-                "booking_id": "890123"
+                "booking_id": "890123",
+                "id": "10813a73-a824-43cc-b006-51c6963afdfc"
               },
               {
                 "start": "2025-02-25T11:30:00.000",
                 "end": "2025-02-25T14:00:00.000",
                 "status": "booked-use",
-                "booking_id": "890123"
+                "booking_id": "890123",
+                "id": "ccff6dd8-99a1-4d00-8d91-e7b653854553"
               },
               {
                 "start": "2025-02-25T14:00:00.000",
                 "end": "2025-02-25T22:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "b5dc5da9-a302-48ec-9a44-255558bb61cc"
               },
               {
                 "start": "2025-02-25T22:00:00.000",
                 "end": "2025-02-27T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "c6d5b13b-68a7-4b30-9cd7-47aca5b722d0"
               }
             ]
           },
@@ -416,7 +464,8 @@
               {
                 "start": "2025-02-25T00:00:00.000",
                 "end": "2025-02-27T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "1a1765b8-657e-413b-8498-8a966ba7e506"
               }
             ]
           },
@@ -426,29 +475,34 @@
               {
                 "start": "2025-02-25T00:00:00.000",
                 "end": "2025-02-25T09:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "893e49cd-8c05-4b59-9eb8-56ebd95aee14"
               },
               {
                 "start": "2025-02-25T09:00:00.000",
                 "end": "2025-02-25T09:30:00.000",
                 "status": "booked",
-                "booking_id": "901234"
+                "booking_id": "901234",
+                "id": "9b9f3ebd-fd79-4824-b557-7ce24a31ea90"
               },
               {
                 "start": "2025-02-25T09:30:00.000",
                 "end": "2025-02-25T12:00:00.000",
                 "status": "booked-use",
-                "booking_id": "901234"
+                "booking_id": "901234",
+                "id": "9a307f65-8d7a-4092-aa68-6145e685ca42"
               },
               {
                 "start": "2025-02-25T12:00:00.000",
                 "end": "2025-02-25T22:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "875cae51-1376-4050-8578-e5c4fe582127"
               },
               {
                 "start": "2025-02-25T22:00:00.000",
                 "end": "2025-02-27T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "b56c37cb-57a8-4e48-a0dd-910f25ab5f01"
               }
             ]
           },
@@ -458,7 +512,8 @@
               {
                 "start": "2025-02-25T00:00:00.000",
                 "end": "2025-02-27T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "a6de25ca-c451-4fe1-9011-41e82f5a2def"
               }
             ]
           },
@@ -468,34 +523,40 @@
               {
                 "start": "2025-02-25T00:00:00.000",
                 "end": "2025-02-25T09:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "e22d46a1-e474-44a8-acdd-a3f6b5c30872"
               },
               {
                 "start": "2025-02-25T09:00:00.000",
                 "end": "2025-02-25T09:20:00.000",
                 "status": "booked",
-                "booking_id": "123789"
+                "booking_id": "123789",
+                "id": "0c8fb55a-819c-4328-a9cd-9cadc4462744"
               },
               {
                 "start": "2025-02-25T09:20:00.000",
                 "end": "2025-02-25T11:50:00.000",
                 "status": "booked-use",
-                "booking_id": "123789"
+                "booking_id": "123789",
+                "id": "c79252c0-3ee0-4c2f-b894-914e4c1fe2bd"
               },
               {
                 "start": "2025-02-25T11:50:00.000",
                 "end": "2025-02-25T12:00:00.000",
-                "status": "nobooked-use"
+                "status": "nobooked-use",
+                "id": "30d97fda-625e-4622-aeea-f80fe8c53cdc"
               },
               {
                 "start": "2025-02-25T12:00:00.000",
                 "end": "2025-02-25T22:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "9d39d5d5-035e-4c1c-86b1-b3a836358cae"
               },
               {
                 "start": "2025-02-25T22:00:00.000",
                 "end": "2025-02-27T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "50cbd857-afc8-41db-a623-058d5d64f09b"
               }
             ]
           },
@@ -505,7 +566,8 @@
               {
                 "start": "2025-02-25T00:00:00.000",
                 "end": "2025-02-27T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "3679f673-64eb-482c-8750-cd54713fa23d"
               }
             ]
           },
@@ -515,7 +577,8 @@
               {
                 "start": "2025-02-25T00:00:00.000",
                 "end": "2025-02-27T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "0d3374a0-79bd-45cf-98ac-34fc88217983"
               }
             ]
           }
@@ -533,29 +596,34 @@
               {
                 "start": "2025-02-26T00:00:00.000",
                 "end": "2025-02-26T09:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "83924b9a-3fab-403b-8559-58a850ebee4d"
               },
               {
                 "start": "2025-02-26T09:00:00.000",
                 "end": "2025-02-26T09:45:00.000",
                 "status": "booked",
-                "booking_id": "234890"
+                "booking_id": "234890",
+                "id": "498819da-148f-4c6e-8f81-38f1fd8d0a9a"
               },
               {
                 "start": "2025-02-26T09:45:00.000",
                 "end": "2025-02-26T12:15:00.000",
                 "status": "booked-use",
-                "booking_id": "234890"
+                "booking_id": "234890",
+                "id": "35cbe777-ccc5-43f4-ae91-2d7a7ae1b97d"
               },
               {
                 "start": "2025-02-26T12:15:00.000",
                 "end": "2025-02-26T22:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "41ff891f-8885-492a-8420-7ef9673f8c4e"
               },
               {
                 "start": "2025-02-26T22:00:00.000",
                 "end": "2025-02-28T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "d8569188-cb01-43ff-ba33-6da8577ed4d0"
               }
             ]
           },
@@ -565,7 +633,8 @@
               {
                 "start": "2025-02-26T00:00:00.000",
                 "end": "2025-02-28T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "2764a136-3ef7-4fb4-9db9-012a818cb332"
               }
             ]
           },
@@ -575,29 +644,34 @@
               {
                 "start": "2025-02-26T00:00:00.000",
                 "end": "2025-02-26T09:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "8e38429d-8a7f-4816-bf34-f0cc5f4c82ff"
               },
               {
                 "start": "2025-02-26T09:00:00.000",
                 "end": "2025-02-26T09:30:00.000",
                 "status": "booked",
-                "booking_id": "345901"
+                "booking_id": "345901",
+                "id": "aed94e0a-d0b6-4509-8804-8b6f799f4ffa"
               },
               {
                 "start": "2025-02-26T09:30:00.000",
                 "end": "2025-02-26T11:30:00.000",
                 "status": "booked-use",
-                "booking_id": "345901"
+                "booking_id": "345901",
+                "id": "9616c0fa-546d-4f00-ad31-628087944f5b"
               },
               {
                 "start": "2025-02-26T11:30:00.000",
                 "end": "2025-02-26T22:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "d4da056b-b9a2-452f-a8d6-c42a5da1080d"
               },
               {
                 "start": "2025-02-26T22:00:00.000",
                 "end": "2025-02-28T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "7c0dc2e7-8b0a-4a9c-ba2a-6c809e51a5d2"
               }
             ]
           },
@@ -607,7 +681,8 @@
               {
                 "start": "2025-02-26T00:00:00.000",
                 "end": "2025-02-28T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "e418e6d8-2fa1-4e51-98df-aaa5fe9ab549"
               }
             ]
           },
@@ -617,34 +692,40 @@
               {
                 "start": "2025-02-26T00:00:00.000",
                 "end": "2025-02-26T09:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "3a0375d1-d1f2-4a64-9b65-bdab1c074471"
               },
               {
                 "start": "2025-02-26T09:00:00.000",
                 "end": "2025-02-26T09:30:00.000",
                 "status": "booked",
-                "booking_id": "456012"
+                "booking_id": "456012",
+                "id": "25775a41-f7a8-4b5a-af53-b150f001353c"
               },
               {
                 "start": "2025-02-26T09:30:00.000",
                 "end": "2025-02-26T12:00:00.000",
                 "status": "booked-use",
-                "booking_id": "456012"
+                "booking_id": "456012",
+                "id": "ea9d52b4-84a3-4450-907f-59aebfdda5bd"
               },
               {
                 "start": "2025-02-26T12:00:00.000",
                 "end": "2025-02-26T12:10:00.000",
-                "status": "nobooked-use"
+                "status": "nobooked-use",
+                "id": "78ec6563-b4eb-4c2e-b767-cf059c051ce7"
               },
               {
                 "start": "2025-02-26T12:10:00.000",
                 "end": "2025-02-26T22:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "5bafd690-4155-4ec7-8b96-82d6413d94ae"
               },
               {
                 "start": "2025-02-26T22:00:00.000",
                 "end": "2025-02-28T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "9642c6a1-c70f-40b0-b0e4-0fe1f9311643"
               }
             ]
           },
@@ -654,7 +735,8 @@
               {
                 "start": "2025-02-26T00:00:00.000",
                 "end": "2025-02-28T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "0aff76a5-277a-4a4a-b35e-e01ff401cedc"
               }
             ]
           },
@@ -664,29 +746,34 @@
               {
                 "start": "2025-02-26T00:00:00.000",
                 "end": "2025-02-26T09:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "c2b2e4dd-c8c9-40da-bd97-30ce93f7011e"
               },
               {
                 "start": "2025-02-26T09:00:00.000",
                 "end": "2025-02-26T09:30:00.000",
                 "status": "booked",
-                "booking_id": "567123"
+                "booking_id": "567123",
+                "id": "462a7ed9-e037-41c8-a07e-1dda85bafd59"
               },
               {
                 "start": "2025-02-26T09:30:00.000",
                 "end": "2025-02-26T11:00:00.000",
                 "status": "booked-use",
-                "booking_id": "567123"
+                "booking_id": "567123",
+                "id": "970e1a06-a090-4abe-b59e-cafa0d2bab7a"
               },
               {
                 "start": "2025-02-26T11:00:00.000",
                 "end": "2025-02-26T22:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "da620d34-3787-428d-bd86-aae684362674"
               },
               {
                 "start": "2025-02-26T22:00:00.000",
                 "end": "2025-02-28T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "3e0be4d4-ad90-47c5-812f-f2292eaa8018"
               }
             ]
           },
@@ -696,7 +783,8 @@
               {
                 "start": "2025-02-26T00:00:00.000",
                 "end": "2025-02-28T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "26dd62d0-3143-4da2-ba13-458539760396"
               }
             ]
           },
@@ -706,7 +794,8 @@
               {
                 "start": "2025-02-26T00:00:00.000",
                 "end": "2025-02-28T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "a49fdee9-adbc-4d34-ab8b-ecd302652562"
               }
             ]
           },
@@ -716,7 +805,8 @@
               {
                 "start": "2025-02-26T00:00:00.000",
                 "end": "2025-02-28T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "3ca0e119-8a74-407b-9c65-0c2d015ed091"
               }
             ]
           }
@@ -734,7 +824,8 @@
               {
                 "start": "2025-02-27T00:00:00.000",
                 "end": "2025-03-01T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "518a4519-20e8-42e9-bf86-588fdba1182b"
               }
             ]
           },
@@ -744,29 +835,34 @@
               {
                 "start": "2025-02-27T00:00:00.000",
                 "end": "2025-02-27T09:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "2f69f6ab-0f26-44a2-8769-9c02fe2b23b6"
               },
               {
                 "start": "2025-02-27T09:00:00.000",
                 "end": "2025-02-27T09:15:00.000",
                 "status": "booked",
-                "booking_id": "678234"
+                "booking_id": "678234",
+                "id": "e438d016-e203-44ff-bd7f-da4153b265c1"
               },
               {
                 "start": "2025-02-27T09:15:00.000",
                 "end": "2025-02-27T11:45:00.000",
                 "status": "booked-use",
-                "booking_id": "678234"
+                "booking_id": "678234",
+                "id": "ce41fc70-f323-4dfc-8ab5-ed41e1d79bae"
               },
               {
                 "start": "2025-02-27T11:45:00.000",
                 "end": "2025-02-27T22:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "69b374f1-a2a3-4cd7-82b4-cf4f1f5b19ad"
               },
               {
                 "start": "2025-02-27T22:00:00.000",
                 "end": "2025-03-01T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "b662d07d-ebab-4394-89ab-83fbaef332c7"
               }
             ]
           },
@@ -776,7 +872,8 @@
               {
                 "start": "2025-02-27T00:00:00.000",
                 "end": "2025-03-01T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "005ea9c8-73e7-4dc7-9de7-9c810a606882"
               }
             ]
           },
@@ -786,29 +883,34 @@
               {
                 "start": "2025-02-27T00:00:00.000",
                 "end": "2025-02-27T09:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "f05d6096-44f6-4ea0-aea4-22a201dee98b"
               },
               {
                 "start": "2025-02-27T09:00:00.000",
                 "end": "2025-02-27T10:00:00.000",
                 "status": "booked",
-                "booking_id": "789345"
+                "booking_id": "789345",
+                "id": "d8652deb-b3c2-48b5-93a3-a1495a610bc1"
               },
               {
                 "start": "2025-02-27T10:00:00.000",
                 "end": "2025-02-27T12:30:00.000",
                 "status": "booked-use",
-                "booking_id": "789345"
+                "booking_id": "789345",
+                "id": "8584bc40-5b44-4e0e-9c93-048725fa96ed"
               },
               {
                 "start": "2025-02-27T12:30:00.000",
                 "end": "2025-02-27T22:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "735cc3e1-22fb-4f3a-a309-c9ccf9c0b970"
               },
               {
                 "start": "2025-02-27T22:00:00.000",
                 "end": "2025-03-01T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "1c4547df-36c3-401c-94a7-02bf444cc509"
               }
             ]
           },
@@ -818,7 +920,8 @@
               {
                 "start": "2025-02-27T00:00:00.000",
                 "end": "2025-03-01T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "311f8620-d163-47c4-8265-57695ed92a6d"
               }
             ]
           },
@@ -828,7 +931,8 @@
               {
                 "start": "2025-02-27T00:00:00.000",
                 "end": "2025-03-01T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "2b48fb18-1fce-4c54-b8e6-4f5a38eaae23"
               }
             ]
           },
@@ -838,34 +942,40 @@
               {
                 "start": "2025-02-27T00:00:00.000",
                 "end": "2025-02-27T09:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "0b367d4c-0380-4845-9434-7570dcb8ec5d"
               },
               {
                 "start": "2025-02-27T09:00:00.000",
                 "end": "2025-02-27T09:45:00.000",
                 "status": "booked",
-                "booking_id": "890456"
+                "booking_id": "890456",
+                "id": "1535ef4d-4e89-4180-8477-510f54211413"
               },
               {
                 "start": "2025-02-27T09:45:00.000",
                 "end": "2025-02-27T12:15:00.000",
                 "status": "booked-use",
-                "booking_id": "890456"
+                "booking_id": "890456",
+                "id": "c7ca4d0c-f7b4-4000-8ef9-74718f8f3076"
               },
               {
                 "start": "2025-02-27T12:15:00.000",
                 "end": "2025-02-27T12:25:00.000",
-                "status": "nobooked-use"
+                "status": "nobooked-use",
+                "id": "f5865a7b-e3f4-460e-91b2-bd233563e9fd"
               },
               {
                 "start": "2025-02-27T12:25:00.000",
                 "end": "2025-02-27T22:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "4968dbd7-9774-44cb-ab13-c3aedc2bb147"
               },
               {
                 "start": "2025-02-27T22:00:00.000",
                 "end": "2025-03-01T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "993b85cc-df4f-44c5-a6fa-6ce1a9044ed8"
               }
             ]
           },
@@ -875,7 +985,8 @@
               {
                 "start": "2025-02-27T00:00:00.000",
                 "end": "2025-03-01T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "66d236a8-5b42-4ad7-8ac8-aefa786a2744"
               }
             ]
           },
@@ -885,29 +996,34 @@
               {
                 "start": "2025-02-27T00:00:00.000",
                 "end": "2025-02-27T09:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "57bb868b-523c-494b-a237-9ef7bf802a4d"
               },
               {
                 "start": "2025-02-27T09:00:00.000",
                 "end": "2025-02-27T09:30:00.000",
                 "status": "booked",
-                "booking_id": "901567"
+                "booking_id": "901567",
+                "id": "18ce5f29-a10c-421d-b0ee-70a0acadbfe6"
               },
               {
                 "start": "2025-02-27T09:30:00.000",
                 "end": "2025-02-27T11:00:00.000",
                 "status": "booked-use",
-                "booking_id": "901567"
+                "booking_id": "901567",
+                "id": "8e1b531e-ef2c-423c-8ec0-530a8cca8932"
               },
               {
                 "start": "2025-02-27T11:00:00.000",
                 "end": "2025-02-27T22:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "2795070f-fc35-429e-beeb-d51fb308ac92"
               },
               {
                 "start": "2025-02-27T22:00:00.000",
                 "end": "2025-03-01T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "51fef573-22f1-4fd3-bce7-de252dddb7d3"
               }
             ]
           },
@@ -917,7 +1033,8 @@
               {
                 "start": "2025-02-27T00:00:00.000",
                 "end": "2025-03-01T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "a1dc2ff6-a3d3-42eb-b2a7-a17604314694"
               }
             ]
           }
@@ -935,29 +1052,34 @@
               {
                 "start": "2025-02-28T00:00:00.000",
                 "end": "2025-02-28T09:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "0b904845-a6cd-4d88-a6fc-b342955f5eee"
               },
               {
                 "start": "2025-02-28T09:00:00.000",
                 "end": "2025-02-28T09:30:00.000",
                 "status": "booked",
-                "booking_id": "123890"
+                "booking_id": "123890",
+                "id": "f558063c-4bf0-410d-a2cd-2592172151ab"
               },
               {
                 "start": "2025-02-28T09:30:00.000",
                 "end": "2025-02-28T11:30:00.000",
                 "status": "booked-use",
-                "booking_id": "123890"
+                "booking_id": "123890",
+                "id": "f05a223d-323b-4165-aa9a-4af43380c7f4"
               },
               {
                 "start": "2025-02-28T11:30:00.000",
                 "end": "2025-02-28T22:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "b357fa93-b247-477e-9a80-c4f5c8c13b8e"
               },
               {
                 "start": "2025-02-28T22:00:00.000",
                 "end": "2025-03-02T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "769606c9-7e7f-4198-bc46-83c9a98b6e7e"
               }
             ]
           },
@@ -967,7 +1089,8 @@
               {
                 "start": "2025-02-28T00:00:00.000",
                 "end": "2025-03-02T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "6f47365d-5cdf-4406-b919-09a5e39a40b8"
               }
             ]
           },
@@ -977,7 +1100,8 @@
               {
                 "start": "2025-02-28T00:00:00.000",
                 "end": "2025-03-02T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "3d803a8b-b790-4c34-9515-ae5d82a61093"
               }
             ]
           },
@@ -987,34 +1111,40 @@
               {
                 "start": "2025-02-28T00:00:00.000",
                 "end": "2025-02-28T09:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "ec175d06-e5de-42c5-9188-968fed6e8750"
               },
               {
                 "start": "2025-02-28T09:00:00.000",
                 "end": "2025-02-28T09:15:00.000",
                 "status": "booked",
-                "booking_id": "234901"
+                "booking_id": "234901",
+                "id": "4ea23042-5a70-4cab-9b29-4650b4d59083"
               },
               {
                 "start": "2025-02-28T09:15:00.000",
                 "end": "2025-02-28T11:45:00.000",
                 "status": "booked-use",
-                "booking_id": "234901"
+                "booking_id": "234901",
+                "id": "6b3948d0-be2e-4cd5-a2e9-41fbcd7e4e3a"
               },
               {
                 "start": "2025-02-28T11:45:00.000",
                 "end": "2025-02-28T11:55:00.000",
-                "status": "nobooked-use"
+                "status": "nobooked-use",
+                "id": "ea8e56cf-a6a7-46b5-9f1e-cf6230fc392a"
               },
               {
                 "start": "2025-02-28T11:55:00.000",
                 "end": "2025-02-28T22:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "2b0e4643-3d03-4905-90fb-fc7afff20fb3"
               },
               {
                 "start": "2025-02-28T22:00:00.000",
                 "end": "2025-03-02T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "a6831cb1-f177-4bf2-97ae-70cb874ab2bd"
               }
             ]
           },
@@ -1024,7 +1154,8 @@
               {
                 "start": "2025-02-28T00:00:00.000",
                 "end": "2025-03-02T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "5de94c8b-f1d8-4964-bdac-0e3e0809a6f3"
               }
             ]
           },
@@ -1034,29 +1165,34 @@
               {
                 "start": "2025-02-28T00:00:00.000",
                 "end": "2025-02-28T09:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "ff7e60ec-f31f-498c-aac1-3320cca021be"
               },
               {
                 "start": "2025-02-28T09:00:00.000",
                 "end": "2025-02-28T09:30:00.000",
                 "status": "booked",
-                "booking_id": "345012"
+                "booking_id": "345012",
+                "id": "ccd33dda-96d0-479e-8ef8-d9894e1fdf27"
               },
               {
                 "start": "2025-02-28T09:30:00.000",
                 "end": "2025-02-28T12:00:00.000",
                 "status": "booked-use",
-                "booking_id": "345012"
+                "booking_id": "345012",
+                "id": "f9659220-e0d3-462c-acfc-2e3b45fc9141"
               },
               {
                 "start": "2025-02-28T12:00:00.000",
                 "end": "2025-02-28T22:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "1a64ed91-5512-4b4f-ad54-3f6dc83d69ed"
               },
               {
                 "start": "2025-02-28T22:00:00.000",
                 "end": "2025-03-02T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "dc540657-c4e7-465f-b0a4-4c7f1fefd3ac"
               }
             ]
           },
@@ -1066,7 +1202,8 @@
               {
                 "start": "2025-02-28T00:00:00.000",
                 "end": "2025-03-02T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "6a2e3140-9e01-4fde-b2c3-731a92ab24aa"
               }
             ]
           },
@@ -1076,7 +1213,8 @@
               {
                 "start": "2025-02-28T00:00:00.000",
                 "end": "2025-03-02T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "a0df5773-dc3e-495e-bc23-44f17269fa50"
               }
             ]
           },
@@ -1086,7 +1224,8 @@
               {
                 "start": "2025-02-28T00:00:00.000",
                 "end": "2025-03-02T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "97ab63e2-8400-4230-b02c-daafb884dd83"
               }
             ]
           },
@@ -1096,29 +1235,34 @@
               {
                 "start": "2025-02-28T00:00:00.000",
                 "end": "2025-02-28T09:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "55ee3ea8-fb97-4c78-8fcc-a63832fc8b77"
               },
               {
                 "start": "2025-02-28T09:00:00.000",
                 "end": "2025-02-28T09:45:00.000",
                 "status": "booked",
-                "booking_id": "456123"
+                "booking_id": "456123",
+                "id": "d5d071e1-5c8e-4890-922d-ffcfdfbfc583"
               },
               {
                 "start": "2025-02-28T09:45:00.000",
                 "end": "2025-02-28T12:15:00.000",
                 "status": "booked-use",
-                "booking_id": "456123"
+                "booking_id": "456123",
+                "id": "aa5e2d43-b1ac-484f-891e-9261d3ae50a4"
               },
               {
                 "start": "2025-02-28T12:15:00.000",
                 "end": "2025-02-28T22:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "f9ebbd3a-b706-4f0c-bbcd-1b7e43e37552"
               },
               {
                 "start": "2025-02-28T22:00:00.000",
                 "end": "2025-03-02T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "eaaeaa92-6e2d-44c2-97d2-5b5b9319fbc4"
               }
             ]
           }
@@ -1136,7 +1280,8 @@
               {
                 "start": "2025-03-01T00:00:00.000",
                 "end": "2025-03-03T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "4ea89f1c-4120-42d9-91b1-16ac2968855e"
               }
             ]
           },
@@ -1146,29 +1291,34 @@
               {
                 "start": "2025-03-01T00:00:00.000",
                 "end": "2025-03-01T09:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "631a4a26-a2c4-435a-a0b7-58a5dbb0d1cf"
               },
               {
                 "start": "2025-03-01T09:00:00.000",
                 "end": "2025-03-01T09:30:00.000",
                 "status": "booked",
-                "booking_id": "567234"
+                "booking_id": "567234",
+                "id": "25833318-f8b9-4f49-bc91-0c315eab50de"
               },
               {
                 "start": "2025-03-01T09:30:00.000",
                 "end": "2025-03-01T11:00:00.000",
                 "status": "booked-use",
-                "booking_id": "567234"
+                "booking_id": "567234",
+                "id": "4b12e6f4-69b5-4a71-974c-55642818df4d"
               },
               {
                 "start": "2025-03-01T11:00:00.000",
                 "end": "2025-03-01T22:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "f2ceab49-26d6-4615-9732-e719299f06f5"
               },
               {
                 "start": "2025-03-01T22:00:00.000",
                 "end": "2025-03-03T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "c5765c3a-9605-4404-80aa-5fcd2d76f42f"
               }
             ]
           },
@@ -1178,7 +1328,8 @@
               {
                 "start": "2025-03-01T00:00:00.000",
                 "end": "2025-03-03T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "e0b1e93f-c869-437d-a377-3ede7e01fbee"
               }
             ]
           },
@@ -1188,7 +1339,8 @@
               {
                 "start": "2025-03-01T00:00:00.000",
                 "end": "2025-03-03T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "021d05a6-442c-41fc-98b2-d0c286555cc8"
               }
             ]
           },
@@ -1198,29 +1350,34 @@
               {
                 "start": "2025-03-01T00:00:00.000",
                 "end": "2025-03-01T09:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "5e2821ff-4392-4021-ac77-d994b2567e0b"
               },
               {
                 "start": "2025-03-01T09:00:00.000",
                 "end": "2025-03-01T09:15:00.000",
                 "status": "booked",
-                "booking_id": "678345"
+                "booking_id": "678345",
+                "id": "1bd00e9c-108a-4187-9213-fafe9d959f04"
               },
               {
                 "start": "2025-03-01T09:15:00.000",
                 "end": "2025-03-01T11:45:00.000",
                 "status": "booked-use",
-                "booking_id": "678345"
+                "booking_id": "678345",
+                "id": "4980ad66-21cc-4da8-a85d-812d7a9facff"
               },
               {
                 "start": "2025-03-01T11:45:00.000",
                 "end": "2025-03-01T22:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "98fe2331-577f-4e8c-b92d-8d85dd2832af"
               },
               {
                 "start": "2025-03-01T22:00:00.000",
                 "end": "2025-03-03T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "ea9d46c8-286d-416d-a236-c604e25d610e"
               }
             ]
           },
@@ -1230,7 +1387,8 @@
               {
                 "start": "2025-03-01T00:00:00.000",
                 "end": "2025-03-03T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "b5806803-b3f1-4a48-a0a0-db41ddea6a71"
               }
             ]
           },
@@ -1240,7 +1398,8 @@
               {
                 "start": "2025-03-01T00:00:00.000",
                 "end": "2025-03-03T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "4c8f8ad9-be9f-4c49-b500-ebedbd3b82a6"
               }
             ]
           },
@@ -1250,34 +1409,40 @@
               {
                 "start": "2025-03-01T00:00:00.000",
                 "end": "2025-03-01T09:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "7b28aa1b-a912-4b3f-80a6-82b72eed155a"
               },
               {
                 "start": "2025-03-01T09:00:00.000",
                 "end": "2025-03-01T09:30:00.000",
                 "status": "booked",
-                "booking_id": "789456"
+                "booking_id": "789456",
+                "id": "856a2d0f-7205-421a-a31d-d780221bce08"
               },
               {
                 "start": "2025-03-01T09:30:00.000",
                 "end": "2025-03-01T12:00:00.000",
                 "status": "booked-use",
-                "booking_id": "789456"
+                "booking_id": "789456",
+                "id": "873ec1ab-8b92-4af1-b8b2-b812745d20aa"
               },
               {
                 "start": "2025-03-01T12:00:00.000",
                 "end": "2025-03-01T12:10:00.000",
-                "status": "nobooked-use"
+                "status": "nobooked-use",
+                "id": "9b9c5de9-a000-4782-99d4-37566f1fa9fd"
               },
               {
                 "start": "2025-03-01T12:10:00.000",
                 "end": "2025-03-01T22:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "de596e7c-9d9b-4231-8c46-91329a6e21c7"
               },
               {
                 "start": "2025-03-01T22:00:00.000",
                 "end": "2025-03-03T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "d7c12070-0bcc-4287-836f-5dfdbde8b573"
               }
             ]
           },
@@ -1287,7 +1452,8 @@
               {
                 "start": "2025-03-01T00:00:00.000",
                 "end": "2025-03-03T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "d02d3837-611c-4a4e-aa10-a4f736ce4633"
               }
             ]
           },
@@ -1297,7 +1463,8 @@
               {
                 "start": "2025-03-01T00:00:00.000",
                 "end": "2025-03-03T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "1be48106-dade-49bd-a997-a8552de94e1f"
               }
             ]
           }
@@ -1315,29 +1482,34 @@
               {
                 "start": "2025-03-02T00:00:00.000",
                 "end": "2025-03-02T09:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "217df01a-9763-45b3-9eb5-d47d99835a05"
               },
               {
                 "start": "2025-03-02T09:00:00.000",
                 "end": "2025-03-02T10:00:00.000",
                 "status": "booked",
-                "booking_id": "890567"
+                "booking_id": "890567",
+                "id": "a5251b10-4ccd-48c7-b257-6510b841fcfe"
               },
               {
                 "start": "2025-03-02T10:00:00.000",
                 "end": "2025-03-02T12:30:00.000",
                 "status": "booked-use",
-                "booking_id": "890567"
+                "booking_id": "890567",
+                "id": "426dae0c-00a5-473d-9a4a-e58685bffd14"
               },
               {
                 "start": "2025-03-02T12:30:00.000",
                 "end": "2025-03-02T22:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "610a8170-aa57-4b67-9e3a-3e7260911cce"
               },
               {
                 "start": "2025-03-02T22:00:00.000",
                 "end": "2025-03-04T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "021d38f5-3af4-4a1b-9646-2a43c95d509f"
               }
             ]
           },
@@ -1347,7 +1519,8 @@
               {
                 "start": "2025-03-02T00:00:00.000",
                 "end": "2025-03-04T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "ed2775da-ea4b-41a2-973a-b0763bc91480"
               }
             ]
           },
@@ -1357,7 +1530,8 @@
               {
                 "start": "2025-03-02T00:00:00.000",
                 "end": "2025-03-04T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "31c113b3-4e60-4d6e-bd61-fbb3f63cce61"
               }
             ]
           },
@@ -1367,29 +1541,34 @@
               {
                 "start": "2025-03-02T00:00:00.000",
                 "end": "2025-03-02T09:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "270f1c86-503e-4b6e-8296-4cd88e8e092e"
               },
               {
                 "start": "2025-03-02T09:00:00.000",
                 "end": "2025-03-02T09:30:00.000",
                 "status": "booked",
-                "booking_id": "901678"
+                "booking_id": "901678",
+                "id": "d0681622-bcad-43e5-a6b3-26603706d7e5"
               },
               {
                 "start": "2025-03-02T09:30:00.000",
                 "end": "2025-03-02T11:30:00.000",
                 "status": "booked-use",
-                "booking_id": "901678"
+                "booking_id": "901678",
+                "id": "8fbd2360-1628-4e79-8610-82bf5b9d0f45"
               },
               {
                 "start": "2025-03-02T11:30:00.000",
                 "end": "2025-03-02T22:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "e596b24e-cfed-422c-85e5-8140b29735e8"
               },
               {
                 "start": "2025-03-02T22:00:00.000",
                 "end": "2025-03-04T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "5eac9efe-d8c5-4a1a-9352-5d6fbc189a5f"
               }
             ]
           },
@@ -1399,7 +1578,8 @@
               {
                 "start": "2025-03-02T00:00:00.000",
                 "end": "2025-03-04T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "15b0e7c5-97eb-4ec5-926b-0faaa3aba485"
               }
             ]
           },
@@ -1409,7 +1589,8 @@
               {
                 "start": "2025-03-02T00:00:00.000",
                 "end": "2025-03-04T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "0b603f60-2ce2-49f1-b155-e19b9613c992"
               }
             ]
           },
@@ -1419,34 +1600,40 @@
               {
                 "start": "2025-03-02T00:00:00.000",
                 "end": "2025-03-02T09:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "ba5f4612-c238-4c73-aa30-fea9946e92d5"
               },
               {
                 "start": "2025-03-02T09:00:00.000",
                 "end": "2025-03-02T09:15:00.000",
                 "status": "booked",
-                "booking_id": "123456"
+                "booking_id": "123456",
+                "id": "4640e320-0ce6-428a-9808-42bf27bd9fb0"
               },
               {
                 "start": "2025-03-02T09:15:00.000",
                 "end": "2025-03-02T11:45:00.000",
                 "status": "booked-use",
-                "booking_id": "123456"
+                "booking_id": "123456",
+                "id": "6c512f7f-9711-48e0-a636-b9ae5f1670db"
               },
               {
                 "start": "2025-03-02T11:45:00.000",
                 "end": "2025-03-02T11:55:00.000",
-                "status": "nobooked-use"
+                "status": "nobooked-use",
+                "id": "1e44cb4e-c91f-4bb6-8d2f-8a96573c3313"
               },
               {
                 "start": "2025-03-02T11:55:00.000",
                 "end": "2025-03-02T22:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "51952530-f21d-48bf-86cb-2efd895abb0f"
               },
               {
                 "start": "2025-03-02T22:00:00.000",
                 "end": "2025-03-04T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "6a2bdcf9-64af-4ec4-99c8-cdb371a75949"
               }
             ]
           },
@@ -1456,7 +1643,8 @@
               {
                 "start": "2025-03-02T00:00:00.000",
                 "end": "2025-03-04T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "174ce2d8-1220-469f-be22-ac7f278283ad"
               }
             ]
           },
@@ -1466,7 +1654,8 @@
               {
                 "start": "2025-03-02T00:00:00.000",
                 "end": "2025-03-04T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "5cd81d84-a8c4-4f44-b5fd-35651d3b9cff"
               }
             ]
           },
@@ -1476,7 +1665,8 @@
               {
                 "start": "2025-03-02T00:00:00.000",
                 "end": "2025-03-04T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "241d73d5-7769-4ce7-bef0-bf78a9eaab8c"
               }
             ]
           }
@@ -1494,7 +1684,8 @@
               {
                 "start": "2025-03-03T00:00:00.000",
                 "end": "2025-03-05T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "fb0778a4-5b77-4233-b930-eaeb7c71e8dd"
               }
             ]
           },
@@ -1504,29 +1695,34 @@
               {
                 "start": "2025-03-03T00:00:00.000",
                 "end": "2025-03-03T09:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "e2c089f6-7c7d-4316-8f1b-6c458fbb8d0b"
               },
               {
                 "start": "2025-03-03T09:00:00.000",
                 "end": "2025-03-03T09:30:00.000",
                 "status": "booked",
-                "booking_id": "234567"
+                "booking_id": "234567",
+                "id": "a3021283-f220-42b1-8f8d-1d748f86e8cf"
               },
               {
                 "start": "2025-03-03T09:30:00.000",
                 "end": "2025-03-03T11:30:00.000",
                 "status": "booked-use",
-                "booking_id": "234567"
+                "booking_id": "234567",
+                "id": "abf8d5be-ece3-4613-ad48-d1ef761b1d2b"
               },
               {
                 "start": "2025-03-03T11:30:00.000",
                 "end": "2025-03-03T22:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "35efab46-2b9a-435a-8e9f-9d8d468668d2"
               },
               {
                 "start": "2025-03-03T22:00:00.000",
                 "end": "2025-03-05T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "0a50a4e7-eb83-4479-a233-73e4e2389d9f"
               }
             ]
           },
@@ -1536,29 +1732,34 @@
               {
                 "start": "2025-03-03T00:00:00.000",
                 "end": "2025-03-03T09:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "737d438e-640d-4e49-932b-661e65637929"
               },
               {
                 "start": "2025-03-03T09:00:00.000",
                 "end": "2025-03-03T09:45:00.000",
                 "status": "booked",
-                "booking_id": "345678"
+                "booking_id": "345678",
+                "id": "42a3b3b2-8912-41ac-abc2-9c2ed3591d6c"
               },
               {
                 "start": "2025-03-03T09:45:00.000",
                 "end": "2025-03-03T12:15:00.000",
                 "status": "booked-use",
-                "booking_id": "345678"
+                "booking_id": "345678",
+                "id": "8b073eca-3f01-4f67-9192-5445bead9c15"
               },
               {
                 "start": "2025-03-03T12:15:00.000",
                 "end": "2025-03-03T22:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "5e3bbbff-6499-4b6e-8216-943fc2e69884"
               },
               {
                 "start": "2025-03-03T22:00:00.000",
                 "end": "2025-03-05T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "01eb4dc4-e446-4877-8ebc-4ace1065def1"
               }
             ]
           },
@@ -1568,7 +1769,8 @@
               {
                 "start": "2025-03-03T00:00:00.000",
                 "end": "2025-03-05T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "c92d5a32-f6a8-4516-86d4-8af9ebae174b"
               }
             ]
           },
@@ -1578,7 +1780,8 @@
               {
                 "start": "2025-03-03T00:00:00.000",
                 "end": "2025-03-05T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "132664a9-9e11-42b3-addb-bd9d57785956"
               }
             ]
           },
@@ -1588,7 +1791,8 @@
               {
                 "start": "2025-03-03T00:00:00.000",
                 "end": "2025-03-05T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "46fa2411-d5e8-430a-9294-e6eb0c698fb0"
               }
             ]
           },
@@ -1598,29 +1802,34 @@
               {
                 "start": "2025-03-03T00:00:00.000",
                 "end": "2025-03-03T09:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "d73c8233-79b3-49a4-be68-ecd203f6feea"
               },
               {
                 "start": "2025-03-03T09:00:00.000",
                 "end": "2025-03-03T09:15:00.000",
                 "status": "booked",
-                "booking_id": "456789"
+                "booking_id": "456789",
+                "id": "a2e90069-7e67-40e0-868d-ae5d22fad403"
               },
               {
                 "start": "2025-03-03T09:15:00.000",
                 "end": "2025-03-03T11:45:00.000",
                 "status": "booked-use",
-                "booking_id": "456789"
+                "booking_id": "456789",
+                "id": "4395c316-e932-400a-901e-49f13240597d"
               },
               {
                 "start": "2025-03-03T11:45:00.000",
                 "end": "2025-03-03T22:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "324a2b09-3925-4c24-ad05-50ddac554d26"
               },
               {
                 "start": "2025-03-03T22:00:00.000",
                 "end": "2025-03-05T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "5dee6e67-3aa5-4b2f-9add-6291ddc29eb4"
               }
             ]
           },
@@ -1630,7 +1839,8 @@
               {
                 "start": "2025-03-03T00:00:00.000",
                 "end": "2025-03-05T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "51d833b1-2474-4333-aed2-498263921a39"
               }
             ]
           },
@@ -1640,7 +1850,8 @@
               {
                 "start": "2025-03-03T00:00:00.000",
                 "end": "2025-03-05T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "e8708f22-f02b-429f-8833-0aeda7ed90a6"
               }
             ]
           },
@@ -1650,7 +1861,8 @@
               {
                 "start": "2025-03-03T00:00:00.000",
                 "end": "2025-03-05T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "d6105711-8743-462b-af6d-5b0733512aa9"
               }
             ]
           }
@@ -1668,29 +1880,34 @@
               {
                 "start": "2025-03-04T00:00:00.000",
                 "end": "2025-03-04T09:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "75caf4e0-d457-4982-896c-c5a081fb6c98"
               },
               {
                 "start": "2025-03-04T09:00:00.000",
                 "end": "2025-03-04T09:30:00.000",
                 "status": "booked",
-                "booking_id": "567890"
+                "booking_id": "567890",
+                "id": "10a4ffe3-aa7d-4a7c-b244-b9f83f803807"
               },
               {
                 "start": "2025-03-04T09:30:00.000",
                 "end": "2025-03-04T12:00:00.000",
                 "status": "booked-use",
-                "booking_id": "567890"
+                "booking_id": "567890",
+                "id": "47a27099-e4f3-43ee-a362-fefecba35ee3"
               },
               {
                 "start": "2025-03-04T12:00:00.000",
                 "end": "2025-03-04T22:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "a442e052-181b-41f8-b1bd-b3081bb699c0"
               },
               {
                 "start": "2025-03-04T22:00:00.000",
                 "end": "2025-03-06T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "3b886214-4bce-42a8-be79-6d38a19b1bc9"
               }
             ]
           },
@@ -1700,7 +1917,8 @@
               {
                 "start": "2025-03-04T00:00:00.000",
                 "end": "2025-03-06T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "3275c486-aa28-49fa-9b82-5336a6b8a5ef"
               }
             ]
           },
@@ -1710,7 +1928,8 @@
               {
                 "start": "2025-03-04T00:00:00.000",
                 "end": "2025-03-06T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "b99e6ce8-18e9-49d5-b0f5-58c55134baf3"
               }
             ]
           },
@@ -1720,34 +1939,40 @@
               {
                 "start": "2025-03-04T00:00:00.000",
                 "end": "2025-03-04T09:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "b7c76409-2c2c-4600-9e79-73578e481211"
               },
               {
                 "start": "2025-03-04T09:00:00.000",
                 "end": "2025-03-04T09:15:00.000",
                 "status": "booked",
-                "booking_id": "678901"
+                "booking_id": "678901",
+                "id": "17fe6500-a222-47aa-85ab-ee90feacbb37"
               },
               {
                 "start": "2025-03-04T09:15:00.000",
                 "end": "2025-03-04T11:45:00.000",
                 "status": "booked-use",
-                "booking_id": "678901"
+                "booking_id": "678901",
+                "id": "314599c1-f578-4bdc-a353-23f9c6d5a503"
               },
               {
                 "start": "2025-03-04T11:45:00.000",
                 "end": "2025-03-04T11:55:00.000",
-                "status": "nobooked-use"
+                "status": "nobooked-use",
+                "id": "207a7598-7d25-4f8f-b833-00a4f36b005d"
               },
               {
                 "start": "2025-03-04T11:55:00.000",
                 "end": "2025-03-04T22:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "c02e7a8e-3675-40f7-8be6-5b9b0b853a7c"
               },
               {
                 "start": "2025-03-04T22:00:00.000",
                 "end": "2025-03-06T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "a2922555-74cf-41ee-92f4-5fb612492969"
               }
             ]
           },
@@ -1757,7 +1982,8 @@
               {
                 "start": "2025-03-04T00:00:00.000",
                 "end": "2025-03-06T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "043327a7-3cec-4688-be2e-bd89c9a74eda"
               }
             ]
           },
@@ -1767,29 +1993,34 @@
               {
                 "start": "2025-03-04T00:00:00.000",
                 "end": "2025-03-04T09:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "558b456c-7af0-4b65-bbda-aa6011154812"
               },
               {
                 "start": "2025-03-04T09:00:00.000",
                 "end": "2025-03-04T09:30:00.000",
                 "status": "booked",
-                "booking_id": "789012"
+                "booking_id": "789012",
+                "id": "1244046a-f265-455c-a2bb-5fba5f7623c7"
               },
               {
                 "start": "2025-03-04T09:30:00.000",
                 "end": "2025-03-04T11:00:00.000",
                 "status": "booked-use",
-                "booking_id": "789012"
+                "booking_id": "789012",
+                "id": "71d2f987-4821-4303-893c-498775585c42"
               },
               {
                 "start": "2025-03-04T11:00:00.000",
                 "end": "2025-03-04T22:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "7aecf70e-cc20-49a7-99d4-14945e9c4156"
               },
               {
                 "start": "2025-03-04T22:00:00.000",
                 "end": "2025-03-06T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "e406b572-0f0d-4f7a-974d-fa8e13be758a"
               }
             ]
           },
@@ -1799,7 +2030,8 @@
               {
                 "start": "2025-03-04T00:00:00.000",
                 "end": "2025-03-06T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "7771cab1-edd0-47ea-b754-56701da4120d"
               }
             ]
           },
@@ -1809,7 +2041,8 @@
               {
                 "start": "2025-03-04T00:00:00.000",
                 "end": "2025-03-06T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "578af8e6-1655-4f79-91dc-07d94180dcdc"
               }
             ]
           },
@@ -1819,7 +2052,8 @@
               {
                 "start": "2025-03-04T00:00:00.000",
                 "end": "2025-03-06T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "34c103cc-3bf6-4643-9048-9114fe239afd"
               }
             ]
           },
@@ -1829,7 +2063,8 @@
               {
                 "start": "2025-03-04T00:00:00.000",
                 "end": "2025-03-06T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "936a2b76-4741-45c9-8d35-0266671ba3ac"
               }
             ]
           }
@@ -1847,7 +2082,8 @@
               {
                 "start": "2025-03-05T00:00:00.000",
                 "end": "2025-03-07T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "18941c72-9797-4997-a6d1-dcccc1e3e48b"
               }
             ]
           },
@@ -1857,34 +2093,40 @@
               {
                 "start": "2025-03-05T00:00:00.000",
                 "end": "2025-03-05T09:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "fef1ddfe-b14b-49d0-9208-c7bd84462d7f"
               },
               {
                 "start": "2025-03-05T09:00:00.000",
                 "end": "2025-03-05T09:45:00.000",
                 "status": "booked",
-                "booking_id": "890123"
+                "booking_id": "890123",
+                "id": "bae3843c-1ff7-4226-ab83-2c148e7b3f2c"
               },
               {
                 "start": "2025-03-05T09:45:00.000",
                 "end": "2025-03-05T12:15:00.000",
                 "status": "booked-use",
-                "booking_id": "890123"
+                "booking_id": "890123",
+                "id": "cab41cd1-98d6-4a06-bbe9-a99570d8d74a"
               },
               {
                 "start": "2025-03-05T12:15:00.000",
                 "end": "2025-03-05T12:25:00.000",
-                "status": "nobooked-use"
+                "status": "nobooked-use",
+                "id": "495497a5-4c7b-49c1-8c21-04fed175ce57"
               },
               {
                 "start": "2025-03-05T12:25:00.000",
                 "end": "2025-03-05T22:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "829daa09-7a16-473e-aebb-f6e98dee76a7"
               },
               {
                 "start": "2025-03-05T22:00:00.000",
                 "end": "2025-03-07T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "b0bdc026-ef0d-4259-a1b5-2c850d275232"
               }
             ]
           },
@@ -1894,7 +2136,8 @@
               {
                 "start": "2025-03-05T00:00:00.000",
                 "end": "2025-03-07T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "7127ed45-c6a3-4044-828f-99c47f2d3bf8"
               }
             ]
           },
@@ -1904,7 +2147,8 @@
               {
                 "start": "2025-03-05T00:00:00.000",
                 "end": "2025-03-07T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "ff4971c1-42d9-4e7e-8541-3569e73a21bd"
               }
             ]
           },
@@ -1914,29 +2158,34 @@
               {
                 "start": "2025-03-05T00:00:00.000",
                 "end": "2025-03-05T09:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "5a77e659-7212-4588-9617-0e3e0eb5b969"
               },
               {
                 "start": "2025-03-05T09:00:00.000",
                 "end": "2025-03-05T09:30:00.000",
                 "status": "booked",
-                "booking_id": "901234"
+                "booking_id": "901234",
+                "id": "99b2469d-68b8-400b-a1f5-cd7e5077f4a4"
               },
               {
                 "start": "2025-03-05T09:30:00.000",
                 "end": "2025-03-05T11:30:00.000",
                 "status": "booked-use",
-                "booking_id": "901234"
+                "booking_id": "901234",
+                "id": "3e7ebcc4-bcd4-4a24-8283-bb02c3c14cd5"
               },
               {
                 "start": "2025-03-05T11:30:00.000",
                 "end": "2025-03-05T22:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "eca43e55-9064-4fdc-943f-a4ade5e63cf0"
               },
               {
                 "start": "2025-03-05T22:00:00.000",
                 "end": "2025-03-07T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "dce53e2a-ac84-4b22-aa33-c6961313c96e"
               }
             ]
           },
@@ -1946,7 +2195,8 @@
               {
                 "start": "2025-03-05T00:00:00.000",
                 "end": "2025-03-07T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "ae673022-af40-4505-85a6-3afbfcc25f9b"
               }
             ]
           },
@@ -1956,7 +2206,8 @@
               {
                 "start": "2025-03-05T00:00:00.000",
                 "end": "2025-03-07T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "df0b6d80-892f-44e8-806d-090df7ad1bfd"
               }
             ]
           },
@@ -1966,7 +2217,8 @@
               {
                 "start": "2025-03-05T00:00:00.000",
                 "end": "2025-03-07T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "b91ed420-8765-45ef-9905-50d3bdbc9be3"
               }
             ]
           },
@@ -1976,7 +2228,8 @@
               {
                 "start": "2025-03-05T00:00:00.000",
                 "end": "2025-03-07T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "0ed99e0b-2cf1-4680-a8c9-4d21befd363a"
               }
             ]
           },
@@ -1986,7 +2239,8 @@
               {
                 "start": "2025-03-05T00:00:00.000",
                 "end": "2025-03-07T00:00:00.000",
-                "status": "empty"
+                "status": "empty",
+                "id": "e82f114a-c368-4468-8b5d-78a95184639e"
               }
             ]
           }

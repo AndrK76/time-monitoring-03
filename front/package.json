@@ -22,6 +22,8 @@
     "@angular/router": "^18.2.14",
     "@daypilot/daypilot-lite-angular": "^5.10.0",
     "@fontsource/roboto": "^5.3.0",
+    "date-fns": "^4.4.0",
+    "date-fns-tz": "^3.2.0",
     "material-icons": "^1.13.14",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",

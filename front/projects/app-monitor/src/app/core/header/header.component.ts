@@ -53,9 +53,9 @@ export class HeaderComponent implements OnInit {
     { label: 'Главная', route: '/', exact: true },
     { label: 'Таблица', route: '/test-table' },
     {
-      label: 'Администрирование',
+      label: 'Таблицы',
       children: [
-        { label: 'Пользователи', route: '/users' },
+        { label: 'Версия 1', route: '/test-table-1' },
         { label: 'Настройки', route: '/settings' },
         {
           label: 'Журналы',

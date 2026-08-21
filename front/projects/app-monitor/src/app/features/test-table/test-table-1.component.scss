@@ -50,6 +50,17 @@ mat-card-content {
     min-width: 30rem;
 }
 
+.mat-column-expandedDetail {
+    padding-left: 0;
+    padding-right: 0;
+    max-width: 0; // разрешаем сжатие
+    overflow: hidden;
+}
+
+.detail-row {
+    padding: 8px 0;
+}
+
 // ============================================================
 // Остальные вспомогательные классы
 // ============================================================
