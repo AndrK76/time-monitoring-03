@@ -1,0 +1,41 @@
+.sticky-header-table {
+
+    .mat-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
+
+    .mat-mdc-header-row {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+
+}
+
+.sticky-firstcol-table {
+
+    .mat-mdc-cell:first-child,
+    .mat-mdc-header-cell:first-child {
+        position: sticky;
+        left: 0;
+        z-index: 5;
+    }
+
+    .mat-mdc-header-cell:first-child {
+        z-index: 15;
+    }
+}
+
+.nowrap-table {
+    .mat-mdc-cell,
+    .mat-mdc-header-cell {
+        white-space: nowrap;
+    }
+}
+
+.mat-mdc-row:hover {
+    background-color: var(--table-row-hover-bg) !important;
+}

@@ -1,1 +1,85 @@
-<h1>Таблица данных</h1>
+<div class="test-table-container">
+    <mat-card>
+        <mat-card-header>
+            <mat-card-title>Список событий</mat-card-title>
+            <mat-card-subtitle>Все события по всем местам ({{ eventRows().length }} записей)</mat-card-subtitle>
+        </mat-card-header>
+
+        <mat-card-actions align="end">
+            <button mat-raised-button color="primary" (click)="refreshData()" [disabled]="isLoading()">
+                <mat-icon>refresh</mat-icon>
+                {{ isLoading() ? 'Загрузка...' : 'Обновить' }}
+            </button>
+        </mat-card-actions>
+
+        <mat-card-content>
+            <!-- Индикатор загрузки -->
+            @if (isLoading()) {
+            <div class="loading-spinner">
+                <mat-spinner diameter="40"></mat-spinner>
+                <p>Загрузка данных...</p>
+            </div>
+            }
+
+            <!-- Ошибка -->
+            @if (error()) {
+            <div class="error-message">
+                <mat-icon color="warn">error</mat-icon>
+                <span>{{ error() }}</span>
+            </div>
+            }
+
+            <!-- Таблица -->
+            @if (!isLoading() && !error()) {
+            <div class="table-wrapper sticky-header-table sticky-firstcol-table nowrap-table">
+                <table mat-table [dataSource]="eventRows()" class="mat-elevation-z0">
+
+                    <ng-container matColumnDef="placeName">
+                        <th mat-header-cell *matHeaderCellDef> Место </th>
+                        <td mat-cell *matCellDef="let row"> {{ row.placeName }} </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="statusName">
+                        <th mat-header-cell *matHeaderCellDef> Статус </th>
+                        <td mat-cell *matCellDef="let row">
+                            <span class="status-badge" [style.background-color]="row.statusColor">{{ row.statusName
+                                }}</span>
+                        </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="start">
+                        <th mat-header-cell *matHeaderCellDef> Начало </th>
+                        <td mat-cell *matCellDef="let row"> {{ row.start | date:'dd.MM.yyyy HH:mm':'UTC' }} </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="end">
+                        <th mat-header-cell *matHeaderCellDef> Окончание </th>
+                        <td mat-cell *matCellDef="let row"> {{ row.end | date:'dd.MM.yyyy HH:mm':'UTC' }} </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="booking_id">
+                        <th mat-header-cell *matHeaderCellDef> ID брони </th>
+                        <td mat-cell *matCellDef="let row"> {{ row.booking_id || '—' }} </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="details">
+                        <th mat-header-cell *matHeaderCellDef> Детали </th>
+                        <td mat-cell *matCellDef="let row"> {{ row.details }} </td>
+                    </ng-container>
+
+                    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                </table>
+            </div>
+            }
+
+            <!-- Пустое состояние -->
+            @if (!isLoading() && !error() && eventRows().length === 0) {
+            <div class="empty-state">
+                <mat-icon>info</mat-icon>
+                <p>Нет событий для отображения</p>
+            </div>
+            }
+        </mat-card-content>
+    </mat-card>
+</div>

@@ -6,6 +6,10 @@ import { routes } from './app.routes';
 import { AdminService, AuthService } from '@mon3/sa';
 import { environment } from '../environments/environment';
 import { lastValueFrom } from 'rxjs';
+import { registerLocaleData } from '@angular/common';
+import localeRu from '@angular/common/locales/ru';
+
+registerLocaleData(localeRu);
 
 export const appConfig: ApplicationConfig = {
   providers: [

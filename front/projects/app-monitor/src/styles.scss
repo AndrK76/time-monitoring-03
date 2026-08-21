@@ -9,6 +9,7 @@
 @import '@fontsource/roboto/500.css';
 @import 'material-icons/iconfont/material-icons.css';
 
+
 //Инициализация Material core
 @include mat.core();
 
@@ -75,8 +76,8 @@ body {
   --menu-hover-bg: #{
  mix(mat.m2-get-color-from-palette(vars.$my-accent, 500), mat.m2-get-color-from-palette(vars.$my-accent, 600), 50%)
 }
-
 ;
+
 
 
 --menu-icon-color: #{vars.$primary-contrast};
@@ -90,3 +91,9 @@ body {
 --menu-active-bg: var(--menu-bg);
 --menu-active-text: #{map.get(vars.$my-accent, 'contrast', 600)};
 }
+
+:root {
+  --table-row-hover-bg: rgba(0, 0, 0, 0.04);
+}
+
+@import 'table-extensions';
