@@ -188,15 +188,33 @@
             &:hover:not(:disabled) {
                 background-color: var(--btn-success-hover);
             }
+
+            &:disabled {
+                background-color: var(--mat-raised-button-disabled-container-color, rgba(0, 0, 0, 0.12)) !important;
+                color: var(--mat-raised-button-disabled-label-text-color, rgba(0, 0, 0, 0.38)) !important;
+            }
         }
 
     }
 }
 
 .btn-icon-danger {
-    color: var(--btn-danger-bg);
+    //width: 32px;
+    //height: 24px;
+    //line-height: 24px;
+    color: inherit !important;
+    transition: background-color 0.2s, color 0.2s;
+
+    .mat-icon {
+        font-size: 20px; // уменьшаем иконку
+        width: 24px;
+        height: 20px;
+        line-height: 20px;
+    }
 
     &:hover {
-        background-color: rgba(var(--btn-danger-bg-rgb), 0.1);
+        background-color: var(--btn-danger-bg); // красный фон
+        color: #fff !important; // белая иконка
+        border-radius: 30%; // круглая кнопка
     }
 }

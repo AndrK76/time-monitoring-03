@@ -1,4 +1,4 @@
-import { Component, computed, inject, OnInit, signal, ViewChild, ViewEncapsulation } from '@angular/core';
+import { AfterViewInit, Component, computed, inject, OnInit, signal, ViewChild, ViewEncapsulation, WritableSignal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SampleDataService } from '../../services/sample-data.service';
 import { Place, EventStatus, PlaceEvents, EventData } from '../../models/sample-data-model';
@@ -10,8 +10,9 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
 import { EventsEditorInplaceComponent } from '../events-editor-inplace/events-editor-inplace.component';
 import { createEmptyEventRow, EventRow } from '../event-row';
-import { DialogService, addModifyChangeToState, addOrigData, formatTableChanges, hasTableChanges, newTableDataChanges, TableDataChanges, updateDataSourceItem, addDeleteChangeToState, addNewChangeToState, addNewItemFlag, setExpanded, addDataSourceItem, isNewItem, deleteDataSourceItem } from '@mon3/sc';
+import { DialogService, addModifyChangeToState, formatTableChanges, hasTableChanges, newTableDataChanges, TableDataChanges, updateDataSourceItem, addDeleteChangeToState, addNewChangeToState, addNewItemFlag, setExpanded, addDataSourceItem, isNewItem, deleteDataSourceItem, selectDataSourceItem, isExpanded, doSaveData, NotificationService } from '@mon3/sc';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatSort, MatSortModule } from '@angular/material/sort';
 
 @Component({
   selector: 'app-test-table-1',
@@ -24,25 +25,42 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     MatProgressSpinnerModule,
     MatIconModule,
     EventsEditorInplaceComponent,
-    MatTooltipModule
+    MatTooltipModule,
+    MatSortModule
   ],
   templateUrl: './test-table-1.component.html',
   styleUrl: './test-table-1.component.scss',
 })
-export class TestTable1Component implements OnInit {
+export class TestTable1Component implements OnInit, AfterViewInit {
   private dataService = inject(SampleDataService);
   private dialogService = inject(DialogService);
+  private notificationService = inject(NotificationService);
 
   places = signal<Place[]>([]);
   statuses = signal<EventStatus[]>([]);
+
   isLoading = signal(false);
+  isSaving = signal(false);
   error = signal<string | null>(null);
 
   @ViewChild(MatTable) table!: MatTable<EventRow>;
   displayedColumns = ['expand', 'placeName', 'statusName', 'start', 'end', 'booking_id', 'details'];
   dataSource = new MatTableDataSource<EventRow>([]);
   dataState = signal<TableDataChanges>(newTableDataChanges());
+  trackById = (index: number, item: EventRow) => item.id;
+  itemId = (item: EventRow) => item.id;
 
+  @ViewChild(MatSort) sort!: MatSort;
+  showFilter = signal(false);
+  filterValue = signal('');
+
+  ngAfterViewInit(): void {
+    //this.dataSource.sort = this.sort;
+    setTimeout(() => this.dataSource.sort = this.sort, 0);
+  }
+
+
+  selectedItem: WritableSignal<EventRow | undefined> = signal(undefined);
   hasChanges = computed(() => hasTableChanges(this.dataState()));
   changesSummary = computed(() => formatTableChanges(this.dataState()));
 
@@ -58,6 +76,8 @@ export class TestTable1Component implements OnInit {
       return of([]);
     });
   }
+
+
 
   private initializeData(): void {
     this.isLoading.set(true);
@@ -98,7 +118,6 @@ export class TestTable1Component implements OnInit {
           placeEvents.forEach(pe => {
             const placeName = placesMap.get(pe.place) || pe.place;
             pe.events.forEach((evt: EventData) => {
-              if (evt.status === 'empty') return;
               const status = statusesMap.get(evt.status);
               const startStr = evt.start.replace('T', ' ').slice(0, 16);
               const endStr = evt.end.replace('T', ' ').slice(0, 16);
@@ -119,31 +138,33 @@ export class TestTable1Component implements OnInit {
 
           //this.eventRows.set(rows);
           this.dataSource.data = rows;
+          //this.dataSource.sort = this.sort;
         }
       });
   }
 
-  toggleRow(row: any): void {
-    const updatedRows = this.dataSource.data.map(r => {
-      const rowAny = r as any;
-      if (rowAny.id === row.id) {
-        const expanded = rowAny._expanded === undefined ? true : !rowAny._expanded;
-        let ret = { ...r, _expanded: expanded };
-        if (ret._expanded) {
-          ret = addOrigData(ret);
-        }
-        return ret;
-      }
-      return r;
-    });
-    this.dataSource.data = updatedRows;
+
+  callSelect(item: EventRow) {
+    const expanded = isExpanded(item);
+    this.doSelect(item, !expanded);
+  }
+  isExpanded = (index: number, item: any): boolean => {
+    return isExpanded(item);
   }
 
-  isExpanded = (index: number, row: any): boolean => {
-    return (row as any)._expanded === true;
+  toggleFilter(): void {
+    this.showFilter.update(v => !v);
+    if (!this.showFilter()) {
+      this.dataSource.filter = '';
+      this.filterValue.set('');
+    }
   }
 
-  trackById = (index: number, item: EventRow) => item.id;
+  applyFilter(event: Event): void {
+    const value = (event.target as HTMLInputElement).value;
+    this.filterValue.set(value);
+    this.dataSource.filter = value.trim().toLowerCase();
+  }
 
 
   callRefresh() {
@@ -151,87 +172,99 @@ export class TestTable1Component implements OnInit {
       if (confirmed) this.doRefresh();
     });
   }
-
   callAdd() {
     this.doAdd();
   }
-
-  callDelete(row: EventRow) {
-    if (isNewItem(row)) {
-      this.doDelete(row);
+  callDelete(item: EventRow) {
+    if (isNewItem(item)) {
+      this.doDelete(item);
     } else {
-      this.dialogService.confirm(`Удалить запись с ID = ${row.id}?`).subscribe(confirmed => {
-        if (confirmed) this.doDelete(row)
+      this.dialogService.confirm(`Удалить запись с ID = ${item.id}?`).subscribe(confirmed => {
+        if (confirmed) this.doDelete(item)
       });
     }
   }
+  callSave(): void {
+    this.dialogService.confirm('Сохранить изменения?').subscribe(confirmed => {
+      if (confirmed) this.doSave();
+    });
+  }
 
+
+
+  doSelect(item: EventRow, newState: boolean) {
+    const result = selectDataSourceItem(this.dataSource.data, item, this.itemId, newState);
+    this.selectedItem.set(undefined);
+    if (result.selected) {
+      this.dataSource.data = result.data;
+      this.table.renderRows();
+      this.selectedItem.set(item);
+    }
+  }
   private doRefresh(): void {
     this.loadEvents();
     this.dataState.set(newTableDataChanges());
+    this.selectedItem.set(undefined);
   }
-
   private doAdd(): void {
     const newEvent = createEmptyEventRow(this.places()[0]?.id);
+    this.selectedItem.set(undefined);
     const result = addDataSourceItem(this.dataSource.data, newEvent);
     if (result.added) {
       this.dataSource.data = result.data;
       this.table.renderRows();
       this.dataState.update(state => addNewChangeToState(state, newEvent.id));
+      this.selectedItem.set(newEvent);
       // Прокручиваем таблицу к началу, чтобы новая строка была видна
       // (опционально)
     }
   }
-
-
-  doUpdate(updatedEvent: EventRow): void {
+  doUpdate(item: EventRow): void {
     const result = updateDataSourceItem(
-      this.dataSource.data,
-      updatedEvent,
-      (item: EventRow) => item.id,
-      undefined, true
-    );
+      this.dataSource.data, item, this.itemId, undefined, true);
     if (result.updated) {
       this.dataSource.data = result.data;
       this.table.renderRows();
-      this.dataState.update(state => addModifyChangeToState(state, updatedEvent.id));
+      this.dataState.update(state => addModifyChangeToState(state, item.id));
     }
   }
-
-
-  doDelete(deletedItem: EventRow): void {
-    const result = deleteDataSourceItem(
-      this.dataSource.data,
-      deletedItem,
-      (item: EventRow) => item.id
-    );
+  doDelete(item: EventRow): void {
+    const result = deleteDataSourceItem(this.dataSource.data, item, this.itemId);
     if (result.deleted) {
       this.dataSource.data = result.data;
       this.table.renderRows();
-      this.dataState.update(state => addDeleteChangeToState(state, deletedItem.id));
+      this.dataState.update(state => addDeleteChangeToState(state, item, this.itemId));
+      this.selectedItem.set(undefined);
     }
   }
 
 
 
-  saveChanges(): void {
-    this.dialogService.confirm('Сохранить изменения?').subscribe(confirmed => {
-      if (confirmed) {
-        // Здесь отправляем изменённые данные на сервер.
-        // Пока просто выводим в консоль.
-        console.log('Сохранение изменений...', this.dataState());
-        // После сохранения сбрасываем состояние.
-        this.dataState.set(newTableDataChanges());
-        // Убираем _orig у всех строк.
-        const updatedRows = this.dataSource.data.map(r => {
-          const { _orig, ...rest } = r as any;
-          return rest;
-        });
-        this.dataSource.data = updatedRows;
-        this.table.renderRows();
-      }
-    });
+  doSave(): void {
+    this.isSaving.set(true);
+    doSaveData(
+      this.dataSource.data, this.itemId, this.dataState(),
+      (item: EventRow) => this.dataService.addEventRow(item),
+      (item: EventRow) => this.dataService.updateEventRow(item),
+      (item: EventRow) => this.dataService.removeEventRow(item)).subscribe({
+        next: result => {
+          this.isSaving.set(false);
+          this.dataSource.data = result.data;
+          //this.table.renderRows();
+          this.dataState.set(result.changes);
+          if (result.success) {
+            this.notificationService.success('Все изменения сохранены успешно');
+          } else {
+            const errorsMsg = result.errors.map(e => `Запись ${e.id}: ${e.message}`).join('\n');
+            this.notificationService.error(`Ошибки при сохранении:\n${errorsMsg}`);
+          }
+        },
+        error: err => {
+          this.isSaving.set(false);
+          console.error('Неожиданная ошибка:', err);
+          this.error.set('Не удалось сохранить изменения');
+        }
+      })
+
   }
-
-
 }

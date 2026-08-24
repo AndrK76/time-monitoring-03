@@ -3,17 +3,19 @@
  */
 
 export * from './lib/utils/object-utils';
-export * from './lib/utils/table-state-utils';
+export * from './lib/utils/table-manage-utils';
 export * from './lib/utils/date-utils';
 
 
 export * from './lib/models/menu-item';
-export * from './lib/models/table-data-changes';
+export * from './lib/models/table-data-items';
 
 export * from './lib/components/top-menu-item/top-menu-item.component';
 
 export * from './lib/services/dialog.service';
 export * from './lib/components/confirm-dialog/confirm-dialog.component';
+
+export * from './lib/services/notification.service';
 
 export * from './lib/components/login/login.component';
 export * from './lib/components/register/register.component';

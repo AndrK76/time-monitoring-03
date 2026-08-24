@@ -16,16 +16,16 @@
 
         <mat-card-actions align="end">
             <div class="action-button-group">
-                <button mat-raised-button color="primary" (click)="callRefresh()" [disabled]="isLoading()">
+                <button mat-raised-button color="accent" (click)="callRefresh()" [disabled]="isLoading() || isSaving()">
                     <mat-icon>refresh</mat-icon>
                     {{ isLoading() ? 'Загрузка...' : 'Перечитать' }}
                 </button>
                 <button mat-raised-button class="table-action-btn btn-success" (click)="callAdd()"
-                    [disabled]="isLoading()">
+                    [disabled]="isLoading() || isSaving()">
                     <mat-icon>add</mat-icon> Добавить
                 </button>
-                <button mat-raised-button color="primary" (click)="saveChanges()"
-                    [disabled]="!hasChanges() || isLoading()">
+                <button mat-raised-button color="primary" (click)="callSave()"
+                    [disabled]="!hasChanges() || isLoading() || isSaving()">
                     Сохранить
                 </button>
             </div>
@@ -33,10 +33,10 @@
 
         <mat-card-content>
             <!-- Индикатор загрузки -->
-            @if (isLoading()) {
+            @if (isLoading() || isSaving()) {
             <div class="loading-spinner">
                 <mat-spinner diameter="40"></mat-spinner>
-                <p>Загрузка данных...</p>
+                <p>{{isLoading()?'Загрузка':'Сохранение'}} данных...</p>
             </div>
             }
 
@@ -49,28 +49,37 @@
             }
 
             <!-- Таблица -->
-            @if (!isLoading() && !error() && dataSource.data.length > 0) {
+            @if (!isLoading() && !error() && !isSaving() && dataSource.data.length > 0) {
             <div class="table-wrapper sticky-header-table sticky-firstcol-table nowrap-table inrow-editor-table">
-                <table mat-table [dataSource]="dataSource" class="mat-elevation-z0" multiTemplateDataRows>
+                <table mat-table [dataSource]="dataSource" [trackBy]="trackById" class="mat-elevation-z0"
+                    multiTemplateDataRows matSort>
 
                     <ng-container matColumnDef="expand">
                         <th mat-header-cell *matHeaderCellDef>
+                            <button mat-icon-button (click)="toggleFilter()" matTooltip="Фильтр">
+                                <mat-icon>filter_list</mat-icon>
+                            </button>
+                            @if (showFilter()) {
+                            <input matInput placeholder="Фильтр..." (input)="applyFilter($event)"
+                                [value]="filterValue()" style="width: 100px; margin-left: 8px;">
+                            }
                             @if (hasChanges()) {
                             <span class="changes-indicator" matTooltip="{{ changesSummary() }}">*</span>
                             }
                         </th>
                         <td mat-cell *matCellDef="let row">
-                            <button mat-icon-button (click)="toggleRow(row)">
+                            <button mat-icon-button (click)="callSelect(row)">
                                 <mat-icon>{{ row._expanded ? 'expand_less' : 'expand_more' }}</mat-icon>
                             </button>
-                            <button mat-icon-button color="warn" (click)="callDelete(row)" class="btn-icon-danger">
+                            <button mat-icon-button color="warn" (click)="callDelete(row)" class="btn-icon-danger"
+                                matTooltip="Удалить">
                                 <mat-icon>delete</mat-icon>
                             </button>
                         </td>
                     </ng-container>
 
                     <ng-container matColumnDef="placeName">
-                        <th mat-header-cell *matHeaderCellDef> Место </th>
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Место </th>
                         <td mat-cell *matCellDef="let row"> {{ row.placeName }} </td>
                     </ng-container>
 
@@ -83,12 +92,12 @@
                     </ng-container>
 
                     <ng-container matColumnDef="start">
-                        <th mat-header-cell *matHeaderCellDef> Начало </th>
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Начало </th>
                         <td mat-cell *matCellDef="let row"> {{ row.start | date:'dd.MM.yyyy HH:mm' }} </td>
                     </ng-container>
 
                     <ng-container matColumnDef="end">
-                        <th mat-header-cell *matHeaderCellDef> Окончание </th>
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Окончание </th>
                         <td mat-cell *matCellDef="let row"> {{ row.end | date:'dd.MM.yyyy HH:mm' }} </td>
                     </ng-container>
 
@@ -112,8 +121,9 @@
                     </ng-container>
 
                     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-                    <tr mat-row *matRowDef="let row; columns: displayedColumns; trackBy: trackById;"></tr>
-                    <tr mat-row *matRowDef="let row; columns: ['editor']; when: isExpanded; trackBy: trackById;"></tr>
+                    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                    <!--<tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="callSelect(row)"></tr>-->
+                    <tr mat-row *matRowDef="let row; columns: ['editor']; when: isExpanded;"></tr>
                 </table>
             </div>
             }

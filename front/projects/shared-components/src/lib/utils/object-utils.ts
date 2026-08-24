@@ -1,3 +1,4 @@
+
 /**
  * Проверяет, есть ли различия между двумя объектами.
  * Игнорирует поля, начинающиеся с '_' (служебные).
@@ -117,41 +118,6 @@ export function addOrigData<T extends Record<string, any>>(
 }
 
 /**
- * Добавляет к объекту служебное поле `__new`, показывающее что объект новый
- * @param source - исходный объект
- * @returns новый объект с добавленным полем `_orig`
- */
-export function addNewItemFlag<T extends Record<string, any>>(
-    source: T
-): T {
-    return {
-        ...source,
-        _new: true
-    };
-}
-
-/**
- * Проверяет является ли переданный элемент новым
- * @param source - исходный объект
- * @returns новый объект с добавленным полем `_orig`
- */
-export function isNewItem<T extends Record<string, any>>(source: T): boolean {
-    return ('_new' in source && source['_new'] === true);
-}
-
-
-export function setExpanded<T extends Record<string, any>>(
-    source: T, expanded?: boolean
-): T {
-    const _expanded = expanded ? true : false;
-    return {
-        ...source,
-        _expanded: _expanded
-    };
-}
-
-
-/**
  * Удаляет из объекта служебное поле `_orig`.
  * @param source - объект, у которого нужно удалить `_orig`
  * @returns новый объект без поля `_orig`
@@ -165,3 +131,56 @@ export function removeOrigData<T extends Record<string, any>>(
     }
     return source;
 }
+
+
+/**
+ * Добавляет к объекту служебное поле `_new`, показывающее что объект новый
+ * @param source - исходный объект
+ * @returns новый объект с добавленным полем `_new`
+ */
+export function addNewItemFlag<T extends Record<string, any>>(
+    source: T
+): T {
+    return {
+        ...source,
+        _new: true
+    };
+}
+
+/**
+ * Проверяет является ли переданный элемент новым (через аттрибут `_new`)
+ * @param source - исходный объект
+ * @returns является ли объект новым
+ */
+export function isNewItem<T extends Record<string, any>>(source: T): boolean {
+    return ('_new' in source && source['_new'] === true);
+}
+
+
+/**
+ * Устанавливает/снимает признак развернуто в объекте  (через аттрибут `_expanded`)
+ * @param source - исходный объект
+ * @returns новый объект с добавленным полем `_expanded`
+ */
+export function setExpanded<T extends Record<string, any>>(
+    source: T, expanded?: boolean
+): T {
+    const _expanded = expanded ? true : false;
+    return {
+        ...source,
+        _expanded: _expanded
+    };
+}
+
+/**
+ * Проверяет является ли переданный элемент развернутым (через аттрибут `_expanded`)
+ * @param source - исходный объект
+ * @returns является ли объект развернутым
+ */
+export function isExpanded<T extends Record<string, any>>(source: T): boolean {
+    return ('_expanded' in source && source['_expanded'] === true);
+}
+
+
+
+

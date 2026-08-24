@@ -1,0 +1,43 @@
+.snackbar-success {
+    .mdc-snackbar__surface {
+        background: #4caf50 !important;
+    }
+
+    .mat-mdc-snack-bar-label {
+        color: #fff !important;
+        white-space: pre-line;
+    }
+}
+
+.snackbar-error {
+    .mdc-snackbar__surface {
+        background: #f44336 !important;
+    }
+
+    .mat-mdc-snack-bar-label {
+        color: #fff !important;
+        white-space: pre-line;
+    }
+}
+
+.snackbar-info {
+    .mdc-snackbar__surface {
+        background: #2196f3 !important;
+    }
+
+    .mat-mdc-snack-bar-label {
+        color: #fff !important;
+        white-space: pre-line;
+    }
+}
+
+.snackbar-warning {
+    .mdc-snackbar__surface {
+        background: #ff9800 !important;
+    }
+
+    .mat-mdc-snack-bar-label {
+        color: #fff !important;
+        white-space: pre-line;
+    }
+}
