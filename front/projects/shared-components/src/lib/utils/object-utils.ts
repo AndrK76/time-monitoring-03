@@ -95,11 +95,9 @@ export function addOrigData<T extends Record<string, any>>(
     source: T,
     ignoreKeys: string[] = []
 ): T {
-    // Игнорируем служебные поля и само поле _orig (если оно уже есть)
     const allIgnore = new Set([
         ...ignoreKeys,
-        ...Object.keys(source).filter(k => k.startsWith('_')),
-        '_orig'
+        ...Object.keys(source).filter(k => k.startsWith('_'))
     ]);
 
     const cleanSource: any = {};
@@ -109,7 +107,6 @@ export function addOrigData<T extends Record<string, any>>(
         }
     }
 
-    // Глубокая копия через JSON (для простоты)
     const cloned = JSON.parse(JSON.stringify(cleanSource));
 
     // Возвращаем новый объект с добавленным _orig
@@ -118,6 +115,41 @@ export function addOrigData<T extends Record<string, any>>(
         _orig: cloned
     };
 }
+
+/**
+ * Добавляет к объекту служебное поле `__new`, показывающее что объект новый
+ * @param source - исходный объект
+ * @returns новый объект с добавленным полем `_orig`
+ */
+export function addNewItemFlag<T extends Record<string, any>>(
+    source: T
+): T {
+    return {
+        ...source,
+        _new: true
+    };
+}
+
+/**
+ * Проверяет является ли переданный элемент новым
+ * @param source - исходный объект
+ * @returns новый объект с добавленным полем `_orig`
+ */
+export function isNewItem<T extends Record<string, any>>(source: T): boolean {
+    return ('_new' in source && source['_new'] === true);
+}
+
+
+export function setExpanded<T extends Record<string, any>>(
+    source: T, expanded?: boolean
+): T {
+    const _expanded = expanded ? true : false;
+    return {
+        ...source,
+        _expanded: _expanded
+    };
+}
+
 
 /**
  * Удаляет из объекта служебное поле `_orig`.

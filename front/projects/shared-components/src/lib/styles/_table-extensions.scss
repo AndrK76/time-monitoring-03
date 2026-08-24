@@ -150,3 +150,53 @@
     font-weight: normal;
     color: var(--changes-color);
 }
+
+
+.action-button-group {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+
+    // Кнопки действий (общие стили)
+    .table-action-btn {
+        min-width: 100px;
+        font-weight: 500;
+
+        &.btn-primary {
+            background-color: var(--btn-primary-bg);
+            color: var(--btn-primary-text);
+
+            &:hover:not(:disabled) {
+                background-color: var(--btn-primary-hover);
+            }
+        }
+
+        &.btn-danger {
+            background-color: var(--btn-danger-bg);
+            color: var(--btn-danger-text);
+
+            &:hover:not(:disabled) {
+                background-color: var(--btn-danger-hover);
+            }
+        }
+
+        &.btn-success {
+            background-color: var(--btn-success-bg);
+            color: var(--btn-success-text);
+
+            &:hover:not(:disabled) {
+                background-color: var(--btn-success-hover);
+            }
+        }
+
+    }
+}
+
+.btn-icon-danger {
+    color: var(--btn-danger-bg);
+
+    &:hover {
+        background-color: rgba(var(--btn-danger-bg-rgb), 0.1);
+    }
+}

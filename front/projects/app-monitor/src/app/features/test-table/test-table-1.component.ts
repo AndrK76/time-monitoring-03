@@ -9,10 +9,9 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
 import { EventsEditorInplaceComponent } from '../events-editor-inplace/events-editor-inplace.component';
-import { EventRow } from '../event-row';
-import { addModifyChangeToState, addNewChangeToState, addOrigData, formatTableChanges, hasTableChanges, newTableDataChanges, TableDataChanges, updateDataSourceItem } from '@mon3/sc';
+import { createEmptyEventRow, EventRow } from '../event-row';
+import { DialogService, addModifyChangeToState, addOrigData, formatTableChanges, hasTableChanges, newTableDataChanges, TableDataChanges, updateDataSourceItem, addDeleteChangeToState, addNewChangeToState, addNewItemFlag, setExpanded, addDataSourceItem, isNewItem, deleteDataSourceItem } from '@mon3/sc';
 import { MatTooltipModule } from '@angular/material/tooltip';
-
 
 @Component({
   selector: 'app-test-table-1',
@@ -32,10 +31,10 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 })
 export class TestTable1Component implements OnInit {
   private dataService = inject(SampleDataService);
+  private dialogService = inject(DialogService);
 
   places = signal<Place[]>([]);
   statuses = signal<EventStatus[]>([]);
-  //eventRows = signal<EventRow[]>([]);
   isLoading = signal(false);
   error = signal<string | null>(null);
 
@@ -124,10 +123,6 @@ export class TestTable1Component implements OnInit {
       });
   }
 
-  refreshData(): void {
-    this.loadEvents();
-  }
-
   toggleRow(row: any): void {
     const updatedRows = this.dataSource.data.map(r => {
       const rowAny = r as any;
@@ -148,8 +143,48 @@ export class TestTable1Component implements OnInit {
     return (row as any)._expanded === true;
   }
 
+  trackById = (index: number, item: EventRow) => item.id;
 
-  updateEvent(updatedEvent: EventRow): void {
+
+  callRefresh() {
+    this.dialogService.confirm('Перечитать данные? Все несохранённые изменения будут потеряны.').subscribe(confirmed => {
+      if (confirmed) this.doRefresh();
+    });
+  }
+
+  callAdd() {
+    this.doAdd();
+  }
+
+  callDelete(row: EventRow) {
+    if (isNewItem(row)) {
+      this.doDelete(row);
+    } else {
+      this.dialogService.confirm(`Удалить запись с ID = ${row.id}?`).subscribe(confirmed => {
+        if (confirmed) this.doDelete(row)
+      });
+    }
+  }
+
+  private doRefresh(): void {
+    this.loadEvents();
+    this.dataState.set(newTableDataChanges());
+  }
+
+  private doAdd(): void {
+    const newEvent = createEmptyEventRow(this.places()[0]?.id);
+    const result = addDataSourceItem(this.dataSource.data, newEvent);
+    if (result.added) {
+      this.dataSource.data = result.data;
+      this.table.renderRows();
+      this.dataState.update(state => addNewChangeToState(state, newEvent.id));
+      // Прокручиваем таблицу к началу, чтобы новая строка была видна
+      // (опционально)
+    }
+  }
+
+
+  doUpdate(updatedEvent: EventRow): void {
     const result = updateDataSourceItem(
       this.dataSource.data,
       updatedEvent,
@@ -160,11 +195,43 @@ export class TestTable1Component implements OnInit {
       this.dataSource.data = result.data;
       this.table.renderRows();
       this.dataState.update(state => addModifyChangeToState(state, updatedEvent.id));
-      console.log(`1=${this.dataState().added.length > 0 || this.dataState().modified.length > 0 || this.dataState().deleted.length > 0}` +
-        ` 2 = ${this.hasChanges()}`);
     }
   }
 
+
+  doDelete(deletedItem: EventRow): void {
+    const result = deleteDataSourceItem(
+      this.dataSource.data,
+      deletedItem,
+      (item: EventRow) => item.id
+    );
+    if (result.deleted) {
+      this.dataSource.data = result.data;
+      this.table.renderRows();
+      this.dataState.update(state => addDeleteChangeToState(state, deletedItem.id));
+    }
+  }
+
+
+
+  saveChanges(): void {
+    this.dialogService.confirm('Сохранить изменения?').subscribe(confirmed => {
+      if (confirmed) {
+        // Здесь отправляем изменённые данные на сервер.
+        // Пока просто выводим в консоль.
+        console.log('Сохранение изменений...', this.dataState());
+        // После сохранения сбрасываем состояние.
+        this.dataState.set(newTableDataChanges());
+        // Убираем _orig у всех строк.
+        const updatedRows = this.dataSource.data.map(r => {
+          const { _orig, ...rest } = r as any;
+          return rest;
+        });
+        this.dataSource.data = updatedRows;
+        this.table.renderRows();
+      }
+    });
+  }
 
 
 }

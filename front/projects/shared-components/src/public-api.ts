@@ -12,6 +12,9 @@ export * from './lib/models/table-data-changes';
 
 export * from './lib/components/top-menu-item/top-menu-item.component';
 
+export * from './lib/services/dialog.service';
+export * from './lib/components/confirm-dialog/confirm-dialog.component';
+
 export * from './lib/components/login/login.component';
 export * from './lib/components/register/register.component';
 export * from './lib/components/logout/logout.component';

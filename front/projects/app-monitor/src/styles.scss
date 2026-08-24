@@ -101,8 +101,25 @@ body {
 :root {
   --editor-bg: #f9f9f9;
   --editor-border: #e0e0e0;
-
   --changes-color: #{vars.$warn-500};
+}
+
+:root {
+  // Кнопки действий в таблицах
+  --btn-primary-bg: #{vars.$primary-500};
+  --btn-primary-text: #{vars.$primary-contrast};
+  --btn-primary-hover: #{darken(vars.$primary-500, 10%)};
+
+  --btn-danger-bg: #{vars.$warn-500};
+  --btn-danger-text: #{vars.$warn-contrast};
+  --btn-danger-hover: #{darken(vars.$warn-500, 10%)};
+
+  --btn-success-bg: #{#4caf50};
+  --btn-success-text: #ffffff;
+  --btn-success-hover: #{darken(#4caf50, 10%)};
+  --btn-danger-bg-rgb: #{red(vars.$warn-500)},
+  #{green(vars.$warn-500)},
+  #{blue(vars.$warn-500)};
 }
 
 @import 'table-extensions';

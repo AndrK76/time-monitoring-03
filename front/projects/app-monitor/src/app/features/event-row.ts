@@ -8,5 +8,27 @@ export interface EventRow {
   start: string;
   end: string;
   booking_id?: string;
-  details: string; // длинная "мусорная" колонка
+  details: string;
 }
+
+export function createEmptyEventRow(placeId?: string): EventRow {
+  const now = new Date();
+  const start = new Date(now);
+  start.setHours(8, 0, 0, 0);
+  const end = new Date(start);
+  end.setHours(9, 0, 0, 0);
+
+  return {
+    id: crypto.randomUUID ? crypto.randomUUID() : 'temp-' + Date.now(),
+    placeId: placeId || '001-001',
+    placeName: '',
+    statusCode: 'empty',
+    statusName: '',
+    statusColor: undefined,
+    start: start.toISOString(),
+    end: end.toISOString(),
+    booking_id: undefined,
+    details: ''
+  };
+}
+

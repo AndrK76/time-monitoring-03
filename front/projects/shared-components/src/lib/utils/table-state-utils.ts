@@ -1,5 +1,5 @@
 import { TableDataChanges } from '../models/table-data-changes';
-import { hasChanges, applyChanges, addOrigData } from './object-utils';
+import { hasChanges, applyChanges, addOrigData, setExpanded, addNewItemFlag } from './object-utils';
 
 /**
  * Обновляет элемент в массиве данных.
@@ -9,6 +9,7 @@ import { hasChanges, applyChanges, addOrigData } from './object-utils';
  * @param updatedItem - элемент с обновлёнными данными
  * @param idGetter - функция для получения идентификатора элемента
  * @param ignoreKeys - поля, которые нужно игнорировать при сравнении
+ * @param applyChangesToOrig - обновлять поля в оригинальном объекте
  * @returns объект с новым массивом и флагом, были ли изменения
  */
 export function updateDataSourceItem<T extends Record<string, any>>(
@@ -24,7 +25,6 @@ export function updateDataSourceItem<T extends Record<string, any>>(
     }
 
     const oldRow = dataSource[index];
-    // Если есть _orig, сравниваем с ним, иначе с текущей строкой
     const compareWith = (oldRow as any)._orig || oldRow;
 
     // Проверяем, есть ли изменения (игнорируем служебные поля)
@@ -45,6 +45,54 @@ export function updateDataSourceItem<T extends Record<string, any>>(
 
     return { data: newData, updated: true };
 }
+
+
+/**
+ * Обновляет элемент в массиве данных.
+ * Возвращает новый массив с обновлённым элементом, если были изменения.
+ * 
+ * @param dataSource - исходный массив данных
+ * @param addItem - элемент с добавленными данными
+ * @param ignoreKeys - поля, которые нужно игнорировать при сравнении
+ * @returns объект с новым массивом и флагом, были ли добавления
+ */
+export function addDataSourceItem<T extends Record<string, any>>(
+    dataSource: T[],
+    addItem: T,
+    ignoreKeys?: string[]
+): { data: T[]; added: boolean } {
+
+    let newRow = addOrigData(addItem, ignoreKeys);
+    newRow = setExpanded(newRow, true);
+    newRow = addNewItemFlag(newRow);
+    // Создаём новый массив с обновлённой строкой
+    const newData = [newRow, ...dataSource];
+    return { data: newData, added: true };
+}
+
+/**
+ * Удаляет элемент из массива данных.
+ * Возвращает новый массив без удаленного элемента если элемент найден.
+ * 
+ * @param dataSource - исходный массив данных
+ * @param deletedItem - удаляемый элемент
+ * @param idGetter - функция для получения идентификатора элемента
+ * @returns объект с новым массивом и флагом, было ли удаление
+ */
+export function deleteDataSourceItem<T extends Record<string, any>>(
+    dataSource: T[],
+    deletedItem: T,
+    idGetter: (item: T) => string | number
+): { data: T[]; deleted: boolean } {
+    const index = dataSource.findIndex(e => idGetter(e) === idGetter(deletedItem));
+    if (index === -1) {
+        return { data: dataSource, deleted: false };
+    }
+    const newData = [...dataSource];
+    newData.splice(index, 1);
+    return { data: newData, deleted: true };
+}
+
 
 /**
  * Создаёт пустой объект TableDataChanges.
@@ -102,6 +150,8 @@ export function addModifyChangeToState(
 ): TableDataChanges {
     if (changes.modified.includes(id)) {
         return changes;
+    } else if (changes.added.includes(id)) {
+        return changes;
     }
     return {
         ...changes,
@@ -116,11 +166,16 @@ export function addDeleteChangeToState(
     changes: TableDataChanges,
     id: string
 ): TableDataChanges {
-    if (changes.deleted.includes(id)) {
-        return changes;
+    let newAdded = changes.added;
+    let newModified = changes.modified;
+    let newDeleted = changes.deleted;
+    if (newModified.includes(id)) {
+        newModified = newModified.filter(item => item !== id)
     }
-    return {
-        ...changes,
-        deleted: [...changes.deleted, id]
-    };
+    if (newAdded.includes(id)) {
+        newAdded = newAdded.filter(item => item !== id)
+    } else if (!newDeleted.includes(id)) {
+        newDeleted = [...newDeleted, id]
+    }
+    return { added: newAdded, modified: newModified, deleted: newDeleted };
 }
