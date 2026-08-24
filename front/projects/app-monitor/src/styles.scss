@@ -76,6 +76,7 @@ body {
   --menu-hover-bg: #{
  mix(mat.m2-get-color-from-palette(vars.$my-accent, 500), mat.m2-get-color-from-palette(vars.$my-accent, 600), 50%)
 }
+
 ;
 
 
@@ -94,6 +95,14 @@ body {
 
 :root {
   --table-row-hover-bg: rgba(0, 0, 0, 0.04);
+  --changes-color: #{vars.$warn-500};
+}
+
+:root {
+  --editor-bg: #f9f9f9;
+  --editor-border: #e0e0e0;
+
+  --changes-color: #{vars.$warn-500};
 }
 
 @import 'table-extensions';

@@ -1,5 +1,5 @@
 import { TableDataChanges } from '../models/table-data-changes';
-import { hasChanges, applyChanges } from './object-utils';
+import { hasChanges, applyChanges, addOrigData } from './object-utils';
 
 /**
  * Обновляет элемент в массиве данных.
@@ -8,7 +8,6 @@ import { hasChanges, applyChanges } from './object-utils';
  * @param dataSource - исходный массив данных
  * @param updatedItem - элемент с обновлёнными данными
  * @param idGetter - функция для получения идентификатора элемента
- * @param updateDerived - функция для пересчёта производных полей (опционально)
  * @param ignoreKeys - поля, которые нужно игнорировать при сравнении
  * @returns объект с новым массивом и флагом, были ли изменения
  */
@@ -16,7 +15,8 @@ export function updateDataSourceItem<T extends Record<string, any>>(
     dataSource: T[],
     updatedItem: T,
     idGetter: (item: T) => string | number,
-    ignoreKeys?: string[]
+    ignoreKeys?: string[],
+    applyChangesToOrig?: boolean
 ): { data: T[]; updated: boolean } {
     const index = dataSource.findIndex(e => idGetter(e) === idGetter(updatedItem));
     if (index === -1) {
@@ -24,16 +24,20 @@ export function updateDataSourceItem<T extends Record<string, any>>(
     }
 
     const oldRow = dataSource[index];
+    // Если есть _orig, сравниваем с ним, иначе с текущей строкой
+    const compareWith = (oldRow as any)._orig || oldRow;
 
     // Проверяем, есть ли изменения (игнорируем служебные поля)
-    if (!hasChanges(oldRow, updatedItem, ignoreKeys)) {
+    if (!hasChanges(compareWith, updatedItem, ignoreKeys)) {
         return { data: dataSource, updated: false };
     }
 
     // Создаём копию строки и применяем изменения
-    const newRow = { ...oldRow };
+    let newRow = { ...oldRow };
     applyChanges(newRow, updatedItem, ignoreKeys);
-
+    if (applyChangesToOrig && oldRow['_orig']) {
+        newRow = addOrigData(newRow);
+    }
 
     // Создаём новый массив с обновлённой строкой
     const newData = [...dataSource];
@@ -74,28 +78,49 @@ export function formatTableChanges(changes: TableDataChanges): string {
 }
 
 /**
- * Добавляет ID в массив добавленных элементов, если его там ещё нет.
+ * Добавляет ID в массив добавленных элементов (иммутабельно).
  */
-export function addNewChangeToState(changes: TableDataChanges, id: string): void {
-    if (!changes.added.includes(id)) {
-        changes.added.push(id);
+export function addNewChangeToState(
+    changes: TableDataChanges,
+    id: string
+): TableDataChanges {
+    if (changes.added.includes(id)) {
+        return changes;
     }
+    return {
+        ...changes,
+        added: [...changes.added, id]
+    };
 }
 
 /**
- * Добавляет ID в массив изменённых элементов, если его там ещё нет.
+ * Добавляет ID в массив изменённых элементов (иммутабельно).
  */
-export function addModifyChangeToState(changes: TableDataChanges, id: string): void {
-    if (!changes.modified.includes(id)) {
-        changes.modified.push(id);
+export function addModifyChangeToState(
+    changes: TableDataChanges,
+    id: string
+): TableDataChanges {
+    if (changes.modified.includes(id)) {
+        return changes;
     }
+    return {
+        ...changes,
+        modified: [...changes.modified, id]
+    };
 }
 
 /**
- * Добавляет ID в массив удалённых элементов, если его там ещё нет.
+ * Добавляет ID в массив удалённых элементов (иммутабельно).
  */
-export function addDeleteChangeToState(changes: TableDataChanges, id: string): void {
-    if (!changes.deleted.includes(id)) {
-        changes.deleted.push(id);
+export function addDeleteChangeToState(
+    changes: TableDataChanges,
+    id: string
+): TableDataChanges {
+    if (changes.deleted.includes(id)) {
+        return changes;
     }
+    return {
+        ...changes,
+        deleted: [...changes.deleted, id]
+    };
 }

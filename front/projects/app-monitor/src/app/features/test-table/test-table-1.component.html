@@ -1,4 +1,4 @@
-<div class="test-table-container">
+<div class="standard-table-container">
     <mat-card>
         <mat-card-header>
             <mat-card-title>Список событий</mat-card-title>
@@ -40,13 +40,13 @@
 
             <!-- Таблица -->
             @if (!isLoading() && !error() && dataSource.data.length > 0) {
-            <div class="table-wrapper sticky-header-table sticky-firstcol-table nowrap-table">
+            <div class="table-wrapper sticky-header-table sticky-firstcol-table nowrap-table inrow-editor-table">
                 <table mat-table [dataSource]="dataSource" class="mat-elevation-z0" multiTemplateDataRows>
 
                     <ng-container matColumnDef="expand">
                         <th mat-header-cell *matHeaderCellDef>
                             @if (hasChanges()) {
-                            <span matTooltip="{{ changesSummary() }}">*</span>
+                            <span class="changes-indicator" matTooltip="{{ changesSummary() }}">*</span>
                             }
                         </th>
                         <td mat-cell *matCellDef="let row">
@@ -89,9 +89,9 @@
                         <td mat-cell *matCellDef="let row"> {{ row.details }} </td>
                     </ng-container>
 
-                    <ng-container matColumnDef="expandedDetail">
+                    <ng-container matColumnDef="editor">
                         <td mat-cell *matCellDef="let row" [attr.colspan]="displayedColumns.length">
-                            <div class="detail-row" *ngIf="row._expanded">
+                            <div class="editor-row" *ngIf="row._expanded">
                                 <app-events-editor-inplace [eventData]="row" [places]="places()" [statuses]="statuses()"
                                     (change)="updateEvent($event)"></app-events-editor-inplace>
                             </div>
@@ -100,8 +100,7 @@
 
                     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
                     <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-                    <!--<tr mat-row *matRowDef="let row; columns: ['expandedDetail'];"></tr>-->
-                    <tr mat-row *matRowDef="let row; columns: ['expandedDetail']; when: isExpanded"></tr>
+                    <tr mat-row *matRowDef="let row; columns: ['editor']; when: isExpanded"></tr>
                 </table>
             </div>
             }

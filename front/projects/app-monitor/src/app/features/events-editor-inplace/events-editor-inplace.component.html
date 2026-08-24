@@ -1,20 +1,20 @@
 <div class="editor-container" *ngIf="eventData()">
-    <form #editorForm="ngForm" class="editor-form">
+    <form [formGroup]="form" class="editor-form">
         <div class="form-row">
             <mat-form-field appearance="outline" class="full-width">
                 <mat-label>ID</mat-label>
-                <input matInput [value]="eventData().id" readonly>
+                <input matInput formControlName="id" readonly>
             </mat-form-field>
             <mat-form-field appearance="outline" class="full-width">
                 <mat-label>ID брони</mat-label>
-                <input matInput [(ngModel)]="eventData().booking_id" name="booking_id">
+                <input matInput formControlName="booking_id">
             </mat-form-field>
         </div>
+
         <div class="form-row">
             <mat-form-field appearance="outline" class="full-width">
                 <mat-label>Место</mat-label>
-                <mat-select [(ngModel)]="eventData().placeId" name="placeId" required
-                    (ngModelChange)="onFieldChange('placeId', $event)">
+                <mat-select formControlName="placeId">
                     <mat-option *ngFor="let place of places()" [value]="place.id">
                         {{ place.name }}
                     </mat-option>
@@ -22,22 +22,22 @@
             </mat-form-field>
             <mat-form-field appearance="outline" class="full-width">
                 <mat-label>Статус</mat-label>
-                <mat-select [(ngModel)]="eventData().statusCode" name="statusCode" required
-                    (ngModelChange)="onFieldChange('statusCode', $event)">
+                <mat-select formControlName="statusCode">
                     <mat-option *ngFor="let status of statuses()" [value]="status.code">
                         {{ status.name }}
                     </mat-option>
                 </mat-select>
             </mat-form-field>
         </div>
+
         <div class="form-row">
             <mat-form-field appearance="outline" class="full-width">
                 <mat-label>Начало</mat-label>
-                <input matInput type="datetime-local" [(ngModel)]="eventData().start" name="start" required>
+                <input matInput type="datetime-local" formControlName="start">
             </mat-form-field>
             <mat-form-field appearance="outline" class="full-width">
                 <mat-label>Окончание</mat-label>
-                <input matInput type="datetime-local" [(ngModel)]="eventData().end" name="end" required>
+                <input matInput type="datetime-local" formControlName="end">
             </mat-form-field>
         </div>
     </form>

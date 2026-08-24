@@ -1,5 +1,3 @@
-// shared-components/src/lib/utils/object-utils.ts
-
 /**
  * Проверяет, есть ли различия между двумя объектами.
  * Игнорирует поля, начинающиеся с '_' (служебные).
@@ -75,8 +73,6 @@ export function applyChanges<T extends Record<string, any>>(
     source: T,
     ignoreKeys: string[] = []
 ): void {
-    console.log('applyChanges before')
-    console.dir(target)
     const ignoreSet = new Set([...ignoreKeys, ...Object.keys(source).filter(k => k.startsWith('_'))]);
     const keys = Object.keys(source) as (keyof T)[];
     for (const key of keys) {
@@ -85,7 +81,55 @@ export function applyChanges<T extends Record<string, any>>(
             target[key] = source[key];
         }
     }
-    console.log('applyChanges after')
-    console.dir(target)
+}
 
+
+/**
+ * Добавляет к объекту служебное поле `_orig`, содержащее глубокую копию исходных данных.
+ * Поля, начинающиеся с '_' и переданные в ignoreKeys, исключаются из копии.
+ * @param source - исходный объект
+ * @param ignoreKeys - дополнительные ключи для игнорирования
+ * @returns новый объект с добавленным полем `_orig`
+ */
+export function addOrigData<T extends Record<string, any>>(
+    source: T,
+    ignoreKeys: string[] = []
+): T {
+    // Игнорируем служебные поля и само поле _orig (если оно уже есть)
+    const allIgnore = new Set([
+        ...ignoreKeys,
+        ...Object.keys(source).filter(k => k.startsWith('_')),
+        '_orig'
+    ]);
+
+    const cleanSource: any = {};
+    for (const key in source) {
+        if (!allIgnore.has(key)) {
+            cleanSource[key] = source[key];
+        }
+    }
+
+    // Глубокая копия через JSON (для простоты)
+    const cloned = JSON.parse(JSON.stringify(cleanSource));
+
+    // Возвращаем новый объект с добавленным _orig
+    return {
+        ...source,
+        _orig: cloned
+    };
+}
+
+/**
+ * Удаляет из объекта служебное поле `_orig`.
+ * @param source - объект, у которого нужно удалить `_orig`
+ * @returns новый объект без поля `_orig`
+ */
+export function removeOrigData<T extends Record<string, any>>(
+    source: T
+): T {
+    if (source && typeof source === 'object' && '_orig' in source) {
+        const { _orig, ...rest } = source;
+        return rest as T;
+    }
+    return source;
 }

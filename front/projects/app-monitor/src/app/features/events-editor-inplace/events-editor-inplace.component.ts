@@ -1,23 +1,24 @@
-import { Component, input, output, computed } from '@angular/core';
+import { Component, input, output, computed, DestroyRef, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { provideNativeDateAdapter } from '@angular/material/core';
-import { format, parseISO } from 'date-fns';
-import { toZonedTime } from 'date-fns-tz';
 import { Place, EventStatus } from '../../models/sample-data-model';
 import { EventRow } from '../event-row';
+import { toLocalDatetimeString, toUtcDateString } from '@mon3/sc';
+import { debounceTime, distinctUntilChanged, filter } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-events-editor-inplace',
   standalone: true,
   imports: [
     CommonModule,
-    FormsModule,
+    ReactiveFormsModule,
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
@@ -28,59 +29,79 @@ import { EventRow } from '../event-row';
   templateUrl: './events-editor-inplace.component.html',
   styleUrl: './events-editor-inplace.component.scss'
 })
-export class EventsEditorInplaceComponent {
+export class EventsEditorInplaceComponent implements OnInit {
   eventData = input.required<EventRow>();
   places = input.required<Place[]>();
   statuses = input.required<EventStatus[]>();
-
   change = output<EventRow>();
 
-  get startLocal(): string {
-    return this.toLocalDatetimeString(this.eventData().start);
-  }
-  set startLocal(value: string) {
-    const utc = this.toUtcDateString(value);
-    this.updateField('start', utc);
-  }
 
-  get endLocal(): string {
-    return this.toLocalDatetimeString(this.eventData().end);
-  }
-  set endLocal(value: string) {
-    const utc = this.toUtcDateString(value);
-    this.updateField('end', utc);
-  }
+  private fb = inject(FormBuilder);
+  private destroyRef = inject(DestroyRef);
 
-  private updateField<K extends keyof EventRow>(field: K, value: EventRow[K]): void {
-    const current = this.eventData();
-    if (!current) return;
-    const updated = { ...current, [field]: value };
-    this.change.emit(updated);
-  }
+  form!: FormGroup;
 
-  onFieldChange(field: keyof EventRow, value: any): void {
-    this.updateField(field, value);
+  ngOnInit(): void {
+    this.buildForm();
+    this.listenToChanges();
   }
 
 
-  // Преобразование UTC -> локальная строка для datetime-local
-  private toLocalDatetimeString(utcDateStr: string): string {
-    if (!utcDateStr) return '';
-    const date = parseISO(utcDateStr);
-    const zoned = toZonedTime(date, Intl.DateTimeFormat().resolvedOptions().timeZone);
-    return format(zoned, "yyyy-MM-dd'T'HH:mm");
+  private buildForm(): void {
+    const data = this.eventData();
+    this.form = this.fb.group({
+      id: [{ value: data.id, disabled: true }],
+      placeId: [data.placeId, Validators.required],
+      statusCode: [data.statusCode, Validators.required],
+      start: [toLocalDatetimeString(data.start), Validators.required],
+      end: [toLocalDatetimeString(data.end), Validators.required],
+      booking_id: [data.booking_id || '']
+    });
   }
 
-  // Преобразование локальной строки -> UTC
-  private toUtcDateString(localDatetimeStr: string): string {
-    if (!localDatetimeStr) return '';
-    const [datePart, timePart] = localDatetimeStr.split('T');
-    const [year, month, day] = datePart.split('-').map(Number);
-    const [hours, minutes] = timePart.split(':').map(Number);
-    // Создаём локальную дату
-    const localDate = new Date(year, month - 1, day, hours, minutes);
-    // Возвращаем UTC ISO (с Z)
-    return localDate.toISOString();
+  private listenToChanges(): void {
+    this.form.valueChanges
+      .pipe(
+        debounceTime(300), // задержка перед отправкой
+        distinctUntilChanged(),
+        filter(() => this.form.valid),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe(values => {
+
+        const updateDerived = (row: EventRow): void => {
+          const placesMap = new Map(this.places().map(p => [p.id, p.name]));
+          const statusesMap = new Map(this.statuses().map(s => [s.code, s]));
+
+          const placeName = placesMap.get(row.placeId) || row.placeId;
+          const status = statusesMap.get(row.statusCode);
+          const statusName = status?.name || row.statusCode;
+          const statusColor = status?.color;
+
+          row.placeName = placeName;
+          row.statusName = statusName;
+          row.statusColor = statusColor;
+
+          const startStr = row.start ? row.start.replace('T', ' ').slice(0, 16) : '';
+          const endStr = row.end ? row.end.replace('T', ' ').slice(0, 16) : '';
+          row.details = `Место: ${placeName} | Статус: ${statusName} | ${startStr} – ${endStr} | ID: ${row.booking_id || '—'}`;
+        };
+
+        const updated: EventRow = {
+          id: this.eventData().id,
+          placeId: values.placeId,
+          statusCode: values.statusCode,
+          start: toUtcDateString(values.start),
+          end: toUtcDateString(values.end),
+          booking_id: values.booking_id || undefined,
+          placeName: this.eventData().placeName,
+          statusName: this.eventData().statusName,
+          statusColor: this.eventData().statusColor,
+          details: this.eventData().details
+        };
+        updateDerived(updated);
+        this.change.emit(updated);
+      });
   }
 
 }

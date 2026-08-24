@@ -10,7 +10,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
 import { EventsEditorInplaceComponent } from '../events-editor-inplace/events-editor-inplace.component';
 import { EventRow } from '../event-row';
-import { addModifyChangeToState, addNewChangeToState, formatTableChanges, hasTableChanges, newTableDataChanges, TableDataChanges, updateDataSourceItem } from '@mon3/sc';
+import { addModifyChangeToState, addNewChangeToState, addOrigData, formatTableChanges, hasTableChanges, newTableDataChanges, TableDataChanges, updateDataSourceItem } from '@mon3/sc';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
 
@@ -43,6 +43,7 @@ export class TestTable1Component implements OnInit {
   displayedColumns = ['expand', 'placeName', 'statusName', 'start', 'end', 'booking_id', 'details'];
   dataSource = new MatTableDataSource<EventRow>([]);
   dataState = signal<TableDataChanges>(newTableDataChanges());
+
   hasChanges = computed(() => hasTableChanges(this.dataState()));
   changesSummary = computed(() => formatTableChanges(this.dataState()));
 
@@ -132,7 +133,11 @@ export class TestTable1Component implements OnInit {
       const rowAny = r as any;
       if (rowAny.id === row.id) {
         const expanded = rowAny._expanded === undefined ? true : !rowAny._expanded;
-        return { ...r, _expanded: expanded };
+        let ret = { ...r, _expanded: expanded };
+        if (ret._expanded) {
+          ret = addOrigData(ret);
+        }
+        return ret;
       }
       return r;
     });
@@ -145,43 +150,21 @@ export class TestTable1Component implements OnInit {
 
 
   updateEvent(updatedEvent: EventRow): void {
-    // Функция пересчёта производных полей
-    const updateDerived = (row: EventRow): void => {
-      const placesMap = new Map(this.places().map(p => [p.id, p.name]));
-      const statusesMap = new Map(this.statuses().map(s => [s.code, s]));
-
-      const placeName = placesMap.get(row.placeId) || row.placeId;
-      const status = statusesMap.get(row.statusCode);
-      const statusName = status?.name || row.statusCode;
-      const statusColor = status?.color;
-
-      row.placeName = placeName;
-      row.statusName = statusName;
-      row.statusColor = statusColor;
-
-      // Безопасное форматирование дат
-      const startStr = row.start ? row.start.replace('T', ' ').slice(0, 16) : '';
-      const endStr = row.end ? row.end.replace('T', ' ').slice(0, 16) : '';
-      row.details = `Место: ${placeName} | Статус: ${statusName} | ${startStr} – ${endStr} | ID: ${row.booking_id || '—'}`;
-    };
-
-    updateDerived(updatedEvent);
-
     const result = updateDataSourceItem(
       this.dataSource.data,
       updatedEvent,
       (item: EventRow) => item.id,
+      undefined, true
     );
-
     if (result.updated) {
       this.dataSource.data = result.data;
       this.table.renderRows();
-      this.dataState.update(state => {
-        addModifyChangeToState(state, updatedEvent.id);
-        return state;
-      });
-      console.log('Строка обновлена');
+      this.dataState.update(state => addModifyChangeToState(state, updatedEvent.id));
+      console.log(`1=${this.dataState().added.length > 0 || this.dataState().modified.length > 0 || this.dataState().deleted.length > 0}` +
+        ` 2 = ${this.hasChanges()}`);
     }
   }
+
+
 
 }

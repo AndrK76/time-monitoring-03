@@ -4,6 +4,8 @@
 
 export * from './lib/utils/object-utils';
 export * from './lib/utils/table-state-utils';
+export * from './lib/utils/date-utils';
+
 
 export * from './lib/models/menu-item';
 export * from './lib/models/table-data-changes';

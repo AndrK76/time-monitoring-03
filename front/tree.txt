@@ -221,11 +221,17 @@
 |   |   |   |   |       |-- view-current-profile.component.scss
 |   |   |   |   |       `-- view-current-profile.component.ts
 |   |   |   |   |-- models
-|   |   |   |   |   `-- menu-item.ts
-|   |   |   |   `-- styles
-|   |   |   |       |-- _auth-common.scss
-|   |   |   |       |-- _table-extensions.scss
-|   |   |   |       `-- _theme-variables.scss
+|   |   |   |   |   |-- menu-item.ts
+|   |   |   |   |   `-- table-data-changes.ts
+|   |   |   |   |-- styles
+|   |   |   |   |   |-- _auth-common.scss
+|   |   |   |   |   |-- _editor-common.scss
+|   |   |   |   |   |-- _table-extensions.scss
+|   |   |   |   |   `-- _theme-variables.scss
+|   |   |   |   `-- utils
+|   |   |   |       |-- date-utils.ts
+|   |   |   |       |-- object-utils.ts
+|   |   |   |       `-- table-state-utils.ts
 |   |   |   `-- public-api.ts
 |   |   |-- README.md
 |   |   |-- ng-package.json
@@ -262,4 +268,4 @@
 |-- tsconfig.json
 `-- tsconfig.prod.json
 
-79 directories, 183 files
+80 directories, 188 files
