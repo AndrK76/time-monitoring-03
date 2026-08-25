@@ -21,12 +21,17 @@ export const routes: Routes = [
 
   {
     path: 'test-table',
-    loadComponent: () => import('./features/test-table-1/test-table-1.component').then(m => m.TestTable1Component),
+    loadComponent: () => import('./features/test-table-2/test-table-2.component').then(m => m.TestTable2Component),
     canActivate: [authGuard]
   },
   {
     path: 'test-table-1',
     loadComponent: () => import('./features/test-table-1/test-table-1.component').then(m => m.TestTable1Component),
+    canActivate: [authGuard]
+  },
+  {
+    path: 'test-table-2',
+    loadComponent: () => import('./features/test-table-2/test-table-2.component').then(m => m.TestTable2Component),
     canActivate: [authGuard]
   },
   { path: '**', redirectTo: '/' }

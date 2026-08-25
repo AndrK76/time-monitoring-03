@@ -1,0 +1,20 @@
+.mat-column-details {
+    text-wrap: revert;
+    min-width: 30rem;
+}
+
+.mat-column-placeName {
+    max-width: 10rem;
+    min-width: 8rem;
+}
+
+.mat-column-start,
+.mat-column-end {
+    max-width: 10rem;
+    min-width: 8rem;
+}
+
+.mat-column-booking_id {
+    max-width: 8rem;
+    min-width: 6rem;
+}

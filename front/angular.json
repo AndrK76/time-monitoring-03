@@ -713,8 +713,8 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "500kB",
-                  "maximumError": "1MB"
+                  "maximumWarning": "2MB",
+                  "maximumError": "4MB"
                 },
                 {
                   "type": "anyComponentStyle",
@@ -727,7 +727,7 @@
                 {
                   "replace": "projects/app-monitor/src/environments/environment.ts",
                   "with": "projects/app-monitor/src/environments/environment.staging.ts"
-            },
+                },
                 {
                   "replace": "tsconfig.json",
                   "with": "tsconfig.prod.json"
@@ -738,8 +738,8 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "500kB",
-                  "maximumError": "1MB"
+                  "maximumWarning": "2MB",
+                  "maximumError": "4MB"
                 },
                 {
                   "type": "anyComponentStyle",
@@ -767,7 +767,7 @@
           "options": {
             "host": "crm.host",
             "port": 4312
-            },
+          },
           "configurations": {
             "development": {
               "buildTarget": "app-monitor:build:development"

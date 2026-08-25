@@ -3,10 +3,16 @@
 :host {
     display: block;
     height: 100%;
-    overflow: auto; 
+    overflow: auto;
     padding: 1rem;
     background: vars.$bg-color;
     box-sizing: border-box;
+}
+
+@media (max-width: 599.98px) {
+    :host {
+        padding: 2px !important; // вместо 16px
+    }
 }
 
 // Стилизация скроллбара

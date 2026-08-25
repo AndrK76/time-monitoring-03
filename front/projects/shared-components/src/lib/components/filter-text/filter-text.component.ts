@@ -3,7 +3,7 @@ import { Component, effect, input, OnDestroy, output, signal } from '@angular/co
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { TableFilterTextValue } from '@mon3/sc';
+import { TableFilterTextValue } from '../../models/table-filter-items';
 
 @Component({
   selector: 'sc-filter-text',
