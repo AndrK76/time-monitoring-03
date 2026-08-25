@@ -10,7 +10,15 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
 import { EventsEditorInplaceComponent } from '../events-editor-inplace/events-editor-inplace.component';
 import { createEmptyEventRow, EventRow } from '../event-row';
-import { DialogService, addModifyChangeToState, formatTableChanges, hasTableChanges, newTableDataChanges, TableDataChanges, updateDataSourceItem, addDeleteChangeToState, addNewChangeToState, addNewItemFlag, setExpanded, addDataSourceItem, isNewItem, deleteDataSourceItem, selectDataSourceItem, isExpanded, doSaveData, NotificationService } from '@mon3/sc';
+import {
+  DialogService, addModifyChangeToState, formatTableChanges, hasTableChanges, newTableDataChanges,
+  TableDataChanges, updateDataSourceItem, addDeleteChangeToState, addNewChangeToState,
+  addDataSourceItem, isNewItem, deleteDataSourceItem, selectDataSourceItem, isExpanded, doSaveData,
+  NotificationService, TableFilterInfo, TableFilterType, FilterRootComponent,
+  initFilterPredicate,
+  applyFilters,
+  clearFilterValues
+} from '@mon3/sc';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 
@@ -26,7 +34,8 @@ import { MatSort, MatSortModule } from '@angular/material/sort';
     MatIconModule,
     EventsEditorInplaceComponent,
     MatTooltipModule,
-    MatSortModule
+    MatSortModule,
+    FilterRootComponent
   ],
   templateUrl: './test-table-1.component.html',
   styleUrl: './test-table-1.component.scss',
@@ -52,11 +61,17 @@ export class TestTable1Component implements OnInit, AfterViewInit {
 
   @ViewChild(MatSort) sort!: MatSort;
   showFilter = signal(false);
-  filterValue = signal('');
+  filterConfig: WritableSignal<Map<string, TableFilterInfo>> = signal(new Map<string, TableFilterInfo>([
+    ['placeId', { key: 'placeId', type: TableFilterType.LIST, config: { dataSource: [] } }],
+    ['start', { key: 'start', type: TableFilterType.DATE }],
+    ['end', { key: 'end', type: TableFilterType.DATE }],
+    ['booking_id', { key: 'booking_id', type: TableFilterType.TEXT }],
+  ]));
+
 
   ngAfterViewInit(): void {
-    //this.dataSource.sort = this.sort;
-    setTimeout(() => this.dataSource.sort = this.sort, 0);
+    this.dataSource.sort = this.sort;
+    initFilterPredicate(this.dataSource, () => this.filterConfig());
   }
 
 
@@ -78,7 +93,6 @@ export class TestTable1Component implements OnInit, AfterViewInit {
   }
 
 
-
   private initializeData(): void {
     this.isLoading.set(true);
     this.error.set(null);
@@ -91,6 +105,18 @@ export class TestTable1Component implements OnInit, AfterViewInit {
         const { places, statuses } = result as { places: Place[]; statuses: EventStatus[] };
         this.places.set(places);
         this.statuses.set(statuses);
+
+        this.filterConfig.update(map => {
+          const config = map.get('placeId');
+          if (config) {
+            const dataSource = places.map(p => ({ id: p.id, text: p.name }));
+            const newMap = new Map(map);
+            newMap.set('placeId', { ...config, config: { ...config.config, dataSource } });
+            return newMap;
+          }
+          return map;
+        });
+
         this.loadEvents();
       },
       error: () => {
@@ -136,11 +162,28 @@ export class TestTable1Component implements OnInit, AfterViewInit {
             });
           });
 
-          //this.eventRows.set(rows);
           this.dataSource.data = rows;
-          //this.dataSource.sort = this.sort;
+          applyFilters(this.dataSource);
         }
       });
+  }
+
+
+  onFilterChange(val: TableFilterInfo) {
+    this.filterConfig.update(v => {
+      const newVal: TableFilterInfo = { ...v.get(val.key)!, value: val.value };
+      v.set(val.key, newVal);
+      return v;
+    });
+    applyFilters(this.dataSource);
+  }
+
+  toggleFilter(): void {
+    this.showFilter.update(v => !v);
+    if (!this.showFilter()) {
+      this.filterConfig.update(map => clearFilterValues(map));
+      applyFilters(this.dataSource);
+    }
   }
 
 
@@ -150,20 +193,6 @@ export class TestTable1Component implements OnInit, AfterViewInit {
   }
   isExpanded = (index: number, item: any): boolean => {
     return isExpanded(item);
-  }
-
-  toggleFilter(): void {
-    this.showFilter.update(v => !v);
-    if (!this.showFilter()) {
-      this.dataSource.filter = '';
-      this.filterValue.set('');
-    }
-  }
-
-  applyFilter(event: Event): void {
-    const value = (event.target as HTMLInputElement).value;
-    this.filterValue.set(value);
-    this.dataSource.filter = value.trim().toLowerCase();
   }
 
 
@@ -191,8 +220,7 @@ export class TestTable1Component implements OnInit, AfterViewInit {
   }
 
 
-
-  doSelect(item: EventRow, newState: boolean) {
+  private doSelect(item: EventRow, newState: boolean) {
     const result = selectDataSourceItem(this.dataSource.data, item, this.itemId, newState);
     this.selectedItem.set(undefined);
     if (result.selected) {
@@ -228,7 +256,7 @@ export class TestTable1Component implements OnInit, AfterViewInit {
       this.dataState.update(state => addModifyChangeToState(state, item.id));
     }
   }
-  doDelete(item: EventRow): void {
+  private doDelete(item: EventRow): void {
     const result = deleteDataSourceItem(this.dataSource.data, item, this.itemId);
     if (result.deleted) {
       this.dataSource.data = result.data;
@@ -238,9 +266,7 @@ export class TestTable1Component implements OnInit, AfterViewInit {
     }
   }
 
-
-
-  doSave(): void {
+  private doSave(): void {
     this.isSaving.set(true);
     doSaveData(
       this.dataSource.data, this.itemId, this.dataState(),

@@ -40,6 +40,20 @@
         height: 100%;
     }
 
+    .table-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.9);
+        z-index: 20;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+    }
+
     .status-badge {
         display: inline-block;
         padding: 2px 10px;
@@ -79,7 +93,39 @@
         color: #888;
         gap: 8px;
     }
+}
 
+.filtered-table {
+
+    .filter-header {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+
+        .header-row {
+            display: flex;
+            justify-content: stretch;
+            width: 100%;
+
+            .mat-sort-header-container {
+                justify-content: flex-start;
+                //gap: 1rem;
+            }
+        }
+
+        .filter-row {
+            width: 100%;
+            margin-top: 4px;
+            /* небольшой отступ от заголовка */
+        }
+
+    }
+
+
+
+    .mat-mdc-header-row {
+        vertical-align: top;
+    }
 }
 
 .sticky-header-table {
@@ -216,5 +262,95 @@
         background-color: var(--btn-danger-bg); // красный фон
         color: #fff !important; // белая иконка
         border-radius: 30%; // круглая кнопка
+    }
+}
+
+.filter-field {
+    width: 100%;
+    font-size: 0.5rem;
+    flex-wrap: nowrap;
+
+    .mat-mdc-select,
+    .mat-mdc-input-element {
+        font-size: 0.7rem !important;
+    }
+
+    .mat-mdc-form-field {
+        font-size: 0.7rem !important;
+    }
+
+    .mat-select-value-text {
+        font-size: 0.7rem;
+    }
+
+    .mat-form-field-wrapper {
+        padding-bottom: 0;
+    }
+
+    .mat-mdc-form-field-infix {
+        padding: 0 0 !important;
+        width: unset;
+    }
+
+    .mdc-text-field {
+        padding-left: 0.3rem;
+    }
+}
+
+.filter-field-container {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    width: 100%;
+    font-size: 0.75rem;
+
+    .operator-btn {
+        flex-shrink: 0;
+        width: 24px;
+        height: 24px;
+        line-height: 24px;
+        padding: 0 !important; // убираем стандартные отступы
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        .mat-icon {
+            font-size: 18px;
+            width: 18px;
+            height: 18px;
+            line-height: 18px;
+        }
+    }
+
+    .filter-field {
+        flex: 1;
+        font-size: 0.75rem;
+
+        .mat-mdc-text-field-wrapper {
+            height: 28px !important;
+            padding: 0 8px !important;
+        }
+
+        .mat-mdc-form-field-infix {
+            padding: 4px 0 !important;
+            min-height: auto !important;
+        }
+
+        .mat-mdc-form-field-subscript-wrapper {
+            display: none !important;
+        }
+    }
+}
+
+.filter-list-panel {
+    .mat-mdc-option {
+        font-size: 0.65rem !important;
+        min-height: 32px !important;
+        line-height: 32px !important;
+
+        .mdc-list-item__primary-text {
+            font-size: 0.65rem !important;
+
+        }
     }
 }

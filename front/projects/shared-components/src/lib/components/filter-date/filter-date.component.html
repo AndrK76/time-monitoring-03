@@ -1,0 +1,9 @@
+<div class="filter-field-container">
+    <button mat-icon-button (click)="toggleOperator()" class="operator-btn" matTooltip="До или после (включительно)">
+        <mat-icon>{{ operator() === '>' ? 'chevron_right' : 'chevron_left' }}</mat-icon>
+    </button>
+    <mat-form-field appearance="fill" class="filter-field">
+        <input matInput placeholder="дд.мм.гггг" class="filter-input" (input)="onInput($event)"
+            (keydown)="onKeyDown($event)" [value]="dateValue()" (change)="$event.stopPropagation()">
+    </mat-form-field>
+</div>

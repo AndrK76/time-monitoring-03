@@ -1,0 +1,4 @@
+<mat-form-field appearance="fill" class="filter-field">
+    <input matInput class="filter-input" matTooltip="~0-пусто, ~1-не пусто, ~!-не содержит" (input)="onInput($event)"
+        [value]="textValue()" (change)="$event.stopPropagation()">
+</mat-form-field>

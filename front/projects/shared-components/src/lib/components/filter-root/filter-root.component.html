@@ -1,0 +1,23 @@
+<div class="filter-header">
+    @if (sortable()) {
+    <div class="header-row" mat-sort-header>
+        <span>{{label()}}</span>
+    </div>
+    } @else {
+    <div class="header-row">
+        <span>{{label()}}</span>
+    </div>
+    }
+    @if (showFilter()) {
+    <div class="filter-row">
+        @if (config().type === TableFilterType.LIST) {
+        <sc-filter-list [datasource]="(config().config?.dataSource)??[]" (change)="onChange($event)"
+            [current]="initialVal()"></sc-filter-list>
+        } @else if (config().type === TableFilterType.DATE) {
+        <sc-filter-date (change)="onChange($event)" [current]="initialVal()"></sc-filter-date>
+        } @else if (config().type === TableFilterType.TEXT) {
+        <sc-filter-text (change)="onChange($event)" [current]="initialVal()"></sc-filter-text>
+        }
+    </div>
+    }
+</div>

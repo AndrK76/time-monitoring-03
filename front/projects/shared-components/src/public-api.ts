@@ -22,3 +22,9 @@ export * from './lib/components/register/register.component';
 export * from './lib/components/logout/logout.component';
 export * from './lib/components/view-current-profile/view-current-profile.component';
 
+export * from './lib/models/table-filter-items';
+export * from './lib/components/filter-root/filter-root.component';
+export * from './lib/components/filter-list/filter-list.component';
+export * from './lib/components/filter-date/filter-date.component';
+export * from './lib/components/filter-text/filter-text.component';
+

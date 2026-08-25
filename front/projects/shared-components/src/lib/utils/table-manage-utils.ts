@@ -1,6 +1,8 @@
 import { catchError, concatMap, from, map, Observable, of } from 'rxjs';
 import { SaveDataError, TableDataChanges } from '../models/table-data-items';
 import { hasChanges, applyChanges, addOrigData, setExpanded, addNewItemFlag } from './object-utils';
+import { TableFilterDateValue, TableFilterInfo, TableFilterListValue, TableFilterTextValue, TableFilterType } from '../models/table-filter-items';
+import { MatTableDataSource } from '@angular/material/table';
 
 
 /**
@@ -315,4 +317,116 @@ export function doSaveData<T extends Record<string, any>>(
             }
         });
     });
+}
+
+
+
+/**
+ * Создаёт функцию-предикат для фильтрации данных на основе конфигурации фильтров.
+ * @param getFilterConfig - функция, возвращающая актуальную карту фильтров (сигнал или обычная функция)
+ * @returns предикат для MatTableDataSource.filterPredicate
+ */
+export function createFilterPredicate<T extends Record<string, any>>(
+    getFilterConfig: () => Map<string, TableFilterInfo>
+): (data: T, filter: string) => boolean {
+    return (data: T, filter: string): boolean => {
+        const config = getFilterConfig();
+        for (const [key, info] of config) {
+            if (!info.value) continue;
+            const type = info.type;
+            if (type === TableFilterType.LIST) {
+                const value = info.value as TableFilterListValue;
+                if (value.id !== undefined && value.id !== null) {
+                    if (data[key] !== value.id) return false;
+                }
+            } else if (type === TableFilterType.DATE) {
+                const dateVal = info.value as TableFilterDateValue;
+                if (dateVal.date) {
+                    const parts = dateVal.date.split('.');
+                    if (parts.length === 3) {
+                        const isoDate = `${parts[2]}-${parts[1]}-${parts[0]}`;
+                        const itemDate = new Date(data[key]);
+                        if (!isNaN(itemDate.getTime())) {
+                            const itemDateStr = itemDate.toISOString().slice(0, 10);
+                            if (dateVal.greatest) {
+                                if (itemDateStr < isoDate) return false;
+                            } else {
+                                if (itemDateStr > isoDate) return false;
+                            }
+                        }
+                    }
+                }
+            } else if (type === TableFilterType.TEXT) {
+                const textVal = info.value as TableFilterTextValue;
+                const text = textVal.text || '';
+                const flag = textVal.flag;
+                const fieldValue = (data[key] || '').toString();
+                if (flag === '~0') {
+                    if (fieldValue !== '') return false;
+                } else if (flag === '~1') {
+                    if (fieldValue === '') return false;
+                } else if (flag === '~!') {
+                    if (fieldValue !== '' && fieldValue.includes(text)) return false;
+                } else {
+                    if (text && !fieldValue.includes(text)) return false;
+                }
+            }
+        }
+        return true;
+    };
+}
+
+/**
+ * Инициализирует filterPredicate для dataSource и сразу применяет фильтры.
+ * @param dataSource - источник данных таблицы
+ * @param getFilterConfig - функция для получения актуальной карты фильтров
+ */
+export function initFilterPredicate<T extends Record<string, any>>(
+    dataSource: MatTableDataSource<T>,
+    getFilterConfig: () => Map<string, TableFilterInfo>
+): void {
+    dataSource.filterPredicate = createFilterPredicate(getFilterConfig);
+    // Триггерим применение фильтров
+    dataSource.filter = 'apply';
+}
+
+/**
+ * Обновляет значение фильтра для указанного ключа и возвращает новую карту.
+ * @param config - текущая карта фильтров
+ * @param key - ключ фильтра
+ * @param value - новое значение (сохраняется в info.value)
+ * @returns новая карта с обновлённым фильтром
+ */
+export function updateFilterConfig(
+    config: Map<string, TableFilterInfo>,
+    key: string,
+    value: any
+): Map<string, TableFilterInfo> {
+    const newMap = new Map(config);
+    const existing = newMap.get(key);
+    if (existing) {
+        newMap.set(key, { ...existing, value });
+    }
+    return newMap;
+}
+
+/**
+ * Сбрасывает все значения фильтров (устанавливает undefined).
+ * @param config - текущая карта фильтров
+ * @returns новая карта со сброшенными значениями
+ */
+export function clearFilterValues(config: Map<string, TableFilterInfo>): Map<string, TableFilterInfo> {
+    const newMap = new Map(config);
+    for (const [key, val] of newMap) {
+        newMap.set(key, { ...val, value: undefined });
+    }
+    return newMap;
+}
+
+/**
+ * Применяет текущие фильтры к dataSource (триггер пересчёта).
+ * @param dataSource - источник данных таблицы
+ */
+export function applyFilters<T>(dataSource: MatTableDataSource<T>): void {
+    dataSource.filter = 'apply';
 }

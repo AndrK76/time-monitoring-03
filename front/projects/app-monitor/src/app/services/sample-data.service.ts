@@ -124,6 +124,7 @@ export class SampleDataService {
           throw new Error('PlaceEvents cache not initialized (500)');
         }
         return this.placeEventsCache;
+        //return [];
       })
     );
   }

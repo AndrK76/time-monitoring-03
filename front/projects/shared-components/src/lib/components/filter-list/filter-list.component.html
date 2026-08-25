@@ -1,0 +1,9 @@
+<mat-form-field appearance="fill" class="filter-field">
+    <mat-select placeholder="Все" panelClass="filter-list-panel" [hideSingleSelectionIndicator]="true"
+        (valueChange)="onChange($event)" [value]="current()">
+        <mat-option value="">Все</mat-option>
+        @for (item of datasource(); track $index) {
+        <mat-option [value]="item.id">{{item.text}}</mat-option>
+        }
+    </mat-select>
+</mat-form-field>
