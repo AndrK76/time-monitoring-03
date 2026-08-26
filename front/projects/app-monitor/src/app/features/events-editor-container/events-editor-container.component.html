@@ -1,18 +1,14 @@
-    <div class="editor-container-wrapper">
-      <div class="editor-header">
-        <h3>Редактирование события</h3>
-        <button mat-icon-button (click)="close.emit()" matTooltip="Закрыть">
-          <mat-icon>close</mat-icon>
-        </button>
-      </div>
-      <app-events-editor-inplace
-        [eventData]="eventData()"
-        [places]="places()"
-        [statuses]="statuses()"
-        (change)="change.emit($event)"
-      ></app-events-editor-inplace>
-      <div class="editor-actions">
-        <button mat-raised-button color="primary" (click)="save.emit()">Сохранить</button>
-        <button mat-raised-button (click)="close.emit()">Отмена</button>
-      </div>
-    </div>
+<div class="editor-container-wrapper">
+  <div class="editor-header">
+    <h3>Редактирование события</h3>
+    <button mat-icon-button matTooltip="Закрыть">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+  <app-events-editor-inplace [eventData]="eventData()" [places]="places()"
+    [statuses]="statuses()"></app-events-editor-inplace>
+  <div class="editor-actions">
+    <button mat-raised-button color="primary">Сохранить</button>
+    <button mat-raised-button>Отмена</button>
+  </div>
+</div>

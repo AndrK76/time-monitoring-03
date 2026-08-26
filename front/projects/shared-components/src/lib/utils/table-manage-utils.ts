@@ -1,9 +1,11 @@
 import { catchError, concatMap, from, map, Observable, of } from 'rxjs';
-import { SaveDataError, TableDataChanges } from '../models/table-data-items';
+import { SaveDataError, SaveDataResult, TableDataChanges } from '../models/table-data-items';
 import { hasChanges, applyChanges, addOrigData, setExpanded, addNewItemFlag } from './object-utils';
 import { TableFilterDateValue, TableFilterInfo, TableFilterListValue, TableFilterTextValue, TableFilterType } from '../models/table-filter-items';
 import { MatTableDataSource } from '@angular/material/table';
 
+export type SelectFn<T> = (item: T | undefined, newState: boolean, updateUrl?: boolean, scrollTo?: boolean) => void;
+export type ItemIdFn<T> = (item: T) => any;
 
 /**
  * Обновляет элемент в массиве данных.
@@ -252,7 +254,7 @@ export function doSaveData<T extends Record<string, any>>(
     addFn: (item: T) => Observable<T>,
     updateFn: (item: T) => Observable<T>,
     deleteFn: (item: T) => Observable<void>,
-): Observable<{ data: T[]; changes: TableDataChanges; success: boolean; errors: SaveDataError[] }> {
+): Observable<SaveDataResult<T>> {
     return new Observable(subscriber => {
         let currentData = [...data];
         let currentChanges = {

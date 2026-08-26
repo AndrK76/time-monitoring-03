@@ -56,8 +56,8 @@
             }
 
             <!-- Таблица -->
-            <div
-                class="table-wrapper sticky-header-table sticky-firstcol-table nowrap-table inrow-editor-table filtered-table click-edit-table">
+            <div class="table-wrapper sticky-header-table sticky-firstcol-table nowrap-table inrow-editor-table filtered-table click-edit-table"
+                #tableWrapper>
                 <table mat-table [dataSource]="dataSource" [trackBy]="trackById" class="mat-elevation-z0"
                     multiTemplateDataRows matSort>
 
@@ -134,7 +134,8 @@
 
                     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
                     <tr mat-row *matRowDef="let row; columns: displayedColumns;"
-                        [style.display]="row._expanded ? 'none' : ''" (click)="callSelect(row)" class="simple-row"></tr>
+                        [style.display]="row._expanded ? 'none' : ''" (click)="callSelect(row)" class="simple-row"
+                        [attr.data-id]="row.id"></tr>
                     <tr mat-row *matRowDef="let row; columns: ['editor']; when: isExpanded;" class="editor-row"></tr>
 
                     <tr class="mat-row" *matNoDataRow>

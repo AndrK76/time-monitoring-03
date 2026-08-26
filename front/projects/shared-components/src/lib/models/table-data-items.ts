@@ -11,3 +11,10 @@ export interface SaveDataError {
     id: string | number,
     message: string
 }
+
+export interface SaveDataResult<T> {
+    data: T[];
+    changes: TableDataChanges;
+    success: boolean;
+    errors: SaveDataError[];
+}

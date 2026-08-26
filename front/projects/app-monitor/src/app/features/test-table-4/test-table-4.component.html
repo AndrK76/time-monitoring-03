@@ -57,7 +57,7 @@
 
             <!-- Таблица -->
             @if (!selectedItem()) {
-            <div class="table-wrapper sticky-header-table sticky-firstcol-table nowrap-table inrow-editor-table filtered-table click-edit-table"
+            <div class="table-wrapper sticky-header-table sticky-firstcol-table nowrap-table filtered-table click-edit-table"
                 #tableWrapper>
                 <table mat-table [dataSource]="dataSource" [trackBy]="trackById" class="mat-elevation-z0"
                     multiTemplateDataRows matSort>

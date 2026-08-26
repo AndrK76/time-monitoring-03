@@ -25,7 +25,4 @@ export class EventsEditorContainerComponent {
   eventData = input.required<EventRow>();
   places = input.required<Place[]>();
   statuses = input.required<EventStatus[]>();
-  change = output<EventRow>();
-  save = output<void>();
-  close = output<void>();
 }

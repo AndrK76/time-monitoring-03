@@ -1,52 +1,82 @@
-import { Injectable, signal, WritableSignal, computed, ElementRef } from '@angular/core';
+import { Injectable, signal, WritableSignal, computed, ElementRef, inject, Signal } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 
-import { Observable } from 'rxjs';
-import { TableDataChanges } from '../models/table-data-items';
-import { addDataSourceItem, addDeleteChangeToState, addModifyChangeToState, addNewChangeToState, applyFilters, 
-  clearFilterValues, deleteDataSourceItem, doSaveData, formatTableChanges, hasTableChanges, 
-  initFilterPredicate, newTableDataChanges, selectDataSourceItem, 
-  updateDataSourceItem, updateFilterConfig } from '../utils/table-manage-utils';
+import { catchError, Observable, of } from 'rxjs';
+import { SaveDataResult, TableDataChanges } from '../models/table-data-items';
+import {
+  addDataSourceItem, addDeleteChangeToState, addModifyChangeToState, addNewChangeToState, applyFilters,
+  clearFilterValues, deleteDataSourceItem, doSaveData, formatTableChanges, hasTableChanges,
+  initFilterPredicate, ItemIdFn, newTableDataChanges, selectDataSourceItem,
+  SelectFn,
+  updateDataSourceItem, updateFilterConfig
+} from '../utils/table-manage-utils';
 import { TableFilterInfo } from '../models/table-filter-items';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Injectable() // Без providedIn, регистрируем в компоненте
 export class TableManageService<T extends Record<string, any>> {
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+
   // === Публичные сигналы ===
   readonly dataSource = new MatTableDataSource<T>([]);
   readonly dataState = signal<TableDataChanges>(newTableDataChanges());
   readonly selectedItem = signal<T | undefined>(undefined);
   readonly filterConfig = signal<Map<string, TableFilterInfo>>(new Map());
   readonly showFilter = signal(false);
+  readonly error = signal<string | null>(null);
 
   // === Вычисляемые сигналы ===
   readonly hasChanges = computed(() => hasTableChanges(this.dataState()));
   readonly changesSummary = computed(() => formatTableChanges(this.dataState()));
 
+
+
+  // === Функция выбора строки ===
+  private doSelectFn!: SelectFn<T>;
+  setSelectFn(fn: SelectFn<T>): void {
+    this.doSelectFn = fn;
+  }
+
   // === Ссылка на DOM-контейнер таблицы (для прокрутки) ===
   private tableWrapperRef: ElementRef<HTMLDivElement> | null = null;
+  setTableWrapper = (wrapper: ElementRef<HTMLDivElement>) => this.tableWrapperRef = wrapper;
+
+  private itemIdFn!: ItemIdFn<T>;
+  setItemIdFn = (fn: ItemIdFn<T>) => this.itemIdFn = fn;
+
+
+  // === Установка данных ===
+  setData(data: T[]): void {
+    this.dataSource.data = data;
+    applyFilters(this.dataSource);
+  }
 
   // === Инициализация фильтрации ===
   initFilterPredicate(): void {
     initFilterPredicate(this.dataSource, () => this.filterConfig());
   }
 
-  // === Установка обёртки для прокрутки ===
-  setTableWrapper(wrapper: ElementRef<HTMLDivElement>): void {
-    this.tableWrapperRef = wrapper;
-  }
-
   // === Прокрутка к элементу по ID ===
-  scrollToItem(idGetter: (item: T) => string | number, id: string | number): void {
-    if (!this.tableWrapperRef) return;
-    const rowElement = this.tableWrapperRef.nativeElement.querySelector(`tr[data-id="${id}"]`);
-    if (rowElement) {
-      requestAnimationFrame(() => {
+  scrollToItemId(itemId?: any): void {
+    if (!itemId) return;
+    requestAnimationFrame(() => {
+      const rowElement = this.tableWrapperRef!.nativeElement.querySelector(`tr[data-id="${itemId}"]`);
+      if (rowElement) {
         rowElement.scrollIntoView({ block: 'center', behavior: 'smooth' });
-      });
-    }
+      }
+    });
   }
 
   // === Управление фильтрами ===
+  onFilterChange(val: TableFilterInfo) {
+    this.filterConfig.update(v => {
+      const newVal: TableFilterInfo = { ...v.get(val.key)!, value: val.value };
+      v.set(val.key, newVal);
+      return v;
+    });
+    applyFilters(this.dataSource);
+  }
   toggleFilter(reset?: boolean): void {
     if (reset) this.showFilter.set(false);
     else this.showFilter.update(v => !v);
@@ -56,120 +86,112 @@ export class TableManageService<T extends Record<string, any>> {
     }
   }
 
-  updateFilter(key: string, value: any): void {
-    this.filterConfig.update(map => updateFilterConfig(map, key, value));
-    applyFilters(this.dataSource);
+  //Работа с Url
+  handleUrlParams(): void {
+    const idParam = this.route.snapshot.queryParamMap.get('id');
+    if (idParam) {
+      const item = this.dataSource.data.find(row => this.itemIdFn(row) === idParam);
+      this.doSelectFn(item, true, item ? false : true, true);
+    } else {
+      this.doSelectFn(undefined, false, false);
+    }
   }
-
-  clearFilters(): void {
-    this.filterConfig.update(map => clearFilterValues(map));
-    applyFilters(this.dataSource);
+  private updateUrlParams(id?: any): void {
+    const _id: string | null = id ? `${id}` : null;
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { id: _id },
+      queryParamsHandling: 'merge',
+      replaceUrl: true
+    });
   }
 
   // === Выбор элемента ===
-  selectItem(
-    item: T | undefined,
-    expanded: boolean,
-    collapseOthers: boolean = true,
-    idGetter: (item: T) => string | number,
-    ignoreKeys?: string[]
-  ): { selected: boolean; id?: string | number } {
-    const result = selectDataSourceItem(
-      this.dataSource.data,
-      item,
-      idGetter,
-      expanded,
-      collapseOthers,
-      ignoreKeys
-    );
+  doSelectBase(item: T | undefined, newState: boolean, renderFn: () => void, updateUrl: boolean = true, scrollTo: boolean = false) {
+    const result = selectDataSourceItem(this.dataSource.data, item, this.itemIdFn, newState, true);
     this.selectedItem.set(undefined);
-    let id: string | number | undefined;
+    let _id: string | undefined = undefined;
     if (result.selected) {
       this.dataSource.data = result.data;
       this.selectedItem.set(item);
-      if (item && expanded) id = idGetter(item);
+      if (item && newState) _id = this.itemIdFn(item);
     }
-    return { selected: result.selected, id };
+    if (updateUrl) this.updateUrlParams(_id);
+    renderFn();
+    if (scrollTo && _id) this.scrollToItemId(_id);
   }
 
-  // === Добавление ===
-  addItem(
-    newItem: T,
-    idGetter: (item: T) => string | number,
-    ignoreKeys?: string[]
-  ): { added: boolean; id?: string | number } {
-    const result = addDataSourceItem(this.dataSource.data, newItem, ignoreKeys);
-    if (result.added) {
-      this.dataSource.data = result.data;
-      this.dataState.update(state => addNewChangeToState(state, idGetter(newItem) as string));
-      this.selectedItem.set(newItem);
-      return { added: true, id: idGetter(newItem) };
-    }
-    return { added: false };
-  }
-
-  // === Обновление ===
-  updateItem(
-    updatedItem: T,
-    idGetter: (item: T) => string | number,
-    ignoreKeys?: string[],
-    applyChangesToOrig?: boolean
-  ): { updated: boolean } {
-    const result = updateDataSourceItem(
-      this.dataSource.data,
-      updatedItem,
-      idGetter,
-      ignoreKeys,
-      applyChangesToOrig
-    );
-    if (result.updated) {
-      this.dataSource.data = result.data;
-      this.dataState.update(state => addModifyChangeToState(state, idGetter(updatedItem) as string));
-    }
-    return { updated: result.updated };
-  }
-
-  // === Удаление ===
-  deleteItem(
-    item: T,
-    idGetter: (item: T) => string | number
-  ): { deleted: boolean } {
-    const result = deleteDataSourceItem(this.dataSource.data, item, idGetter);
-    if (result.deleted) {
-      this.dataSource.data = result.data;
-      this.dataState.update(state => addDeleteChangeToState(state, item, idGetter));
-      this.selectedItem.set(undefined);
-    }
-    return { deleted: result.deleted };
-  }
-
-  // === Сохранение изменений ===
-  saveChanges(
-    idGetter: (item: T) => string | number,
-    addFn: (item: T) => Observable<T>,
-    updateFn: (item: T) => Observable<T>,
-    deleteFn: (item: T) => Observable<void>
-  ): Observable<{ data: T[]; changes: TableDataChanges; success: boolean; errors: any[] }> {
-    return doSaveData(
-      this.dataSource.data,
-      idGetter,
-      this.dataState(),
-      addFn,
-      updateFn,
-      deleteFn
-    );
-  }
-
-  // === Сброс состояния (после сохранения или обновления) ===
-  resetState(data: T[]): void {
-    this.dataSource.data = data;
+  //Выпонение обновления данных
+  doRefreshBase(loadEventsFn: () => void): void {
+    this.updateUrlParams();
+    loadEventsFn();
     this.dataState.set(newTableDataChanges());
     this.selectedItem.set(undefined);
   }
 
-  // === Замена данных (при загрузке) ===
-  setData(data: T[]): void {
-    this.dataSource.data = data;
-    applyFilters(this.dataSource);
+  // === Добавление ===
+  doAddBase(newItem: T, renderFn: () => void): void {
+    this.selectedItem.set(undefined);
+    const result = addDataSourceItem(this.dataSource.data, newItem);
+    if (result.added) {
+      this.dataSource.data = result.data;
+      renderFn();
+      this.dataState.update(state => addNewChangeToState(state, this.itemIdFn(newItem)));
+      this.selectedItem.set(newItem);
+    }
   }
+
+  // === Обновление ===
+  doUpdateBase(item: T, renderFn: () => void): void {
+    const result = updateDataSourceItem(
+      this.dataSource.data, item, this.itemIdFn, undefined, true);
+    if (result.updated) {
+      this.dataSource.data = result.data;
+      renderFn();
+      this.dataState.update(state => addModifyChangeToState(state, this.itemIdFn(item)));
+    }
+  }
+
+  // === Удаление ===
+  doDeleteBase(item: T, renderFn: () => void): void {
+    const result = deleteDataSourceItem(this.dataSource.data, item, this.itemIdFn);
+    if (result.deleted) {
+      this.dataSource.data = result.data;
+      renderFn();
+      this.dataState.update(state => addDeleteChangeToState(state, item, this.itemIdFn));
+      this.selectedItem.set(undefined);
+      this.updateUrlParams();
+    }
+  }
+
+  // === Сохранение изменений ===
+  doSaveBase(isSaving: WritableSignal<boolean>,
+    addFn: (item: T) => Observable<T>, updateFn: (item: T) => Observable<T>, deleteFn: (item: T) => Observable<void>,
+    applyFn: (result: SaveDataResult<T>) => void
+  ): void {
+    isSaving.set(true);
+    doSaveData(
+      this.dataSource.data, this.itemIdFn, this.dataState(), addFn, updateFn, deleteFn).subscribe({
+        next: result => {
+          isSaving.set(false);
+          this.dataSource.data = result.data;
+          this.dataState.set(result.changes);
+          applyFn(result);
+        },
+        error: err => {
+          isSaving.set(false);
+          console.error('Неожиданная ошибка:', err);
+          this.error.set('Не удалось сохранить изменения');
+        }
+      })
+  }
+
+  handleError(message: string) {
+    return catchError((err: any) => {
+      console.error(err);
+      this.error.set(message);
+      return of([]);
+    });
+  }
+
 }
