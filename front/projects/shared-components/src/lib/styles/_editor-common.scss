@@ -26,13 +26,13 @@
 
     .full-width {
         flex: 1 1 0;
-        min-width: 0; // разрешаем сжатие
+        min-width: 0;
         max-width: 100%;
         width: 100%;
         box-sizing: border-box;
     }
 
-    @media (max-width: 500px) {
+    @media (max-width: 599.98px) {
         .form-row {
             flex-wrap: wrap;
             gap: 6px;
@@ -40,6 +40,10 @@
 
         .full-width {
             flex: 1 1 100%;
+        }
+
+        .editor-form {
+            max-width: calc(100vw - 3rem);
         }
     }
 
@@ -54,5 +58,56 @@
     .mat-mdc-form-field-infix {
         padding-top: 6px !important;
         padding-bottom: 4px !important;
+    }
+}
+
+.editor-container-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    padding: 16px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    box-sizing: border-box;
+
+    .editor-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+        flex-shrink: 0;
+    }
+
+    .editor-actions-top {
+        display: flex;
+        gap: 8px;
+    }
+
+    .editor-scroll-wrapper {
+        flex: 1;
+        min-height: 0;
+        overflow: auto; // именно здесь появляется прокрутка
+        padding: 0 4px 0 0; // опционально для красоты
+    }
+
+    @media (max-width: 599.98px) {
+        padding: 0 !important;
+        border-radius: 0;
+        box-shadow: none;
+
+        .editor-header {
+            margin-bottom: 4px;
+            padding: 2px 2px 0 2px;
+        }
+
+        .editor-actions-top {
+            gap: 4px;
+        }
+
+        .editor-scroll-wrapper {
+            padding: 0 4px;
+        }
     }
 }

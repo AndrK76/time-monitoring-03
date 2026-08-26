@@ -1,14 +1,23 @@
 <div class="editor-container-wrapper">
   <div class="editor-header">
-    <h3>Редактирование события</h3>
-    <button mat-icon-button matTooltip="Закрыть">
-      <mat-icon>close</mat-icon>
+    <!-- Кнопка "Назад" слева -->
+    <button mat-icon-button (click)="back.emit()" matTooltip="Назад">
+      <mat-icon>arrow_back</mat-icon>
     </button>
+
+    <!-- Группа кнопок справа -->
+    <div class="editor-actions-top">
+      <button mat-raised-button color="primary" (click)="apply.emit()">Применить</button>
+      <button mat-raised-button (click)="cancel.emit()">Отмена</button>
+    </div>
   </div>
-  <app-events-editor-inplace [eventData]="eventData()" [places]="places()"
-    [statuses]="statuses()"></app-events-editor-inplace>
-  <div class="editor-actions">
-    <button mat-raised-button color="primary">Сохранить</button>
-    <button mat-raised-button>Отмена</button>
+
+  <!-- Обёртка для прокрутки -->
+  <div class="editor-scroll-wrapper">
+    <app-events-editor-inplace
+      [eventData]="eventData()"
+      [places]="places()"
+      [statuses]="statuses()"
+    ></app-events-editor-inplace>
   </div>
 </div>

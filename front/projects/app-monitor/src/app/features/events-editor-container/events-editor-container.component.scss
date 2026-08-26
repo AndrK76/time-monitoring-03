@@ -1,31 +1,6 @@
- .editor-container-wrapper {
-     padding: 16px;
-     background: white;
-     border-radius: 8px;
-     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-     height: 100%;
-     display: flex;
-     flex-direction: column;
- }
-
- .editor-header {
-     display: flex;
-     justify-content: space-between;
-     align-items: center;
-     margin-bottom: 16px;
- }
-
- .editor-header h3 {
-     margin: 0;
- }
-
- .editor-actions {
-     display: flex;
-     gap: 8px;
-     justify-content: flex-end;
-     margin-top: 16px;
- }
-
- app-events-editor-inplace {
-     flex: 1;
- }
+:host {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    box-sizing: border-box;
+}

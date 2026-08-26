@@ -1,4 +1,4 @@
-import { Component, input, output, inject, DestroyRef, OnInit } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -25,4 +25,8 @@ export class EventsEditorContainerComponent {
   eventData = input.required<EventRow>();
   places = input.required<Place[]>();
   statuses = input.required<EventStatus[]>();
+
+  back = output<void>();
+  apply = output<void>();
+  cancel = output<void>();
 }
