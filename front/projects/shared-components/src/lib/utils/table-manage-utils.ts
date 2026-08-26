@@ -17,12 +17,15 @@ import { MatTableDataSource } from '@angular/material/table';
  */
 export function selectDataSourceItem<T extends Record<string, any>>(
     dataSource: T[],
-    selectedItem: T,
+    selectedItem: T | undefined,
     idGetter: (item: T) => string | number,
     expanded: boolean,
     collapseOthers?: boolean,
     ignoreKeys?: string[]
 ): { data: T[]; selected: boolean; expanded: boolean } {
+    if (!selectedItem) {
+        return { data: dataSource, selected: false, expanded: false };
+    }
     const index = dataSource.findIndex(e => idGetter(e) === idGetter(selectedItem));
     if (index === -1) {
         return { data: dataSource, selected: false, expanded: false };

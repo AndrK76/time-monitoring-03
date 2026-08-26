@@ -21,6 +21,7 @@ import {
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { EventsEditorContainerComponent } from '../events-editor-container/events-editor-container.component';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-test-table-1',
@@ -44,6 +45,8 @@ export class TestTable4Component implements OnInit, AfterViewInit {
   private dataService = inject(SampleDataService);
   private dialogService = inject(DialogService);
   private notificationService = inject(NotificationService);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
 
   places = signal<Place[]>([]);
   statuses = signal<EventStatus[]>([]);
@@ -73,9 +76,8 @@ export class TestTable4Component implements OnInit, AfterViewInit {
     this.dataSource.sort = this.sort;
     initFilterPredicate(this.dataSource, () => this.filterConfig());
   }
-
-
   selectedItem: WritableSignal<EventRow | undefined> = signal(undefined);
+
   hasChanges = computed(() => hasTableChanges(this.dataState()));
   changesSummary = computed(() => formatTableChanges(this.dataState()));
 
@@ -166,6 +168,7 @@ export class TestTable4Component implements OnInit, AfterViewInit {
 
           this.dataSource.data = rows;
           applyFilters(this.dataSource);
+          this.handleUrlParams();
         }
       });
   }
@@ -179,7 +182,6 @@ export class TestTable4Component implements OnInit, AfterViewInit {
     });
     applyFilters(this.dataSource);
   }
-
   toggleFilter(reset?: boolean): void {
     if (reset) this.showFilter.set(false);
     else this.showFilter.update(v => !v);
@@ -222,14 +224,36 @@ export class TestTable4Component implements OnInit, AfterViewInit {
   }
 
 
-  private doSelect(item: EventRow, newState: boolean) {
+  private handleUrlParams(): void {
+    const idParam = this.route.snapshot.queryParamMap.get('id');
+    if (idParam) {
+      const item = this.dataSource.data.find(row => this.itemId(row) === idParam);
+      this.doSelect(item, true, false);
+    } else {
+      this.doSelect(undefined, false, false);
+    }
+  }
+  private updateUrlParams(id?: string): void {
+    const _id: string | null = id ?? null;
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { id: _id },
+      queryParamsHandling: 'merge',
+      replaceUrl: true
+    });
+  }
+
+  private doSelect(item: EventRow | undefined, newState: boolean, updateUrl: boolean = true) {
     const result = selectDataSourceItem(this.dataSource.data, item, this.itemId, newState, true);
     this.selectedItem.set(undefined);
+    let _id: string | undefined = undefined;
     if (result.selected) {
       this.dataSource.data = result.data;
-      this.table.renderRows();
       this.selectedItem.set(item);
+      _id = item?.id;
     }
+    if (updateUrl) this.updateUrlParams(_id);
+    this.table.renderRows();
   }
   private doRefresh(): void {
     this.loadEvents();

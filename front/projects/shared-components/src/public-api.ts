@@ -28,3 +28,5 @@ export * from './lib/components/filter-list/filter-list.component';
 export * from './lib/components/filter-date/filter-date.component';
 export * from './lib/components/filter-text/filter-text.component';
 
+export * from './lib/services/table-manage.service';
+

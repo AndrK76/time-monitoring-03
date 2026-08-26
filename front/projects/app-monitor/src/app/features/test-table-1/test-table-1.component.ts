@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, computed, inject, OnInit, signal, ViewChild, ViewEncapsulation, WritableSignal } from '@angular/core';
+import { AfterViewInit, Component, computed, ElementRef, inject, OnInit, signal, ViewChild, ViewEncapsulation, WritableSignal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SampleDataService } from '../../services/sample-data.service';
 import { Place, EventStatus, PlaceEvents, EventData } from '../../models/sample-data-model';
@@ -17,10 +17,12 @@ import {
   NotificationService, TableFilterInfo, TableFilterType, FilterRootComponent,
   initFilterPredicate,
   applyFilters,
-  clearFilterValues
+  clearFilterValues,
+  TableManageService
 } from '@mon3/sc';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSort, MatSortModule } from '@angular/material/sort';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-test-table-1',
@@ -37,6 +39,7 @@ import { MatSort, MatSortModule } from '@angular/material/sort';
     MatSortModule,
     FilterRootComponent
   ],
+  providers: [TableManageService],
   templateUrl: './test-table-1.component.html',
   styleUrl: './test-table-1.component.scss',
 })
@@ -44,6 +47,11 @@ export class TestTable1Component implements OnInit, AfterViewInit {
   private dataService = inject(SampleDataService);
   private dialogService = inject(DialogService);
   private notificationService = inject(NotificationService);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+
+  private tableManager = inject(TableManageService<EventRow>);
+
 
   places = signal<Place[]>([]);
   statuses = signal<EventStatus[]>([]);
@@ -67,6 +75,8 @@ export class TestTable1Component implements OnInit, AfterViewInit {
     ['end', { key: 'end', type: TableFilterType.DATE }],
     ['booking_id', { key: 'booking_id', type: TableFilterType.TEXT }],
   ]));
+
+  @ViewChild('tableWrapper') tableWrapper!: ElementRef<HTMLDivElement>;
 
 
   ngAfterViewInit(): void {
@@ -165,6 +175,7 @@ export class TestTable1Component implements OnInit, AfterViewInit {
 
           this.dataSource.data = rows;
           applyFilters(this.dataSource);
+          this.handleUrlParams();
         }
       });
   }
@@ -222,16 +233,49 @@ export class TestTable1Component implements OnInit, AfterViewInit {
   }
 
 
-  private doSelect(item: EventRow, newState: boolean) {
-    const result = selectDataSourceItem(this.dataSource.data, item, this.itemId, newState);
-    this.selectedItem.set(undefined);
-    if (result.selected) {
-      this.dataSource.data = result.data;
-      this.table.renderRows();
-      this.selectedItem.set(item);
+  private handleUrlParams(): void {
+    const idParam = this.route.snapshot.queryParamMap.get('id');
+    if (idParam) {
+      const item = this.dataSource.data.find(row => this.itemId(row) === idParam);
+      this.doSelect(item, true, item ? false : true, true);
+    } else {
+      this.doSelect(undefined, false, false);
     }
   }
+  private updateUrlParams(id?: string): void {
+    const _id: string | null = id ?? null;
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { id: _id },
+      queryParamsHandling: 'merge',
+      replaceUrl: true
+    });
+  }
+  scrollTItemId(itemId?: any): void {
+    if (!itemId) return;
+    requestAnimationFrame(() => {
+      const rowElement = this.tableWrapper.nativeElement.querySelector(`tr[data-id="${itemId}"]`);
+      if (rowElement) {
+        rowElement.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      }
+    });
+  }
+
+  private doSelect(item: EventRow | undefined, newState: boolean, updateUrl: boolean = true, scrollTo: boolean = false) {
+    const result = selectDataSourceItem(this.dataSource.data, item, this.itemId, newState, true);
+    this.selectedItem.set(undefined);
+    let _id: string | undefined = undefined;
+    if (result.selected) {
+      this.dataSource.data = result.data;
+      this.selectedItem.set(item);
+      if (item && newState) _id = item?.id;
+    }
+    if (updateUrl) this.updateUrlParams(_id);
+    this.table.renderRows();
+    if (scrollTo && _id) this.scrollTItemId(_id);
+  }
   private doRefresh(): void {
+    this.updateUrlParams();
     this.loadEvents();
     this.dataState.set(newTableDataChanges());
     this.selectedItem.set(undefined);
@@ -245,8 +289,6 @@ export class TestTable1Component implements OnInit, AfterViewInit {
       this.table.renderRows();
       this.dataState.update(state => addNewChangeToState(state, newEvent.id));
       this.selectedItem.set(newEvent);
-      // Прокручиваем таблицу к началу, чтобы новая строка была видна
-      // (опционально)
     }
   }
   doUpdate(item: EventRow): void {
@@ -265,6 +307,7 @@ export class TestTable1Component implements OnInit, AfterViewInit {
       this.table.renderRows();
       this.dataState.update(state => addDeleteChangeToState(state, item, this.itemId));
       this.selectedItem.set(undefined);
+      this.updateUrlParams();
     }
   }
 
@@ -278,7 +321,6 @@ export class TestTable1Component implements OnInit, AfterViewInit {
         next: result => {
           this.isSaving.set(false);
           this.dataSource.data = result.data;
-          //this.table.renderRows();
           this.dataState.set(result.changes);
           if (result.success) {
             this.notificationService.success('Все изменения сохранены успешно');

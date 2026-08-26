@@ -52,8 +52,8 @@
             }
 
             <!-- Таблица -->
-            <div
-                class="table-wrapper sticky-header-table sticky-firstcol-table nowrap-table inrow-editor-table filtered-table">
+            <div class="table-wrapper sticky-header-table sticky-firstcol-table nowrap-table inrow-editor-table filtered-table"
+                #tableWrapper>
                 <table mat-table [dataSource]="dataSource" [trackBy]="trackById" class="mat-elevation-z0"
                     multiTemplateDataRows matSort>
 
@@ -136,7 +136,8 @@
                     </ng-container>
 
                     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-                    <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="simple-row"></tr>
+                    <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="simple-row"
+                        [attr.data-id]="row.id"></tr>
                     <tr mat-row *matRowDef="let row; columns: ['editor']; when: isExpanded;" class="editor-row"></tr>
 
                     <tr class="mat-row" *matNoDataRow>
