@@ -8,7 +8,6 @@ import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
-import { EventsEditorInplaceComponent } from '../events-editor-inplace/events-editor-inplace.component';
 import { createEmptyEventRow, EventRow } from '../event-row';
 import {
   DialogService, addModifyChangeToState, formatTableChanges, hasTableChanges, newTableDataChanges,
@@ -21,6 +20,7 @@ import {
 } from '@mon3/sc';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSort, MatSortModule } from '@angular/material/sort';
+import { EventsEditorContainerComponent } from '../events-editor-container/events-editor-container.component';
 
 @Component({
   selector: 'app-test-table-1',
@@ -32,15 +32,15 @@ import { MatSort, MatSortModule } from '@angular/material/sort';
     MatButtonModule,
     MatProgressSpinnerModule,
     MatIconModule,
-    EventsEditorInplaceComponent,
     MatTooltipModule,
     MatSortModule,
-    FilterRootComponent
+    FilterRootComponent,
+    EventsEditorContainerComponent
   ],
-  templateUrl: './test-table-2.component.html',
-  styleUrl: './test-table-2.component.scss',
+  templateUrl: './test-table-4.component.html',
+  styleUrl: './test-table-4.component.scss',
 })
-export class TestTable2Component implements OnInit, AfterViewInit {
+export class TestTable4Component implements OnInit, AfterViewInit {
   private dataService = inject(SampleDataService);
   private dialogService = inject(DialogService);
   private notificationService = inject(NotificationService);

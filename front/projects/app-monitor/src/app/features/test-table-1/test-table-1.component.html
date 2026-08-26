@@ -2,7 +2,7 @@
     <mat-card>
         <mat-card-header>
             <mat-card-title>Список событий</mat-card-title>
-            <mat-card-subtitle>
+            <mat-card-subtitle class="hide-on-small">
                 Все события по всем местам ({{ dataSource.data.length }} записей)
                 @if (hasChanges()) {
                 <span class="changes-summary">
@@ -16,13 +16,14 @@
 
         <mat-card-actions align="end">
             <div class="action-button-group">
-                <button mat-raised-button color="accent" (click)="callRefresh()" [disabled]="isLoading() || isSaving()">
-                    <mat-icon>refresh</mat-icon>
-                    <span class="hide-on-small">{{ isLoading() ? 'Загрузка...' : 'Перечитать' }}</span>
-                </button>
                 <button mat-raised-button class="table-action-btn btn-success" (click)="callAdd()"
                     [disabled]="isLoading() || isSaving()">
                     <mat-icon>add</mat-icon><span class="hide-on-small">Добавить</span>
+                </button>
+                <button mat-raised-button class="table-action-btn btn-light" (click)="callRefresh()"
+                    [disabled]="isLoading() || isSaving()">
+                    <mat-icon>refresh</mat-icon>
+                    <span class="hide-on-small">{{ isLoading() ? 'Загрузка...' : 'Перечитать' }}</span>
                 </button>
                 <button mat-raised-button color="primary" (click)="callSave()"
                     [disabled]="!hasChanges() || isLoading() || isSaving()">
@@ -135,9 +136,8 @@
                     </ng-container>
 
                     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-                    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-                    <!--<tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="callSelect(row)"></tr>-->
-                    <tr mat-row *matRowDef="let row; columns: ['editor']; when: isExpanded;"></tr>
+                    <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="simple-row"></tr>
+                    <tr mat-row *matRowDef="let row; columns: ['editor']; when: isExpanded;" class="editor-row"></tr>
 
                     <tr class="mat-row" *matNoDataRow>
                         <td class="mat-cell" [attr.colspan]="displayedColumns.length">

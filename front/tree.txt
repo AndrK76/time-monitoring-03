@@ -108,6 +108,10 @@
 |   |   |   |   |       |-- user-profile-dialog.component.scss
 |   |   |   |   |       `-- user-profile-dialog.component.ts
 |   |   |   |   |-- features
+|   |   |   |   |   |-- events-editor-container
+|   |   |   |   |   |   |-- events-editor-container.component.html
+|   |   |   |   |   |   |-- events-editor-container.component.scss
+|   |   |   |   |   |   `-- events-editor-container.component.ts
 |   |   |   |   |   |-- events-editor-inplace
 |   |   |   |   |   |   |-- events-editor-inplace.component.html
 |   |   |   |   |   |   |-- events-editor-inplace.component.scss
@@ -124,10 +128,22 @@
 |   |   |   |   |   |   |-- index.component.html
 |   |   |   |   |   |   |-- index.component.scss
 |   |   |   |   |   |   `-- index.component.ts
-|   |   |   |   |   |-- test-table
+|   |   |   |   |   |-- test-table-1
 |   |   |   |   |   |   |-- test-table-1.component.html
 |   |   |   |   |   |   |-- test-table-1.component.scss
 |   |   |   |   |   |   `-- test-table-1.component.ts
+|   |   |   |   |   |-- test-table-2
+|   |   |   |   |   |   |-- test-table-2.component.html
+|   |   |   |   |   |   |-- test-table-2.component.scss
+|   |   |   |   |   |   `-- test-table-2.component.ts
+|   |   |   |   |   |-- test-table-3
+|   |   |   |   |   |   |-- test-table-3.component.html
+|   |   |   |   |   |   |-- test-table-3.component.scss
+|   |   |   |   |   |   `-- test-table-3.component.ts
+|   |   |   |   |   |-- test-table-4
+|   |   |   |   |   |   |-- test-table-4.component.html
+|   |   |   |   |   |   |-- test-table-4.component.scss
+|   |   |   |   |   |   `-- test-table-4.component.ts
 |   |   |   |   |   `-- event-row.ts
 |   |   |   |   |-- models
 |   |   |   |   |   `-- sample-data-model.ts
@@ -200,6 +216,26 @@
 |   |   |-- src
 |   |   |   |-- lib
 |   |   |   |   |-- components
+|   |   |   |   |   |-- confirm-dialog
+|   |   |   |   |   |   |-- confirm-dialog.component.html
+|   |   |   |   |   |   |-- confirm-dialog.component.scss
+|   |   |   |   |   |   `-- confirm-dialog.component.ts
+|   |   |   |   |   |-- filter-date
+|   |   |   |   |   |   |-- filter-date.component.html
+|   |   |   |   |   |   |-- filter-date.component.scss
+|   |   |   |   |   |   `-- filter-date.component.ts
+|   |   |   |   |   |-- filter-list
+|   |   |   |   |   |   |-- filter-list.component.html
+|   |   |   |   |   |   |-- filter-list.component.scss
+|   |   |   |   |   |   `-- filter-list.component.ts
+|   |   |   |   |   |-- filter-root
+|   |   |   |   |   |   |-- filter-root.component.html
+|   |   |   |   |   |   |-- filter-root.component.scss
+|   |   |   |   |   |   `-- filter-root.component.ts
+|   |   |   |   |   |-- filter-text
+|   |   |   |   |   |   |-- filter-text.component.html
+|   |   |   |   |   |   |-- filter-text.component.scss
+|   |   |   |   |   |   `-- filter-text.component.ts
 |   |   |   |   |   |-- login
 |   |   |   |   |   |   |-- login.component.html
 |   |   |   |   |   |   |-- login.component.scss
@@ -222,16 +258,21 @@
 |   |   |   |   |       `-- view-current-profile.component.ts
 |   |   |   |   |-- models
 |   |   |   |   |   |-- menu-item.ts
-|   |   |   |   |   `-- table-data-changes.ts
+|   |   |   |   |   |-- table-data-items.ts
+|   |   |   |   |   `-- table-filter-items.ts
+|   |   |   |   |-- services
+|   |   |   |   |   |-- dialog.service.ts
+|   |   |   |   |   `-- notification.service.ts
 |   |   |   |   |-- styles
 |   |   |   |   |   |-- _auth-common.scss
 |   |   |   |   |   |-- _editor-common.scss
+|   |   |   |   |   |-- _snackbar-common.scss
 |   |   |   |   |   |-- _table-extensions.scss
 |   |   |   |   |   `-- _theme-variables.scss
 |   |   |   |   `-- utils
 |   |   |   |       |-- date-utils.ts
 |   |   |   |       |-- object-utils.ts
-|   |   |   |       `-- table-state-utils.ts
+|   |   |   |       `-- table-manage-utils.ts
 |   |   |   `-- public-api.ts
 |   |   |-- README.md
 |   |   |-- ng-package.json
@@ -268,4 +309,4 @@
 |-- tsconfig.json
 `-- tsconfig.prod.json
 
-80 directories, 188 files
+90 directories, 219 files

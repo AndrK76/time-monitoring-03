@@ -1,0 +1,585 @@
+.
+|-- back
+|   |-- .mvn
+|   |   `-- wrapper
+|   |       `-- maven-wrapper.properties
+|   |-- core-common
+|   |   |-- src
+|   |   |   `-- main
+|   |   |       `-- java
+|   |   |           `-- ru
+|   |   |               `-- igorit
+|   |   |                   `-- monitoring
+|   |   |                       `-- common
+|   |   |                           |-- config
+|   |   |                           |   `-- JacksonConfig.java
+|   |   |                           |-- dto
+|   |   |                           |   `-- command
+|   |   |                           |       |-- auth
+|   |   |                           |       |   |-- SecurityContextDto.java
+|   |   |                           |       |   |-- UserContextDto.java
+|   |   |                           |       |   |-- UserCreatedEventCommandDto.java
+|   |   |                           |       |   `-- UserInfoUpdatedEventCommandDto.java
+|   |   |                           |       `-- CommandMessageDto.java
+|   |   |                           |-- enums
+|   |   |                           |   `-- command
+|   |   |                           |       `-- CommandMessageType.java
+|   |   |                           |-- exception
+|   |   |                           |-- service
+|   |   |                           `-- AuthConstants.java
+|   |   `-- pom.xml
+|   |-- core-persistence
+|   |   |-- src
+|   |   |   `-- main
+|   |   |       |-- java
+|   |   |       |   `-- ru
+|   |   |       |       `-- igorit
+|   |   |       |           `-- monitoring
+|   |   |       |               `-- persistence
+|   |   |       |                   |-- config
+|   |   |       |                   |   `-- PersistenceConfig.java
+|   |   |       |                   `-- entity
+|   |   |       |                       |-- admin
+|   |   |       |                       |   `-- AppUser.java
+|   |   |       |                       `-- auth
+|   |   |       |                           |-- Permission.java
+|   |   |       |                           |-- Role.java
+|   |   |       |                           |-- TelegramToken.java
+|   |   |       |                           |-- User.java
+|   |   |       |                           `-- UserAuthProvider.java
+|   |   |       `-- resources
+|   |   `-- pom.xml
+|   |-- core-rabbit
+|   |   |-- src
+|   |   |   `-- main
+|   |   |       `-- java
+|   |   |           `-- ru
+|   |   |               `-- igorit
+|   |   |                   `-- monitoring
+|   |   |                       `-- rabbit
+|   |   |                           |-- config
+|   |   |                           |   |-- RabbitMQConfig.java
+|   |   |                           |   |-- RabbitMQJacksonConfig.java
+|   |   |                           |   `-- RabbitMQSecurityConfig.java
+|   |   |                           `-- service
+|   |   |                               |-- CommandReceiver.java
+|   |   |                               `-- CommandSender.java
+|   |   `-- pom.xml
+|   |-- core-security
+|   |   |-- src
+|   |   |   `-- main
+|   |   |       |-- java
+|   |   |       |   `-- ru
+|   |   |       |       `-- igorit
+|   |   |       |           `-- monitoring
+|   |   |       |               `-- security
+|   |   |       |                   |-- annotation
+|   |   |       |                   |   `-- WithSecurityContext.java
+|   |   |       |                   |-- aspect
+|   |   |       |                   |   `-- SecurityContextAspect.java
+|   |   |       |                   |-- config
+|   |   |       |                   |   |-- CookieProperties.java
+|   |   |       |                   |   |-- CorsConfig.java
+|   |   |       |                   |   |-- CorsProperties.java
+|   |   |       |                   |   |-- SecurityAspectConfig.java
+|   |   |       |                   |   `-- SecurityBeansConfig.java
+|   |   |       |                   |-- filter
+|   |   |       |                   |   `-- JwtAuthenticationFilter.java
+|   |   |       |                   |-- mapper
+|   |   |       |                   |   `-- SecurityContextMapper.java
+|   |   |       |                   |-- model
+|   |   |       |                   |   |-- AuthProvider.java
+|   |   |       |                   |   |-- CustomOAuth2User.java
+|   |   |       |                   |   |-- JwtAuthenticationToken.java
+|   |   |       |                   |   |-- SecurityContextAuthentication.java
+|   |   |       |                   |   `-- UserPrincipal.java
+|   |   |       |                   |-- service
+|   |   |       |                   |   |-- JwtService.java
+|   |   |       |                   |   `-- TelegramTokenService.java
+|   |   |       |                   `-- util
+|   |   |       |                       `-- AuthInfoUtils.java
+|   |   |       `-- resources
+|   |   `-- pom.xml
+|   |-- core-telegram
+|   |   |-- src
+|   |   |   `-- main
+|   |   |       `-- java
+|   |   |           `-- ru
+|   |   |               `-- igorit
+|   |   |                   `-- monitoring
+|   |   |                       `-- telegram
+|   |   `-- pom.xml
+|   |-- core-web
+|   |   |-- src
+|   |   |   `-- main
+|   |   |       `-- java
+|   |   |           `-- ru
+|   |   |               `-- igorit
+|   |   |                   `-- monitoring
+|   |   |                       `-- web
+|   |   `-- pom.xml
+|   |-- service-admin
+|   |   |-- src
+|   |   |   `-- main
+|   |   |       |-- java
+|   |   |       |   `-- ru
+|   |   |       |       `-- igorit
+|   |   |       |           `-- monitoring
+|   |   |       |               `-- admin
+|   |   |       |                   |-- config
+|   |   |       |                   |   `-- SecurityConfig.java
+|   |   |       |                   |-- controller
+|   |   |       |                   |   `-- TestController.java
+|   |   |       |                   |-- dto
+|   |   |       |                   |   `-- TestResponse.java
+|   |   |       |                   |-- listener
+|   |   |       |                   |   `-- UserCommandListener.java
+|   |   |       |                   |-- mapper
+|   |   |       |                   |   `-- UserEventCommandMapper.java
+|   |   |       |                   |-- repository
+|   |   |       |                   |   `-- AppUserRepository.java
+|   |   |       |                   |-- service
+|   |   |       |                   |   |-- TestService.java
+|   |   |       |                   |   `-- UserEventsReceiveService.java
+|   |   |       |                   `-- AdminApplication.java
+|   |   |       `-- resources
+|   |   |           |-- db
+|   |   |           |   `-- migration
+|   |   |           |       `-- V01.01__init_admin_schema.sql
+|   |   |           `-- application.yml
+|   |   |-- .properties
+|   |   `-- pom.xml
+|   |-- service-auth
+|   |   |-- src
+|   |   |   `-- main
+|   |   |       |-- java
+|   |   |       |   `-- ru
+|   |   |       |       `-- igorit
+|   |   |       |           `-- monitoring
+|   |   |       |               `-- auth
+|   |   |       |                   |-- config
+|   |   |       |                   |   |-- MessageSourceConfig.java
+|   |   |       |                   |   `-- SecurityConfig.java
+|   |   |       |                   |-- controller
+|   |   |       |                   |   |-- AdminController.java
+|   |   |       |                   |   |-- AuthController.java
+|   |   |       |                   |   |-- OAuth2Controller.java
+|   |   |       |                   |   `-- UserManageController.java
+|   |   |       |                   |-- dto
+|   |   |       |                   |   |-- ChangePasswordRequestDto.java
+|   |   |       |                   |   |-- LoginRequestDto.java
+|   |   |       |                   |   |-- PermissionDto.java
+|   |   |       |                   |   |-- RegistrationRequestDto.java
+|   |   |       |                   |   |-- ResetPasswordRequestDto.java
+|   |   |       |                   |   |-- RoleDto.java
+|   |   |       |                   |   |-- TokenResponseDto.java
+|   |   |       |                   |   |-- UpdateUserRequestDto.java
+|   |   |       |                   |   |-- UserListItemDto.java
+|   |   |       |                   |   `-- UserResponseDto.java
+|   |   |       |                   |-- helper
+|   |   |       |                   |   |-- AuthErrorHelper.java
+|   |   |       |                   |   |-- LocaleHelper.java
+|   |   |       |                   |   `-- LoginMessageHelper.java
+|   |   |       |                   |-- mapper
+|   |   |       |                   |   `-- UserManagementMapper.java
+|   |   |       |                   |-- repository
+|   |   |       |                   |   |-- PermissionRepository.java
+|   |   |       |                   |   |-- RoleRepository.java
+|   |   |       |                   |   |-- TelegramTokenRepository.java
+|   |   |       |                   |   |-- UserAuthProviderRepository.java
+|   |   |       |                   |   `-- UserRepository.java
+|   |   |       |                   |-- service
+|   |   |       |                   |   |-- AdminService.java
+|   |   |       |                   |   |-- AuthManagementPersistService.java
+|   |   |       |                   |   |-- AuthService.java
+|   |   |       |                   |   |-- ResetPasswordService.java
+|   |   |       |                   |   |-- TelegramTokenServiceImpl.java
+|   |   |       |                   |   |-- UserDetailsServiceImpl.java
+|   |   |       |                   |   |-- UserManagementService.java
+|   |   |       |                   |   `-- UserService.java
+|   |   |       |                   `-- AuthApplication.java
+|   |   |       `-- resources
+|   |   |           |-- db
+|   |   |           |   `-- migration
+|   |   |           |       |-- V01.01__init_auth_schema.sql
+|   |   |           |       |-- V01.02__add_telegram_support.sql
+|   |   |           |       `-- V01.03__add_initial_data.sql
+|   |   |           |-- org
+|   |   |           |   `-- springframework
+|   |   |           |       `-- security
+|   |   |           |           `-- messages_ru.properties
+|   |   |           `-- application.yml
+|   |   |-- .properties
+|   |   `-- pom.xml
+|   |-- service-monitoring
+|   |   |-- src
+|   |   |   `-- main
+|   |   |       |-- java
+|   |   |       |   `-- ru
+|   |   |       |       `-- igorit
+|   |   |       |           `-- monitoring
+|   |   |       |               `-- monitoring
+|   |   |       |                   `-- MonitoringApplication.java
+|   |   |       `-- resources
+|   |   |           `-- application.yml
+|   |   `-- pom.xml
+|   |-- spring-boot-parent
+|   |   `-- pom.xml
+|   |-- .gitignore
+|   |-- .properties
+|   |-- amplicode.xml
+|   |-- mvnw
+|   |-- mvnw.cmd
+|   `-- pom.xml
+|-- docker
+|   |-- postgres
+|   |   |-- 01-init.sh
+|   |   `-- Dockerfile
+|   |-- rabbitmq
+|   |-- .env
+|   |-- create.cmd
+|   |-- docker-compose.yml
+|   |-- remove.cmd
+|   `-- start.cmd
+|-- docker-test
+|   |-- .gigacode
+|   |   `-- plans
+|   |-- admin-test
+|   |   `-- Dockerfile
+|   |-- mon-test
+|   |   `-- Dockerfile
+|   |-- nginx
+|   |   `-- nginx.conf
+|   |-- nginx-frontend
+|   |   `-- Dockerfile
+|   |-- build.bat
+|   |-- docker-compose.yml
+|   |-- notes.txt
+|   |-- start.bat
+|   `-- stop.bat
+|-- front
+|   |-- .gigacode
+|   |   `-- plans
+|   |-- projects
+|   |   |-- .gigacode
+|   |   |   `-- plans
+|   |   |-- admin-test
+|   |   |   |-- src
+|   |   |   |   |-- app
+|   |   |   |   |   |-- features
+|   |   |   |   |   |   |-- admin
+|   |   |   |   |   |   |   |-- admin.component.html
+|   |   |   |   |   |   |   |-- admin.component.scss
+|   |   |   |   |   |   |   `-- admin.component.ts
+|   |   |   |   |   |   |-- change-password
+|   |   |   |   |   |   |   |-- change-password.component.html
+|   |   |   |   |   |   |   |-- change-password.component.scss
+|   |   |   |   |   |   |   `-- change-password.component.ts
+|   |   |   |   |   |   |-- login
+|   |   |   |   |   |   |   |-- login.component.html
+|   |   |   |   |   |   |   |-- login.component.scss
+|   |   |   |   |   |   |   `-- login.component.ts
+|   |   |   |   |   |   |-- register
+|   |   |   |   |   |   |   |-- register.component.html
+|   |   |   |   |   |   |   |-- register.component.scss
+|   |   |   |   |   |   |   `-- register.component.ts
+|   |   |   |   |   |   `-- user-management
+|   |   |   |   |   |       |-- user-management.component.html
+|   |   |   |   |   |       |-- user-management.component.scss
+|   |   |   |   |   |       `-- user-management.component.ts
+|   |   |   |   |   |-- app.component.html
+|   |   |   |   |   |-- app.component.scss
+|   |   |   |   |   |-- app.component.ts
+|   |   |   |   |   |-- app.config.ts
+|   |   |   |   |   `-- app.routes.ts
+|   |   |   |   |-- assets
+|   |   |   |   |   `-- .gitkeep
+|   |   |   |   |-- environments
+|   |   |   |   |   |-- environment-interface.ts
+|   |   |   |   |   |-- environment.production.ts
+|   |   |   |   |   |-- environment.staging.ts
+|   |   |   |   |   `-- environment.ts
+|   |   |   |   |-- favicon.ico
+|   |   |   |   |-- index.html
+|   |   |   |   |-- main.ts
+|   |   |   |   `-- styles.scss
+|   |   |   `-- tsconfig.app.json
+|   |   |-- app-admin
+|   |   |   |-- public
+|   |   |   |   |-- favicon.ico
+|   |   |   |   `-- logo.svg
+|   |   |   |-- src
+|   |   |   |   |-- app
+|   |   |   |   |   |-- core
+|   |   |   |   |   |   |-- header
+|   |   |   |   |   |   |   |-- header.component.html
+|   |   |   |   |   |   |   |-- header.component.scss
+|   |   |   |   |   |   |   `-- header.component.ts
+|   |   |   |   |   |   |-- index
+|   |   |   |   |   |   |   |-- index.component.html
+|   |   |   |   |   |   |   |-- index.component.scss
+|   |   |   |   |   |   |   `-- index.component.ts
+|   |   |   |   |   |   `-- main
+|   |   |   |   |   |       |-- main.component.html
+|   |   |   |   |   |       |-- main.component.scss
+|   |   |   |   |   |       `-- main.component.ts
+|   |   |   |   |   |-- dialogs
+|   |   |   |   |   |   `-- user-profile-dialog
+|   |   |   |   |   |       |-- user-profile-dialog.component.html
+|   |   |   |   |   |       |-- user-profile-dialog.component.scss
+|   |   |   |   |   |       `-- user-profile-dialog.component.ts
+|   |   |   |   |   |-- features
+|   |   |   |   |   |-- app.component.html
+|   |   |   |   |   |-- app.component.scss
+|   |   |   |   |   |-- app.component.ts
+|   |   |   |   |   |-- app.config.ts
+|   |   |   |   |   `-- app.routes.ts
+|   |   |   |   |-- environments
+|   |   |   |   |   |-- environment-interface.ts
+|   |   |   |   |   |-- environment-prod.ts
+|   |   |   |   |   |-- environment.production.ts
+|   |   |   |   |   |-- environment.staging.ts
+|   |   |   |   |   `-- environment.ts
+|   |   |   |   |-- index.html
+|   |   |   |   |-- main.ts
+|   |   |   |   `-- styles.scss
+|   |   |   `-- tsconfig.app.json
+|   |   |-- app-monitor
+|   |   |   |-- public
+|   |   |   |   |-- favicon.ico
+|   |   |   |   |-- logo.svg
+|   |   |   |   |-- sample-nosplit-data.json
+|   |   |   |   `-- sample_split_data.json
+|   |   |   |-- src
+|   |   |   |   |-- app
+|   |   |   |   |   |-- core
+|   |   |   |   |   |   |-- header
+|   |   |   |   |   |   |   |-- header.component.html
+|   |   |   |   |   |   |   |-- header.component.scss
+|   |   |   |   |   |   |   `-- header.component.ts
+|   |   |   |   |   |   `-- main
+|   |   |   |   |   |       |-- main.component.html
+|   |   |   |   |   |       |-- main.component.scss
+|   |   |   |   |   |       `-- main.component.ts
+|   |   |   |   |   |-- dialogs
+|   |   |   |   |   |   `-- user-profile-dialog
+|   |   |   |   |   |       |-- user-profile-dialog.component.html
+|   |   |   |   |   |       |-- user-profile-dialog.component.scss
+|   |   |   |   |   |       `-- user-profile-dialog.component.ts
+|   |   |   |   |   |-- features
+|   |   |   |   |   |   |-- events-editor-container
+|   |   |   |   |   |   |   |-- events-editor-container.component.html
+|   |   |   |   |   |   |   |-- events-editor-container.component.scss
+|   |   |   |   |   |   |   `-- events-editor-container.component.ts
+|   |   |   |   |   |   |-- events-editor-inplace
+|   |   |   |   |   |   |   |-- events-editor-inplace.component.html
+|   |   |   |   |   |   |   |-- events-editor-inplace.component.scss
+|   |   |   |   |   |   |   `-- events-editor-inplace.component.ts
+|   |   |   |   |   |   |-- index
+|   |   |   |   |   |   |   |-- index-auth
+|   |   |   |   |   |   |   |   |-- index-auth.component.html
+|   |   |   |   |   |   |   |   |-- index-auth.component.scss
+|   |   |   |   |   |   |   |   `-- index-auth.component.ts
+|   |   |   |   |   |   |   |-- index-noauth
+|   |   |   |   |   |   |   |   |-- index-noauth.component.html
+|   |   |   |   |   |   |   |   |-- index-noauth.component.scss
+|   |   |   |   |   |   |   |   `-- index-noauth.component.ts
+|   |   |   |   |   |   |   |-- index.component.html
+|   |   |   |   |   |   |   |-- index.component.scss
+|   |   |   |   |   |   |   `-- index.component.ts
+|   |   |   |   |   |   |-- test-table-1
+|   |   |   |   |   |   |   |-- test-table-1.component.html
+|   |   |   |   |   |   |   |-- test-table-1.component.scss
+|   |   |   |   |   |   |   `-- test-table-1.component.ts
+|   |   |   |   |   |   |-- test-table-2
+|   |   |   |   |   |   |   |-- test-table-2.component.html
+|   |   |   |   |   |   |   |-- test-table-2.component.scss
+|   |   |   |   |   |   |   `-- test-table-2.component.ts
+|   |   |   |   |   |   |-- test-table-3
+|   |   |   |   |   |   |   |-- test-table-3.component.html
+|   |   |   |   |   |   |   |-- test-table-3.component.scss
+|   |   |   |   |   |   |   `-- test-table-3.component.ts
+|   |   |   |   |   |   |-- test-table-4
+|   |   |   |   |   |   |   |-- test-table-4.component.html
+|   |   |   |   |   |   |   |-- test-table-4.component.scss
+|   |   |   |   |   |   |   `-- test-table-4.component.ts
+|   |   |   |   |   |   `-- event-row.ts
+|   |   |   |   |   |-- models
+|   |   |   |   |   |   `-- sample-data-model.ts
+|   |   |   |   |   |-- services
+|   |   |   |   |   |   `-- sample-data.service.ts
+|   |   |   |   |   |-- app.component.html
+|   |   |   |   |   |-- app.component.scss
+|   |   |   |   |   |-- app.component.ts
+|   |   |   |   |   |-- app.config.ts
+|   |   |   |   |   `-- app.routes.ts
+|   |   |   |   |-- environments
+|   |   |   |   |   |-- environment-interface.ts
+|   |   |   |   |   |-- environment-prod.ts
+|   |   |   |   |   |-- environment.production.ts
+|   |   |   |   |   |-- environment.staging.ts
+|   |   |   |   |   `-- environment.ts
+|   |   |   |   |-- index.html
+|   |   |   |   |-- main.ts
+|   |   |   |   `-- styles.scss
+|   |   |   `-- tsconfig.app.json
+|   |   |-- mon-test
+|   |   |   |-- src
+|   |   |   |   |-- app
+|   |   |   |   |   |-- features
+|   |   |   |   |   |   |-- dashboard
+|   |   |   |   |   |   |   |-- dashboard.component.html
+|   |   |   |   |   |   |   |-- dashboard.component.scss
+|   |   |   |   |   |   |   `-- dashboard.component.ts
+|   |   |   |   |   |   `-- login
+|   |   |   |   |   |       |-- login.component.html
+|   |   |   |   |   |       |-- login.component.scss
+|   |   |   |   |   |       `-- login.component.ts
+|   |   |   |   |   |-- app.component.html
+|   |   |   |   |   |-- app.component.scss
+|   |   |   |   |   |-- app.component.ts
+|   |   |   |   |   |-- app.config.ts
+|   |   |   |   |   `-- app.routes.ts
+|   |   |   |   |-- assets
+|   |   |   |   |   `-- .gitkeep
+|   |   |   |   |-- environments
+|   |   |   |   |   |-- environment-interface.ts
+|   |   |   |   |   |-- environment.production.ts
+|   |   |   |   |   |-- environment.staging.ts
+|   |   |   |   |   `-- environment.ts
+|   |   |   |   |-- favicon.ico
+|   |   |   |   |-- index.html
+|   |   |   |   |-- main.ts
+|   |   |   |   `-- styles.scss
+|   |   |   `-- tsconfig.app.json
+|   |   |-- shared-auth
+|   |   |   |-- src
+|   |   |   |   |-- lib
+|   |   |   |   |   |-- guards
+|   |   |   |   |   |   `-- auth.guard.ts
+|   |   |   |   |   |-- interceptors
+|   |   |   |   |   |   |-- auth.interceptor.fn.ts
+|   |   |   |   |   |   `-- language.interceptor.fn.ts
+|   |   |   |   |   |-- models
+|   |   |   |   |   |   `-- auth.models.ts
+|   |   |   |   |   `-- services
+|   |   |   |   |       |-- admin.service.ts
+|   |   |   |   |       `-- auth.service.ts
+|   |   |   |   `-- public-api.ts
+|   |   |   |-- README.md
+|   |   |   |-- ng-package.json
+|   |   |   |-- package.json
+|   |   |   |-- tsconfig.lib.json
+|   |   |   `-- tsconfig.lib.prod.json
+|   |   |-- shared-components
+|   |   |   |-- src
+|   |   |   |   |-- lib
+|   |   |   |   |   |-- components
+|   |   |   |   |   |   |-- confirm-dialog
+|   |   |   |   |   |   |   |-- confirm-dialog.component.html
+|   |   |   |   |   |   |   |-- confirm-dialog.component.scss
+|   |   |   |   |   |   |   `-- confirm-dialog.component.ts
+|   |   |   |   |   |   |-- filter-date
+|   |   |   |   |   |   |   |-- filter-date.component.html
+|   |   |   |   |   |   |   |-- filter-date.component.scss
+|   |   |   |   |   |   |   `-- filter-date.component.ts
+|   |   |   |   |   |   |-- filter-list
+|   |   |   |   |   |   |   |-- filter-list.component.html
+|   |   |   |   |   |   |   |-- filter-list.component.scss
+|   |   |   |   |   |   |   `-- filter-list.component.ts
+|   |   |   |   |   |   |-- filter-root
+|   |   |   |   |   |   |   |-- filter-root.component.html
+|   |   |   |   |   |   |   |-- filter-root.component.scss
+|   |   |   |   |   |   |   `-- filter-root.component.ts
+|   |   |   |   |   |   |-- filter-text
+|   |   |   |   |   |   |   |-- filter-text.component.html
+|   |   |   |   |   |   |   |-- filter-text.component.scss
+|   |   |   |   |   |   |   `-- filter-text.component.ts
+|   |   |   |   |   |   |-- login
+|   |   |   |   |   |   |   |-- login.component.html
+|   |   |   |   |   |   |   |-- login.component.scss
+|   |   |   |   |   |   |   `-- login.component.ts
+|   |   |   |   |   |   |-- logout
+|   |   |   |   |   |   |   |-- logout.component.html
+|   |   |   |   |   |   |   |-- logout.component.scss
+|   |   |   |   |   |   |   `-- logout.component.ts
+|   |   |   |   |   |   |-- register
+|   |   |   |   |   |   |   |-- register.component.html
+|   |   |   |   |   |   |   |-- register.component.scss
+|   |   |   |   |   |   |   `-- register.component.ts
+|   |   |   |   |   |   |-- top-menu-item
+|   |   |   |   |   |   |   |-- top-menu-item.component.html
+|   |   |   |   |   |   |   |-- top-menu-item.component.scss
+|   |   |   |   |   |   |   `-- top-menu-item.component.ts
+|   |   |   |   |   |   `-- view-current-profile
+|   |   |   |   |   |       |-- view-current-profile.component.html
+|   |   |   |   |   |       |-- view-current-profile.component.scss
+|   |   |   |   |   |       `-- view-current-profile.component.ts
+|   |   |   |   |   |-- models
+|   |   |   |   |   |   |-- menu-item.ts
+|   |   |   |   |   |   |-- table-data-items.ts
+|   |   |   |   |   |   `-- table-filter-items.ts
+|   |   |   |   |   |-- services
+|   |   |   |   |   |   |-- dialog.service.ts
+|   |   |   |   |   |   `-- notification.service.ts
+|   |   |   |   |   |-- styles
+|   |   |   |   |   |   |-- _auth-common.scss
+|   |   |   |   |   |   |-- _editor-common.scss
+|   |   |   |   |   |   |-- _snackbar-common.scss
+|   |   |   |   |   |   |-- _table-extensions.scss
+|   |   |   |   |   |   `-- _theme-variables.scss
+|   |   |   |   |   `-- utils
+|   |   |   |   |       |-- date-utils.ts
+|   |   |   |   |       |-- object-utils.ts
+|   |   |   |   |       `-- table-manage-utils.ts
+|   |   |   |   `-- public-api.ts
+|   |   |   |-- README.md
+|   |   |   |-- ng-package.json
+|   |   |   |-- package.json
+|   |   |   |-- tsconfig.lib.json
+|   |   |   `-- tsconfig.lib.prod.json
+|   |   `-- shared-test
+|   |       |-- src
+|   |       |   |-- lib
+|   |       |   |   |-- guards
+|   |       |   |   |   `-- auth.guard.ts
+|   |       |   |   |-- interceptors
+|   |       |   |   |   |-- auth.interceptor.fn.ts
+|   |       |   |   |   `-- language.interceptor.fn.ts
+|   |       |   |   |-- models
+|   |       |   |   |   `-- auth.models.ts
+|   |       |   |   `-- services
+|   |       |   |       |-- admin.service.ts
+|   |       |   |       `-- auth.service.ts
+|   |       |   `-- public-api.ts
+|   |       |-- README.md
+|   |       |-- ng-package.json
+|   |       |-- package.json
+|   |       |-- tsconfig.lib.json
+|   |       `-- tsconfig.lib.prod.json
+|   |-- .editorconfig
+|   |-- .gitignore
+|   |-- README.md
+|   |-- angular.json
+|   |-- notes.txt
+|   |-- package-lock.json
+|   |-- package.json
+|   |-- tree.txt
+|   |-- tsconfig.json
+|   `-- tsconfig.prod.json
+|-- notes
+|   |-- concepts
+|   |   |-- auth.txt
+|   |   |-- auth01.png
+|   |   |-- auth02.png
+|   |   `-- deepseek_mermaid_20260728_a6a5aa.mermaid
+|   |-- Monitoring3.postman_collection.json
+|   |-- git-check.txt
+|   |-- git-init.txt
+|   `-- tree.txt
+|-- release
+|-- .gitignore
+|-- README.md
+`-- tree.txt
+
+228 directories, 354 files

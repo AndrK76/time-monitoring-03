@@ -20,6 +20,7 @@ export function selectDataSourceItem<T extends Record<string, any>>(
     selectedItem: T,
     idGetter: (item: T) => string | number,
     expanded: boolean,
+    collapseOthers?: boolean,
     ignoreKeys?: string[]
 ): { data: T[]; selected: boolean; expanded: boolean } {
     const index = dataSource.findIndex(e => idGetter(e) === idGetter(selectedItem));
@@ -27,14 +28,26 @@ export function selectDataSourceItem<T extends Record<string, any>>(
         return { data: dataSource, selected: false, expanded: false };
     }
 
-    let newRow = dataSource[index];
-    if (expanded)
-        newRow = addOrigData(newRow, ignoreKeys);
-    newRow = setExpanded(newRow, expanded);
+    let newData = [...dataSource];
 
-    // Создаём новый массив с обновлённой строкой
-    const newData = [...dataSource];
-    newData[index] = newRow;
+    if (collapseOthers && expanded) {
+        newData = newData.map((item, i) => {
+            if (i === index) {
+                return setExpanded(addOrigData(item, ignoreKeys), true);
+            } else {
+                return setExpanded(item, false)
+            }
+
+        });
+
+    } else {
+
+        let newRow = dataSource[index];
+        if (expanded)
+            newRow = addOrigData(newRow, ignoreKeys);
+        newRow = setExpanded(newRow, expanded);
+        newData[index] = newRow;
+    }
 
     return { data: newData, selected: true, expanded: expanded };
 }

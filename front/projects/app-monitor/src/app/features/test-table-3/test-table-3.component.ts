@@ -37,10 +37,10 @@ import { MatSort, MatSortModule } from '@angular/material/sort';
     MatSortModule,
     FilterRootComponent
   ],
-  templateUrl: './test-table-2.component.html',
-  styleUrl: './test-table-2.component.scss',
+  templateUrl: './test-table-3.component.html',
+  styleUrl: './test-table-3.component.scss',
 })
-export class TestTable2Component implements OnInit, AfterViewInit {
+export class TestTable3Component implements OnInit, AfterViewInit {
   private dataService = inject(SampleDataService);
   private dialogService = inject(DialogService);
   private notificationService = inject(NotificationService);

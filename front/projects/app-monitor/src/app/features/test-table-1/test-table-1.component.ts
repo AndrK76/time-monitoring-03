@@ -128,6 +128,7 @@ export class TestTable1Component implements OnInit, AfterViewInit {
   private loadEvents(): void {
     this.isLoading.set(true);
     this.error.set(null);
+    this.toggleFilter(true);
 
     this.dataService.getPlaceEvents()
       .pipe(
@@ -178,8 +179,9 @@ export class TestTable1Component implements OnInit, AfterViewInit {
     applyFilters(this.dataSource);
   }
 
-  toggleFilter(): void {
-    this.showFilter.update(v => !v);
+  toggleFilter(reset?: boolean): void {
+    if (reset) this.showFilter.set(false);
+    else this.showFilter.update(v => !v);
     if (!this.showFilter()) {
       this.filterConfig.update(map => clearFilterValues(map));
       applyFilters(this.dataSource);

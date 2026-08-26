@@ -57,6 +57,8 @@ export class HeaderComponent implements OnInit {
       children: [
         { label: 'Версия 1', route: '/test-table-1' },
         { label: 'Версия 2', route: '/test-table-2' },
+        { label: 'Версия 3', route: '/test-table-3' },
+        { label: 'Версия 4', route: '/test-table-4' },
         {
           label: 'Журналы',
           children: [

@@ -21,7 +21,7 @@ export const routes: Routes = [
 
   {
     path: 'test-table',
-    loadComponent: () => import('./features/test-table-2/test-table-2.component').then(m => m.TestTable2Component),
+    loadComponent: () => import('./features/test-table-4/test-table-4.component').then(m => m.TestTable4Component),
     canActivate: [authGuard]
   },
   {
@@ -32,6 +32,16 @@ export const routes: Routes = [
   {
     path: 'test-table-2',
     loadComponent: () => import('./features/test-table-2/test-table-2.component').then(m => m.TestTable2Component),
+    canActivate: [authGuard]
+  },
+  {
+    path: 'test-table-3',
+    loadComponent: () => import('./features/test-table-3/test-table-3.component').then(m => m.TestTable3Component),
+    canActivate: [authGuard]
+  },
+  {
+    path: 'test-table-4',
+    loadComponent: () => import('./features/test-table-4/test-table-4.component').then(m => m.TestTable4Component),
     canActivate: [authGuard]
   },
   { path: '**', redirectTo: '/' }

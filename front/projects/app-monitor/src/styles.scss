@@ -113,14 +113,21 @@ body {
   --btn-danger-bg: #{vars.$warn-500};
   --btn-danger-text: #{vars.$warn-contrast};
   --btn-danger-hover: #{darken(vars.$warn-500, 10%)};
+  --btn-danger-bg-rgb: #{red(vars.$warn-500)},
+  #{green(vars.$warn-500)},
+  #{blue(vars.$warn-500)};
 
   --btn-success-bg: #{#4caf50};
   --btn-success-text: #ffffff;
   --btn-success-hover: #{darken(#4caf50, 10%)};
-  --btn-danger-bg-rgb: #{red(vars.$warn-500)},
-  #{green(vars.$warn-500)},
-  #{blue(vars.$warn-500)};
+
+  --btn-light-bg: #{mat.m2-get-color-from-palette(vars.$my-primary, 300)};
+  //--btn-light-text: #{map.get(vars.$my-primary, 'contrast', 200)};
+  --btn-light-text: #ffffff;
+  --btn-light-hover: #{mat.m2-get-color-from-palette(vars.$my-primary, 400)};
+
 }
+
 
 @import 'table-extensions';
 @import 'snackbar-common';
