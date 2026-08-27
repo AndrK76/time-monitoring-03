@@ -160,6 +160,14 @@ export class TestTable2Component implements OnInit, AfterViewInit {
 
           this.tableManager.setData(rows);
           this.tableManager.handleUrlParams();
+          if (this.selectedItem()) {
+            const _item = this.selectedItem();
+            this.selectedItem.set(undefined);
+            this.tableManager.scrollToItemId(_item?.id);
+            setTimeout(() => {
+              this.selectedItem.set(_item);
+            }, 300);
+          }
         }
       });
   }
@@ -193,7 +201,7 @@ export class TestTable2Component implements OnInit, AfterViewInit {
 
 
   private doSelect = (item: EventRow | undefined, newState: boolean, updateUrl: boolean = true, scrollTo: boolean = false) => {
-    this.tableManager.doSelectBase(item, newState, () => this.table.renderRows(), updateUrl, scrollTo);
+    this.tableManager.doSelectBaseWithCollapse(item, newState, () => this.table.renderRows(), updateUrl, scrollTo);
   }
   private doRefresh = () => this.tableManager.doRefreshBase(() => this.loadEvents());
   private doAdd(): void {

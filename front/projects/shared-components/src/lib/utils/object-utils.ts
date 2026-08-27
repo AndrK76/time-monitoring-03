@@ -181,6 +181,45 @@ export function isExpanded<T extends Record<string, any>>(source: T): boolean {
     return ('_expanded' in source && source['_expanded'] === true);
 }
 
+/**
+ * Добавляет к объекту служебное поле `_dettached`, показывающее что объект не подтверждён
+ * @param source - исходный объект
+ * @returns новый объект с добавленным полем `_dettached`
+ */
+export function addNotApplyItemFlag<T extends Record<string, any>>(
+    source: T
+): T {
+    return {
+        ...source,
+        _dettached: true
+    };
+}
+
+/**
+ * Проверяет является ли переданный элемент новым (через аттрибут `_new`)
+ * @param source - исходный объект
+ * @returns является ли объект новым
+ */
+export function isNotApplyItem<T extends Record<string, any>>(source: T): boolean {
+    return ('_dettached' in source && source['_dettached'] === true);
+}
+
+/**
+ * Удаляет к объекту служебное поле `_dettached`, показывающее что объект не подтверждён
+ * @param source - исходный объект
+ * @returns новый объект с удаленным полем `_dettached`
+ */
+export function removeNotApplyItemFlag<T extends Record<string, any>>(
+    source: T
+): T {
+    if ('_dettached' in source) {
+        const { _dettached, ...res } = source;
+        return res as T;
+    }
+    return source;
+}
+
+
 
 
 

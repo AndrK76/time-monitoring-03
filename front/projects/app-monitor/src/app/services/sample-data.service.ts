@@ -3,6 +3,7 @@ import { inject, Injectable } from '@angular/core';
 import { delay, map, Observable, of, tap } from 'rxjs';
 import { EventData, EventStatus, Place, PlaceEvents, SampleData } from '../models/sample-data-model';
 import { EventRow } from '../features/event-row';
+import { toUtcDateStringAlways } from '@mon3/sc';
 
 @Injectable({
   providedIn: 'root'
@@ -123,7 +124,16 @@ export class SampleDataService {
         if (!this.placeEventsCache) {
           throw new Error('PlaceEvents cache not initialized (500)');
         }
-        return this.placeEventsCache;
+        return this.placeEventsCache.map(pm => {
+          let ret = { ...pm };
+          ret.events = ret.events.map(e => {
+            let eRet = { ...e };
+            if (eRet.start) eRet.start = toUtcDateStringAlways(eRet.start);
+            if (eRet.end) eRet.end = toUtcDateStringAlways(eRet.end);
+            return eRet;
+          })
+          return ret;
+        })
         //return [];
       })
     );

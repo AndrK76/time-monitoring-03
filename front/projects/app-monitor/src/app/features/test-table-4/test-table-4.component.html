@@ -17,7 +17,7 @@
         <mat-card-actions align="end">
             <div class="action-button-group">
                 <button mat-raised-button class="table-action-btn btn-success" (click)="callAdd()"
-                    [disabled]="isLoading() || isSaving()">
+                    [disabled]="isLoading() || isSaving() || selectedItem()">
                     <mat-icon>add</mat-icon><span class="hide-on-small">Добавить</span>
                 </button>
                 <button mat-raised-button class="table-action-btn btn-danger" (click)="callDelete(selectedItem()!)"
@@ -56,9 +56,9 @@
             }
 
             <!-- Таблица -->
-            @if (!selectedItem()) {
+            <!--@if (!selectedItem() ) {-->
             <div class="table-wrapper sticky-header-table sticky-firstcol-table nowrap-table filtered-table click-edit-table"
-                #tableWrapper>
+                #tableWrapper [style.display]="selectedItem() ? 'none' : ''">
                 <table mat-table [dataSource]="dataSource" [trackBy]="trackById" class="mat-elevation-z0"
                     multiTemplateDataRows matSort>
 
@@ -139,12 +139,14 @@
                     </tr>
                 </table>
             </div>
-            } @else {
+            <!--} @else { -->
+            @if (selectedItem()) {
             <div class="editor-wrapper">
-                <app-events-editor-container [eventData]="selectedItem()!" [places]="places()"
-                    [statuses]="statuses()"></app-events-editor-container>
+                <app-events-editor-container [eventData]="selectedItem()!" [places]="places()" [statuses]="statuses()"
+                    (change)="doUpdate($event)" (exit)="onEditorClose($event)"></app-events-editor-container>
             </div>
             }
+            <!--}-->
 
         </mat-card-content>
     </mat-card>

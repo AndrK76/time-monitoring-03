@@ -117,14 +117,14 @@ export function addDataSourceItem<T extends Record<string, any>>(
     dataSource: T[],
     addItem: T,
     ignoreKeys?: string[]
-): { data: T[]; added: boolean } {
+): { data: T[]; added: boolean, fullItem: T } {
 
     let newRow = addOrigData(addItem, ignoreKeys);
     newRow = setExpanded(newRow, true);
     newRow = addNewItemFlag(newRow);
     // Создаём новый массив с обновлённой строкой
     const newData = [newRow, ...dataSource];
-    return { data: newData, added: true };
+    return { data: newData, added: true, fullItem: newRow };
 }
 
 /**

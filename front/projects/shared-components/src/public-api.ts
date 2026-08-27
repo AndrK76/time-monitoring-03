@@ -14,6 +14,7 @@ export * from './lib/components/top-menu-item/top-menu-item.component';
 
 export * from './lib/services/dialog.service';
 export * from './lib/components/confirm-dialog/confirm-dialog.component';
+export * from './lib/components/confirm-dialog-cancel/confirm-dialog-cancel.component';
 
 export * from './lib/services/notification.service';
 

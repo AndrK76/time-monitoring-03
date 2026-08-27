@@ -1,22 +1,41 @@
-import { format, parseISO } from 'date-fns';
-import { toZonedTime } from 'date-fns-tz';
+import { parseISO, formatISO } from 'date-fns';
+import { format, toZonedTime, fromZonedTime } from 'date-fns-tz';
 
-// Преобразование UTC -> локальная строка для datetime-local
-export function toLocalDatetimeString(utcDateStr: string): string {
-    if (!utcDateStr) return '';
-    const date = parseISO(utcDateStr);
-    const zoned = toZonedTime(date, Intl.DateTimeFormat().resolvedOptions().timeZone);
-    return format(zoned, "yyyy-MM-dd'T'HH:mm");
+
+// Преобразование локальной строки -> UTC (если TZ не указано, то считаем что в локальной TZ)
+export function toUtcDateStringAlways(dateTimeStr: string): string {
+  if (!dateTimeStr) return '';
+  const hasZone = /[+-]\d{2}:\d{2}$|Z$/i.test(dateTimeStr);
+
+  let date: Date;
+  const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
+  if (hasZone) {
+    // Строка уже содержит зону (Z или +-HH:MM) – парсим как UTC
+    date = parseISO(dateTimeStr);
+  } else {
+    // Строка без зоны – интерпретируем как локальное время в указанной зоне
+    date = fromZonedTime(dateTimeStr, timeZone);
+  }
+  // Преобразуем в локальное время для отображения
+  const localDate = toZonedTime(date, timeZone);
+  return formatISO(localDate, { representation: 'complete' });
 }
 
-// Преобразование локальной строки -> UTC
-export function toUtcDateString(localDatetimeStr: string): string {
-    if (!localDatetimeStr) return '';
-    const [datePart, timePart] = localDatetimeStr.split('T');
-    const [year, month, day] = datePart.split('-').map(Number);
-    const [hours, minutes] = timePart.split(':').map(Number);
-    // Создаём локальную дату
-    const localDate = new Date(year, month - 1, day, hours, minutes);
-    // Возвращаем UTC ISO (с Z)
-    return localDate.toISOString();
+// Преобразует UTC-строку в формат для <input type="datetime-local">
+export function toLocalInputString(utcString: string): string {
+  const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
+  const date = parseISO(utcString);
+  const zoned = toZonedTime(date, timeZone);
+  return format(zoned, "yyyy-MM-dd'T'HH:mm", { timeZone });
+}
+
+
+// Преобразование локальной строки -> UTC в TZ клиента
+export function fromLocalInputToUtc(localInput: string): string {
+  const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
+  // Добавляем секунды и миллисекунды для корректного парсинга
+  const dateStr = localInput + ':00.000';
+  // Интерпретируем как локальное время в целевой зоне
+  const utcDate = fromZonedTime(dateStr, timeZone);
+  return utcDate.toISOString(); // всегда возвращает 'YYYY-MM-DDTHH:mm:ss.SSSZ'
 }

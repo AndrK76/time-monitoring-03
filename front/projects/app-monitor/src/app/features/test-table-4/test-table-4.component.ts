@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, inject, OnInit, signal, ViewChild, } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, inject, OnInit, signal, ViewChild, } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SampleDataService } from '../../services/sample-data.service';
 import { Place, EventStatus, PlaceEvents, EventData } from '../../models/sample-data-model';
@@ -12,7 +12,8 @@ import { createEmptyEventRow, EventRow } from '../event-row';
 import {
   DialogService, isNewItem, isExpanded,
   NotificationService, TableFilterInfo, TableFilterType, FilterRootComponent,
-  TableManageService, SaveDataResult
+  TableManageService, SaveDataResult,
+  isNotApplyItem
 } from '@mon3/sc';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSort, MatSortModule } from '@angular/material/sort';
@@ -42,6 +43,8 @@ export class TestTable4Component implements OnInit, AfterViewInit {
   private dialogService = inject(DialogService);
   private notificationService = inject(NotificationService);
   private tableManager = inject(TableManageService<EventRow>);
+
+  private cdr = inject(ChangeDetectorRef);
 
   dataSource = this.tableManager.dataSource;
   dataState = this.tableManager.dataState;
@@ -188,12 +191,12 @@ export class TestTable4Component implements OnInit, AfterViewInit {
   }
 
   private doSelect = (item: EventRow | undefined, newState: boolean, updateUrl: boolean = true, scrollTo: boolean = false) => {
-    this.tableManager.doSelectBase(item, newState, () => this.table.renderRows(), updateUrl, scrollTo);
+    this.tableManager.doSelectBaseWithCollapse(item, newState, () => this.table.renderRows(), updateUrl, scrollTo);
   }
   private doRefresh = () => this.tableManager.doRefreshBase(() => this.loadEvents());
   private doAdd(): void {
     const newItem = createEmptyEventRow(this.places()[0]?.id);
-    this.tableManager.doAddBase(newItem, () => this.table.renderRows());
+    this.tableManager.doAddBase(newItem, () => this.table.renderRows(), true);
   }
   doUpdate = (item: EventRow) => this.tableManager.doUpdateBase(item, () => this.table.renderRows());
   private doDelete = (item: EventRow) => this.tableManager.doDeleteBase(item, () => this.table.renderRows());
@@ -213,4 +216,17 @@ export class TestTable4Component implements OnInit, AfterViewInit {
       (item: EventRow) => this.dataService.removeEventRow(item),
       resApply);
   }
+
+  onEditorClose(item: EventRow) {
+    if (isNotApplyItem(item)) {
+      this.doDelete(item);
+    } else {
+      const _id = (this.selectedItem()?.id) ?? null;
+      this.tableManager.doSelectBaseWithCollapse(this.selectedItem(), false, undefined, true, false);
+      this.tableManager.scrollToItemId(_id);
+    }
+  }
+
+
+
 }

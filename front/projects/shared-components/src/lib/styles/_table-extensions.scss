@@ -306,10 +306,30 @@
     }
 
     .mat-column-expand {
-        width: 36px !important;
+        width: 40x !important;
         min-width: 32px !important;
-        max-width: 36px !important;
-        padding: 0 2px !important;
+        max-width: 40px !important;
+        padding: 0 0 !important;
+        column-gap: 0 !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+
+        .mat-mdc-icon-button {
+            width: 14px;
+            height: 14px;
+            line-height: 14px;
+
+            .mat-icon {
+                font-size: 18px !important;
+                width: 18px;
+                height: 18px;
+                line-height: 18px;
+            }
+        }
+
+        .changes-indicator {
+            font-size: 0.6rem;
+        }
 
         @media (max-width: 599.98px) {
             width: 36px !important;

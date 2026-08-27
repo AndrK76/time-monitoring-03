@@ -7,7 +7,7 @@
             </mat-form-field>
             <mat-form-field appearance="outline" class="full-width">
                 <mat-label>ID брони</mat-label>
-                <input matInput formControlName="booking_id">
+                <input matInput formControlName="booking_id" (change)="$event.stopPropagation()">
             </mat-form-field>
         </div>
 
@@ -33,11 +33,11 @@
         <div class="form-row">
             <mat-form-field appearance="outline" class="full-width">
                 <mat-label>Начало</mat-label>
-                <input matInput type="datetime-local" formControlName="start">
+                <input matInput type="datetime-local" formControlName="start" (change)="$event.stopPropagation()">
             </mat-form-field>
             <mat-form-field appearance="outline" class="full-width">
                 <mat-label>Окончание</mat-label>
-                <input matInput type="datetime-local" formControlName="end">
+                <input matInput type="datetime-local" formControlName="end" (change)="$event.stopPropagation()">
             </mat-form-field>
         </div>
     </form>

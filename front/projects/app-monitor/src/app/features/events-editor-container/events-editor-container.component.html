@@ -1,23 +1,22 @@
 <div class="editor-container-wrapper">
   <div class="editor-header">
     <!-- Кнопка "Назад" слева -->
-    <button mat-icon-button (click)="back.emit()" matTooltip="Назад">
+    <button mat-icon-button (click)="callBack()" matTooltip="Назад">
       <mat-icon>arrow_back</mat-icon>
     </button>
 
     <!-- Группа кнопок справа -->
     <div class="editor-actions-top">
-      <button mat-raised-button color="primary" (click)="apply.emit()">Применить</button>
-      <button mat-raised-button (click)="cancel.emit()">Отмена</button>
+      <button mat-raised-button color="primary" (click)="applyChanges()" [disabled]="!dataChanged()">Применить</button>
+      <button mat-raised-button (click)="rejectChanges()">Отмена</button>
     </div>
   </div>
 
   <!-- Обёртка для прокрутки -->
   <div class="editor-scroll-wrapper">
-    <app-events-editor-inplace
-      [eventData]="eventData()"
-      [places]="places()"
-      [statuses]="statuses()"
-    ></app-events-editor-inplace>
+    @if(inited) {
+    <app-events-editor-inplace [eventData]="toEditItem()!" [places]="places()" [statuses]="statuses()"
+      (change)="onChange($event)"></app-events-editor-inplace>
+    }
   </div>
 </div>

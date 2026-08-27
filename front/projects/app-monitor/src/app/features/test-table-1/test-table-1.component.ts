@@ -170,7 +170,7 @@ export class TestTable1Component implements OnInit, AfterViewInit {
   toggleFilter = (reset?: boolean) => this.tableManager.toggleFilter();
   isExpanded = (index: number, item: any): boolean => isExpanded(item)
 
-  callSelect = (item: EventRow) => this.doSelect(item, true);
+  callSelect = (item: EventRow) => this.doSelect(item, !isExpanded(item));
   callRefresh() {
     this.dialogService.confirm('Перечитать данные? Все несохранённые изменения будут потеряны.').subscribe(confirmed => {
       if (confirmed) this.doRefresh();
@@ -194,7 +194,7 @@ export class TestTable1Component implements OnInit, AfterViewInit {
 
 
   private doSelect = (item: EventRow | undefined, newState: boolean, updateUrl: boolean = true, scrollTo: boolean = false) => {
-    this.tableManager.doSelectBase(item, newState, () => this.table.renderRows(), updateUrl, scrollTo);
+    this.tableManager.doSelectBaseWithoutCollapse(item, newState, () => this.table.renderRows(), updateUrl, scrollTo);
   }
   private doRefresh = () => this.tableManager.doRefreshBase(() => this.loadEvents());
   private doAdd(): void {

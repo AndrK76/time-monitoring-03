@@ -18,6 +18,7 @@ import { TableFilterDateValue, TableFilterInfo, TableFilterListValue, TableFilte
 })
 export class FilterRootComponent {
 
+
   key = input.required<string>({ alias: 'key' });
   label = input.required<string>({ alias: 'label' });
   showFilter = input.required<boolean>({ alias: 'showFilter' });

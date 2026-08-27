@@ -12,6 +12,7 @@ import {
 } from '../utils/table-manage-utils';
 import { TableFilterInfo } from '../models/table-filter-items';
 import { ActivatedRoute, Router } from '@angular/router';
+import { addNotApplyItemFlag } from '../utils/object-utils';
 
 @Injectable() // Без providedIn, регистрируем в компоненте
 export class TableManageService<T extends Record<string, any>> {
@@ -23,7 +24,7 @@ export class TableManageService<T extends Record<string, any>> {
   readonly dataState = signal<TableDataChanges>(newTableDataChanges());
   readonly selectedItem = signal<T | undefined>(undefined);
   readonly filterConfig = signal<Map<string, TableFilterInfo>>(new Map());
-  readonly showFilter = signal(false);
+  readonly showFilter = signal(true);
   readonly error = signal<string | null>(null);
 
   // === Вычисляемые сигналы ===
@@ -62,11 +63,14 @@ export class TableManageService<T extends Record<string, any>> {
     if (!itemId) return;
     requestAnimationFrame(() => {
       const rowElement = this.tableWrapperRef!.nativeElement.querySelector(`tr[data-id="${itemId}"]`);
+      //console.log(this.tableWrapperRef?.nativeElement.innerHTML);
       if (rowElement) {
+        //console.log(rowElement.innerHTML);
         rowElement.scrollIntoView({ block: 'center', behavior: 'smooth' });
       }
     });
   }
+
 
   // === Управление фильтрами ===
   onFilterChange(val: TableFilterInfo) {
@@ -107,19 +111,28 @@ export class TableManageService<T extends Record<string, any>> {
   }
 
   // === Выбор элемента ===
-  doSelectBase(item: T | undefined, newState: boolean, renderFn: () => void, updateUrl: boolean = true, scrollTo: boolean = false) {
-    const result = selectDataSourceItem(this.dataSource.data, item, this.itemIdFn, newState, true);
+  doSelectBaseWithCollapse(item: T | undefined, newState: boolean, renderFn: (() => void) | undefined, updateUrl: boolean = true, scrollTo: boolean = false) {
+    this._doSelectBase(item, newState, renderFn, updateUrl, scrollTo, true);
+  }
+
+  doSelectBaseWithoutCollapse(item: T | undefined, newState: boolean, renderFn: (() => void) | undefined, updateUrl: boolean = true, scrollTo: boolean = false) {
+    this._doSelectBase(item, newState, renderFn, updateUrl, scrollTo, false);
+  }
+
+  private _doSelectBase(item: T | undefined, newState: boolean, renderFn: (() => void) | undefined, updateUrl: boolean, scrollTo: boolean, collapseOthers: boolean) {
+    const result = selectDataSourceItem(this.dataSource.data, item, this.itemIdFn, newState, collapseOthers);
     this.selectedItem.set(undefined);
     let _id: string | undefined = undefined;
     if (result.selected) {
       this.dataSource.data = result.data;
-      this.selectedItem.set(item);
+      if (newState) this.selectedItem.set(item);
       if (item && newState) _id = this.itemIdFn(item);
     }
     if (updateUrl) this.updateUrlParams(_id);
-    renderFn();
+    if (renderFn) renderFn();
     if (scrollTo && _id) this.scrollToItemId(_id);
   }
+
 
   //Выпонение обновления данных
   doRefreshBase(loadEventsFn: () => void): void {
@@ -130,14 +143,15 @@ export class TableManageService<T extends Record<string, any>> {
   }
 
   // === Добавление ===
-  doAddBase(newItem: T, renderFn: () => void): void {
+  doAddBase(newItem: T, renderFn: () => void, markAsDettach: boolean = false): void {
     this.selectedItem.set(undefined);
     const result = addDataSourceItem(this.dataSource.data, newItem);
     if (result.added) {
       this.dataSource.data = result.data;
-      renderFn();
+      if (renderFn) renderFn();
       this.dataState.update(state => addNewChangeToState(state, this.itemIdFn(newItem)));
-      this.selectedItem.set(newItem);
+      if (markAsDettach) result.fullItem = addNotApplyItemFlag(result.fullItem);
+      this.selectedItem.set(result.fullItem);
     }
   }
 
@@ -147,7 +161,7 @@ export class TableManageService<T extends Record<string, any>> {
       this.dataSource.data, item, this.itemIdFn, undefined, true);
     if (result.updated) {
       this.dataSource.data = result.data;
-      renderFn();
+      if (renderFn) renderFn();
       this.dataState.update(state => addModifyChangeToState(state, this.itemIdFn(item)));
     }
   }
@@ -157,7 +171,7 @@ export class TableManageService<T extends Record<string, any>> {
     const result = deleteDataSourceItem(this.dataSource.data, item, this.itemIdFn);
     if (result.deleted) {
       this.dataSource.data = result.data;
-      renderFn();
+      if (renderFn) renderFn();
       this.dataState.update(state => addDeleteChangeToState(state, item, this.itemIdFn));
       this.selectedItem.set(undefined);
       this.updateUrlParams();

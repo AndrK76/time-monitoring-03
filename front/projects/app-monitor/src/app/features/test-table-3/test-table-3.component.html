@@ -134,8 +134,8 @@
 
                     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
                     <tr mat-row *matRowDef="let row; columns: displayedColumns;"
-                        [style.display]="row._expanded ? 'none' : ''" (click)="callSelect(row)" class="simple-row"
-                        [attr.data-id]="row.id"></tr>
+                        [style.display]="row._expanded && selectedItem() ? 'none' : ''" (click)="callSelect(row)"
+                        class="simple-row" [attr.data-id]="row.id"></tr>
                     <tr mat-row *matRowDef="let row; columns: ['editor']; when: isExpanded;" class="editor-row"></tr>
 
                     <tr class="mat-row" *matNoDataRow>
