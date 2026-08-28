@@ -3,7 +3,7 @@ import { provideRouter } from '@angular/router';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { provideHttpClient } from '@angular/common/http';
 import { routes } from './app.routes';
-import { AdminService, AuthService } from '@mon3/sa';
+import { UsermanageService, AuthService } from '@mon3/sa';
 import { environment } from '../environments/environment';
 import { lastValueFrom } from 'rxjs';
 import { registerLocaleData } from '@angular/common';
@@ -27,7 +27,7 @@ export const appConfig: ApplicationConfig = {
 
 function initializeApp() {
   const authService = inject(AuthService);
-  const adminService = inject(AdminService);
+  const adminService = inject(UsermanageService);
 
   return () => {
     authService.setApiUrl(environment.authApiUrl);

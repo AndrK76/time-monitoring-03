@@ -1,13 +1,14 @@
 //Импорт Material (обязательно первым)
 @use '@angular/material' as mat;
 @use 'theme-variables' as vars;
-//@use '@mon3/sc/styles/theme-variables' as vars;
+@use 'sass:map';
 
 //Импорт локальных шрифтов и иконок
 @import '@fontsource/roboto/300.css';
 @import '@fontsource/roboto/400.css';
 @import '@fontsource/roboto/500.css';
 @import 'material-icons/iconfont/material-icons.css';
+
 
 //Инициализация Material core
 @include mat.core();
@@ -35,6 +36,9 @@ body {
   height: 100%;
   font-family: Roboto, "Helvetica Neue", sans-serif;
   background: #f5f7fa;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
 }
 
 //Переопределение высоты полей ввода
@@ -64,3 +68,67 @@ body {
     --warn-light-bg: #{rgba(vars.$warn-500, 0.1)};
   }
 }
+
+:root {
+  --menu-bg: #{mat.m2-get-color-from-palette(vars.$my-accent, 600)};
+  --menu-text: #{mat.m2-get-color-from-palette(vars.$my-accent, 300)};
+
+  --menu-hover-bg: #{
+ mix(mat.m2-get-color-from-palette(vars.$my-accent, 500), mat.m2-get-color-from-palette(vars.$my-accent, 600), 50%)
+}
+
+;
+
+
+
+--menu-icon-color: #{vars.$primary-contrast};
+
+--menu-divider-color: #{vars.$primary-contrast};
+--mat-menu-item-icon-color: var(--menu-icon-color, #{vars.$primary-contrast});
+
+--toolbar-active-text: #ffffff;
+--toolbar-active-bg: rgba(255, 255, 255, 0.15);
+
+--menu-active-bg: var(--menu-bg);
+--menu-active-text: #{map.get(vars.$my-accent, 'contrast', 600)};
+}
+
+:root {
+  --table-row-hover-bg: rgba(0, 0, 0, 0.04);
+  --changes-color: #{vars.$warn-500};
+}
+
+:root {
+  --editor-bg: #f9f9f9;
+  --editor-border: #e0e0e0;
+  --changes-color: #{vars.$warn-500};
+}
+
+:root {
+  // Кнопки действий в таблицах
+  --btn-primary-bg: #{vars.$primary-500};
+  --btn-primary-text: #{vars.$primary-contrast};
+  --btn-primary-hover: #{darken(vars.$primary-500, 10%)};
+
+  --btn-danger-bg: #{vars.$warn-500};
+  --btn-danger-text: #{vars.$warn-contrast};
+  --btn-danger-hover: #{darken(vars.$warn-500, 10%)};
+  --btn-danger-bg-rgb: #{red(vars.$warn-500)},
+  #{green(vars.$warn-500)},
+  #{blue(vars.$warn-500)};
+
+  --btn-success-bg: #{#4caf50};
+  --btn-success-text: #ffffff;
+  --btn-success-hover: #{darken(#4caf50, 10%)};
+
+  --btn-light-bg: #{mat.m2-get-color-from-palette(vars.$my-primary, 300)};
+  //--btn-light-text: #{map.get(vars.$my-primary, 'contrast', 200)};
+  --btn-light-text: #ffffff;
+  --btn-light-hover: #{mat.m2-get-color-from-palette(vars.$my-primary, 400)};
+
+}
+
+
+@import 'table-extensions';
+@import 'snackbar-common';
+@import 'editor-common';

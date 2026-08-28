@@ -1,0 +1,124 @@
+<div class="standard-table-container">
+    <mat-card>
+        <mat-card-header>
+            <mat-card-title>Пользователи</mat-card-title>
+            <mat-card-subtitle class="hide-on-small">
+                Всего: {{ dataSource.data.length }}
+                @if (hasChanges()) {
+                <span class="changes-summary">
+                    | Добавлено: {{ dataState().added.length }},
+                    Изменено: {{ dataState().modified.length }},
+                    Удалено: {{ dataState().deleted.length }}
+                </span>
+                }
+            </mat-card-subtitle>
+        </mat-card-header>
+
+        <mat-card-actions align="end">
+            <div class="action-button-group">
+                <button mat-raised-button class="table-action-btn btn-success" (click)="callAdd()"
+                    [disabled]="isLoading() || isSaving()">
+                    <mat-icon>add</mat-icon><span class="hide-on-small">Добавить</span>
+                </button>
+                <button mat-raised-button class="table-action-btn btn-danger" (click)="callDelete(selectedItem()!)"
+                    [disabled]="isLoading() || isSaving() || !selectedItem()">
+                    <mat-icon>delete</mat-icon><span class="hide-on-small">Удалить</span>
+                </button>
+                <button mat-raised-button class="table-action-btn btn-light" (click)="callRefresh()"
+                    [disabled]="isLoading() || isSaving()">
+                    <mat-icon>refresh</mat-icon>
+                    <span class="hide-on-small">{{ isLoading() ? 'Загрузка...' : 'Перечитать' }}</span>
+                </button>
+                <button mat-raised-button color="primary" (click)="callSave()"
+                    [disabled]="!hasChanges() || isLoading() || isSaving()">
+                    <mat-icon>save</mat-icon><span class="hide-on-small">Сохранить</span>
+                </button>
+            </div>
+        </mat-card-actions>
+
+        <mat-card-content>
+            <!-- Оверлей (спиннер/ошибка) поверх таблицы -->
+            @if (isLoading() || isSaving() || error()) {
+            <div class="table-overlay">
+                @if (isLoading() || isSaving()) {
+                <div class="loading-spinner">
+                    <mat-spinner diameter="40"></mat-spinner>
+                    <p>{{ isLoading() ? 'Загрузка' : 'Сохранение' }} данных...</p>
+                </div>
+                }
+                @if (error()) {
+                <div class="error-message">
+                    <mat-icon color="warn">error</mat-icon>
+                    <span>{{ error() }}</span>
+                </div>
+                }
+            </div>
+            }
+
+            <!-- Таблица -->
+            <div class="table-wrapper sticky-header-table sticky-firstcol-table nowrap-table inrow-editor-table filtered-table click-edit-table"
+                #tableWrapper>
+                <table mat-table [dataSource]="dataSource" [trackBy]="trackById" class="mat-elevation-z0"
+                    multiTemplateDataRows matSort>
+
+                    <ng-container matColumnDef="expand">
+                        <th mat-header-cell *matHeaderCellDef>
+                            <button mat-icon-button (click)="toggleFilter()" matTooltip="Фильтр">
+                                <mat-icon>filter_list</mat-icon>
+                            </button>
+                            @if (hasChanges()) {
+                            <span class="changes-indicator" matTooltip="{{ changesSummary() }}">*</span>
+                            }
+                        </th>
+                        <td mat-cell *matCellDef="let row">
+                        </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="username">
+                        <th mat-header-cell *matHeaderCellDef>
+                            <sc-filter-root key="username" label="Login" [showFilter]="showFilter()" [sort]="true"
+                                [config]="filterConfig().get('username')!"
+                                (change)="onFilterChange($event)"></sc-filter-root>
+                        </th>
+                        <td mat-cell *matCellDef="let row"> {{ row.username }} </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="displayName">
+                        <th mat-header-cell *matHeaderCellDef>
+                            <sc-filter-root key="displayName" label="Полное имя" [showFilter]="showFilter()"
+                                [sort]="true" [config]="filterConfig().get('displayName')!"
+                                (change)="onFilterChange($event)"></sc-filter-root>
+                        </th>
+                        <td mat-cell *matCellDef="let row"> {{ row.displayName }} </td>
+                    </ng-container>
+
+
+                    <ng-container matColumnDef="editor">
+                        <td mat-cell *matCellDef="let row" [attr.colspan]="displayedColumns.length">
+                            <div class="editor-row" *ngIf="row._expanded">
+                                <!--<app-events-editor-inplace [eventData]="row" [places]="places()" [statuses]="statuses()"
+                                    (change)="doUpdate($event)"></app-events-editor-inplace>-->
+                            </div>
+                        </td>
+                    </ng-container>
+
+                    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                    <tr mat-row *matRowDef="let row; columns: displayedColumns;"
+                        [style.display]="row._expanded && selectedItem() ? 'none' : ''" (click)="callSelect(row)"
+                        class="simple-row" [attr.data-id]="row.id"></tr>
+                    <tr mat-row *matRowDef="let row; columns: ['editor']; when: isExpanded;" class="editor-row"></tr>
+
+                    <tr class="mat-row" *matNoDataRow>
+                        <td class="mat-cell" [attr.colspan]="displayedColumns.length">
+                            <div class="empty-state">
+                                <mat-icon>info</mat-icon>
+                                <p>Пользователи не найдены</p>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+        </mat-card-content>
+    </mat-card>
+</div>

@@ -54,9 +54,15 @@ export class AuthService {
   // ============================================================
   // Подписка на изменения
   // ============================================================
-
-  onAuthChange(callback: (authenticated: boolean) => void): void {
+  onAuthChange(callback: (authenticated: boolean) => void): () => void {
     this.authChangeListeners.push(callback);
+    // Возвращаем функцию отписки
+    return () => {
+      const index = this.authChangeListeners.indexOf(callback);
+      if (index !== -1) {
+        this.authChangeListeners.splice(index, 1);
+      }
+    };
   }
 
   private notifyListeners(authenticated: boolean): void {
@@ -188,6 +194,13 @@ export class AuthService {
     return `Bearer ${this.tokenSignal()}`;
   }
 
+  getStoredUser(): UserResponseDto | undefined {
+    const userItem = localStorage.getItem('user');
+    if (userItem) {
+      return JSON.parse(userItem) as UserResponseDto;
+    }
+    return undefined;
+  }
 
   // ============================================================
   // Приватные методы

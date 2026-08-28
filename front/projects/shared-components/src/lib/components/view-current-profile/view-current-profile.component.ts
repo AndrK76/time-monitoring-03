@@ -4,7 +4,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { AdminService, UserResponseDto } from '@mon3/sa';
+import { UsermanageService, UserResponseDto } from '@mon3/sa';
 import { finalize } from 'rxjs/operators';
 
 @Component({
@@ -15,7 +15,7 @@ import { finalize } from 'rxjs/operators';
   styleUrl: './view-current-profile.component.scss'
 })
 export class ViewCurrentProfileComponent implements OnInit {
-  private adminService = inject(AdminService);
+  private adminService = inject(UsermanageService);
 
   user = signal<UserResponseDto | null>(null);
   loading = signal(true);

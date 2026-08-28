@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
 @Injectable({
   providedIn: 'root'
 })
-export class AdminService {
+export class UsermanageService {
 
   private http: HttpClient = inject(HttpClient);
   private authService: AuthService = inject(AuthService);
