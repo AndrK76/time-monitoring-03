@@ -16,6 +16,7 @@ export class UserInfo implements UserResponseDto {
         public roles: string[],
         public permissions: string[],
         public anonymous: boolean,
+        public rolesWithInfo: RoleInfo[]
     ) { }
 
 }

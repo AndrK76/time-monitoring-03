@@ -28,6 +28,9 @@ public interface UserManagementMapper {
 
     List<UserResponseDto> toResponseList(List<User> users);
 
+    @Mapping(target = "active", source = "isActive")
+    @Mapping(target = "approved", source = "isApproved")
+    @Mapping(target = "roles", expression = "java(user.getRoles().stream().map(Role::getName).collect(java.util.stream.Collectors.toList()))")
     UserListItemDto toUserListItem(User user);
 
     RoleDto toRoleDto(Role role);

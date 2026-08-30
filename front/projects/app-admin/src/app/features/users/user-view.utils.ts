@@ -1,8 +1,13 @@
 import { UserListItemDto } from "@mon3/sa";
-import { UserInfo } from "./user-view.models";
+import { RoleInfo, UserInfo } from "./user-view.models";
 
-export function userDtoToView(dto: UserListItemDto): UserInfo {
-    let ret: UserInfo = new UserInfo(
+export function userListDtoToView(dto: UserListItemDto, allRoles: RoleInfo[]): UserInfo {
+    const rolesWithInfo: RoleInfo[] = (dto.roles || []).map(roleName => {
+        const found = allRoles.find(r => r.name === roleName);
+        return found || new RoleInfo(roleName, '');
+    });
+
+    return new UserInfo(
         dto.id,             // id
         dto.username,       // username
         '',                 // email
@@ -10,14 +15,14 @@ export function userDtoToView(dto: UserListItemDto): UserInfo {
         '',                 // lastName
         dto.displayName,    // displayName
         undefined,          // avatarUrl
-        true,               // active
-        false,              // approved
+        dto.active,         // active
+        dto.approved,       // approved
         false,              // emailVerified
-        [],                 // roles
+        dto.roles || [],    // roles
         [],                 // permissions
-        false               // anonymous
+        false,              // anonymous
+        rolesWithInfo       // rolesWithInfo
     );
-    return ret;
 }
 
 export function createEmptyUser(): UserInfo {
@@ -34,6 +39,7 @@ export function createEmptyUser(): UserInfo {
         false,                 // emailVerified
         [],                    // roles
         [],                    // permissions
-        false                  // anonymous
+        false,              // anonymous
+        []                  // rolesWithInfo
     );
 }

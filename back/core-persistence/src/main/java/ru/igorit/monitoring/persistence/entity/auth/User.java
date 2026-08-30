@@ -3,6 +3,7 @@ package ru.igorit.monitoring.persistence.entity.auth;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.LazyInitializationException;
+import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -81,6 +82,7 @@ public class User implements Cloneable{
     @Builder.Default
     private Set<UserAuthProvider> authProviders = new HashSet<>();
 
+    @BatchSize(size = 20)
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "user_roles",

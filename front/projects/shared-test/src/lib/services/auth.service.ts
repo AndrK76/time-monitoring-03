@@ -212,7 +212,7 @@ export class AuthService {
         const user = JSON.parse(userStr);
         this.tokenSignal.set(token);
         this.currentUserSignal.set(user);
-        console.log('📂 Session loaded from localStorage');
+        //console.log('📂 Session loaded from localStorage');
       } catch (e) {
         this.clearSession();
       }

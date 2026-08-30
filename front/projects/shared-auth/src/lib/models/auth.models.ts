@@ -50,6 +50,9 @@ export interface UserListItemDto {
   id: string;
   username: string;
   displayName: string;
+  active: boolean;
+  approved: boolean;
+  roles: string[];
 }
 
 export interface RoleDto {

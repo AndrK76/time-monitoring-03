@@ -4,7 +4,7 @@ import { AuthService } from '@mon3/shared-test';
 import { RoleInfo, UserInfo } from '../user-view.models';
 import { DialogService, FilterRootComponent, isExpanded, isNewItem, NotificationService, SaveDataResult, TableFilterInfo, TableFilterType, TableManageService } from '@mon3/sc';
 import { finalize, forkJoin, map } from 'rxjs';
-import { createEmptyUser, userDtoToView } from '../user-view.utils';
+import { createEmptyUser, userListDtoToView } from '../user-view.utils';
 import { CommonModule } from '@angular/common';
 import { MatTable, MatTableModule } from '@angular/material/table';
 import { MatCardModule } from '@angular/material/card';
@@ -13,6 +13,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSort, MatSortModule } from '@angular/material/sort';
+import { UserEditorInplaceComponent } from '../user-editor-inplace/user-editor-inplace.component';
 
 @Component({
   selector: 'app-user-list-table',
@@ -23,7 +24,7 @@ import { MatSort, MatSortModule } from '@angular/material/sort';
     MatButtonModule,
     MatProgressSpinnerModule,
     MatIconModule,
-    //EventsEditorInplaceComponent,
+    UserEditorInplaceComponent,
     MatTooltipModule,
     MatSortModule,
     FilterRootComponent],
@@ -57,7 +58,7 @@ export class UserListTableComponent implements OnInit, AfterViewInit {
   roles = signal<RoleInfo[]>([]);
   users = signal<UserInfo[]>([]);
 
-  displayedColumns = ['expand', 'username', 'displayName'];
+  displayedColumns = ['expand', 'username', 'displayName', 'active', 'approved', 'rolesWithInfo'];
   trackById = (index: number, item: UserInfo) => item.id;
   itemId = (item: UserInfo) => item.id;
 
@@ -67,6 +68,9 @@ export class UserListTableComponent implements OnInit, AfterViewInit {
   _filterConfig: Map<string, TableFilterInfo> = new Map<string, TableFilterInfo>([
     ['username', { key: 'username', type: TableFilterType.TEXT }],
     ['displayName', { key: 'displayName', type: TableFilterType.TEXT }],
+    ['roles', { key: 'roles', type: TableFilterType.LIST, config: { dataSource: [] } }],
+    ['active', { key: 'active', type: TableFilterType.LIST, config: { dataSource: [{ id: true, text: 'Да' }, { id: false, text: 'Нет' }] } }],
+    ['approved', { key: 'approved', type: TableFilterType.LIST, config: { dataSource: [{ id: true, text: 'Да' }, { id: false, text: 'Нет' }] } }],
   ]);
 
   ngOnInit(): void {
@@ -93,7 +97,19 @@ export class UserListTableComponent implements OnInit, AfterViewInit {
         ),
     }).subscribe({
       next: (result) => {
+        const { roles } = result as { roles: RoleInfo[]; };
 
+        this.roles.set(roles);
+        this.filterConfig.update(map => {
+          const config = map.get('roles');
+          if (config) {
+            const dataSource = roles.map(p => ({ id: p.name, text: p.description }));
+            const newMap = new Map(map);
+            newMap.set('roles', { ...config, config: { ...config.config, dataSource } });
+            return newMap;
+          }
+          return map;
+        });
         this.loadData();
       },
       error: () => {
@@ -105,10 +121,11 @@ export class UserListTableComponent implements OnInit, AfterViewInit {
   private loadData(): void {
     this.isLoading.set(true);
     this.error.set(null);
+    const roles = this.roles();
 
     this.dataService.getUsersList()
       .pipe(
-        map(list => list.map(userDtoToView)),
+        map(list => list.map(dto => userListDtoToView(dto, roles))),
         this.tableManager.handleError('Ошибка загрузки пользователей'),
         finalize(() => this.isLoading.set(false))
       )

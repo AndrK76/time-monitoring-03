@@ -355,7 +355,15 @@ export function createFilterPredicate<T extends Record<string, any>>(
             if (type === TableFilterType.LIST) {
                 const value = info.value as TableFilterListValue;
                 if (value.id !== undefined && value.id !== null) {
-                    if (data[key] !== value.id) return false;
+                    //if (data[key] !== value.id) return false;
+                    const field = data[key];
+                    if (Array.isArray(field)) {
+                        //console.log(field);
+                        //console.log(value.id);
+                        if (!field.includes(value.id)) return false;
+                    } else {
+                        if (field !== value.id) return false;
+                    }
                 }
             } else if (type === TableFilterType.DATE) {
                 const dateVal = info.value as TableFilterDateValue;
