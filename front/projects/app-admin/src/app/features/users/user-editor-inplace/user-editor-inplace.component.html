@@ -7,38 +7,59 @@
             <p>Загрузка данных...</p>
         </div>
         }
+
+        <!-- Шапка редактора с кнопками -->
+        <div class="editor-header">
+            <div class="editor-header-actions">
+                <button mat-raised-button [color]="data.active ? 'warn' : 'primary'"
+                    [disabled]="loading() || isSomeUser()" (click)="toggleActive()" *ngIf="canFullUpdate()">
+                    <mat-icon>{{ data.active ? 'lock' : 'lock_open' }}</mat-icon>
+                    <span class="button-text">{{ data.active ? 'Заблокировать' : 'Разблокировать' }}</span>
+                </button>
+                <button mat-raised-button color="primary" [disabled]="loading() || data.approved"
+                    (click)="toggleApproved()" *ngIf="canFullUpdate()">
+                    <mat-icon>{{ data.approved ? 'check_circle' : 'check_circle_outline' }}</mat-icon>
+                    <span class="button-text">{{ data.approved ? 'Подтверждён' : 'Подтвердить' }}</span>
+                </button>
+                <button mat-raised-button color="accent" [disabled]="loading()" (click)="openChangePassword()"
+                    *ngIf="canFullUpdate() || isSomeUser()">
+                    <mat-icon>vpn_key</mat-icon>
+                    <span class="button-text">Сменить пароль</span>
+                </button>
+            </div>
+        </div>
+
         <form [formGroup]="form" class="editor-form">
-            <!-- все поля без изменений -->
             <div class="form-row">
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Login</mat-label>
+                    <input matInput formControlName="username" (change)="$event.stopPropagation()">
+                </mat-form-field>
                 <mat-form-field appearance="outline" class="full-width">
                     <mat-label>ID</mat-label>
                     <input matInput formControlName="id" readonly>
-                </mat-form-field>
-                <mat-form-field appearance="outline" class="full-width">
-                    <mat-label>Имя пользователя</mat-label>
-                    <input matInput formControlName="username">
                 </mat-form-field>
             </div>
 
             <div class="form-row">
                 <mat-form-field appearance="outline" class="full-width">
                     <mat-label>Email</mat-label>
-                    <input matInput formControlName="email" type="email">
+                    <input matInput formControlName="email" type="email" (change)="$event.stopPropagation()">
                 </mat-form-field>
                 <mat-form-field appearance="outline" class="full-width">
                     <mat-label>Отображаемое имя</mat-label>
-                    <input matInput formControlName="displayName">
+                    <input matInput formControlName="displayName" (change)="$event.stopPropagation()">
                 </mat-form-field>
             </div>
 
             <div class="form-row">
                 <mat-form-field appearance="outline" class="full-width">
                     <mat-label>Имя</mat-label>
-                    <input matInput formControlName="firstName">
+                    <input matInput formControlName="firstName" (change)="$event.stopPropagation()">
                 </mat-form-field>
                 <mat-form-field appearance="outline" class="full-width">
                     <mat-label>Фамилия</mat-label>
-                    <input matInput formControlName="lastName">
+                    <input matInput formControlName="lastName" (change)="$event.stopPropagation()">
                 </mat-form-field>
             </div>
 
@@ -51,11 +72,6 @@
                         </mat-option>
                     </mat-select>
                 </mat-form-field>
-            </div>
-
-            <div class="form-row checkbox-row">
-                <mat-checkbox formControlName="active">Активен</mat-checkbox>
-                <mat-checkbox formControlName="approved">Подтверждён</mat-checkbox>
             </div>
         </form>
     </div>

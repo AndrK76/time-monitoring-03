@@ -1,6 +1,6 @@
 import { catchError, concatMap, from, map, Observable, of } from 'rxjs';
 import { SaveDataError, SaveDataResult, TableDataChanges } from '../models/table-data-items';
-import { hasChanges, applyChanges, addOrigData, setExpanded, addNewItemFlag } from './object-utils';
+import { hasChanges, applyChanges, addOrigData, setExpanded, addNewItemFlag, isNotFullLoadedItem, addNotFullLoadItemFlag, removeNotFullLoadItemFlag } from './object-utils';
 import { TableFilterDateValue, TableFilterInfo, TableFilterListValue, TableFilterTextValue, TableFilterType } from '../models/table-filter-items';
 import { MatTableDataSource } from '@angular/material/table';
 
@@ -22,39 +22,77 @@ export function selectDataSourceItem<T extends Record<string, any>>(
     selectedItem: T | undefined,
     idGetter: (item: T) => string | number,
     expanded: boolean,
-    collapseOthers?: boolean,
+    collapseOthers: boolean,
+    needFill: boolean,
     ignoreKeys?: string[]
-): { data: T[]; selected: boolean; expanded: boolean } {
+): { data: T[]; selected: boolean; expanded: boolean, item: T | undefined } {
     if (!selectedItem) {
-        return { data: dataSource, selected: false, expanded: false };
+        return { data: dataSource, selected: false, expanded: false, item: selectedItem };
     }
     const index = dataSource.findIndex(e => idGetter(e) === idGetter(selectedItem));
     if (index === -1) {
-        return { data: dataSource, selected: false, expanded: false };
+        return { data: dataSource, selected: false, expanded: false, item: selectedItem };
     }
 
     let newData = [...dataSource];
-
+    let newRow: T | undefined;
     if (collapseOthers && expanded) {
         newData = newData.map((item, i) => {
+            let processRow = item;
             if (i === index) {
-                return setExpanded(addOrigData(item, ignoreKeys), true);
+                processRow = addOrigData(processRow, ignoreKeys);
+                if (needFill && isNotFullLoadedItem(processRow))
+                    processRow = addNotFullLoadItemFlag(processRow);
+                processRow = setExpanded(processRow, true);
+                newRow = processRow;
             } else {
-                return setExpanded(item, false)
+                processRow = setExpanded(processRow, false);
             }
-
+            return processRow;
         });
-
     } else {
-
-        let newRow = dataSource[index];
-        if (expanded)
-            newRow = addOrigData(newRow, ignoreKeys);
+        newRow = dataSource[index];
+        if (expanded) newRow = addOrigData(newRow, ignoreKeys);
         newRow = setExpanded(newRow, expanded);
+        if (needFill && isNotFullLoadedItem(newRow)) {
+            newRow = addNotFullLoadItemFlag(newRow);
+        }
         newData[index] = newRow;
     }
+    return { data: newData, selected: true, expanded: expanded, item: newRow };
+}
 
-    return { data: newData, selected: true, expanded: expanded };
+/**
+ * Обновляет элемент в массиве данных.
+ * Возвращает новый массив с обновлённым элементом, если были изменения.
+ * 
+ * @param dataSource - исходный массив данных
+ * @param updatedItem - элемент с обновлёнными данными
+ * @param idGetter - функция для получения идентификатора элемента
+ * @param ignoreKeys - поля, которые нужно игнорировать при сравнении
+ * @returns объект с новым массивом и флагом, были ли изменения
+ */
+export function actualizeDataSourceItem<T extends Record<string, any>>(
+    dataSource: T[],
+    actualizeItem: T | undefined,
+    actialData: T | undefined,
+    idGetter: (item: T) => string | number,
+    ignoreKeys?: string[]
+): { data: T[]; actualized: boolean; item: T | undefined } {
+    if (!actualizeItem || !actialData) {
+        return { data: dataSource, actualized: false, item: actualizeItem };
+    }
+    const index = dataSource.findIndex(e => idGetter(e) === idGetter(actualizeItem));
+    if (index === -1) {
+        return { data: dataSource, actualized: false, item: actualizeItem };
+    }
+
+    let newData = [...dataSource];
+    let newRow: T | undefined = dataSource[index];
+    applyChanges(newRow, actialData, ignoreKeys);
+    newRow = removeNotFullLoadItemFlag(newRow);
+    newData[index] = newRow;
+    return { data: newData, actualized: true, item: newRow };
 }
 
 
@@ -116,15 +154,21 @@ export function updateDataSourceItem<T extends Record<string, any>>(
 export function addDataSourceItem<T extends Record<string, any>>(
     dataSource: T[],
     addItem: T,
+    collapseOthers: boolean,
     ignoreKeys?: string[]
 ): { data: T[]; added: boolean, fullItem: T } {
 
     let newRow = addOrigData(addItem, ignoreKeys);
     newRow = setExpanded(newRow, true);
     newRow = addNewItemFlag(newRow);
-    // Создаём новый массив с обновлённой строкой
-    const newData = [newRow, ...dataSource];
-    return { data: newData, added: true, fullItem: newRow };
+    if (collapseOthers) {
+        let newData = dataSource.map(item => setExpanded(item, false));
+        newData = [newRow, ...newData];
+        return { data: newData, added: true, fullItem: newRow };
+    } else {
+        const newData = [newRow, ...dataSource];
+        return { data: newData, added: true, fullItem: newRow };
+    }
 }
 
 /**

@@ -6,6 +6,63 @@
     overflow: hidden;
     box-sizing: border-box;
 
+    .editor-header {
+        display: flex;
+        justify-content: flex-end; // кнопки прижаты к правому краю
+        align-items: center;
+        margin-bottom: 12px;
+        max-width: calc(100vw - 3rem);
+
+        .editor-header-actions {
+            display: flex;
+            gap: 8px;
+
+            button {
+                min-width: 120px;
+
+                .button-text {
+                    display: inline;
+                }
+
+                // мобильная адаптация
+                @media (max-width: 599.98px) {
+                    min-width: auto;
+                    padding: 0 12px;
+
+                    .button-text {
+                        display: none; // скрываем текст на маленьких экранах
+                    }
+                }
+            }
+        }
+    }
+
+    .loading-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.8);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 10;
+        border-radius: 4px;
+        max-width: calc(100vw - 3rem);
+
+         @media (max-width: 599.98px) {
+            justify-content: start;
+         }
+
+        p {
+            margin-top: 8px;
+            font-size: 0.9rem;
+            color: #555;
+        }
+    }
+
     .editor-form {
         display: flex;
         flex-direction: column;

@@ -25,13 +25,15 @@ export class PermissionService {
 
   checkPermissions(requestData: any): boolean {
     const user = this.currentUser() || this.auth.getStoredUser();
-    //console.log(user?.username);
-    //console.log(JSON.stringify(requestData));
     const normData = this.normalizePermissions(requestData);
-    //console.log(JSON.stringify(normData));
     const res = this.evaluatePermissions(normData, user?.permissions || []);
-    //console.log(`result: ${res}`);
     return res;
+  }
+
+  isSomeUser(requesrUser: UserResponseDto | undefined): boolean {
+    const user = this.currentUser() || this.auth.getStoredUser();
+    if (!requesrUser || !user) return false;
+    return user.id === requesrUser.id;
   }
 
   /**

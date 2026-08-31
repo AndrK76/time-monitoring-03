@@ -1,9 +1,10 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { AuthService } from '@mon3/sa';
+import { NavigationService } from '../../services/navigation.service';
 
 @Component({
   selector: 'sc-logout',
@@ -17,12 +18,19 @@ import { AuthService } from '@mon3/sa';
   templateUrl: './logout.component.html',
   styleUrl: './logout.component.scss'
 })
-export class LogoutComponent {
+export class LogoutComponent implements OnInit {
   private authService = inject(AuthService);
   private router = inject(Router);
+  private navigationService = inject(NavigationService);
 
   isLoading = false;
   errorMessage: string | null = null;
+  returnUrl: string = '/';
+
+  ngOnInit(): void {
+    this.returnUrl = this.navigationService.getPreviousUrl() || '/'
+  }
+
 
   confirmLogout(): void {
     this.isLoading = true;
@@ -44,6 +52,6 @@ export class LogoutComponent {
 
   cancel(): void {
     // Возвращаемся на предыдущую страницу или на главную
-    this.router.navigate(['/']);
+    this.router.navigateByUrl(this.returnUrl);
   }
 }

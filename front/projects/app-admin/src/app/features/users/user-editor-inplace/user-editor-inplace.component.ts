@@ -8,8 +8,12 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner'; // добавить
 import { UserInfo, RoleInfo } from '../user-view.models';
-import { debounceTime, distinctUntilChanged, filter } from 'rxjs';
+import { debounceTime, distinctUntilChanged, filter, Observable } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ChangePasswordDialogData, ChangePasswordDialogResult, DialogService, isNewItem, isNotFullLoadedItem } from '@mon3/sc';
+import { rolesWithInfo } from '../user-view.utils';
+import { MatIconModule } from '@angular/material/icon';
+import { ChangePasswordRequestDto } from '@mon3/sa';
 
 @Component({
   selector: 'app-user-editor-inplace',
@@ -22,7 +26,8 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
     MatSelectModule,
     MatCheckboxModule,
     MatButtonModule,
-    MatProgressSpinnerModule, // добавить
+    MatProgressSpinnerModule,
+    MatIconModule
   ],
   templateUrl: './user-editor-inplace.component.html',
   styleUrl: './user-editor-inplace.component.scss'
@@ -30,42 +35,74 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 export class UserEditorInplaceComponent implements OnInit {
   userData = input.required<UserInfo>();
   roles = input.required<RoleInfo[]>();
+  loadItemFn = input.required<(item: UserInfo) => Observable<UserInfo | undefined>>();
+  setPasswordFn = input.required<(item: UserInfo, data: ChangePasswordRequestDto) => Observable<void>>();
+  resetPasswordFn = input<(item: UserInfo) => Observable<void>>();
+  canFullUpdate = input.required<boolean>();
+  canPartialUpdate = input.required<boolean>();
+  isSomeUser = input.required<boolean>();
 
+
+  loaded = output<UserInfo>();
   change = output<UserInfo>();
 
   private fb = inject(FormBuilder);
   private destroyRef = inject(DestroyRef);
+  private dialogService = inject(DialogService);
 
   form!: FormGroup;
-  loading = signal<boolean>(false); // сигнал загрузки
+  data!: UserInfo;
+  loading = signal<boolean>(false);
+
+  showResetPassword = signal<boolean>(true);
+  showOldPassword = signal<boolean>(false);
+
 
   ngOnInit(): void {
+    this.data = this.userData();
+    this.showResetPassword.set(this.canFullUpdate() && !this.isSomeUser());
+    this.showOldPassword.set(this.isSomeUser());
     this.buildForm();
-    this.loadDetails(); // запускаем загрузку после построения формы
-    this.listenToChanges();
+    this.loadDetails();
   }
 
   private buildForm(): void {
-    const data = this.userData();
     this.form = this.fb.group({
-      id: [{ value: data.id, disabled: true }],
-      username: [data.username, Validators.required],
-      email: [data.email, [Validators.required, Validators.email]],
-      firstName: [data.firstName],
-      lastName: [data.lastName],
-      displayName: [data.displayName, Validators.required],
-      active: [data.active],
-      approved: [data.approved],
-      roles: [data.roles || []]
+      id: [{ value: this.data.id, disabled: true }],
+      username: [{ value: this.data.username, disabled: !this.canFullUpdate() }, Validators.required],
+      email: [this.data.email, [Validators.required, Validators.email]],
+      firstName: [this.data.firstName],
+      lastName: [this.data.lastName],
+      displayName: [this.data.displayName, Validators.required],
+      active: [this.data.active],
+      approved: [this.data.approved],
+      roles: [{ value: this.data.roles || [], disabled: !this.canFullUpdate() }]
     });
   }
 
   private loadDetails(): void {
-    this.loading.set(true);
-    // Имитация задержки запроса (1 секунда)
-    setTimeout(() => {
+    if (isNotFullLoadedItem(this.data) && !isNewItem(this.data)) {
+      this.loading.set(true);
+      this.loadItemFn()(this.data).pipe(
+        takeUntilDestroyed(this.destroyRef)
+      ).subscribe({
+        next: (data) => {
+          if (data) {
+            this.data = data;
+            this.loaded.emit(this.data);
+            this.loading.set(false);
+            this.buildForm();
+            this.listenToChanges();
+          } else {
+            this.listenToChanges();
+          }
+        }
+      });
+    } else {
       this.loading.set(false);
-    }, 1000);
+      this.listenToChanges();
+    }
+
   }
 
   private listenToChanges(): void {
@@ -79,42 +116,72 @@ export class UserEditorInplaceComponent implements OnInit {
         takeUntilDestroyed(this.destroyRef)
       )
       .subscribe(values => {
-        const allRoles = this.roles();
-        const rolesWithInfo = (values.roles || []).map((roleName: string) => {
-          const found = allRoles.find(r => r.name === roleName);
-          return found || new RoleInfo(roleName, '');
-        });
 
         const updated: UserInfo = new UserInfo(
-          this.userData().id,
+          this.data.id,
           values.username,
           values.email,
           values.firstName || '',
           values.lastName || '',
           values.displayName,
-          this.userData().avatarUrl,
+          this.data.avatarUrl,
           values.active,
           values.approved,
-          this.userData().emailVerified,
+          this.data.emailVerified,
           values.roles || [],
-          this.userData().permissions,
-          this.userData().anonymous,
-          rolesWithInfo
+          this.data.permissions,
+          this.data.anonymous,
+          rolesWithInfo(values || [], this.roles())
         );
         this.change.emit(updated);
       });
   }
 
-  resetToData(data: UserInfo): void {
-    this.form.patchValue({
-      username: data.username,
-      email: data.email,
-      firstName: data.firstName,
-      lastName: data.lastName,
-      displayName: data.displayName,
-      active: data.active,
-      approved: data.approved,
-      roles: data.roles || []
-    }, { emitEvent: false });
+  toggleActive(): void {
+    const current = this.data.active;
+    const newValue = !current;
+    const action = current ? 'Заблокировать' : 'Разблокировать';
+    const message = current
+      ? `Заблокировать пользователя ${this.data.username}?`
+      : `Разблокировать пользователя ${this.data.username}?`;
+
+    this.dialogService.confirm(message, 'Подтверждение').subscribe(confirmed => {
+      if (confirmed) {
+        this.data = { ...this.data, active: newValue };
+        this.form.patchValue({ active: newValue }, { emitEvent: true });
+      }
+    });
   }
+
+  toggleApproved(): void {
+    const current = this.data.approved;
+    if (current) return; // если уже подтверждён, кнопка неактивна
+
+    this.dialogService.confirm(
+      `Подтвердить пользователя ${this.data.username}?`,
+      'Подтверждение'
+    ).subscribe(confirmed => {
+      if (confirmed) {
+        this.data = { ...this.data, approved: true };
+        this.form.patchValue({ approved: true }, { emitEvent: true });
+      }
+    });
+  }
+
+  openChangePassword(): void {
+    if (this.loading()) return;
+    const data: ChangePasswordDialogData = {
+      username: this.data.username,
+      resetAvailable: this.showResetPassword(),
+      showOldPassword: this.showOldPassword()
+    };
+    this.dialogService.changePassword(data).subscribe((result: ChangePasswordDialogResult) => {
+      if (result.action === 'set') {
+        this.setPasswordFn()(this.data, result.data).subscribe();
+      } else if (result.action === 'reset' && this.resetPasswordFn) {
+        this.resetPasswordFn()!(this.data).subscribe();
+      }
+    });
+  }
+
 }

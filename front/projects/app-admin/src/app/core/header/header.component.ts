@@ -5,14 +5,15 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatMenuModule } from '@angular/material/menu';
-import { Router, RouterLink } from '@angular/router';
+import { NavigationEnd, NavigationStart, Router, RouterLink } from '@angular/router';
 import { AuthService, PermissionService } from '@mon3/sa';
 import { NgIf } from '@angular/common';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { MatDialog } from '@angular/material/dialog';
 import { UserProfileDialogComponent } from '../../dialogs/user-profile-dialog/user-profile-dialog.component';
-import { MenuItem, TopMenuItemComponent } from '@mon3/sc';
+import { MenuItem, NavigationService, TopMenuItemComponent } from '@mon3/sc';
 import { authConstant } from '../../auth-constants';
+import { filter, pairwise } from 'rxjs';
 
 @Component({
   selector: 'app-header',
@@ -30,6 +31,9 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewInit {
   private permissionService = inject(PermissionService);
   private router = inject(Router);
   private breakpointObserver = inject(BreakpointObserver);
+  private navigationService = inject(NavigationService);
+  private dialog = inject(MatDialog);
+
 
   // Сигналы для реактивного отслеживания
   user = this.authService.currentUser;
@@ -64,6 +68,9 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewInit {
     },
     { label: 'Тест', route: '/test' },
   ]
+
+  exitMenuItem: MenuItem = { label: 'Выход', route: '/logout' };
+
   usedMenuItems: WritableSignal<MenuItem[]> = signal([]);
 
 
@@ -124,6 +131,20 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewInit {
         this.limit.set(30);
       }
     });
+
+    // Подписываемся на изменения маршрута
+    this.router.events
+      .pipe(
+        filter(event => event instanceof NavigationStart),
+        pairwise()
+      )
+      .subscribe(([prevEvent, currentEvent]: [NavigationStart, NavigationStart]) => {
+        const targetUrl = currentEvent.url;
+        if (targetUrl === '/logout' || targetUrl.startsWith('/logout?')) {
+          this.navigationService.setPreviousUrl(prevEvent.url);
+        }
+      });
+
   }
 
   ngAfterViewInit(): void {
@@ -161,25 +182,6 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewInit {
     if (!user) return 'Пользователь';
     return user.displayName || user.username || 'Пользователь';
   }
-
-  /**
-   * Выход из системы
-   */
-  logout(): void {
-    this.authService.logout().subscribe({
-      next: () => {
-        this.router.navigate(['/']);
-      },
-      error: (err) => {
-        console.error('Logout error:', err);
-        // Даже при ошибке пробуем перенаправить на логин
-        this.router.navigate(['/']);
-      }
-    });
-  }
-
-  //Диалог для отображения
-  private dialog = inject(MatDialog);
 
   openUserProfile(): void {
     this.dialog.open(UserProfileDialogComponent, {

@@ -13,6 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
+import static org.apache.commons.lang3.StringUtils.isBlank;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -35,7 +37,7 @@ public class UserService {
         User user = User.builder()
                 .username(username)
                 .email(email)
-                .password(passwordEncoder.encode(password))
+                //.password(passwordEncoder.encode(password))
                 .firstName(firstName)
                 .lastName(lastName)
                 .displayName(displayName)
@@ -43,6 +45,9 @@ public class UserService {
                 .isEmailVerified(false)
                 .createdBy(creatorId)
                 .build();
+        if (!isBlank(password)) {
+            user.setPassword(passwordEncoder.encode(password));
+        }
 
         UserAuthProvider localProvider = UserAuthProvider.builder()
                 .providerName("LOCAL")

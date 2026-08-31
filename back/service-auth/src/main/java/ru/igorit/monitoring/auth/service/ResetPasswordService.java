@@ -63,6 +63,7 @@ public class ResetPasswordService {
         if (password == null || password.isBlank()) {
             throw new IllegalArgumentException("New password cannot be empty");
         }
+
         String encoded = passwordEncoder.encode(password);
         user.setPassword(encoded);
         user.setUpdatedBy(AuthInfoUtils.extractUserId(AuthInfoUtils.getCurrentAuth()));

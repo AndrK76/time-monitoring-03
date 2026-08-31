@@ -31,6 +31,7 @@ public class UserManagementService {
     private final UserManagementMapper userManagementMapper;
     private final CommandSender commandSender;
     private final ResetPasswordService resetPasswordService;
+    private final UserService userService;
 
 
     // ============================================================
@@ -70,26 +71,47 @@ public class UserManagementService {
         return toResponse(saved);
     }
 
-    @PreAuthorize("hasAuthority('USER_WRITE')")
+    @PreAuthorize("hasAnyAuthority('SUPERUSER', 'USER_WRITE', 'USER_READ')")
     @Transactional
-    public UserResponseDto updateUser(String userId, UpdateUserRequestDto request) {
+    public UserResponseDto updateUserPartial(String userId, UpdateUserRequestDto request) {
         User user = getUserEntityById(userId);
-        User oldState = user.clone();
         String updaterId = extractUserId(getCurrentAuth());
-        var saved = updateAllFields(user, request, updaterId);
-        sendUserUpdatedEvent(saved, true);
-        log.info("User fully updated: {}", user.getUsername());
+        updatePersonalFields(user, request, updaterId);
+        User saved = persistService.saveUser(user);
+        sendUserUpdatedEvent(saved, false);
+        log.info("User part updated: {}", user.getUsername());
         return toResponse(saved);
     }
 
-    @PreAuthorize("hasAuthority('USER_WRITE')")
+    @PreAuthorize("hasAnyAuthority('SUPERUSER', 'USER_WRITE')")
+    @Transactional
+    public UserResponseDto updateUserFull(String userId, UpdateUserRequestDto request) {
+        User user = getUserEntityById(userId);
+        String updaterId = extractUserId(getCurrentAuth());
+        var saved = updateAllFields(user, request, updaterId);
+        updatePersonalFields(user, request);
+        sendUserUpdatedEvent(saved, true);
+        log.info("User fully updated: {}", saved.getUsername());
+        return toResponse(saved);
+    }
+
+    @PreAuthorize("hasAnyAuthority('SUPERUSER','USER_WRITE')")
+    @Transactional
+    public UserResponseDto addUser(UpdateUserRequestDto request) {
+        String creatorId = extractUserId(getCurrentAuth());
+        User saved = userService.createLocalUser(request.getUsername(), request.getEmail(),null,
+                request.getFirstName(), request.getLastName(), request.getDisplayName(), creatorId);
+        return toResponse(saved);
+    }
+
+    @PreAuthorize("hasAnyAuthority('SUPERUSER','USER_WRITE')")
     @Transactional
     public void resetPasswordToDefault(String userId) {
         User user = getUserEntityById(userId);
         resetPasswordService.setDefaultPassword(user);
     }
 
-    @PreAuthorize("hasAuthority('USER_WRITE')")
+    @PreAuthorize("hasAnyAuthority('SUPERUSER','USER_WRITE')")
     @Transactional
     public void setPassword(String userId, String newPassword) {
         User user = getUserEntityById(userId);
@@ -99,7 +121,7 @@ public class UserManagementService {
     // ============================================================
     // Публичные методы. Роль — Просмотр
     // ============================================================
-    @PreAuthorize("hasAuthority('USER_READ')")
+    @PreAuthorize("hasAnyAuthority('SUPERUSER','USER_WRITE','USER_READ')")
     @Transactional(readOnly = true)
     public List<RoleDto> getAllRoles() {
         return persistService.findAllRoles().stream()
@@ -111,7 +133,7 @@ public class UserManagementService {
     }
 
 
-    @PreAuthorize("hasAuthority('USER_READ')")
+    @PreAuthorize("hasAnyAuthority('SUPERUSER','USER_WRITE','USER_READ')")
     @Transactional(readOnly = true)
     public List<RoleDto> getUserRoles(String userId) {
         User user = getUserEntityById(userId);
@@ -131,7 +153,7 @@ public class UserManagementService {
     // ============================================================
     // Публичные методы. Полномочия — Просмотр
     // ============================================================
-    @PreAuthorize("hasAuthority('USER_READ')")
+    @PreAuthorize("hasAnyAuthority('SUPERUSER','USER_WRITE','USER_READ')")
     @Transactional(readOnly = true)
     public List<PermissionDto> getAllPermissions() {
         return persistService.findAllPermissions().stream()
@@ -139,7 +161,7 @@ public class UserManagementService {
                 .collect(Collectors.toList());
     }
 
-    @PreAuthorize("hasAuthority('USER_READ')")
+    @PreAuthorize("hasAnyAuthority('SUPERUSER','USER_WRITE','USER_READ')")
     @Transactional(readOnly = true)
     public List<PermissionDto> getUserPermissions(String userId) {
         User user = getUserEntityById(userId);
@@ -224,13 +246,21 @@ public class UserManagementService {
     }
 
     /**
-     * Обновление только личных полей пользователя (без прав)
+     * Обновление только личных полей пользователя (чужого)
      */
-    private void updatePersonalFields(User user, UpdateUserRequestDto request) {
+    private void updatePersonalFields(User user, UpdateUserRequestDto request, String updaterId) {
         user.setFirstName(request.getFirstName());
         user.setLastName(request.getLastName());
         user.setDisplayName(request.getDisplayName());
-        user.setUpdatedBy(user.getId());
+        user.setEmail((request.getEmail()));
+        user.setUpdatedBy(updaterId);
+    }
+
+    /**
+     * Обновление только личных полей пользователя (без прав)
+     */
+    private void updatePersonalFields(User user, UpdateUserRequestDto request) {
+        updatePersonalFields(user, request, user.getId());
     }
 
     /**

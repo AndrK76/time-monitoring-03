@@ -17,11 +17,11 @@
         <mat-card-actions align="end">
             <div class="action-button-group">
                 <button mat-raised-button class="table-action-btn btn-success" (click)="callAdd()"
-                    [disabled]="isLoading() || isSaving()">
+                    [disabled]="isLoading() || isSaving()" *ngIf="canFullUpdate()">
                     <mat-icon>add</mat-icon><span class="hide-on-small">Добавить</span>
                 </button>
                 <button mat-raised-button class="table-action-btn btn-danger" (click)="callDelete(selectedItem()!)"
-                    [disabled]="isLoading() || isSaving() || !selectedItem()">
+                    [disabled]="isLoading() || isSaving() || !isNewItem()" *ngIf="canFullUpdate()">
                     <mat-icon>delete</mat-icon><span class="hide-on-small">Удалить</span>
                 </button>
                 <button mat-raised-button class="table-action-btn btn-light" (click)="callRefresh()"
@@ -127,8 +127,11 @@
                     <ng-container matColumnDef="editor">
                         <td mat-cell *matCellDef="let row" [attr.colspan]="displayedColumns.length">
                             <div class="editor-row" *ngIf="row._expanded">
-                                <app-user-editor-inplace [userData]="row" [roles]="roles()"
-                                    (change)="doUpdate($event)"></app-user-editor-inplace>
+                                <app-user-editor-inplace [userData]="row" [roles]="roles()" [loadItemFn]="loadItem"
+                                    [setPasswordFn]="setPassword" [resetPasswordFn]="resetPassword" ,
+                                    [canFullUpdate]="canFullUpdate()" [canPartialUpdate]="canPartialUpdate()"
+                                    [isSomeUser]="someUser()" (change)="doUpdate($event)"
+                                    (loaded)="doLoadedItem($event)"></app-user-editor-inplace>
                             </div>
                         </td>
                     </ng-container>

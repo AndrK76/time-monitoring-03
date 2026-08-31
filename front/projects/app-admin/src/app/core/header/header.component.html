@@ -4,7 +4,9 @@
     <!-- Левая часть: бренд -->
     <a class="brand-container" routerLink="/">
         <img src="logo.svg" width="30" height="24" alt="Логотип" class="logo">
-        <span class="brand">Мониторинг. Управление</span>
+
+        @if (!isSmallScreen()) {<span class="brand">Мониторинг. Управление</span>}
+        @else {<span class="brand">Мониторинг. Управление</span>}
     </a>
 
 
@@ -36,6 +38,7 @@
             {{ displayName() }}
         </span>
 
+        @if(!isSmallScreen()) {
         <!-- Разделитель -->
         <span class="divider">|</span>
 
@@ -43,13 +46,14 @@
         <a mat-button class="logout-link" routerLink="/logout">
             Выйти
         </a>
-
+        }
         <!-- Гамбургер (на маленьких экранах) -->
         @if (isSmallScreen()) {
         <button mat-icon-button class="hamburger-button" [matMenuTriggerFor]="mobileMenu">
             <mat-icon>menu</mat-icon>
         </button>
         <mat-menu #mobileMenu="matMenu">
+            <sc-top-menu-item [item]="exitMenuItem" [isSubmenu]="true"></sc-top-menu-item>
             @for (item of usedMenuItems(); track item.label) {
             <!-- Для мобильного меню используем тот же компонент, но с флагом isSubmenu -->
             <sc-top-menu-item [item]="item" [isSubmenu]="true"></sc-top-menu-item>

@@ -1,7 +1,7 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { AuthService } from './auth.service';
-import { PermissionDto, RoleDto, TestResponse, UpdateUserRequestDto, UserListItemDto, UserResponseDto } from '../models/auth.models';
+import { ChangePasswordRequestDto, PermissionDto, RoleDto, TestResponse, UpdateUserRequestDto, UserListItemDto, UserResponseDto } from '../models/auth.models';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -32,32 +32,17 @@ export class UsermanageService {
   }
 
   // ============================================================
+  // Управление ролями
+  // ============================================================
+  getAllRoles(): Observable<RoleDto[]> {
+    return this.http.get<RoleDto[]>(`${this.authApiUrl}/usermanage/roles`, {
+      headers: this.getHeaders()
+    });
+  }
+
+  // ============================================================
   // Управление пользователями
   // ============================================================
-
-  getCurrentUser(): Observable<UserResponseDto> {
-    return this.http.get<UserResponseDto>(`${this.authApiUrl}/usermanage/users/me`, {
-      headers: this.getHeaders()
-    });
-  }
-
-  updateCurrentUser(data: UpdateUserRequestDto): Observable<UserResponseDto> {
-    return this.http.put<UserResponseDto>(`${this.authApiUrl}/usermanage/users/me`, data, {
-      headers: this.getHeaders()
-    });
-  }
-
-  getCurrentUserRoles(): Observable<RoleDto[]> {
-    return this.http.get<RoleDto[]>(`${this.authApiUrl}/usermanage/users/me/roles`, {
-      headers: this.getHeaders()
-    });
-  }
-
-  getCurrentUserPermissions(): Observable<PermissionDto[]> {
-    return this.http.get<PermissionDto[]>(`${this.authApiUrl}/usermanage/users/me/permissions`, {
-      headers: this.getHeaders()
-    });
-  }
 
   getUsersList(): Observable<UserListItemDto[]> {
     return this.http.get<UserListItemDto[]>(`${this.authApiUrl}/usermanage/users`, {
@@ -71,11 +56,45 @@ export class UsermanageService {
     });
   }
 
+  getCurrentUser(): Observable<UserResponseDto> {
+    return this.http.get<UserResponseDto>(`${this.authApiUrl}/usermanage/users/me`, {
+      headers: this.getHeaders()
+    });
+  }
+
   updateUser(userId: string, data: UpdateUserRequestDto): Observable<UserResponseDto> {
     return this.http.put<UserResponseDto>(`${this.authApiUrl}/usermanage/users/${userId}`, data, {
       headers: this.getHeaders()
     });
   }
+
+  updateCurrentUser(data: UpdateUserRequestDto): Observable<UserResponseDto> {
+    return this.http.put<UserResponseDto>(`${this.authApiUrl}/usermanage/users/me`, data, {
+      headers: this.getHeaders()
+    });
+  }
+
+  addUser(data: UpdateUserRequestDto): Observable<UserResponseDto> {
+    return this.http.post<UserResponseDto>(`${this.authApiUrl}/usermanage/users`, data, {
+      headers: this.getHeaders()
+    });
+  }
+
+
+
+
+  getCurrentUserRoles(): Observable<RoleDto[]> {
+    return this.http.get<RoleDto[]>(`${this.authApiUrl}/usermanage/users/me/roles`, {
+      headers: this.getHeaders()
+    });
+  }
+
+  getCurrentUserPermissions(): Observable<PermissionDto[]> {
+    return this.http.get<PermissionDto[]>(`${this.authApiUrl}/usermanage/users/me/permissions`, {
+      headers: this.getHeaders()
+    });
+  }
+
 
   getUserRoles(userId: string): Observable<RoleDto[]> {
     return this.http.get<RoleDto[]>(`${this.authApiUrl}/usermanage/users/${userId}/roles`, {
@@ -89,11 +108,7 @@ export class UsermanageService {
     });
   }
 
-  getAllRoles(): Observable<RoleDto[]> {
-    return this.http.get<RoleDto[]>(`${this.authApiUrl}/usermanage/roles`, {
-      headers: this.getHeaders()
-    });
-  }
+
 
   getAllPermissions(): Observable<PermissionDto[]> {
     return this.http.get<PermissionDto[]>(`${this.authApiUrl}/usermanage/permissions`, {
@@ -107,10 +122,10 @@ export class UsermanageService {
     });
   }
 
-  setPassword(userId: string, newPassword: string): Observable<void> {
+  setPassword(userId: string, data: ChangePasswordRequestDto): Observable<void> {
     return this.http.put<void>(
       `${this.authApiUrl}/usermanage/users/${userId}/set-password`,
-      { newPassword },
+      data,
       { headers: this.getHeaders() }
     );
   }

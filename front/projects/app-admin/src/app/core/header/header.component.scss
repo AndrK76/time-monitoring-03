@@ -10,6 +10,8 @@
     gap: 8px;
     flex-wrap: nowrap;
     color: var(--menu-text);
+    flex-wrap: nowrap; // запрещаем перенос
+    overflow: hidden; // обрезаем всё, что не влезает
 
     .mat-mdc-menu-panel {
         background: var(--menu-bg) !important;
@@ -20,13 +22,16 @@
     display: flex;
     align-items: center;
     gap: 12px;
-    flex-shrink: 0;
+    //flex-shrink: 0;
     white-space: nowrap;
     text-decoration: none;
     color: var(--menu-active-text);
     padding: 0 8px;
     min-width: auto;
-    flex-wrap: nowrap; // запрещаем перенос
+    //flex-wrap: nowrap; // запрещаем перенос
+    flex: 0 1 auto; // разрешаем сжатие, но не расширение
+    min-width: 0; // разрешаем сжатие ниже содержимого
+    overflow: hidden; // обрезаем содержимое
 
     .logo {
         display: block;
@@ -37,6 +42,10 @@
         font-size: 1.1rem;
         font-weight: 500;
         white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        flex-shrink: 1; // текст сжимается
+        min-width: 0;
     }
 }
 
@@ -45,6 +54,8 @@
     align-items: center;
     flex: 0 1 auto;
     overflow: hidden;
+    min-width: 0;
+
 }
 
 .nav-links {
@@ -70,6 +81,7 @@
 
 .spacer {
     flex: 1 1 auto;
+    min-width: 0;
 }
 
 .user-section {

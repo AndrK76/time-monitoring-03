@@ -94,8 +94,8 @@ export class TestTable4Component implements OnInit, AfterViewInit {
     this.error.set(null);
 
     forkJoin({
-      places: this.dataService.getPlaces().pipe(this.tableManager.handleError('Ошибка загрузки мест')),
-      statuses: this.dataService.getStatuses().pipe(this.tableManager.handleError('Ошибка загрузки статусов'))
+      places: this.dataService.getPlaces().pipe(this.tableManager.handleError<Place[]>('Ошибка загрузки мест', [])),
+      statuses: this.dataService.getStatuses().pipe(this.tableManager.handleError<EventStatus[]>('Ошибка загрузки статусов', []))
     }).subscribe({
       next: (result) => {
         const { places, statuses } = result as { places: Place[]; statuses: EventStatus[] };
@@ -127,7 +127,7 @@ export class TestTable4Component implements OnInit, AfterViewInit {
 
     this.dataService.getPlaceEvents()
       .pipe(
-        this.tableManager.handleError('Ошибка загрузки событий'),
+        this.tableManager.handleError<PlaceEvents[]>('Ошибка загрузки событий', []),
         finalize(() => this.isLoading.set(false))
       )
       .subscribe({
@@ -191,7 +191,7 @@ export class TestTable4Component implements OnInit, AfterViewInit {
   }
 
   private doSelect = (item: EventRow | undefined, newState: boolean, updateUrl: boolean = true, scrollTo: boolean = false) => {
-    this.tableManager.doSelectBaseWithCollapse(item, newState, () => this.table.renderRows(), updateUrl, scrollTo);
+    this.tableManager.doSelectBaseWithCollapse(item, newState, () => this.table.renderRows(), updateUrl, scrollTo, undefined, undefined);
   }
   private doRefresh = () => this.tableManager.doRefreshBase(() => this.loadEvents());
   private doAdd(): void {
@@ -222,7 +222,7 @@ export class TestTable4Component implements OnInit, AfterViewInit {
       this.doDelete(item);
     } else {
       const _id = (this.selectedItem()?.id) ?? null;
-      this.tableManager.doSelectBaseWithCollapse(this.selectedItem(), false, undefined, true, false);
+      this.tableManager.doSelectBaseWithCollapse(this.selectedItem(), false, undefined, true, false, undefined, undefined);
       this.tableManager.scrollToItemId(_id);
     }
   }

@@ -18,6 +18,7 @@ export * from './lib/components/confirm-dialog-cancel/confirm-dialog-cancel.comp
 
 export * from './lib/services/notification.service';
 
+export * from './lib/services/navigation.service';
 export * from './lib/components/login/login.component';
 export * from './lib/components/register/register.component';
 export * from './lib/components/logout/logout.component';
@@ -30,4 +31,7 @@ export * from './lib/components/filter-date/filter-date.component';
 export * from './lib/components/filter-text/filter-text.component';
 
 export * from './lib/services/table-manage.service';
+
+export * from './lib/components/change-password-dialog/change-password-dialog.model';
+export * from './lib/components/change-password-dialog/change-password-dialog.component';
 

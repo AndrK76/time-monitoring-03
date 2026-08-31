@@ -219,6 +219,48 @@ export function removeNotApplyItemFlag<T extends Record<string, any>>(
     return source;
 }
 
+/**
+ * Добавляет к объекту служебное поле `_needload`, показывающее что объект нужно прочитать полностью
+ * @param source - исходный объект
+ * @returns новый объект с добавленным полем `_dettached`
+ */
+export function addNotFullLoadItemFlag<T extends Record<string, any>>(
+    source: T
+): T {
+    return {
+        ...source,
+        _needload: true
+    };
+}
+
+/**
+ * Проверяет является ли переданный элемент не полностью прочитанным (через аттрибут `_dettached`)
+ * @param source - исходный объект
+ * @returns является ли объект новым
+ */
+export function isNotFullLoadedItem<T extends Record<string, any>>(source: T): boolean {
+    return ('_needload' in source && source['_needload'] === true) || !('_needload' in source);
+}
+
+/**
+ * Удаляет из объекта служебное поле `_needload`, показывающее что объект нужно прочитать полностью
+ * @param source - исходный объект
+ * @returns новый объект с добавленным полем `_dettached`
+ */
+export function removeNotFullLoadItemFlag<T extends Record<string, any>>(
+    source: T
+): T {
+    /*if ('_needload' in source) {
+        const { _needload, ...res } = source;
+        return res as T;
+    }
+    return source;*/
+    return {
+        ...source,
+        _needload: false
+    };
+}
+
 
 
 

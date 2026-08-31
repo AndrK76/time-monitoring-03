@@ -4,6 +4,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { Observable } from 'rxjs';
 import { ConfirmDialogComponent } from '../components/confirm-dialog/confirm-dialog.component';
 import { ConfirmDialogCancelComponent, ConfirmDialogCancelData, ConfirmDialogCancelResult } from '../components/confirm-dialog-cancel/confirm-dialog-cancel.component';
+import { ChangePasswordDialogData, ChangePasswordDialogResult } from '../components/change-password-dialog/change-password-dialog.model';
+import { ChangePasswordDialogComponent } from '../components/change-password-dialog/change-password-dialog.component';
 
 @Injectable({ providedIn: 'root' })
 export class DialogService {
@@ -24,6 +26,15 @@ export class DialogService {
         const dialogRef = this.dialog.open(ConfirmDialogCancelComponent, {
             data,
             width: '400px',
+            autoFocus: false,
+        });
+        return dialogRef.afterClosed();
+    }
+
+    changePassword(data: ChangePasswordDialogData): Observable<ChangePasswordDialogResult> {
+        const dialogRef = this.dialog.open(ChangePasswordDialogComponent, {
+            data,
+            width: '450px',
             autoFocus: false,
         });
         return dialogRef.afterClosed();

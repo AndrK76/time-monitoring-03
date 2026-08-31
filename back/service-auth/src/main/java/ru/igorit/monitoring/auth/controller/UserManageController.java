@@ -1,8 +1,10 @@
 package ru.igorit.monitoring.auth.controller;
 
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import ru.igorit.monitoring.auth.dto.*;
+import ru.igorit.monitoring.auth.helper.AuthErrorHelper;
 import ru.igorit.monitoring.auth.service.UserManagementService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +19,7 @@ import java.util.List;
 public class UserManageController {
 
     private final UserManagementService userManagementService;
+    private final AuthErrorHelper authErrorHelper;
 
     @GetMapping("/users")
     public ResponseEntity<List<UserListItemDto>> getUserList() {
@@ -36,6 +39,16 @@ public class UserManageController {
         return userManagementService.getUserById(userId);
     }
 
+    @PostMapping("/users")
+    public ResponseEntity<?> addUser(@Valid @RequestBody UpdateUserRequestDto request) {
+        log.info("Adding user: {}", request.getUsername());
+        try {
+            return ResponseEntity.status(HttpStatus.CREATED).body(userManagementService.addUser(request));
+        } catch (Exception e) {
+            return authErrorHelper.handleLoginError(e, request.getUsername());
+        }
+    }
+
     @PutMapping("/users/me")
     public ResponseEntity<UserResponseDto> updateCurrentUser(
             @Valid @RequestBody UpdateUserRequestDto request) {
@@ -44,10 +57,17 @@ public class UserManageController {
     }
 
     @PutMapping("/users/{userId}")
-    public UserResponseDto updateUser(@PathVariable String userId,
+    public UserResponseDto updateUserFull(@PathVariable String userId,
                                       @Valid @RequestBody UpdateUserRequestDto request) {
-        log.info("Updating user: {}", userId);
-        return userManagementService.updateUser(userId, request);
+        log.info("Updating user full: {}", userId);
+        return userManagementService.updateUserFull(userId, request);
+    }
+
+    @PutMapping("/users/{userId}/part")
+    public UserResponseDto updateUserPart(@PathVariable String userId,
+                                      @Valid @RequestBody UpdateUserRequestDto request) {
+        log.info("Updating user partial: {}", userId);
+        return userManagementService.updateUserPartial(userId, request);
     }
 
     @GetMapping("/users/me/roles")

@@ -4,6 +4,7 @@ import { MatTableDataSource } from '@angular/material/table';
 import { catchError, Observable, of } from 'rxjs';
 import { SaveDataResult, TableDataChanges } from '../models/table-data-items';
 import {
+  actualizeDataSourceItem,
   addDataSourceItem, addDeleteChangeToState, addModifyChangeToState, addNewChangeToState, applyFilters,
   clearFilterValues, deleteDataSourceItem, doSaveData, formatTableChanges, hasTableChanges,
   initFilterPredicate, ItemIdFn, newTableDataChanges, selectDataSourceItem,
@@ -23,9 +24,11 @@ export class TableManageService<T extends Record<string, any>> {
   readonly dataSource = new MatTableDataSource<T>([]);
   readonly dataState = signal<TableDataChanges>(newTableDataChanges());
   readonly selectedItem = signal<T | undefined>(undefined);
+  readonly expandedItem = signal<T | undefined>(undefined);
   readonly filterConfig = signal<Map<string, TableFilterInfo>>(new Map());
   readonly showFilter = signal(true);
   readonly error = signal<string | null>(null);
+  readonly snackError = signal<string | null>(null);
 
   // === Вычисляемые сигналы ===
   readonly hasChanges = computed(() => hasTableChanges(this.dataState()));
@@ -111,26 +114,44 @@ export class TableManageService<T extends Record<string, any>> {
   }
 
   // === Выбор элемента ===
-  doSelectBaseWithCollapse(item: T | undefined, newState: boolean, renderFn: (() => void) | undefined, updateUrl: boolean = true, scrollTo: boolean = false) {
-    this._doSelectBase(item, newState, renderFn, updateUrl, scrollTo, true);
+  doSelectBaseWithCollapse(item: T | undefined, newState: boolean, renderFn: (() => void) | undefined,
+    updateUrl: boolean = true, scrollTo: boolean = false, needFill: boolean = false,
+    onSetFn: (() => void) | undefined) {
+    this._doSelectBase(item, newState, renderFn, updateUrl, scrollTo, true, needFill, onSetFn);
   }
 
-  doSelectBaseWithoutCollapse(item: T | undefined, newState: boolean, renderFn: (() => void) | undefined, updateUrl: boolean = true, scrollTo: boolean = false) {
-    this._doSelectBase(item, newState, renderFn, updateUrl, scrollTo, false);
+  doSelectBaseWithoutCollapse(item: T | undefined, newState: boolean, renderFn: (() => void) | undefined,
+    updateUrl: boolean = true, scrollTo: boolean = false, needFill: boolean = false,
+    onSetFn: (() => void) | undefined,) {
+    this._doSelectBase(item, newState, renderFn, updateUrl, scrollTo, false, needFill, onSetFn);
   }
 
-  private _doSelectBase(item: T | undefined, newState: boolean, renderFn: (() => void) | undefined, updateUrl: boolean, scrollTo: boolean, collapseOthers: boolean) {
-    const result = selectDataSourceItem(this.dataSource.data, item, this.itemIdFn, newState, collapseOthers);
+  private _doSelectBase(item: T | undefined, newState: boolean, renderFn: (() => void) | undefined,
+    updateUrl: boolean, scrollTo: boolean, collapseOthers: boolean, needFill: boolean,
+    onSetFn: (() => void) | undefined) {
+    const result = selectDataSourceItem(this.dataSource.data, item, this.itemIdFn, newState, collapseOthers, needFill);
     this.selectedItem.set(undefined);
+    this.expandedItem.set(undefined);
     let _id: string | undefined = undefined;
     if (result.selected) {
       this.dataSource.data = result.data;
-      if (newState) this.selectedItem.set(item);
+      if (newState) { this.selectedItem.set(result.item); this.expandedItem.set(result.item); }
       if (item && newState) _id = this.itemIdFn(item);
+      if (onSetFn) onSetFn();
     }
     if (updateUrl) this.updateUrlParams(_id);
     if (renderFn) renderFn();
     if (scrollTo && _id) this.scrollToItemId(_id);
+  }
+
+  doAfterLoadItem(item: T | undefined, renderFn: (() => void) | undefined) {
+    //console.log(item);
+    const result = actualizeDataSourceItem(this.dataSource.data, this.expandedItem(), item, this.itemIdFn);
+    if (result.actualized) {
+      this.dataSource.data = result.data;
+      this.selectedItem.set(result.item);
+      this.expandedItem.set(result.item);
+    }
   }
 
 
@@ -140,23 +161,27 @@ export class TableManageService<T extends Record<string, any>> {
     loadEventsFn();
     this.dataState.set(newTableDataChanges());
     this.selectedItem.set(undefined);
+    this.expandedItem.set(undefined);
   }
 
   // === Добавление ===
-  doAddBase(newItem: T, renderFn: () => void, markAsDettach: boolean = false): void {
+  doAddBase(newItem: T, renderFn: () => void, markAsDettach: boolean = false, collapseOthers: boolean = false): void {
     this.selectedItem.set(undefined);
-    const result = addDataSourceItem(this.dataSource.data, newItem);
+    this.expandedItem.set(undefined);
+    const result = addDataSourceItem(this.dataSource.data, newItem, collapseOthers);
     if (result.added) {
       this.dataSource.data = result.data;
       if (renderFn) renderFn();
       this.dataState.update(state => addNewChangeToState(state, this.itemIdFn(newItem)));
       if (markAsDettach) result.fullItem = addNotApplyItemFlag(result.fullItem);
       this.selectedItem.set(result.fullItem);
+      this.expandedItem.set(result.fullItem);
     }
   }
 
   // === Обновление ===
   doUpdateBase(item: T, renderFn: () => void): void {
+    //console.log(item);
     const result = updateDataSourceItem(
       this.dataSource.data, item, this.itemIdFn, undefined, true);
     if (result.updated) {
@@ -174,6 +199,7 @@ export class TableManageService<T extends Record<string, any>> {
       if (renderFn) renderFn();
       this.dataState.update(state => addDeleteChangeToState(state, item, this.itemIdFn));
       this.selectedItem.set(undefined);
+      this.expandedItem.set(undefined);
       this.updateUrlParams();
     }
   }
@@ -200,11 +226,11 @@ export class TableManageService<T extends Record<string, any>> {
       })
   }
 
-  handleError(message: string) {
+  handleError<T>(message: string, ret: T, target?: WritableSignal<string | null>): (source: Observable<T>) => Observable<T> {
     return catchError((err: any) => {
       console.error(err);
-      this.error.set(message);
-      return of([]);
+      (target ?? this.error).set(message);
+      return of(ret);
     });
   }
 
