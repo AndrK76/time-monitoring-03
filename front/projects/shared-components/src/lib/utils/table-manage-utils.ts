@@ -393,6 +393,7 @@ export function createFilterPredicate<T extends Record<string, any>>(
 ): (data: T, filter: string) => boolean {
     return (data: T, filter: string): boolean => {
         const config = getFilterConfig();
+
         for (const [key, info] of config) {
             if (!info.value) continue;
             const type = info.type;
@@ -431,14 +432,16 @@ export function createFilterPredicate<T extends Record<string, any>>(
                 const text = textVal.text || '';
                 const flag = textVal.flag;
                 const fieldValue = (data[key] || '').toString();
+                const lowerField = fieldValue.toLowerCase();
+                const lowerText = text.toLowerCase();
                 if (flag === '~0') {
                     if (fieldValue !== '') return false;
                 } else if (flag === '~1') {
                     if (fieldValue === '') return false;
                 } else if (flag === '~!') {
-                    if (fieldValue !== '' && fieldValue.includes(text)) return false;
+                    if (fieldValue !== '' && lowerField.includes(lowerText)) return false;
                 } else {
-                    if (text && !fieldValue.includes(text)) return false;
+                    if (text && !lowerField.includes(lowerText)) return false;
                 }
             }
         }

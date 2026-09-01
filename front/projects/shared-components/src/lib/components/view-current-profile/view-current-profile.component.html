@@ -1,6 +1,6 @@
 <div class="profile-container">
     <!-- Состояние загрузки -->
-    <div *ngIf="loading()" class="state-container loading-state">
+    <div *ngIf="isLoading()" class="state-container loading-state">
         <mat-spinner diameter="40"></mat-spinner>
         <p>Загрузка профиля...</p>
     </div>
@@ -12,7 +12,7 @@
     </div>
 
     <!-- Данные -->
-    <ng-container *ngIf="!loading() && !error() && user()">
+    <ng-container *ngIf="!isLoading() && !error() && user()">
         <!-- Tile: аватар + displayName -->
         <div class="tile-section">
             <div class="avatar">
@@ -68,7 +68,7 @@
             <div class="roles-label">Роли</div>
             <div class="roles-list">
                 <span class="role-badge" *ngFor="let role of user()!.roles">
-                    {{ role }}
+                    {{ getRoleDescription(role) }}
                 </span>
                 <span *ngIf="!user()!.roles.length" class="no-roles">—</span>
             </div>

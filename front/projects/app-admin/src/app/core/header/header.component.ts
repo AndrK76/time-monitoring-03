@@ -10,7 +10,7 @@ import { AuthService, PermissionService } from '@mon3/sa';
 import { NgIf } from '@angular/common';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { MatDialog } from '@angular/material/dialog';
-import { UserProfileDialogComponent } from '../../dialogs/user-profile-dialog/user-profile-dialog.component';
+import { UserProfileDialogComponent } from '../../features/users/user-profile-dialog/user-profile-dialog.component';
 import { MenuItem, NavigationService, TopMenuItemComponent } from '@mon3/sc';
 import { authConstant } from '../../auth-constants';
 import { filter, pairwise } from 'rxjs';

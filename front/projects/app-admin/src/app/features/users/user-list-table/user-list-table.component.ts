@@ -1,9 +1,9 @@
 import { AfterViewInit, Component, ElementRef, inject, OnInit, signal, ViewChild } from '@angular/core';
-import { AuthService, ChangePasswordRequestDto, PermissionService, UsermanageService } from '@mon3/sa';
-import { RoleInfo, UserInfo } from '../user-view.models';
+import { AuthService, ChangePasswordRequestDto, PermissionService, UserManageService } from '@mon3/sa';
+import { UserInfo } from '../user-view.models';
 import { DialogService, FilterRootComponent, isExpanded, isNewItem, NotificationService, SaveDataResult, TableFilterInfo, TableFilterType, TableManageService } from '@mon3/sc';
 import { catchError, finalize, forkJoin, map, Observable, of, tap, throwError } from 'rxjs';
-import { createEmptyUser, userItemDtoToView, userListDtoToView, userViewToItem } from '../user-view.utils';
+import { createEmptyUser, userResponseDtoToView, userListDtoToView, userViewToRequestDto } from '../user-view.utils';
 import { CommonModule } from '@angular/common';
 import { MatTable, MatTableModule } from '@angular/material/table';
 import { MatCardModule } from '@angular/material/card';
@@ -14,6 +14,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { UserEditorInplaceComponent } from '../user-editor-inplace/user-editor-inplace.component';
 import { authConstant } from '../../../auth-constants';
+import { RoleInfo } from '../../roles/role-view.models';
+import { roleResponseDtoToVIew } from '../../roles/role-view.utils';
 
 @Component({
   selector: 'app-user-list-table',
@@ -33,13 +35,14 @@ import { authConstant } from '../../../auth-constants';
   styleUrl: './user-list-table.component.scss'
 })
 export class UserListTableComponent implements OnInit, AfterViewInit {
-  dataService = inject(UsermanageService);
+  dataService = inject(UserManageService);
   permisService = inject(PermissionService);
   authService = inject(AuthService);
 
   private dialogService = inject(DialogService);
   private notificationService = inject(NotificationService);
   private tableManager = inject(TableManageService<UserInfo>);
+
 
   dataSource = this.tableManager.dataSource;
   dataState = this.tableManager.dataState;
@@ -49,12 +52,11 @@ export class UserListTableComponent implements OnInit, AfterViewInit {
   filterConfig = this.tableManager.filterConfig;
   showFilter = this.tableManager.showFilter;
   error = this.tableManager.error;
+  isSmallScreen = this.tableManager.isSmallScreen;
 
   @ViewChild(MatTable) table!: MatTable<UserInfo>;
   @ViewChild(MatSort) sort!: MatSort;
   @ViewChild('tableWrapper') tableWrapper!: ElementRef<HTMLDivElement>
-
-
 
   roles = signal<RoleInfo[]>([]);
   users = signal<UserInfo[]>([]);
@@ -81,6 +83,7 @@ export class UserListTableComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     this.canFullUpdate.set(this.permisService.checkPermissions(authConstant('fullUserUpdate')))
     this.canPartialUpdate.set(this.permisService.checkPermissions(authConstant('partUserUpdate')))
+    this.tableManager.breakpointsSubscribe();
     this.filterConfig.set(this._filterConfig);
     this.initializeData();
     this.tableManager.setItemIdFn(this.itemId);
@@ -100,6 +103,7 @@ export class UserListTableComponent implements OnInit, AfterViewInit {
     forkJoin({
       roles: this.dataService.getAllRoles()
         .pipe(
+          map(list => list.map(dto => roleResponseDtoToVIew(dto))),
           this.tableManager.handleError<RoleInfo[]>('Ошибка загрузки списка ролей', []),
         ),
     }).subscribe({
@@ -158,7 +162,7 @@ export class UserListTableComponent implements OnInit, AfterViewInit {
     const roles = this.roles();
     this.tableManager.snackError.set(null);
     return this.dataService.getUserById(item.id).pipe(
-      map(dto => userItemDtoToView(dto, roles)),
+      map(dto => userResponseDtoToView(dto, roles)),
       this.tableManager.handleError<UserInfo | undefined>('Ошибка загрузки информации о пользователе', undefined, this.tableManager.snackError),
       tap(_ => {
         const err = this.tableManager.snackError();
@@ -172,17 +176,17 @@ export class UserListTableComponent implements OnInit, AfterViewInit {
   }
 
   addItem = (item: UserInfo): Observable<UserInfo> => {
-    const reqItem = userViewToItem(item);
+    const reqItem = userViewToRequestDto(item);
     const roles = this.roles();
     return this.dataService.addUser(reqItem).pipe(
-      map(dto => userItemDtoToView(dto, roles)));
+      map(dto => userResponseDtoToView(dto, roles)));
   }
 
   updateItem = (item: UserInfo): Observable<UserInfo> => {
-    const reqItem = userViewToItem(item);
+    const reqItem = userViewToRequestDto(item);
     const roles = this.roles();
     return this.dataService.updateUser(item.id, reqItem).pipe(
-      map(dto => userItemDtoToView(dto, roles)));
+      map(dto => userResponseDtoToView(dto, roles)));
   }
 
   deleteItem = (item: UserInfo): Observable<void> => {
@@ -190,9 +194,6 @@ export class UserListTableComponent implements OnInit, AfterViewInit {
   }
 
   setPassword = (item: UserInfo, data: ChangePasswordRequestDto): Observable<void> => {
-
-    this.authService.changePassword(data)
-
     return (this.someUser() ? this.authService.changePassword(data) : this.dataService.setPassword(item.id, data))
       .pipe(
         tap(_ => { this.notificationService.success('Пароль изменен') }),
@@ -269,7 +270,6 @@ export class UserListTableComponent implements OnInit, AfterViewInit {
         this.notificationService.error(`Ошибки при сохранении:\n${errorsMsg}`);
       }
     }
-    console.log(this.tableManager.dataState());
     this.tableManager.doSaveBase(this.isSaving,
       (item: UserInfo) => this.addItem(item),
       (item: UserInfo) => this.updateItem(item),

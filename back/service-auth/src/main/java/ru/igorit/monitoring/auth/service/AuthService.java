@@ -112,7 +112,7 @@ public class AuthService {
                 .refreshToken(refreshToken)
                 .tokenType("Bearer")
                 .expiresIn(86400L)
-                .user(userManagementMapper.toResponse(user))
+                .user(userManagementMapper.toResponseDto(user))
                 .build();
     }
 
@@ -140,7 +140,7 @@ public class AuthService {
     public UserResponseDto getCurrentUser(HttpServletRequest request) {
         String username = extractUsernameFromContextOrCookie(request);
         User user = getUserByUsernameOrAnonymous(username);
-        return userManagementMapper.toResponse(user);
+        return userManagementMapper.toResponseDto(user);
     }
 
     @Transactional
@@ -166,7 +166,7 @@ public class AuthService {
                 .accessToken(newToken)
                 .tokenType("Bearer")
                 .expiresIn(86400L)
-                .user(userManagementMapper.toResponse(user))
+                .user(userManagementMapper.toResponseDto(user))
                 .build();
     }
 
@@ -202,7 +202,7 @@ public class AuthService {
     }
 
     private User getUserById(String userId) {
-        return persistService.findById(userId)
+        return persistService.findUserById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found: " + userId));
     }
 
@@ -272,7 +272,7 @@ public class AuthService {
                 .refreshToken(refreshToken)
                 .tokenType("Bearer")
                 .expiresIn(86400L)
-                .user(userManagementMapper.toResponse(user))
+                .user(userManagementMapper.toResponseDto(user))
                 .build();
     }
 

@@ -21,7 +21,7 @@ public class UserManageController {
     private final UserManagementService userManagementService;
     private final AuthErrorHelper authErrorHelper;
 
-    @GetMapping("/users")
+    @GetMapping({"/users", "/users/"})
     public ResponseEntity<List<UserListItemDto>> getUserList() {
         log.info("Getting users list");
         return ResponseEntity.ok(userManagementService.getUserList());
@@ -39,7 +39,7 @@ public class UserManageController {
         return userManagementService.getUserById(userId);
     }
 
-    @PostMapping("/users")
+    @PostMapping({"/users", "/users/"})
     public ResponseEntity<?> addUser(@Valid @RequestBody UpdateUserRequestDto request) {
         log.info("Adding user: {}", request.getUsername());
         try {
@@ -58,52 +58,40 @@ public class UserManageController {
 
     @PutMapping("/users/{userId}")
     public UserResponseDto updateUserFull(@PathVariable String userId,
-                                      @Valid @RequestBody UpdateUserRequestDto request) {
+                                          @Valid @RequestBody UpdateUserRequestDto request) {
         log.info("Updating user full: {}", userId);
         return userManagementService.updateUserFull(userId, request);
     }
 
     @PutMapping("/users/{userId}/part")
     public UserResponseDto updateUserPart(@PathVariable String userId,
-                                      @Valid @RequestBody UpdateUserRequestDto request) {
+                                          @Valid @RequestBody UpdateUserRequestDto request) {
         log.info("Updating user partial: {}", userId);
         return userManagementService.updateUserPartial(userId, request);
     }
 
     @GetMapping("/users/me/roles")
-    public ResponseEntity<List<RoleDto>> getCurrentUserRoles() {
+    public ResponseEntity<List<RoleResponseDto>> getCurrentUserRoles() {
         log.info("Getting current user roles");
         return ResponseEntity.ok(userManagementService.getCurrentUserRoles());
     }
 
     @GetMapping("/users/{userId}/roles")
-    public ResponseEntity<List<RoleDto>> getUserRoles(@PathVariable String userId) {
+    public ResponseEntity<List<RoleResponseDto>> getUserRoles(@PathVariable String userId) {
         log.info("Getting roles for user: {}", userId);
         return ResponseEntity.ok(userManagementService.getUserRoles(userId));
     }
 
-    @GetMapping("/roles")
-    public ResponseEntity<List<RoleDto>> getAllRoles() {
-        log.info("Getting all roles");
-        return ResponseEntity.ok(userManagementService.getAllRoles());
-    }
-
     @GetMapping("/users/me/permissions")
-    public ResponseEntity<List<PermissionDto>> getCurrentUserPermissions() {
+    public ResponseEntity<List<PermissionResponseDto>> getCurrentUserPermissions() {
         log.info("Getting current user permissions");
         return ResponseEntity.ok(userManagementService.getCurrentUserPermissions());
     }
 
     @GetMapping("/users/{userId}/permissions")
-    public ResponseEntity<List<PermissionDto>> getUserPermissions(@PathVariable String userId) {
+    public ResponseEntity<List<PermissionResponseDto>> getUserPermissions(@PathVariable String userId) {
         log.info("Getting permissions for user: {}", userId);
         return ResponseEntity.ok(userManagementService.getUserPermissions(userId));
-    }
-
-    @GetMapping("/permissions")
-    public ResponseEntity<List<PermissionDto>> getAllPermissions() {
-        log.info("Getting all permissions");
-        return ResponseEntity.ok(userManagementService.getAllPermissions());
     }
 
     @PutMapping("/users/{userId}/reset-password")
@@ -120,6 +108,44 @@ public class UserManageController {
         log.info("Setting password for user: {}", userId);
         userManagementService.setPassword(userId, request.getNewPassword());
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping({"/roles", "/roles/"})
+    public ResponseEntity<List<RoleResponseDto>> getAllRoles() {
+        log.info("Getting all roles");
+        return ResponseEntity.ok(userManagementService.getAllRoles());
+    }
+
+    @GetMapping("/roles/full")
+    public ResponseEntity<List<RoleWithPermissionDto>> getAllRolesWithPermissions() {
+        log.info("Getting all roles with permissions");
+        return ResponseEntity.ok(userManagementService.getAllRolesWithPermissions());
+    }
+
+    @PostMapping({"/roles", "/roles/"})
+    public ResponseEntity<?> addRole(@RequestBody UpdateRoleRequestDto request) {
+        log.info("Adding role: {}", request.getName());
+        return ResponseEntity.status(HttpStatus.CREATED).body(userManagementService.addRole(request));
+    }
+
+    @PutMapping("/roles/{roleId}")
+    public RoleWithPermissionDto updateRole(@PathVariable String roleId,
+                                            @Valid @RequestBody UpdateRoleRequestDto request) {
+        log.info("Updating role: {}", roleId);
+        return userManagementService.updateRole(roleId, request);
+    }
+
+    @DeleteMapping("/roles/{roleId}")
+    public ResponseEntity<?> deleteRole(@PathVariable String roleId) {
+        log.info("Deleting role: {}", roleId);
+        userManagementService.deleteRole(roleId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/permissions")
+    public ResponseEntity<List<PermissionResponseDto>> getAllPermissions() {
+        log.info("Getting all permissions");
+        return ResponseEntity.ok(userManagementService.getAllPermissions());
     }
 
 

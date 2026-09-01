@@ -195,6 +195,14 @@
         flex-direction: column;
         min-height: 0; // обязательно для flex-детей
     }
+
+    @media (max-width: 599.98px) {
+        .mat-mdc-header-cell {
+            padding-left: 4px;
+            padding-right: 4px;
+        }
+    }
+
 }
 
 .filtered-table {

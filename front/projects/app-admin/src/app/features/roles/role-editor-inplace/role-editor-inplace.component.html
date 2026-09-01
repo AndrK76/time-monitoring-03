@@ -1,0 +1,30 @@
+<div class="editor-container" *ngIf="roleData()">
+    <form [formGroup]="form" class="editor-form">
+        <div class="form-row">
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Название</mat-label>
+                <input matInput formControlName="name" (change)="$event.stopPropagation()">
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>ID</mat-label>
+                <input matInput formControlName="id" readonly>
+            </mat-form-field>
+        </div>
+        <div class="form-row">
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Описание</mat-label>
+                <input matInput formControlName="description" (change)="$event.stopPropagation()">
+            </mat-form-field>
+        </div>
+        <div class="form-row">
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Права</mat-label>
+                <mat-select formControlName="permissions" multiple>
+                    <mat-option *ngFor="let perm of permissions()" [value]="perm.name">
+                        {{ perm.name }} - {{perm.description}}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+    </form>
+</div>

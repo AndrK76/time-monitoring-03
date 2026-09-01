@@ -1,0 +1,40 @@
+<div class="editor-container-wrapper">
+    @if (isLoading() || error() || isSaving()) {
+    <div class="table-overlay">
+        @if (isLoading() || isSaving()) {
+        <div class="loading-spinner">
+            <mat-spinner diameter="40"></mat-spinner>
+            <p>{{spinnerText()}}</p>
+        </div>
+        }
+        @if (error()) {
+        <div class="error-message">
+            <mat-icon color="warn">error</mat-icon>
+            <span>{{ error() }}</span>
+        </div>
+        }
+    </div>
+    }
+
+    <div class="editor-header">
+        <div class="editor-title">
+            Редактирование профиля
+        </div>
+
+        <!-- Группа кнопок справа -->
+        <div class="editor-actions-top">
+            <button mat-raised-button color="primary" (click)="callSave()"
+                [disabled]="!dataChanged()">Сохранить</button>
+            <button mat-raised-button (click)="callReload()" [disabled]="!dataChanged()">Отмена</button>
+        </div>
+    </div>
+
+    <!-- Обёртка для прокрутки -->
+    <div class="editor-scroll-wrapper">
+        @if(!isLoading() && !error()) {
+        <app-user-editor-inplace [userData]="user()!" [roles]="roles()" [loadItemFn]="loadItem"
+            [setPasswordFn]="setPassword" [canFullUpdate]="canFullUpdate()" [canPartialUpdate]="canPartialUpdate()"
+            [isSomeUser]="someUser()" (change)="onUpdate($event)"></app-user-editor-inplace>
+        }
+    </div>
+</div>

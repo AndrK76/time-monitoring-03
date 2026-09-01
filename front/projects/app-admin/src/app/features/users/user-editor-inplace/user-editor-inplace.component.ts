@@ -7,13 +7,14 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner'; // добавить
-import { UserInfo, RoleInfo } from '../user-view.models';
+import { UserInfo } from '../user-view.models';
 import { debounceTime, distinctUntilChanged, filter, Observable } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ChangePasswordDialogData, ChangePasswordDialogResult, DialogService, isNewItem, isNotFullLoadedItem } from '@mon3/sc';
 import { rolesWithInfo } from '../user-view.utils';
 import { MatIconModule } from '@angular/material/icon';
 import { ChangePasswordRequestDto } from '@mon3/sa';
+import { RoleInfo } from '../../roles/role-view.models';
 
 @Component({
   selector: 'app-user-editor-inplace',
@@ -116,22 +117,21 @@ export class UserEditorInplaceComponent implements OnInit {
         takeUntilDestroyed(this.destroyRef)
       )
       .subscribe(values => {
-
         const updated: UserInfo = new UserInfo(
           this.data.id,
-          values.username,
+          values.username || this.data.username,
           values.email,
           values.firstName || '',
           values.lastName || '',
           values.displayName,
           this.data.avatarUrl,
-          values.active,
-          values.approved,
+          values.active || this.data.active,
+          values.approved || this.data.approved,
           this.data.emailVerified,
-          values.roles || [],
+          values.roles || this.data.roles,
           this.data.permissions,
           this.data.anonymous,
-          rolesWithInfo(values || [], this.roles())
+          rolesWithInfo((values.roles ? values : this.data), this.roles())
         );
         this.change.emit(updated);
       });

@@ -8,6 +8,10 @@ export const routes: Routes = [
   { path: 'register', loadComponent: () => import('@mon3/sc').then(m => m.RegisterComponent) },
   { path: 'logout', loadComponent: () => import('@mon3/sc').then(m => m.LogoutComponent), canActivate: [authGuard] },
   {
+    path: 'profile', loadComponent: () => import('./features/users/user-profile-edit-container/user-profile-edit-container.component')
+      .then(m => m.UserProfileEditContainerComponent), canActivate: [authGuard],
+  },
+  {
     path: 'access/users',
     loadComponent: () => import('./features/users/user-list-table/user-list-table.component').then(m => m.UserListTableComponent),
     canActivate: [authGuard],

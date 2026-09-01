@@ -1,10 +1,7 @@
 package ru.igorit.monitoring.auth.mapper;
 
 import org.mapstruct.Named;
-import ru.igorit.monitoring.auth.dto.PermissionDto;
-import ru.igorit.monitoring.auth.dto.RoleDto;
-import ru.igorit.monitoring.auth.dto.UserListItemDto;
-import ru.igorit.monitoring.auth.dto.UserResponseDto;
+import ru.igorit.monitoring.auth.dto.*;
 import ru.igorit.monitoring.common.dto.command.auth.UserCreatedEventCommandDto;
 import ru.igorit.monitoring.common.dto.command.auth.UserInfoUpdatedEventCommandDto;
 import org.mapstruct.Mapper;
@@ -24,18 +21,15 @@ public interface UserManagementMapper {
     @Mapping(target = "active", source = "isActive")
     @Mapping(target = "roles", expression = "java(user.getRoles().stream().map(Role::getName).collect(java.util.stream.Collectors.toList()))")
     @Mapping(target = "permissions", expression = "java(user.getRoles().stream().flatMap(role -> role.getPermissions().stream()).map(ru.igorit.monitoring.persistence.entity.auth.Permission::getName).collect(java.util.stream.Collectors.toList()))")
-    UserResponseDto toResponse(User user);
+    UserResponseDto toResponseDto(User user);
 
     List<UserResponseDto> toResponseList(List<User> users);
 
     @Mapping(target = "active", source = "isActive")
     @Mapping(target = "approved", source = "isApproved")
     @Mapping(target = "roles", expression = "java(user.getRoles().stream().map(Role::getName).collect(java.util.stream.Collectors.toList()))")
-    UserListItemDto toUserListItem(User user);
+    UserListItemDto toListDto(User user);
 
-    RoleDto toRoleDto(Role role);
-
-    PermissionDto toPermissionDto(Permission permission);
 
     @Mapping(target = "approved", source = "isApproved")
     @Mapping(target = "active", source = "isActive")
@@ -43,6 +37,19 @@ public interface UserManagementMapper {
     @Mapping(target = "fullUpdate", ignore = true)
     @Mapping(target = "roles", source = "roles", qualifiedByName = "rolesToArray")
     UserInfoUpdatedEventCommandDto toUserUpdatedEvent(User user);
+
+    @Mapping(target = "userId", source = "id")
+    @Mapping(target = "active", source = "isActive")
+    UserCreatedEventCommandDto toUserCreatedEvent(User user);
+
+    RoleResponseDto toResponseDto(Role role);
+
+
+    @Mapping(target = "permissions", source = "permissions", qualifiedByName = "permissionsToArray")
+    RoleWithPermissionDto toRoleWithPermissionDto(Role role);
+
+    PermissionResponseDto toResponseDto(Permission permission);
+
 
 
     @Named("rolesToArray")
@@ -53,7 +60,11 @@ public interface UserManagementMapper {
         return roles.stream().map(Role::getName).toArray(String[]::new);
     }
 
-    @Mapping(target = "userId", source = "id")
-    @Mapping(target = "active", source = "isActive")
-    UserCreatedEventCommandDto toUserCreatedEvent(User user);
+    @Named("permissionsToArray")
+    default String[] permissionsToArray(Set<Permission> permissions) {
+        if (permissions == null) {
+            return new String[0];
+        }
+        return permissions.stream().map(Permission::getName).toArray(String[]::new);
+    }
 }

@@ -14,11 +14,14 @@ import {
 import { TableFilterInfo } from '../models/table-filter-items';
 import { ActivatedRoute, Router } from '@angular/router';
 import { addNotApplyItemFlag } from '../utils/object-utils';
+import { handleError } from '@mon3/sa';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 
 @Injectable() // Без providedIn, регистрируем в компоненте
 export class TableManageService<T extends Record<string, any>> {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
+  private breakpointObserver = inject(BreakpointObserver);
 
   // === Публичные сигналы ===
   readonly dataSource = new MatTableDataSource<T>([]);
@@ -34,6 +37,16 @@ export class TableManageService<T extends Record<string, any>> {
   readonly hasChanges = computed(() => hasTableChanges(this.dataState()));
   readonly changesSummary = computed(() => formatTableChanges(this.dataState()));
 
+  // === Сигналы размеров ===
+  isSmallScreen = signal(false);
+
+  // Отслеживаем размер экрана
+  breakpointsSubscribe() {
+    this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small])
+      .subscribe(result => {
+        this.isSmallScreen.set(result.matches);
+      });
+  }
 
 
   // === Функция выбора строки ===
@@ -227,11 +240,7 @@ export class TableManageService<T extends Record<string, any>> {
   }
 
   handleError<T>(message: string, ret: T, target?: WritableSignal<string | null>): (source: Observable<T>) => Observable<T> {
-    return catchError((err: any) => {
-      console.error(err);
-      (target ?? this.error).set(message);
-      return of(ret);
-    });
+    return handleError<T>(message, ret, target ?? this.error)
   }
 
 }

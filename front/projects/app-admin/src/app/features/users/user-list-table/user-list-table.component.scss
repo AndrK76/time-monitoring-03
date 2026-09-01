@@ -6,6 +6,14 @@
     min-width: 25rem;
 }
 
+.mat-column-active {
+    min-width: none;
+}
+
+.mat-column-approved {
+    min-width: none;
+}
+
 .mat-column-rolesWithInfo {
     text-wrap: revert;
     min-width: 15rem;
@@ -16,4 +24,26 @@
         color: var(--toolbar-active-text);
 
     }
+}
+
+@media (max-width: 599.98px) {
+    .mat-column-username {
+        min-width: 8rem;
+    }
+
+    .mat-column-displayName {
+        min-width: 12rem;
+        max-width: 20rem;
+        text-wrap: unset !important;
+    }
+
+    .mat-column-active {
+        max-width: 5rem;
+    }
+
+    .mat-column-approved {
+        max-width: 6rem;
+    }
+
+
 }

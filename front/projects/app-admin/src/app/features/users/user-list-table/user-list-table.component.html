@@ -94,8 +94,8 @@
 
                     <ng-container matColumnDef="active">
                         <th mat-header-cell *matHeaderCellDef>
-                            <sc-filter-root key="active" label="Активен" [showFilter]="showFilter()" [sort]="true"
-                                [config]="filterConfig().get('active')!"
+                            <sc-filter-root key="active" [label]="isSmallScreen()?'Акт.':'Активен'"
+                                [showFilter]="showFilter()" [sort]="true" [config]="filterConfig().get('active')!"
                                 (change)="onFilterChange($event)"></sc-filter-root>
                         </th>
                         <td mat-cell *matCellDef="let row"> {{ row.active ? 'Да' : 'Нет' }} </td>
@@ -103,8 +103,8 @@
 
                     <ng-container matColumnDef="approved">
                         <th mat-header-cell *matHeaderCellDef>
-                            <sc-filter-root key="approved" label="Подтверждён" [showFilter]="showFilter()" [sort]="true"
-                                [config]="filterConfig().get('approved')!"
+                            <sc-filter-root key="approved" [label]="isSmallScreen()?'Подтв.':'Подтверждён'"
+                                [showFilter]="showFilter()" [sort]="true" [config]="filterConfig().get('approved')!"
                                 (change)="onFilterChange($event)"></sc-filter-root>
                         </th>
                         <td mat-cell *matCellDef="let row"> {{ row.approved ? 'Да' : 'Нет' }} </td>

@@ -1,11 +1,12 @@
 import { UpdateUserRequestDto, UserListItemDto, UserResponseDto } from "@mon3/sa";
-import { RoleInfo, UserInfo } from "./user-view.models";
+import { UserInfo } from "./user-view.models";
+import { RoleInfo } from "../roles/role-view.models";
 
 
 export const rolesWithInfo = (dto: UserListItemDto | UserResponseDto | UserInfo, allRoles: RoleInfo[]): RoleInfo[] => {
     const ret = (dto.roles || []).map(roleName => {
         const found = allRoles.find(r => r.name === roleName);
-        return found || new RoleInfo(roleName, '');
+        return found || new RoleInfo('temp-' + roleName, roleName, '');
     });
     return ret;
 }
@@ -49,7 +50,7 @@ export function createEmptyUser(): UserInfo {
     );
 }
 
-export function userItemDtoToView(dto: UserResponseDto, allRoles: RoleInfo[]): UserInfo {
+export function userResponseDtoToView(dto: UserResponseDto, allRoles: RoleInfo[]): UserInfo {
     return new UserInfo(
         dto.id,                       // id
         dto.username,                 // username
@@ -68,7 +69,7 @@ export function userItemDtoToView(dto: UserResponseDto, allRoles: RoleInfo[]): U
     );
 }
 
-export function userViewToItem(item: UserInfo): UpdateUserRequestDto {
+export function userViewToRequestDto(item: UserInfo): UpdateUserRequestDto {
     return {
         username: item.username,
         email: item.email,
@@ -81,3 +82,4 @@ export function userViewToItem(item: UserInfo): UpdateUserRequestDto {
         roles: item.roles
     } as UpdateUserRequestDto;
 }
+

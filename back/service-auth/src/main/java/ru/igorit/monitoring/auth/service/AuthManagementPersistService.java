@@ -34,32 +34,17 @@ public class AuthManagementPersistService {
         return userRepository.findAll();
     }
 
-    public User saveUser(User user) {
-        log.debug("repo before save: isApproved={}", user.getIsApproved());
-        User res = userRepository.save(user);
-        //entityManager.flush();
-        log.debug("repo after save: isApproved={}", res.getIsApproved());
-        return res;
-    }
-
-    public List<Role> findAllRoles() {
-        return roleRepository.findAll();
-    }
-
-    public List<Permission> findAllPermissions() {
-        return permissionRepository.findAll();
-    }
-
     public Optional<User> findByUsername(String userName) {
         return userRepository.findByUsername(userName);
     }
 
-    public Optional<User> findById(String id) {
+    public Optional<User> findUserById(String id) {
         return userRepository.findById(id);
     }
 
-    public List<Role> findByNameIn(List<String> roleNames) {
-        return roleRepository.findByNameIn(roleNames);
+
+    public User saveUser(User user) {
+        return userRepository.save(user);
     }
 
     public void updateUserRoles(User user, List<String> newRoleNames, String updaterId) {
@@ -113,6 +98,90 @@ public class AuthManagementPersistService {
             entityManager.clear();
         }
     }
+
+
+
+    public List<Role> findAllRoles() {
+        return roleRepository.findAll();
+    }
+
+    public Optional<Role> findRoleById(String id) {
+        return roleRepository.findById(id);
+    }
+
+    public List<Role> findRoleByNameIn(List<String> roleNames) {
+        return roleRepository.findByNameIn(roleNames);
+    }
+
+    public Role saveRole(Role role) {
+        return roleRepository.save(role);
+    }
+
+    public void deleteRole(Role role) {
+        roleRepository.delete(role);
+    }
+
+
+    public void updateRolePermissions(Role role, List<String> newPermissionNames, String updaterId) {
+
+        String roleId = role.getId();
+        List<String> currentPermissionIds = jdbcTemplate.queryForList(
+                "SELECT permission_id FROM role_permissions WHERE role_id = ?",
+                String.class, roleId);
+
+        Set<String> newPermissionNamesSet = new HashSet<>(newPermissionNames);
+        List<Permission> newPermissions = permissionRepository.findByNameIn(new ArrayList<>(newPermissionNamesSet));
+        Set<String> newPermissionIds = newPermissions.stream().map(Permission::getId).collect(Collectors.toSet());
+
+        Set<String> toAdd = new HashSet<>(newPermissionIds);
+        currentPermissionIds.forEach(toAdd::remove);
+
+        Set<String> toRemove = new HashSet<>(currentPermissionIds);
+        toRemove.removeAll(newPermissionIds);
+        if (!toAdd.isEmpty() || !toRemove.isEmpty()) {
+            entityManager.flush();
+        }
+
+        if (!toAdd.isEmpty()) {
+            String sqlInsert =
+                    "INSERT INTO role_permissions (role_id, permission_id, created_by) "
+                            + "VALUES (?, ?, ?)";
+            for (String permissionId : toAdd) {
+                jdbcTemplate.update(sqlInsert, roleId, permissionId, updaterId);
+            }
+            log.info("Added permissions {} to role {}", toAdd, roleId);
+        }
+
+        if (!toRemove.isEmpty()) {
+            String sqlDelete = "DELETE FROM role_permissions WHERE role_id = ? AND permission_id IN (?)";
+            jdbcTemplate.update(
+                    "DELETE FROM role_permissions WHERE role_id = ? AND permission_id IN ("
+                            + toRemove.stream().map(id -> "?").collect(Collectors.joining(",")) + ")",
+                    rs -> {
+                        int i = 1;
+                        rs.setString(i++, roleId);
+                        for (String permissionId : toRemove) {
+                            rs.setString(i++, permissionId);
+                        }
+                    }
+            );
+            log.info("Removed permissions {} from role {}", toRemove, roleId);
+        }
+
+        if (!toAdd.isEmpty() || !toRemove.isEmpty()) {
+            entityManager.clear();
+        }
+    }
+
+    public List<Permission> findPermissionByNameIn(List<String> permissionNames) {
+        return permissionRepository.findByNameIn(permissionNames);
+    }
+
+
+    public List<Permission> findAllPermissions() {
+        return permissionRepository.findAll();
+    }
+
 
 
 }

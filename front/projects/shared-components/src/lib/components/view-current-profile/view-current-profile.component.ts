@@ -4,8 +4,8 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { UsermanageService, UserResponseDto } from '@mon3/sa';
-import { finalize } from 'rxjs/operators';
+import { handleError, RoleResponseDto, UserManageService, UserResponseDto } from '@mon3/sa';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'sc-view-current-profile',
@@ -15,22 +15,42 @@ import { finalize } from 'rxjs/operators';
   styleUrl: './view-current-profile.component.scss'
 })
 export class ViewCurrentProfileComponent implements OnInit {
-  private adminService = inject(UsermanageService);
+  private dataService = inject(UserManageService);
 
+  roles = signal<RoleResponseDto[]>([]);
   user = signal<UserResponseDto | null>(null);
-  loading = signal(true);
+
+  isLoading = signal(true);
   error = signal<string | null>(null);
 
   ngOnInit(): void {
-    this.adminService.getCurrentUser()
-      .pipe(finalize(() => this.loading.set(false)))
-      .subscribe({
-        next: (data) => this.user.set(data),
-        error: (err) => {
-          console.error('Failed to load profile:', err);
+    this.initializeData();
+  }
+
+  initializeData = (): void => {
+    this.isLoading.set(false);
+    this.error.set(null);
+
+    forkJoin({
+      roles: this.dataService.getCurrentUserRoles()
+        .pipe(handleError<RoleResponseDto[]>('Ошибка загрузки списка ролей пользователя', [], this.error)),
+      user: this.dataService.getCurrentUser()
+        .pipe(handleError<UserResponseDto | null>('Ошибка загрузки профиля пользователя', null, this.error)),
+    }).subscribe({
+      next: (result) => {
+        if (this.error()) {
           this.error.set('Не удалось загрузить данные профиля');
+        } else {
+          const { roles, user } = result as { roles: RoleResponseDto[]; user: UserResponseDto | null };
+          this.roles.set(roles);
+          this.user.set(user);
+          this.isLoading.set(false);
         }
-      });
+      },
+      error: () => {
+        this.error.set('Не удалось загрузить данные профиля');
+      }
+    })
   }
 
   /**
@@ -48,6 +68,10 @@ export class ViewCurrentProfileComponent implements OnInit {
       return parts[0].charAt(0).toUpperCase();
     }
     return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
+  }
+
+  getRoleDescription(roleName: string) {
+    return (this.roles().find(f => f.name === roleName)?.description) ?? roleName;
   }
 
 }

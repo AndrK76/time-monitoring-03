@@ -18,18 +18,15 @@ export interface ChangePasswordRequestDto {
   confirmPassword: string;
 }
 
-export interface UpdateUserRequestDto {
-  username: string;
-  email: string;
-  firstName: string;
-  lastName: string;
-  displayName: string;
-  active?: boolean;
-  userApproved?: boolean;
-  emailVerified?: boolean;
-  roles?: string[];
+export interface TokenResponseDto {
+  accessToken: string;
+  refreshToken: string;
+  tokenType: string;
+  expiresIn: number;
+  user: UserResponseDto;
 }
 
+//User
 export interface UserResponseDto {
   id: string;
   username: string;
@@ -55,23 +52,47 @@ export interface UserListItemDto {
   roles: string[];
 }
 
-export interface RoleDto {
+export interface UpdateUserRequestDto {
+  username: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  displayName: string;
+  active?: boolean;
+  userApproved?: boolean;
+  emailVerified?: boolean;
+  roles?: string[];
+}
+
+//Role
+export interface RoleResponseDto {
+  id: string;
   name: string;
   description: string;
 }
 
-export interface PermissionDto {
+export interface RoleWithPermissionDto {
+  id: string;
+  name: string;
+  description: string;
+  permissions: string[]
+}
+
+export interface UpdateRoleRequestDto {
+  name: string;
+  description: string;
+  permissions?: string[];
+}
+
+//Permission
+export interface PermissionResponseDto {
+  id: string;
   name: string;
   description: string;
 }
 
-export interface TokenResponseDto {
-  accessToken: string;
-  refreshToken: string;
-  tokenType: string;
-  expiresIn: number;
-  user: UserResponseDto;
-}
+
+
 
 export interface TestResponse {
   message: string;

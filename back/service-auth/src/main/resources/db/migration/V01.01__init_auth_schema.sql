@@ -58,7 +58,11 @@ CREATE INDEX idx_auth_providers_name_id ON user_auth_providers(provider_name, pr
 CREATE TABLE IF NOT EXISTS roles (
     id VARCHAR(36) PRIMARY KEY DEFAULT gen_random_uuid()::text,
     name VARCHAR(50) NOT NULL UNIQUE,
-    description VARCHAR(255)
+    description VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_by VARCHAR(255),
+    updated_at TIMESTAMP,
+    updated_by VARCHAR(255)
 );
 
 COMMENT ON TABLE roles IS 'Роли пользователей';
@@ -91,5 +95,7 @@ CREATE TABLE IF NOT EXISTS user_roles (
 CREATE TABLE IF NOT EXISTS role_permissions (
     role_id VARCHAR(36) NOT NULL REFERENCES roles(id) ON DELETE CASCADE,
     permission_id VARCHAR(36) NOT NULL REFERENCES permissions(id) ON DELETE CASCADE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_by VARCHAR(36),
     PRIMARY KEY (role_id, permission_id)
 );
