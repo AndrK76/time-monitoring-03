@@ -27,11 +27,16 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Override
     @Transactional
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
-        log.debug("Loaded user: {}", username);
-        resetPasswordService.setDefaultPasswordIfEmpty(user);
-        return new UserPrincipal(user);
+        try {
+            User user = userRepository.findByUsername(username)
+                    .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+            log.debug("Loaded user: {}", username);
+            resetPasswordService.setDefaultPasswordIfEmpty(user);
+            return new UserPrincipal(user);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            throw new RuntimeException(e);
+        }
     }
 
 

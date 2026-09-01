@@ -1,8 +1,10 @@
 package ru.igorit.monitoring.security.service;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -26,9 +28,11 @@ public class JwtService {
 
 
     @Value("${security.jwt.expiration:86400000}")
+    @Getter
     private long expirationMs;
 
     @Value("${security.jwt.refresh-expiration:604800000}")
+    @Getter
     private long refreshExpirationMs;
 
     private final Map<String, Long> invalidatedTokens = new ConcurrentHashMap<>();
@@ -173,7 +177,8 @@ public class JwtService {
                 return false;
             }
             Claims claims = extractAllClaims(token);
-            return !claims.getExpiration().before(new Date());
+            var ret = !claims.getExpiration().before(new Date());
+            return ret;
         } catch (Exception e) {
             log.debug("Token validation failed: {}", e.getMessage());
             return false;

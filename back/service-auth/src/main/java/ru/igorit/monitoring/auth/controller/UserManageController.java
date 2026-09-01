@@ -23,8 +23,12 @@ public class UserManageController {
 
     @GetMapping({"/users", "/users/"})
     public ResponseEntity<List<UserListItemDto>> getUserList() {
+        try {
         log.info("Getting users list");
         return ResponseEntity.ok(userManagementService.getUserList());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @GetMapping("users/me")
@@ -35,8 +39,8 @@ public class UserManageController {
 
     @GetMapping("/users/{userId}")
     public UserResponseDto getUserById(@PathVariable String userId) {
-        log.info("Getting user by id: {}", userId);
-        return userManagementService.getUserById(userId);
+            log.info("Getting user by id: {}", userId);
+            return userManagementService.getUserById(userId);
     }
 
     @PostMapping({"/users", "/users/"})

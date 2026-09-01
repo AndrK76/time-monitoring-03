@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
-import { BehaviorSubject, catchError, Observable, of, tap } from 'rxjs';
+import { BehaviorSubject, catchError, finalize, Observable, of, tap } from 'rxjs';
 
 import { ChangePasswordRequestDto, LoginRequestDto, RegistrationRequestDto, TokenResponseDto, UserResponseDto } from '../models/auth.models';
 
@@ -75,34 +75,32 @@ export class AuthService {
   // ============================================================
 
   login(credentials: LoginRequestDto): Observable<TokenResponseDto> {
-    return this.http.post<TokenResponseDto>(`${this.authApiUrl}/auth/login`, credentials, {
-      withCredentials: true
-    }).pipe(
-      tap(response => {
-        this.setSession(response);
-        localStorage.setItem('auth_timestamp', Date.now().toString());
-        this.notifyListeners(true);
-      })
+    return this.http.post<TokenResponseDto>(`${this.authApiUrl}/auth/login`, credentials,
+      { withCredentials: true }
+    ).pipe(tap(response => {
+      this.setSession(response);
+      localStorage.setItem('auth_timestamp', Date.now().toString());
+      this.notifyListeners(true);
+    })
     );
   }
 
   register(data: RegistrationRequestDto): Observable<TokenResponseDto> {
-    return this.http.post<TokenResponseDto>(`${this.authApiUrl}/auth/register`, data, {
-      withCredentials: true
-    }).pipe(
-      tap(response => {
-        this.setSession(response);
-        localStorage.setItem('auth_timestamp', Date.now().toString());
-        this.notifyListeners(true);
-      })
+    return this.http.post<TokenResponseDto>(`${this.authApiUrl}/auth/register`, data,
+      { withCredentials: true }
+    ).pipe(tap(response => {
+      this.setSession(response);
+      localStorage.setItem('auth_timestamp', Date.now().toString());
+      this.notifyListeners(true);
+    })
     );
   }
 
   logout(): Observable<void> {
-    return this.http.post<void>(`${this.authApiUrl}/auth/logout`, {}, {
-      withCredentials: true
-    }).pipe(
-      tap(() => {
+    return this.http.post<void>(`${this.authApiUrl}/auth/logout`, {},
+      { withCredentials: true }
+    ).pipe(
+      finalize(() => {
         this.clearSession();
         localStorage.removeItem('auth_timestamp');
         this.notifyListeners(false);
@@ -113,20 +111,17 @@ export class AuthService {
   refreshToken(): Observable<TokenResponseDto> {
     const refreshToken = localStorage.getItem('refreshToken') || '';
     return this.http.post<TokenResponseDto>(
-      `${this.authApiUrl}/auth/refresh`,
-      {},
+      `${this.authApiUrl}/auth/refresh`, {},
       { params: { refreshToken }, withCredentials: true }
     ).pipe(
-      tap(response => {
-        this.setSession(response);
-      })
+      tap(response => { this.setSession(response); })
     );
   }
 
   changePassword(data: ChangePasswordRequestDto): Observable<void> {
-    return this.http.post<void>(`${this.authApiUrl}/auth/change-password`, data, {
-      withCredentials: true
-    });
+    return this.http.post<void>(`${this.authApiUrl}/auth/change-password`, data,
+      //{ withCredentials: true }
+    );
   }
 
   // ============================================================
@@ -139,19 +134,17 @@ export class AuthService {
    * Возвращает TokenResponse, чтобы сохранить токен в localStorage
    */
   checkAuth(): Observable<TokenResponseDto | null> {
-    return this.http.get<TokenResponseDto>(`${this.authApiUrl}/auth/check`, {
-      withCredentials: true
-    }).pipe(
-      tap(response => {
-        if (response && response.accessToken) {
-          // ✅ Сохраняем токен и пользователя в localStorage
-          this.setSession(response);
-          localStorage.setItem('auth_timestamp', Date.now().toString());
-          this.notifyListeners(true);
-          //console.log('✅ Session restored from cookie, token saved to localStorage');
-        }
-      }),
-      catchError(() => {
+    return this.http.get<TokenResponseDto>(`${this.authApiUrl}/auth/check`,
+      { withCredentials: true }
+    ).pipe(tap(response => {
+      if (response && response.accessToken) {
+        this.setSession(response);
+        localStorage.setItem('auth_timestamp', Date.now().toString());
+        this.notifyListeners(true);
+      }
+    }),
+      catchError((err) => {
+        console.log(JSON.stringify(err));
         this.clearSession();
         this.notifyListeners(false);
         return of(null);
@@ -169,16 +162,14 @@ export class AuthService {
       return of(null);
     }
 
-    return this.http.get<UserResponseDto>(`${this.authApiUrl}/users/me`, {
-      headers: { Authorization: `Bearer ${token}` },
-      withCredentials: true
-    }).pipe(
-      tap(user => {
-        this.currentUserSignal.set(user);
-        this.tokenSignal.set(token);
-        localStorage.setItem('user', JSON.stringify(user));
-        this.notifyListeners(true);
-      }),
+    return this.http.get<UserResponseDto>(`${this.authApiUrl}/users/me`,
+      //{ headers: { Authorization: `Bearer ${token}` }, withCredentials: true }
+    ).pipe(tap(user => {
+      this.currentUserSignal.set(user);
+      this.tokenSignal.set(token);
+      localStorage.setItem('user', JSON.stringify(user));
+      this.notifyListeners(true);
+    }),
       catchError(() => {
         this.clearSession();
         return of(null);

@@ -18,6 +18,7 @@ export const authInterceptorFn
     // Пропускаем запросы на аутентификацию
     if (req.url.includes('/auth/login') ||
       req.url.includes('/auth/register') ||
+      req.url.includes('/auth/check') ||
       req.url.includes('/auth/refresh')) {
       return next(req);
     }
@@ -26,17 +27,19 @@ export const authInterceptorFn
 
     let authReq = req;
     if (token) {
+      console.log('isToken')
       authReq = req.clone({
         setHeaders: {
           Authorization: `Bearer ${token}`
         },
-        withCredentials: true
+        //withCredentials: true
       });
     }
 
 
     return next(authReq).pipe(
       catchError((error) => {
+        console.log(JSON.stringify(error));
         if (error.status === 401) {
           return handle401Error(req, next, authService, router);
         }
@@ -68,10 +71,10 @@ function handle401Error(
         return next(clonedReq);
       }),
       catchError((err) => {
-        console.log('AuthInterceptor.handle401Error: '+ err);
+        console.log('AuthInterceptor.handle401Error: '+ JSON.stringify(err));
         isRefreshing = false;
         authService.logout().subscribe();
-        router.navigate(['/login']);
+        router.navigate(['/']);
         return throwError(() => err);
       })
     );

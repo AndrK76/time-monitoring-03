@@ -39,6 +39,7 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final UserService userService;
     private final JwtService jwtService;
+    private final CookieService cookieService;
     private final PasswordEncoder passwordEncoder;
     private final UserManagementMapper userManagementMapper;
     private final CookieProperties cookieProperties;
@@ -59,7 +60,7 @@ public class AuthService {
         User user = getUserByUsername(request.getUsername());
         TokenResponseDto tokenResponse = buildTokenResponse(user);
 
-        addAuthCookie(response, tokenResponse.getAccessToken());
+        cookieService.addAuthCookie(response, tokenResponse.getAccessToken());
         return tokenResponse;
     }
 
@@ -74,7 +75,7 @@ public class AuthService {
                 request.getDisplayName(),
                 extractUserId(getCurrentAuth()));
         TokenResponseDto tokenResponse = buildTokenResponse(user);
-        addAuthCookie(response, tokenResponse.getAccessToken());
+        cookieService.addAuthCookie(response, tokenResponse.getAccessToken());
         sendUserCreateEvent(user);
         return tokenResponse;
     }
@@ -92,28 +93,13 @@ public class AuthService {
     @Transactional
     public TokenResponseDto refreshToken(String refreshToken) {
         if (!jwtService.validateRefreshToken(refreshToken)) {
-            throw new RuntimeException("Invalid refresh token");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid or expired refresh token");
         }
 
         String userId = jwtService.extractUserId(refreshToken);
-        String username = jwtService.extractUsername(refreshToken);
         User user = getUserById(userId);
+        return buildTokenResponse(user);
 
-        String newAccessToken = jwtService.generateToken(
-                userId,
-                username,
-                extractRoles(user),
-                extractPermissions(user),
-                extractOrganizations(user)
-        );
-
-        return TokenResponseDto.builder()
-                .accessToken(newAccessToken)
-                .refreshToken(refreshToken)
-                .tokenType("Bearer")
-                .expiresIn(86400L)
-                .user(userManagementMapper.toResponseDto(user))
-                .build();
     }
 
     public void logout(HttpServletRequest request, HttpServletResponse response) {
@@ -122,7 +108,7 @@ public class AuthService {
             jwtService.invalidateToken(token);
             log.info("Token invalidated");
         }
-        removeAuthCookie(request, response);
+        cookieService.removeAuthCookie(request, response);
         SecurityContextHolder.clearContext();
         log.info("User logged out");
     }
@@ -153,21 +139,8 @@ public class AuthService {
         String username = jwtService.extractUsername(token);
         User user = getUserByUsername(username);
 
-        // Генерируем новый токен для ответа (чтобы фронт мог сохранить его в localStorage)
-        String newToken = jwtService.generateToken(
-                user.getId(),
-                user.getUsername(),
-                extractRoles(user),
-                extractPermissions(user),
-                extractOrganizations(user)
-        );
+        return buildTokenResponse(user);
 
-        return TokenResponseDto.builder()
-                .accessToken(newToken)
-                .tokenType("Bearer")
-                .expiresIn(86400L)
-                .user(userManagementMapper.toResponseDto(user))
-                .build();
     }
 
     // ============================================================
@@ -271,7 +244,7 @@ public class AuthService {
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .tokenType("Bearer")
-                .expiresIn(86400L)
+                .expiresIn(jwtService.getExpirationMs())
                 .user(userManagementMapper.toResponseDto(user))
                 .build();
     }
@@ -289,38 +262,7 @@ public class AuthService {
     // ПРИВАТНЫЕ МЕТОДЫ — COOKIE
     // ============================================================
 
-    private void addAuthCookie(HttpServletResponse response, String token) {
-        try {
-            Cookie cookie = new Cookie(cookieProperties.getName(), token);
-            cookie.setHttpOnly(cookieProperties.isHttpOnly());
-            cookie.setSecure(cookieProperties.isSecure());
-            cookie.setPath(cookieProperties.getPath());
-            cookie.setMaxAge(cookieProperties.getMaxAge());
-            if (cookieProperties.getDomain() != null && !cookieProperties.getDomain().isEmpty()) {
-                cookie.setDomain(cookieProperties.getDomain());
-            }
-            response.addCookie(cookie);
-            log.debug("Auth cookie added with domain: {}", cookieProperties.getDomain());
-        } catch (Exception e) {
-            log.error("Failed to add auth cookie", e);
-        }
-    }
 
-    private void removeAuthCookie(HttpServletRequest request, HttpServletResponse response) {
-        try {
-            Cookie cookie = new Cookie(cookieProperties.getName(), null);
-            cookie.setHttpOnly(cookieProperties.isHttpOnly());
-            cookie.setSecure(cookieProperties.isSecure());
-            cookie.setPath(cookieProperties.getPath());
-            cookie.setMaxAge(0);
-            if (cookieProperties.getDomain() != null && !cookieProperties.getDomain().isEmpty()) {
-                cookie.setDomain(cookieProperties.getDomain());
-            }
-            response.addCookie(cookie);
-        } catch (Exception e) {
-            log.error("Failed to remove auth cookie", e);
-        }
-    }
 
     private String extractTokenFromCookie(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();

@@ -1,6 +1,8 @@
 package ru.igorit.monitoring.auth.config;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -14,17 +16,20 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfigurationSource;
+import ru.igorit.monitoring.auth.service.CookieService;
 import ru.igorit.monitoring.security.filter.JwtAuthenticationFilter;
 
 @Configuration
 @EnableMethodSecurity
 @RequiredArgsConstructor
+@Log4j2
 public class SecurityConfig {
 
     private final UserDetailsService userDetailsService;
     private final PasswordEncoder passwordEncoder;
     private final CorsConfigurationSource corsConfigurationSource;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final CookieService cookieService;
 
     @Bean
     public AuthenticationManager authenticationManager(
@@ -46,6 +51,14 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            log.debug("{}: {}",authException.getClass().getSimpleName(), authException.getMessage());
+                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                            cookieService.removeAuthCookie(request, response);
+                        })
+                )
+                .anonymous(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/api/v1/auth/login",
@@ -57,7 +70,8 @@ public class SecurityConfig {
                                 "/actuator/**",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
-                                "/api/v1/admin/**"
+                                "/api/v1/admin/**",
+                                "/error"
                                 ).permitAll()
                         .anyRequest().authenticated()
                 )

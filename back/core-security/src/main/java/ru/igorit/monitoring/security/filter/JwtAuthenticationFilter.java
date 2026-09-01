@@ -1,5 +1,6 @@
 package ru.igorit.monitoring.security.filter;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -29,14 +30,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
 
-        String token = extractToken(request);
-        if (token == null) {
+        var token = extractToken(request);
+        if (token == null ) {
             filterChain.doFilter(request, response);
             return;
         }
 
         try {
             if (jwtService.isTokenValid(token)) {
+                log.debug("JWT token valid");
                 String userId = jwtService.extractUserId(token);
                 String username = jwtService.extractUsername(token);
                 List<String> roles = jwtService.extractRoles(token);
@@ -58,13 +60,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         username,
                         authentication.getRoles(),
                         authentication.getPermissions());
+            } else {
+                log.debug("JWT token invalid, request: {}", request.getRequestURI());
             }
         } catch (Exception e) {
-            log.warn("Invalid JWT token: {}", e.getMessage());
+            log.warn("request: {}, Invalid JWT token: {}", request.getRequestURI(), e.getMessage());
         }
-
         filterChain.doFilter(request, response);
     }
+
 
     private String extractToken(HttpServletRequest request) {
         // 1. Проверяем Authorization header
@@ -84,5 +88,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
         return null;
     }
+
 
 }
