@@ -1,0 +1,29 @@
+.mat-column-shortName {
+    min-width: 8rem;
+}
+
+.mat-column-fullName {
+    min-width: 20rem;
+}
+
+.mat-column-users {
+    text-wrap: revert;
+    min-width: 15rem;
+
+    .status-badge {
+        margin: 2px;
+        background-color: var(--menu-active-bg);
+        color: var(--toolbar-active-text);
+    }
+}
+
+@media (max-width: 599.98px) {
+    .mat-column-shortName {
+        min-width: 5rem;
+    }
+
+    .mat-column-fullName {
+        min-width: 8rem;
+        max-width: 12rem;
+    }
+}

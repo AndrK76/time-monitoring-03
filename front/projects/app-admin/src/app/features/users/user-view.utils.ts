@@ -1,9 +1,9 @@
 import { UpdateUserRequestDto, UserListItemDto, UserResponseDto } from "@mon3/sa";
-import { UserInfo } from "./user-view.models";
+import { UserShortInfo, UserWithFullInfo } from "./user-view.models";
 import { RoleInfo } from "../roles/role-view.models";
 
 
-export const rolesWithInfo = (dto: UserListItemDto | UserResponseDto | UserInfo, allRoles: RoleInfo[]): RoleInfo[] => {
+export const rolesWithInfo = (dto: UserListItemDto | UserResponseDto | UserWithFullInfo, allRoles: RoleInfo[]): RoleInfo[] => {
     const ret = (dto.roles || []).map(roleName => {
         const found = allRoles.find(r => r.name === roleName);
         return found || new RoleInfo('temp-' + roleName, roleName, '');
@@ -11,8 +11,8 @@ export const rolesWithInfo = (dto: UserListItemDto | UserResponseDto | UserInfo,
     return ret;
 }
 
-export function userListDtoToView(dto: UserListItemDto, allRoles: RoleInfo[]): UserInfo {
-    return new UserInfo(
+export function userListDtoToFullView(dto: UserListItemDto, allRoles: RoleInfo[]): UserWithFullInfo {
+    return new UserWithFullInfo(
         dto.id,                       // id
         dto.username,                 // username
         '',                           // email
@@ -30,9 +30,20 @@ export function userListDtoToView(dto: UserListItemDto, allRoles: RoleInfo[]): U
     );
 }
 
+export function userListDtoToShortView(dto: UserListItemDto): UserShortInfo {
+    return new UserShortInfo(
+        dto.id,           //id
+        dto.username,     //username
+        dto.displayName,  //displayName
+        dto.active,       //active
+        dto.approved,     //approved
+        dto.roles         //roles
+    )
+}
 
-export function createEmptyUser(): UserInfo {
-    return new UserInfo(
+
+export function createEmptyUser(): UserWithFullInfo {
+    return new UserWithFullInfo(
         'temp-' + Date.now(),  // id
         '',                    // username
         '',                    // email
@@ -50,8 +61,8 @@ export function createEmptyUser(): UserInfo {
     );
 }
 
-export function userResponseDtoToView(dto: UserResponseDto, allRoles: RoleInfo[]): UserInfo {
-    return new UserInfo(
+export function userResponseDtoToFullView(dto: UserResponseDto, allRoles: RoleInfo[]): UserWithFullInfo {
+    return new UserWithFullInfo(
         dto.id,                       // id
         dto.username,                 // username
         dto.email,                    // email
@@ -69,7 +80,7 @@ export function userResponseDtoToView(dto: UserResponseDto, allRoles: RoleInfo[]
     );
 }
 
-export function userViewToRequestDto(item: UserInfo): UpdateUserRequestDto {
+export function userViewToRequestDto(item: UserWithFullInfo): UpdateUserRequestDto {
     return {
         username: item.username,
         email: item.email,

@@ -27,7 +27,7 @@ export const authInterceptorFn
 
     let authReq = req;
     if (token) {
-      console.log('isToken')
+      //console.log('isToken')
       authReq = req.clone({
         setHeaders: {
           Authorization: `Bearer ${token}`
@@ -39,7 +39,7 @@ export const authInterceptorFn
 
     return next(authReq).pipe(
       catchError((error) => {
-        console.log(JSON.stringify(error));
+        //console.log(JSON.stringify(error));
         if (error.status === 401) {
           return handle401Error(req, next, authService, router);
         }

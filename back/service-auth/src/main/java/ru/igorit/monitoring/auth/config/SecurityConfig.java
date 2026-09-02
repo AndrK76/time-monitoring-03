@@ -16,7 +16,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfigurationSource;
-import ru.igorit.monitoring.auth.service.CookieService;
+import ru.igorit.monitoring.security.service.CookieService;
 import ru.igorit.monitoring.security.filter.JwtAuthenticationFilter;
 
 @Configuration

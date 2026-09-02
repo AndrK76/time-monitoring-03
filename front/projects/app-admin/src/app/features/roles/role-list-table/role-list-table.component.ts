@@ -203,7 +203,7 @@ export class RoleListTableComponent implements OnInit, AfterViewInit {
 
   private doAdd(): void {
     const newItem = createEmptyRoleWithPermiss();
-    this.tableManager.doAddBase(newItem, () => this.table.renderRows());
+    this.tableManager.doAddBase(newItem, () => this.table.renderRows(), false, true);
   }
   doUpdate = (item: RoleWithPermissionsInfo) => this.tableManager.doUpdateBase(item, () => this.table.renderRows());
   private doDelete = (item: RoleWithPermissionsInfo) => this.tableManager.doDeleteBase(item, () => this.table.renderRows());

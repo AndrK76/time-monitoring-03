@@ -1,6 +1,8 @@
 package ru.igorit.monitoring.auth.service;
 
 import ru.igorit.monitoring.auth.dto.*;
+import ru.igorit.monitoring.web.dto.UserListItemDto;
+import ru.igorit.monitoring.web.dto.UserResponseDto;
 
 import java.util.List;
 

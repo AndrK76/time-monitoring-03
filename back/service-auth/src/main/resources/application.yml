@@ -43,7 +43,7 @@ spring:
       #ddl-auto: validate
     open-in-view: false
     show-sql: false
-    №show-sql: true
+    #show-sql: true
     properties:
       hibernate:
         #format_sql: true
@@ -120,7 +120,7 @@ cookie:
 security:
   jwt:
     secret: ${JWT_SECRET:your-256-bit-secret-key-change-in-production}
-    expiration: 600000
+    expiration: 6000000
     refresh-expiration: 12000000
   telegram:
     token-ttl: 300

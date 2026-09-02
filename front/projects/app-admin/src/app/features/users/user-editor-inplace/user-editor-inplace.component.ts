@@ -7,7 +7,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner'; // добавить
-import { UserInfo } from '../user-view.models';
+import { UserWithFullInfo } from '../user-view.models';
 import { debounceTime, distinctUntilChanged, filter, Observable } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ChangePasswordDialogData, ChangePasswordDialogResult, DialogService, isNewItem, isNotFullLoadedItem } from '@mon3/sc';
@@ -34,25 +34,25 @@ import { RoleInfo } from '../../roles/role-view.models';
   styleUrl: './user-editor-inplace.component.scss'
 })
 export class UserEditorInplaceComponent implements OnInit {
-  userData = input.required<UserInfo>();
+  userData = input.required<UserWithFullInfo>();
   roles = input.required<RoleInfo[]>();
-  loadItemFn = input.required<(item: UserInfo) => Observable<UserInfo | undefined>>();
-  setPasswordFn = input.required<(item: UserInfo, data: ChangePasswordRequestDto) => Observable<void>>();
-  resetPasswordFn = input<(item: UserInfo) => Observable<void>>();
+  loadItemFn = input.required<(item: UserWithFullInfo) => Observable<UserWithFullInfo | undefined>>();
+  setPasswordFn = input.required<(item: UserWithFullInfo, data: ChangePasswordRequestDto) => Observable<void>>();
+  resetPasswordFn = input<(item: UserWithFullInfo) => Observable<void>>();
   canFullUpdate = input.required<boolean>();
   canPartialUpdate = input.required<boolean>();
   isSomeUser = input.required<boolean>();
 
 
-  loaded = output<UserInfo>();
-  change = output<UserInfo>();
+  loaded = output<UserWithFullInfo>();
+  change = output<UserWithFullInfo>();
 
   private fb = inject(FormBuilder);
   private destroyRef = inject(DestroyRef);
   private dialogService = inject(DialogService);
 
   form!: FormGroup;
-  data!: UserInfo;
+  data!: UserWithFullInfo;
   loading = signal<boolean>(false);
 
   showResetPassword = signal<boolean>(true);
@@ -117,7 +117,7 @@ export class UserEditorInplaceComponent implements OnInit {
         takeUntilDestroyed(this.destroyRef)
       )
       .subscribe(values => {
-        const updated: UserInfo = new UserInfo(
+        const updated: UserWithFullInfo = new UserWithFullInfo(
           this.data.id,
           values.username || this.data.username,
           values.email,

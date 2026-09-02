@@ -1,0 +1,34 @@
+<div class="editor-container" *ngIf="organizationData()">
+    <form [formGroup]="form" class="editor-form">
+        <div class="form-row">
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Краткое название</mat-label>
+                <input matInput formControlName="shortName" (change)="$event.stopPropagation()">
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Полное название</mat-label>
+                <input matInput formControlName="fullName" (change)="$event.stopPropagation()">
+            </mat-form-field>
+        </div>
+        <div class="form-row">
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>ID</mat-label>
+                <input matInput formControlName="id" readonly>
+            </mat-form-field>
+        </div>
+        <div class="form-row">
+            <!--mat-form-field appearance="outline" class="full-width">
+                <mat-label>Пользователи</mat-label>
+                <mat-select formControlName="users" multiple>
+                    <mat-option *ngFor="let user of users()" [value]="user.id">
+                        {{ user.displayName || user.username }}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>-->
+            <div class="form-row">
+                <app-organization-user-list [users]="data.usersWithInfo" [allUsers]="users()"
+                    (selectedUserIds)="onUserListChange($event)"></app-organization-user-list>
+            </div>
+        </div>
+    </form>
+</div>

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.igorit.monitoring.auth.dto.*;
 import ru.igorit.monitoring.auth.helper.AuthErrorHelper;
 import ru.igorit.monitoring.auth.service.AuthService;
+import ru.igorit.monitoring.web.dto.UserResponseDto;
 
 @RestController
 @RequestMapping("/api/v1/auth")

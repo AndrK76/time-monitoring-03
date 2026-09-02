@@ -14,6 +14,8 @@ import ru.igorit.monitoring.persistence.entity.auth.Permission;
 import ru.igorit.monitoring.persistence.entity.auth.Role;
 import ru.igorit.monitoring.persistence.entity.auth.User;
 import ru.igorit.monitoring.rabbit.service.CommandSender;
+import ru.igorit.monitoring.web.dto.UserListItemDto;
+import ru.igorit.monitoring.web.dto.UserResponseDto;
 
 import java.util.HashSet;
 import java.util.List;

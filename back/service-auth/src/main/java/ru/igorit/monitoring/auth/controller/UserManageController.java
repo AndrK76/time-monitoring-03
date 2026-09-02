@@ -9,6 +9,8 @@ import ru.igorit.monitoring.auth.service.UserManagementService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import ru.igorit.monitoring.web.dto.UserListItemDto;
+import ru.igorit.monitoring.web.dto.UserResponseDto;
 
 import java.util.List;
 

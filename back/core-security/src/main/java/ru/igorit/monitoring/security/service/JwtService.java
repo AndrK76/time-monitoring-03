@@ -1,23 +1,18 @@
 package ru.igorit.monitoring.security.service;
 
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import javax.crypto.SecretKey;
-import java.nio.charset.StandardCharsets;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static ru.igorit.monitoring.security.util.JwtUtils.getSigningKey;
 
 @Service
 @Slf4j
@@ -26,65 +21,8 @@ public class JwtService {
     @Value("${security.jwt.secret}")
     private String secret;
 
-
-    @Value("${security.jwt.expiration:86400000}")
-    @Getter
-    private long expirationMs;
-
-    @Value("${security.jwt.refresh-expiration:604800000}")
-    @Getter
-    private long refreshExpirationMs;
-
     private final Map<String, Long> invalidatedTokens = new ConcurrentHashMap<>();
 
-    /**
-     * Получение ключа для подписи
-     */
-    private SecretKey getSigningKey() {
-        byte[] keyBytes = secret.getBytes(StandardCharsets.UTF_8);
-        return Keys.hmacShaKeyFor(keyBytes);
-    }
-
-    /**
-     * Генерация access токена с ролями и правами
-     */
-    public String generateToken(String userId, String username,
-                                List<String> roles,
-                                List<String> permissions,
-                                List<String> allowedOrganizations) {
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("userId", userId);
-        claims.put("username", username);
-        claims.put("roles", roles != null ? roles : List.of());
-        claims.put("permissions", permissions != null ? permissions : List.of());
-        claims.put("allowedOrganizations", allowedOrganizations != null ? allowedOrganizations : List.of());
-
-        return Jwts.builder()
-                .claims(claims)
-                .subject(username)
-                .issuedAt(new Date())
-                .expiration(Date.from(Instant.now().plus(expirationMs, ChronoUnit.MILLIS)))
-                .signWith(getSigningKey())
-                .compact();
-    }
-
-
-    /**
-     * Генерация refresh токена
-     */
-    public String generateRefreshToken(String userId, String username) {
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("userId", userId);
-        claims.put("type", "refresh");
-
-        return Jwts.builder()
-                .claims(claims)
-                .subject(username)
-                .issuedAt(new Date())
-                .expiration(Date.from(Instant.now().plus(refreshExpirationMs, ChronoUnit.MILLIS)))
-                .signWith(getSigningKey())
-                .compact();
-    }
 
     /**
      * Извлечение username из токена
@@ -161,7 +99,7 @@ public class JwtService {
      */
     public Claims extractAllClaims(String token) {
         return Jwts.parser()
-                .verifyWith(getSigningKey())
+                .verifyWith(getSigningKey(secret))
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
@@ -185,20 +123,6 @@ public class JwtService {
         }
     }
 
-    /**
-     * Проверка refresh токена
-     */
-    public boolean validateRefreshToken(String token) {
-        try {
-            Claims claims = extractAllClaims(token);
-            if (claims.get("type") == null || !"refresh".equals(claims.get("type"))) {
-                return false;
-            }
-            return !claims.getExpiration().before(new Date());
-        } catch (Exception e) {
-            return false;
-        }
-    }
 
     /**
      * Инвалидация токена (добавление в черный список)
@@ -212,10 +136,10 @@ public class JwtService {
      * Очистка черного списка токенов (старые записи)
      */
     public void cleanInvalidatedTokens() {
-        long now = System.currentTimeMillis();
+        /*long now = System.currentTimeMillis();
         invalidatedTokens.entrySet().removeIf(entry ->
                 (now - entry.getValue()) > refreshExpirationMs
-        );
+        );*/
         log.debug("Invalidated tokens cleaned up");
     }
 }

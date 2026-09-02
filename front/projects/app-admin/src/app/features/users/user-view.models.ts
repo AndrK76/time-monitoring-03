@@ -1,7 +1,7 @@
-import { UserResponseDto } from "@mon3/sa";
+import { UserListItemDto, UserResponseDto } from "@mon3/sa";
 import { RoleInfo } from "../roles/role-view.models";
 
-export class UserInfo implements UserResponseDto {
+export class UserWithFullInfo implements UserResponseDto {
 
     constructor(
         public id: string,
@@ -20,4 +20,15 @@ export class UserInfo implements UserResponseDto {
         public rolesWithInfo: RoleInfo[]
     ) { }
 
+}
+
+export class UserShortInfo implements UserListItemDto {
+    constructor(
+        public id: string,
+        public username: string,
+        public displayName: string,
+        public active: boolean,
+        public approved: boolean,
+        public roles: string[]
+    ) { }
 }

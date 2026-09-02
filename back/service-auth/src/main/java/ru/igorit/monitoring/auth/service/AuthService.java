@@ -3,8 +3,10 @@ package ru.igorit.monitoring.auth.service;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -16,6 +18,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import ru.igorit.monitoring.auth.dto.*;
 import ru.igorit.monitoring.auth.mapper.UserManagementMapper;
+import ru.igorit.monitoring.security.service.CookieService;
+import ru.igorit.monitoring.auth.service.secur.JwtCreateService;
 import ru.igorit.monitoring.common.enums.command.CommandMessageType;
 import ru.igorit.monitoring.persistence.entity.auth.Permission;
 import ru.igorit.monitoring.persistence.entity.auth.Role;
@@ -23,6 +27,7 @@ import ru.igorit.monitoring.persistence.entity.auth.User;
 import ru.igorit.monitoring.rabbit.service.CommandSender;
 import ru.igorit.monitoring.security.config.CookieProperties;
 import ru.igorit.monitoring.security.service.JwtService;
+import ru.igorit.monitoring.web.dto.UserResponseDto;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -39,6 +44,7 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final UserService userService;
     private final JwtService jwtService;
+    private final JwtCreateService jwtCreateService;
     private final CookieService cookieService;
     private final PasswordEncoder passwordEncoder;
     private final UserManagementMapper userManagementMapper;
@@ -92,7 +98,7 @@ public class AuthService {
 
     @Transactional
     public TokenResponseDto refreshToken(String refreshToken) {
-        if (!jwtService.validateRefreshToken(refreshToken)) {
+        if (!jwtCreateService.validateRefreshToken(refreshToken)) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid or expired refresh token");
         }
 
@@ -230,7 +236,7 @@ public class AuthService {
     // ============================================================
 
     private TokenResponseDto buildTokenResponse(User user) {
-        String accessToken = jwtService.generateToken(
+        String accessToken = jwtCreateService.generateToken(
                 user.getId(),
                 user.getUsername(),
                 extractRoles(user),
@@ -238,13 +244,13 @@ public class AuthService {
                 extractOrganizations(user)
         );
 
-        String refreshToken = jwtService.generateRefreshToken(user.getId(), user.getUsername());
+        String refreshToken = jwtCreateService.generateRefreshToken(user.getId(), user.getUsername());
 
         return TokenResponseDto.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .tokenType("Bearer")
-                .expiresIn(jwtService.getExpirationMs())
+                .expiresIn(jwtCreateService.getExpirationMs())
                 .user(userManagementMapper.toResponseDto(user))
                 .build();
     }
@@ -261,7 +267,6 @@ public class AuthService {
     // ============================================================
     // ПРИВАТНЫЕ МЕТОДЫ — COOKIE
     // ============================================================
-
 
 
     private String extractTokenFromCookie(HttpServletRequest request) {

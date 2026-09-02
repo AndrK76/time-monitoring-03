@@ -1,0 +1,53 @@
+<div class="user-list-container">
+    <div class="user-list-actions">
+        <button mat-raised-button color="primary" (click)="addRow()">
+            <mat-icon>add</mat-icon> Добавить
+        </button>
+        <button mat-raised-button color="warn" (click)="removeSelected()" [disabled]="!selectedRow()">
+            <mat-icon>delete</mat-icon> Удалить
+        </button>
+    </div>
+
+    <div class="table-wrapper sticky-header-table nowrap-table filtered-table">
+        <table mat-table [dataSource]="dataSource" class="mat-elevation-z0" multiTemplateDataRows matSort>
+
+            <ng-container matColumnDef="select">
+                <th mat-header-cell *matHeaderCellDef style="width: 48px;"></th>
+                <td mat-cell *matCellDef="let row" style="width: 48px;">
+                    <mat-radio-button (click)="selectRow(row)" [checked]="selectedRow() === row"></mat-radio-button>
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="displayName">
+                <th mat-header-cell *matHeaderCellDef>
+                    <sc-filter-root key="displayName" label="Отображаемое имя" [showFilter]="showFilter()" [sort]="true"
+                        [config]="filterConfig().get('displayName')!"
+                        (change)="onFilterChange($event)"></sc-filter-root>
+                </th>
+                <td mat-cell *matCellDef="let row">
+                    <mat-form-field appearance="fill" class="full-width">
+                        <mat-select [(value)]="row.selectedUserId" (valueChange)="onUserChange(row)">
+                            <mat-option *ngFor="let user of availableUsersForRow(row)" [value]="user.id">
+                                {{ user.displayName || user.username }}
+                            </mat-option>
+                            <mat-option value="">— Не выбран —</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="username">
+                <th mat-header-cell *matHeaderCellDef>
+                    <sc-filter-root key="username" label="Имя пользователя" [showFilter]="showFilter()" [sort]="true"
+                        [config]="filterConfig().get('username')!" (change)="onFilterChange($event)"></sc-filter-root>
+                </th>
+                <td mat-cell *matCellDef="let row">
+                    {{ getUsername(row.selectedUserId) }}
+                </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;" [class.selected]="selectedRow() === row"></tr>
+        </table>
+    </div>
+</div>

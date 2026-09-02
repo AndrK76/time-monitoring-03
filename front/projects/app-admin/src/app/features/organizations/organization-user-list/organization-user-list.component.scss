@@ -1,0 +1,28 @@
+@import 'table-extensions';
+
+.user-list-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 8px 0;
+}
+
+.user-list-actions {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+    flex-shrink: 0;
+}
+
+.full-width {
+    width: 100%;
+}
+
+.selected {
+    background-color: var(--table-row-hover-bg);
+}
+
+.table-wrapper {
+    flex: 1;
+    overflow: auto;
+}

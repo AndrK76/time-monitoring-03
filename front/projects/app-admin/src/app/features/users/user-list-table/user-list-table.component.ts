@@ -1,9 +1,9 @@
 import { AfterViewInit, Component, ElementRef, inject, OnInit, signal, ViewChild } from '@angular/core';
 import { AuthService, ChangePasswordRequestDto, PermissionService, UserManageService } from '@mon3/sa';
-import { UserInfo } from '../user-view.models';
+import { UserWithFullInfo } from '../user-view.models';
 import { DialogService, FilterRootComponent, isExpanded, isNewItem, NotificationService, SaveDataResult, TableFilterInfo, TableFilterType, TableManageService } from '@mon3/sc';
 import { catchError, finalize, forkJoin, map, Observable, of, tap, throwError } from 'rxjs';
-import { createEmptyUser, userResponseDtoToView, userListDtoToView, userViewToRequestDto } from '../user-view.utils';
+import { createEmptyUser, userResponseDtoToFullView, userListDtoToFullView, userViewToRequestDto } from '../user-view.utils';
 import { CommonModule } from '@angular/common';
 import { MatTable, MatTableModule } from '@angular/material/table';
 import { MatCardModule } from '@angular/material/card';
@@ -41,7 +41,7 @@ export class UserListTableComponent implements OnInit, AfterViewInit {
 
   private dialogService = inject(DialogService);
   private notificationService = inject(NotificationService);
-  private tableManager = inject(TableManageService<UserInfo>);
+  private tableManager = inject(TableManageService<UserWithFullInfo>);
 
 
   dataSource = this.tableManager.dataSource;
@@ -54,16 +54,16 @@ export class UserListTableComponent implements OnInit, AfterViewInit {
   error = this.tableManager.error;
   isSmallScreen = this.tableManager.isSmallScreen;
 
-  @ViewChild(MatTable) table!: MatTable<UserInfo>;
+  @ViewChild(MatTable) table!: MatTable<UserWithFullInfo>;
   @ViewChild(MatSort) sort!: MatSort;
   @ViewChild('tableWrapper') tableWrapper!: ElementRef<HTMLDivElement>
 
   roles = signal<RoleInfo[]>([]);
-  users = signal<UserInfo[]>([]);
+  users = signal<UserWithFullInfo[]>([]);
 
   displayedColumns = ['expand', 'username', 'displayName', 'active', 'approved', 'rolesWithInfo'];
-  trackById = (index: number, item: UserInfo) => item.id;
-  itemId = (item: UserInfo) => item.id;
+  trackById = (index: number, item: UserWithFullInfo) => item.id;
+  itemId = (item: UserWithFullInfo) => item.id;
 
   isLoading = signal(false);
   isSaving = signal(false);
@@ -136,13 +136,13 @@ export class UserListTableComponent implements OnInit, AfterViewInit {
 
     this.dataService.getUsersList()
       .pipe(
-        map(list => list.map(dto => userListDtoToView(dto, roles))),
-        this.tableManager.handleError<UserInfo[]>('Ошибка загрузки пользователей', []),
+        map(list => list.map(dto => userListDtoToFullView(dto, roles))),
+        this.tableManager.handleError<UserWithFullInfo[]>('Ошибка загрузки пользователей', []),
         finalize(() => this.isLoading.set(false))
       )
       .subscribe({
         next: (result) => {
-          const rows = result as UserInfo[];
+          const rows = result as UserWithFullInfo[];
 
           this.tableManager.setData(rows);
           this.tableManager.handleUrlParams();
@@ -158,12 +158,12 @@ export class UserListTableComponent implements OnInit, AfterViewInit {
       });
   }
 
-  loadItem = (item: UserInfo): Observable<UserInfo | undefined> => {
+  loadItem = (item: UserWithFullInfo): Observable<UserWithFullInfo | undefined> => {
     const roles = this.roles();
     this.tableManager.snackError.set(null);
     return this.dataService.getUserById(item.id).pipe(
-      map(dto => userResponseDtoToView(dto, roles)),
-      this.tableManager.handleError<UserInfo | undefined>('Ошибка загрузки информации о пользователе', undefined, this.tableManager.snackError),
+      map(dto => userResponseDtoToFullView(dto, roles)),
+      this.tableManager.handleError<UserWithFullInfo | undefined>('Ошибка загрузки информации о пользователе', undefined, this.tableManager.snackError),
       tap(_ => {
         const err = this.tableManager.snackError();
         if (err) {
@@ -175,25 +175,25 @@ export class UserListTableComponent implements OnInit, AfterViewInit {
     );
   }
 
-  addItem = (item: UserInfo): Observable<UserInfo> => {
+  addItem = (item: UserWithFullInfo): Observable<UserWithFullInfo> => {
     const reqItem = userViewToRequestDto(item);
     const roles = this.roles();
     return this.dataService.addUser(reqItem).pipe(
-      map(dto => userResponseDtoToView(dto, roles)));
+      map(dto => userResponseDtoToFullView(dto, roles)));
   }
 
-  updateItem = (item: UserInfo): Observable<UserInfo> => {
+  updateItem = (item: UserWithFullInfo): Observable<UserWithFullInfo> => {
     const reqItem = userViewToRequestDto(item);
     const roles = this.roles();
     return this.dataService.updateUser(item.id, reqItem).pipe(
-      map(dto => userResponseDtoToView(dto, roles)));
+      map(dto => userResponseDtoToFullView(dto, roles)));
   }
 
-  deleteItem = (item: UserInfo): Observable<void> => {
+  deleteItem = (item: UserWithFullInfo): Observable<void> => {
     return throwError(() => new Error('Недопустимая операция'));
   }
 
-  setPassword = (item: UserInfo, data: ChangePasswordRequestDto): Observable<void> => {
+  setPassword = (item: UserWithFullInfo, data: ChangePasswordRequestDto): Observable<void> => {
     return (this.someUser() ? this.authService.changePassword(data) : this.dataService.setPassword(item.id, data))
       .pipe(
         tap(_ => { this.notificationService.success('Пароль изменен') }),
@@ -203,7 +203,7 @@ export class UserListTableComponent implements OnInit, AfterViewInit {
         }));
   }
 
-  resetPassword = (item: UserInfo): Observable<void> => {
+  resetPassword = (item: UserWithFullInfo): Observable<void> => {
     return this.dataService.resetPassword(item.id).pipe(
       tap(_ => { this.notificationService.success('Пароль сброшен') }),
       catchError((err: any) => {
@@ -221,19 +221,18 @@ export class UserListTableComponent implements OnInit, AfterViewInit {
     return isNewItem(this.selectedItem()!);
   }
 
-  callSelect = (item: UserInfo) => this.doSelect(item, true);
+  callSelect = (item: UserWithFullInfo) => this.doSelect(item, true);
   callRefresh() {
     this.dialogService.confirm('Перечитать данные? Все несохранённые изменения будут потеряны.').subscribe(confirmed => {
       if (confirmed) this.doRefresh();
     });
   }
   callAdd = () => this.doAdd();
-  callDelete(item: UserInfo) {
+  callDelete(item: UserWithFullInfo) {
     if (isNewItem(item)) {
       this.doDelete(item);
     }
   }
-
   callSave(): void {
     this.dialogService.confirm('Сохранить изменения?').subscribe(confirmed => {
       if (confirmed) this.doSave();
@@ -241,28 +240,26 @@ export class UserListTableComponent implements OnInit, AfterViewInit {
   }
 
 
-
-  private doSelect = (item: UserInfo | undefined, newState: boolean, updateUrl: boolean = true, scrollTo: boolean = false) => {
+  private doSelect = (item: UserWithFullInfo | undefined, newState: boolean, updateUrl: boolean = true, scrollTo: boolean = false) => {
     const onSelect = () => {
       this.someUser.set(this.permisService.isSomeUser(item));
     }
     this.tableManager.doSelectBaseWithCollapse(item, newState, () => this.table.renderRows(), updateUrl, scrollTo, true, onSelect);
   }
-  doLoadedItem = (item: UserInfo | undefined) => {
+  doLoadedItem = (item: UserWithFullInfo | undefined) => {
     this.tableManager.doAfterLoadItem(item, () => this.table.renderRows());
   }
-
 
   private doRefresh = () => this.tableManager.doRefreshBase(() => this.loadData());
   private doAdd(): void {
     const newItem = createEmptyUser();
     this.tableManager.doAddBase(newItem, () => this.table.renderRows(), false, true);
   }
-  doUpdate = (item: UserInfo) => this.tableManager.doUpdateBase(item, () => this.table.renderRows());
-  private doDelete = (item: UserInfo) => this.tableManager.doDeleteBase(item, () => this.table.renderRows());
+  doUpdate = (item: UserWithFullInfo) => this.tableManager.doUpdateBase(item, () => this.table.renderRows());
+  private doDelete = (item: UserWithFullInfo) => this.tableManager.doDeleteBase(item, () => this.table.renderRows());
 
   private doSave(): void {
-    const resApply = (result: SaveDataResult<UserInfo>) => {
+    const resApply = (result: SaveDataResult<UserWithFullInfo>) => {
       if (result.success) {
         this.notificationService.success('Все изменения сохранены успешно');
       } else {
@@ -271,9 +268,9 @@ export class UserListTableComponent implements OnInit, AfterViewInit {
       }
     }
     this.tableManager.doSaveBase(this.isSaving,
-      (item: UserInfo) => this.addItem(item),
-      (item: UserInfo) => this.updateItem(item),
-      (item: UserInfo) => this.deleteItem(item),
+      (item: UserWithFullInfo) => this.addItem(item),
+      (item: UserWithFullInfo) => this.updateItem(item),
+      (item: UserWithFullInfo) => this.deleteItem(item),
       resApply);
   }
 

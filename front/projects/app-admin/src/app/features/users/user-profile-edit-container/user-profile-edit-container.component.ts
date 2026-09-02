@@ -1,8 +1,8 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
-import { UserInfo } from '../user-view.models';
+import { UserWithFullInfo } from '../user-view.models';
 import { AuthService, ChangePasswordRequestDto, handleError, PermissionService, UserManageService, UserResponseDto } from '@mon3/sa';
 import { catchError, finalize, forkJoin, map, Observable, of, tap, throwError } from 'rxjs';
-import { userResponseDtoToView, userViewToRequestDto } from '../user-view.utils';
+import { userResponseDtoToFullView, userViewToRequestDto } from '../user-view.utils';
 import { MatIconModule } from '@angular/material/icon';
 import { UserEditorInplaceComponent } from '../user-editor-inplace/user-editor-inplace.component';
 import { MatButtonModule } from '@angular/material/button';
@@ -29,8 +29,8 @@ export class UserProfileEditContainerComponent implements OnInit {
   private readonly dialogService = inject(DialogService);
 
   roles = signal<RoleInfo[]>([]);
-  user = signal<UserInfo | undefined>(undefined);
-  userToSave = signal<UserInfo | undefined>(undefined);
+  user = signal<UserWithFullInfo | undefined>(undefined);
+  userToSave = signal<UserWithFullInfo | undefined>(undefined);
 
   isLoading = signal(false);
   isSaving = signal(false);
@@ -85,14 +85,14 @@ export class UserProfileEditContainerComponent implements OnInit {
 
     this.dataService.getCurrentUser()
       .pipe(
-        map(dto => userResponseDtoToView(dto, roles)),
-        handleError<UserInfo | null>('Ошибка загрузки пользователей', null, this.error),
+        map(dto => userResponseDtoToFullView(dto, roles)),
+        handleError<UserWithFullInfo | null>('Ошибка загрузки пользователей', null, this.error),
         finalize(() => this.isLoading.set(false))
       )
       .subscribe({
         next: (result) => {
           if (!this.error()) {
-            const user = result as UserInfo;
+            const user = result as UserWithFullInfo;
             this.user.set(user);
             this.userToSave.set(user);
           }
@@ -100,10 +100,10 @@ export class UserProfileEditContainerComponent implements OnInit {
       });
   }
 
-  loadItem = (item: UserInfo): Observable<UserInfo> => { return of(item) };
+  loadItem = (item: UserWithFullInfo): Observable<UserWithFullInfo> => { return of(item) };
 
 
-  setPassword = (item: UserInfo, data: ChangePasswordRequestDto): Observable<void> => {
+  setPassword = (item: UserWithFullInfo, data: ChangePasswordRequestDto): Observable<void> => {
     return this.authService.changePassword(data)
       .pipe(
         tap(_ => { this.notificationService.success('Пароль изменен') }),
@@ -126,8 +126,8 @@ export class UserProfileEditContainerComponent implements OnInit {
     });
   }
 
-  onUpdate = (item: UserInfo) => {
-    if (hasChanges<UserInfo>(this.userToSave()!, item)) {
+  onUpdate = (item: UserWithFullInfo) => {
+    if (hasChanges<UserWithFullInfo>(this.userToSave()!, item)) {
       this.userToSave.set(item);
       this.dataChanged.set(true);
     }
@@ -142,7 +142,7 @@ export class UserProfileEditContainerComponent implements OnInit {
     return (this.canFullUpdate() ? this.dataService.updateUser(id, reqItem) : this.dataService.updateCurrentUser(reqItem))
       .pipe(
         finalize(() => this.isSaving.set(false)),
-        map(dto => userResponseDtoToView(dto, roles)),
+        map(dto => userResponseDtoToFullView(dto, roles)),
         tap(v => { this.user.set(v); this.userToSave.set(v); this.dataChanged.set(false) }),
         tap(_ => this.notificationService.success('Данные успешно сохранены')),
         catchError((_) => { this.notificationService.error('Ошибка сохранения'); return of(); })

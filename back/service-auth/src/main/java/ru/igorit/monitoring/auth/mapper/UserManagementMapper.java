@@ -9,6 +9,8 @@ import org.mapstruct.Mapping;
 import ru.igorit.monitoring.persistence.entity.auth.Permission;
 import ru.igorit.monitoring.persistence.entity.auth.Role;
 import ru.igorit.monitoring.persistence.entity.auth.User;
+import ru.igorit.monitoring.web.dto.UserListItemDto;
+import ru.igorit.monitoring.web.dto.UserResponseDto;
 
 import java.util.List;
 import java.util.Set;
