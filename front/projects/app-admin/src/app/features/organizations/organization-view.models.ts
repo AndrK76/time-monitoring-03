@@ -1,4 +1,5 @@
 import { OrganizationListDto, UserListItemDto } from "@mon3/sa";
+import { UserShortInfo } from "../users/user-view.models";
 
 export class OrganizationInfo implements OrganizationListDto {
     constructor(
@@ -6,6 +7,6 @@ export class OrganizationInfo implements OrganizationListDto {
         public shortName: string,
         public fullName: string,
         public users?: string[],
-        public usersWithInfo: UserListItemDto[] = []
+        public usersWithInfo: UserShortInfo[] = []
     ) { }
 }

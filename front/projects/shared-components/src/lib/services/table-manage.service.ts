@@ -32,6 +32,7 @@ export class TableManageService<T extends Record<string, any>> {
   readonly showFilter = signal(true);
   readonly error = signal<string | null>(null);
   readonly snackError = signal<string | null>(null);
+  readonly doUpdateUrl = signal<boolean>(true);
 
   // === Вычисляемые сигналы ===
   readonly hasChanges = computed(() => hasTableChanges(this.dataState()));
@@ -108,6 +109,7 @@ export class TableManageService<T extends Record<string, any>> {
 
   //Работа с Url
   handleUrlParams(): void {
+    if (!this.doUpdateUrl()) return;
     const idParam = this.route.snapshot.queryParamMap.get('id');
     if (idParam) {
       const item = this.dataSource.data.find(row => this.itemIdFn(row) === idParam);
@@ -117,6 +119,7 @@ export class TableManageService<T extends Record<string, any>> {
     }
   }
   private updateUrlParams(id?: any): void {
+    if (!this.doUpdateUrl()) return;
     const _id: string | null = id ? `${id}` : null;
     this.router.navigate([], {
       relativeTo: this.route,
@@ -178,7 +181,8 @@ export class TableManageService<T extends Record<string, any>> {
   }
 
   // === Добавление ===
-  doAddBase(newItem: T, renderFn: () => void, markAsDettach: boolean = false, collapseOthers: boolean = false): void {
+  doAddBase(newItem: T, renderFn: () => void, markAsDettach: boolean = false,
+    collapseOthers: boolean = false, onAddFn: (() => void) | undefined = undefined): void {
     this.selectedItem.set(undefined);
     this.expandedItem.set(undefined);
     const result = addDataSourceItem(this.dataSource.data, newItem, collapseOthers);
@@ -189,23 +193,24 @@ export class TableManageService<T extends Record<string, any>> {
       if (markAsDettach) result.fullItem = addNotApplyItemFlag(result.fullItem);
       this.selectedItem.set(result.fullItem);
       this.expandedItem.set(result.fullItem);
+      if (onAddFn) onAddFn();
     }
   }
 
   // === Обновление ===
-  doUpdateBase(item: T, renderFn: () => void): void {
-    //console.log(item);
+  doUpdateBase(item: T, renderFn: () => void, onUpdateFn: ((res: T) => void) | undefined = undefined): void {
     const result = updateDataSourceItem(
       this.dataSource.data, item, this.itemIdFn, undefined, true);
     if (result.updated) {
       this.dataSource.data = result.data;
       if (renderFn) renderFn();
       this.dataState.update(state => addModifyChangeToState(state, this.itemIdFn(item)));
+      if (onUpdateFn) onUpdateFn(item);
     }
   }
 
   // === Удаление ===
-  doDeleteBase(item: T, renderFn: () => void): void {
+  doDeleteBase(item: T, renderFn: () => void, onDeleteFn: (() => void) | undefined = undefined): void {
     const result = deleteDataSourceItem(this.dataSource.data, item, this.itemIdFn);
     if (result.deleted) {
       this.dataSource.data = result.data;
@@ -214,6 +219,7 @@ export class TableManageService<T extends Record<string, any>> {
       this.selectedItem.set(undefined);
       this.expandedItem.set(undefined);
       this.updateUrlParams();
+      if (onDeleteFn) onDeleteFn();
     }
   }
 

@@ -9,13 +9,16 @@ import { MatRadioModule } from '@angular/material/radio';
 import { FormsModule } from '@angular/forms';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { UserShortInfo } from '../../users/user-view.models';
-import { FilterRootComponent, TableManageService, TableFilterInfo, TableFilterType, initFilterPredicate, applyFilters } from '@mon3/sc';
+import { FilterRootComponent, TableManageService, TableFilterInfo, TableFilterType, initFilterPredicate, applyFilters, isExpanded, isNewItem, DialogService, NotificationService } from '@mon3/sc';
+import { MatCardModule } from '@angular/material/card';
+
 
 @Component({
   selector: 'app-organization-user-list',
   standalone: true,
   imports: [
     CommonModule,
+    MatCardModule,
     MatTableModule,
     MatButtonModule,
     MatIconModule,
@@ -31,139 +34,136 @@ import { FilterRootComponent, TableManageService, TableFilterInfo, TableFilterTy
   styleUrls: ['./organization-user-list.component.scss']
 })
 export class OrganizationUserListComponent implements OnInit, AfterViewInit {
-  // Входные данные: текущие пользователи организации (уже выбранные) и все доступные пользователи
+  private tableManager = inject(TableManageService<UserShortInfo>);
+  private dialogService = inject(DialogService);
+
+  usersData = input.required<UserShortInfo[]>();
   users = input.required<UserShortInfo[]>();
-  allUsers = input.required<UserShortInfo[]>();
-
-  // Выход: массив ID выбранных пользователей
-  selectedUserIds = output<string[]>();
-
-  private tableManager = inject(TableManageService<{ selectedUserId: string }>);
+  onSelect = output<UserShortInfo | undefined>();
+  canAddChanged = output<boolean>();
+  newData = output<UserShortInfo[]>();
 
   dataSource = this.tableManager.dataSource;
+  dataState = this.tableManager.dataState;
+  selectedItem = this.tableManager.selectedItem;
+  hasChanges = this.tableManager.hasChanges;
+  changesSummary = this.tableManager.changesSummary;
   filterConfig = this.tableManager.filterConfig;
   showFilter = this.tableManager.showFilter;
+  error = this.tableManager.error;
+  isSmallScreen = this.tableManager.isSmallScreen;
 
   @ViewChild(MatTable) table!: MatTable<{ selectedUserId: string }>;
   @ViewChild(MatSort) sort!: MatSort;
+  @ViewChild('tableWrapper') tableWrapper!: ElementRef<HTMLDivElement>;
 
-  displayedColumns = ['select', 'displayName', 'username'];
-  selectedRow = signal<{ selectedUserId: string } | null>(null);
+  displayedColumns = ['expand', 'displayName', 'username'];
+  trackById = (index: number, item: UserShortInfo) => item.id;
+  itemId = (item: UserShortInfo) => {
+    return (item as any)._id ?? item.id;
+  };
 
-  // Внутренний список строк (каждая строка – это выбранный пользователь)
-  rows = signal<{ selectedUserId: string }[]>([]);
+  _filterConfig: Map<string, TableFilterInfo> = new Map([
+    ['displayName', { key: 'displayName', type: TableFilterType.TEXT }],
+    ['username', { key: 'username', type: TableFilterType.TEXT }]
+  ]);
 
-  private isInternalChange = false;
+  avaibleUsers = signal<UserShortInfo[]>([]);
+  canAddUsers = signal<boolean>(false);
 
-  constructor() {
-    effect(() => {
-      const userList = this.users();
-      const currentIds = this.rows().map(r => r.selectedUserId);
-      const newIds = userList.map(u => u.id);
-
-      // Если списки совпадают, не обновляем
-      if (currentIds.length === newIds.length && currentIds.every((id, i) => id === newIds[i])) {
-        return;
-      }
-
-      // Обновляем rows только если изменилось
-      this.rows.set(userList.map(u => ({ selectedUserId: u.id })));
-      this.updateDataSource();
-
-      // Сбрасываем флаг, чтобы предотвратить эмит при синхронизации
-      this.isInternalChange = false;
-    }, { allowSignalWrites: true });
-  }
 
   ngOnInit(): void {
-    // Настройка фильтров
-    this.filterConfig.set(new Map([
-      ['displayName', { key: 'displayName', type: TableFilterType.TEXT }],
-      ['username', { key: 'username', type: TableFilterType.TEXT }]
-    ]));
-    this.tableManager.setItemIdFn((row: any) => row.selectedUserId);
-    this.tableManager.initFilterPredicate();
-    // Инициализируем данные
-    this.updateDataSource();
+    this.filterConfig.set(this._filterConfig);
+    this.tableManager.doUpdateUrl.set(false);
+    this.tableManager.setItemIdFn(this.itemId);
+    this.tableManager.setSelectFn(this.doSelect);
+    this.tableManager.setData(this.usersData().map(v => {
+      return { ...v, _id: v.id }
+    }));
+    this.showFilter.set(false);
+    this.onChangeCurrent();
   }
 
   ngAfterViewInit(): void {
     this.dataSource.sort = this.sort;
+    this.tableManager.initFilterPredicate();
+    this.tableManager.setTableWrapper(this.tableWrapper);
   }
 
-  private updateDataSource(): void {
-    this.tableManager.setData(this.rows());
+  onFilterChange = (val: TableFilterInfo) => this.tableManager.onFilterChange(val);
+  toggleFilter = (reset?: boolean) => this.tableManager.toggleFilter();
+
+  isExpanded = (index: number, item: any): boolean => isExpanded(item);
+  isNewItem = () => {
+    if (!this.selectedItem()) return false;
+    return isNewItem(this.selectedItem()!);
+  };
+  callSelect = (item: UserShortInfo) => this.doSelect(item, true);
+  callAdd = () => this.doAdd();
+  callDelete(item: UserShortInfo | undefined) {
+    if (!item) return;
+    if (isNewItem(item)) {
+      this.doDelete(item);
+    } else {
+      this.dialogService.confirm(`Удалить доступ для "${item.displayName}"?`).subscribe(confirmed => {
+        if (confirmed) this.doDelete(item);
+      });
+    }
   }
 
-  // Добавить новую пустую строку
-  addRow(): void {
-    const newRow = { selectedUserId: '' };
-    this.rows.update(rows => [...rows, newRow]);
-    this.updateDataSource();
-    this.selectedRow.set(newRow);
-    this.emitChanges();
-  }
-
-  // Удалить выбранную строку
-  removeSelected(): void {
-    const selected = this.selectedRow();
-    if (!selected) return;
-    this.rows.update(rows => rows.filter(row => row !== selected));
-    this.updateDataSource();
-    this.selectedRow.set(null);
-    this.emitChanges();
-  }
-
-  // Выбор строки
-  selectRow(row: any): void {
-    this.selectedRow.set(row);
-  }
-
-  // При изменении выбора пользователя в строке
-  onUserChange(row: any): void {
-    const selectedId = row.selectedUserId;
-    if (selectedId) {
-      // Проверяем дубликат
-      const isDuplicate = this.rows().some(r => r !== row && r.selectedUserId === selectedId);
-      if (isDuplicate) {
-        row.selectedUserId = '';
-        alert('Этот пользователь уже добавлен в организацию');
-        return;
+  private doSelect = (item: UserShortInfo | undefined, newState: boolean, updateUrl: boolean = true, scrollTo: boolean = false) => {
+    this.tableManager.doSelectBaseWithCollapse(item, newState, () => this.table.renderRows(), updateUrl, scrollTo, true, this.onChangeCurrent);
+  };
+  private doAdd(): void {
+    if (this.canAddUsers()) {
+      let newItem: any = (this.avaibleUsers().at(0)?.id === this.selectedItem()?.id) ? this.avaibleUsers().at(1) : this.avaibleUsers().at(0);
+      if (newItem) {
+        newItem = { ...newItem, _id: newItem.id }
+        this.tableManager.doAddBase(newItem, () => this.table.renderRows(), false, true, this.onChangeCurrent);
       }
     }
-    this.updateDataSource();
-    this.emitChanges();
   }
-
-  // Доступные пользователи для выбора в конкретной строке
-  availableUsersForRow(row: any): UserShortInfo[] {
-    const selectedIds = this.rows()
-      .filter(r => r !== row && r.selectedUserId)
-      .map(r => r.selectedUserId);
-    const all = this.allUsers();
-    const currentId = row.selectedUserId;
-    return all.filter(u => !selectedIds.includes(u.id) || u.id === currentId);
-  }
-
-  // Получить username по ID
-  getUsername(userId: string): string {
-    if (!userId) return '';
-    const user = this.allUsers().find(u => u.id === userId);
-    return user ? user.username : '';
-  }
-
-  // Обработка изменения фильтра
-  onFilterChange(val: TableFilterInfo) {
-    this.tableManager.onFilterChange(val);
-  }
-
-  private emitChanges(): void {
-    // Если изменение пришло извне (из эффекта), не эмитим
-    if (this.isInternalChange) {
-      this.isInternalChange = false;
-      return;
+  doUpdate = (item: UserShortInfo) => {
+    const afterUpdate = (val: UserShortInfo) => {
+      this.selectedItem.set(val);
+      this.onChangeCurrent();
     }
-    const ids = this.rows().map(r => r.selectedUserId).filter(id => id);
-    this.selectedUserIds.emit(ids);
+    this.tableManager.doUpdateBase(item, () => this.table.renderRows(), afterUpdate);
+  }
+  private doDelete = (item: UserShortInfo) => {
+    this.tableManager.doDeleteBase(item, () => this.table.renderRows(), this.onChangeCurrent);
+  }
+
+
+  private onChangeCurrent = () => {
+    const calculateAvaible = () => {
+      const allUsers = this.users();
+      const selectedUsers = this.dataSource.data;
+      const currentSelected = this.selectedItem();
+      const selectedIds = new Set(selectedUsers.map(u => u.id));
+      this.avaibleUsers.set(
+        allUsers.filter(user => {
+          if (selectedIds.has(user.id)) {
+            return currentSelected ? user.id === currentSelected.id : false;
+          }
+          return true;
+        }));
+    }
+
+    this.onSelect.emit(this.selectedItem());
+    calculateAvaible();
+    this.canAddUsers.set(((this.avaibleUsers().length > 1) || ((this.avaibleUsers().length === 1) && !this.selectedItem())));
+    this.canAddChanged.emit(this.canAddUsers());
+    this.newData.emit(this.dataSource.data);
+  }
+
+  onChangeSelectedUser = (item: any) => {
+    const newUser = this.avaibleUsers().find(f => f.id === item.value);
+    if (newUser) {
+      (newUser as any)._id = (this.selectedItem() as any)._id;
+      this.doUpdate(newUser);
+    }
   }
 }
+
+

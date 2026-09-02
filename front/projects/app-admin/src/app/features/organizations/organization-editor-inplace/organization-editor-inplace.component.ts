@@ -1,4 +1,4 @@
-import { Component, input, output, inject, DestroyRef, OnInit, signal } from '@angular/core';
+import { Component, input, output, inject, DestroyRef, OnInit, signal, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -11,16 +11,15 @@ import { OrganizationInfo } from '../organization-view.models';
 import { isNewItem, isNotFullLoadedItem } from '@mon3/sc';
 import { UserShortInfo } from '../../users/user-view.models';
 import { OrganizationUserListComponent } from '../organization-user-list/organization-user-list.component';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-organization-editor-inplace',
   standalone: true,
   imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule,
+    CommonModule, ReactiveFormsModule,
+    MatFormFieldModule, MatInputModule, MatSelectModule, MatButtonModule, MatIconModule,
     OrganizationUserListComponent
   ],
   templateUrl: './organization-editor-inplace.component.html',
@@ -31,6 +30,7 @@ export class OrganizationEditorInplaceComponent implements OnInit {
   users = input.required<UserShortInfo[]>();
   loadItemFn = input.required<(item: OrganizationInfo) => Observable<OrganizationInfo | undefined>>();
 
+
   loaded = output<OrganizationInfo>();
   change = output<OrganizationInfo>();
 
@@ -40,6 +40,9 @@ export class OrganizationEditorInplaceComponent implements OnInit {
   form!: FormGroup;
   data!: OrganizationInfo;
   loading = signal<boolean>(false);
+  usersData = signal<UserShortInfo[]>([]);
+
+  @ViewChild(OrganizationUserListComponent) userListComponent!: OrganizationUserListComponent;
 
   ngOnInit(): void {
     this.data = this.organizationData();
@@ -82,6 +85,7 @@ export class OrganizationEditorInplaceComponent implements OnInit {
   }
 
   private listenToChanges(): void {
+    this.usersData.set(this.data?.usersWithInfo || []);
     this.form.valueChanges
       .pipe(
         debounceTime(300),
@@ -109,16 +113,33 @@ export class OrganizationEditorInplaceComponent implements OnInit {
       });
   }
 
-  resetToData(data: OrganizationInfo): void {
-    this.form.patchValue({
-      shortName: data.shortName,
-      fullName: data.fullName,
-      users: data.usersWithInfo.map(u => u.id)
-    }, { emitEvent: false });
+  callAddUser(): void {
+    if (this.userListComponent) {
+      this.userListComponent.callAdd();
+    }
   }
 
-  onUserListChange(userIds: string[]): void {
-    const allUsers = this.users();
+  selectedUser = signal<UserShortInfo | undefined>(undefined);
+  onSelectUser = (item: UserShortInfo | undefined) => {
+    //console.log(this.selectedUser());
+  }
+  callDeleteUser(): void {
+    if (this.userListComponent) {
+      this.userListComponent.callDelete(this.selectedUser());
+    }
+  }
+  canAddUserState = signal<boolean>(false);
+  onCanAddChange = (value: boolean) => {
+    this.canAddUserState.set(value);
+  };
+
+
+
+
+  onUserListChange(newData: UserShortInfo[]): void {
+    console.log(newData);
+    console.log(this.data.users)
+    /*const allUsers = this.users();
     const usersWithInfo = userIds.map(id => {
       const found = allUsers.find(u => u.id === id);
       return found || { id, username: '', displayName: 'Неизвестный' } as UserShortInfo;
@@ -126,6 +147,6 @@ export class OrganizationEditorInplaceComponent implements OnInit {
     this.data.users = userIds;
     this.data.usersWithInfo = usersWithInfo;
     // Эмитим изменение
-    this.change.emit(this.data);
+    this.change.emit(this.data);*/
   }
 }

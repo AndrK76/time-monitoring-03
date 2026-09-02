@@ -112,9 +112,12 @@
         height: 40px !important;
     }
 
-    .mat-mdc-form-field-infix {
-        padding-top: 6px !important;
-        padding-bottom: 4px !important;
+    .full-width {
+        .mat-mdc-form-field-infix {
+            //filter-row
+            padding-top: 6px !important;
+            padding-bottom: 4px !important;
+        }
     }
 }
 

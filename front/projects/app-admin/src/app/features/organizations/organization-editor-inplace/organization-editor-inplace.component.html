@@ -15,20 +15,23 @@
                 <mat-label>ID</mat-label>
                 <input matInput formControlName="id" readonly>
             </mat-form-field>
-        </div>
-        <div class="form-row">
-            <!--mat-form-field appearance="outline" class="full-width">
-                <mat-label>Пользователи</mat-label>
-                <mat-select formControlName="users" multiple>
-                    <mat-option *ngFor="let user of users()" [value]="user.id">
-                        {{ user.displayName || user.username }}
-                    </mat-option>
-                </mat-select>
-            </mat-form-field>-->
-            <div class="form-row">
-                <app-organization-user-list [users]="data.usersWithInfo" [allUsers]="users()"
-                    (selectedUserIds)="onUserListChange($event)"></app-organization-user-list>
+            <div class="action-button-group">
+                <button mat-raised-button class="table-action-btn btn-success" (click)="callAddUser()"
+                    [disabled]="!canAddUserState()">
+                    <mat-icon>add</mat-icon><span class="hide-on-small">Добавить</span>
+                </button>
+                <button mat-raised-button class="table-action-btn btn-danger" (click)="callDeleteUser()"
+                    [disabled]="!selectedUser()">
+                    <mat-icon>delete</mat-icon><span class="hide-on-small">Удалить</span>
+                </button>
             </div>
         </div>
+        @if (!loading()) {
+        <div class="form-row">
+            <app-organization-user-list [usersData]="usersData()" [users]="users()" (onSelect)="onSelectUser($event)"
+                (canAddChanged)="onCanAddChange($event)" (newData)="onUserListChange($event)"
+                class="full-width"></app-organization-user-list>
+        </div>
+        }
     </form>
 </div>

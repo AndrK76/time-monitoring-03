@@ -114,6 +114,11 @@
         align-items: center;
         justify-content: center;
         padding: 40px 0;
+
+        &.inner-table {
+            padding: 10px 0;
+        }
+
         color: #888;
         gap: 8px;
     }
@@ -528,10 +533,21 @@
     }
 }
 
+.filtered-table .filter-field .mat-mdc-form-field-infix {
+    padding: 0 0 !important;
+    width: unset;
+}
+
+.filtered-table .filter-field .mat-mdc-text-field-wrapper {
+    height: 28px !important;
+    padding: 0 8px !important;
+}
+
 .filter-field {
     width: 100%;
     font-size: 0.5rem;
     flex-wrap: nowrap;
+
 
     .mat-mdc-select,
     .mat-mdc-input-element {
@@ -558,6 +574,7 @@
     .mdc-text-field {
         padding-left: 0.3rem;
     }
+
 }
 
 .filter-field-container {
@@ -615,5 +632,12 @@
             font-size: 0.65rem !important;
 
         }
+    }
+}
+
+mat-card-actions,
+mat-card-content {
+    &.inner-table {
+        padding: 0 !important;
     }
 }
