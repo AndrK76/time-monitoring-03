@@ -16,6 +16,8 @@ import { UserEditorInplaceComponent } from '../user-editor-inplace/user-editor-i
 import { authConstant } from '../../../auth-constants';
 import { RoleInfo } from '../../roles/role-view.models';
 import { roleResponseDtoToVIew } from '../../roles/role-view.utils';
+import { OrganizationInfo } from '../../organizations/organization-view.models';
+import { organizationListDtoToView } from '../../organizations/organization-view.utils';
 
 @Component({
   selector: 'app-user-list-table',
@@ -60,6 +62,7 @@ export class UserListTableComponent implements OnInit, AfterViewInit {
 
   roles = signal<RoleInfo[]>([]);
   users = signal<UserWithFullInfo[]>([]);
+  organizations = signal<OrganizationInfo[]>([]);
 
   displayedColumns = ['expand', 'username', 'displayName', 'active', 'approved', 'rolesWithInfo'];
   trackById = (index: number, item: UserWithFullInfo) => item.id;
@@ -105,6 +108,11 @@ export class UserListTableComponent implements OnInit, AfterViewInit {
         .pipe(
           map(list => list.map(dto => roleResponseDtoToVIew(dto))),
           this.tableManager.handleError<RoleInfo[]>('Ошибка загрузки списка ролей', []),
+        ),
+      organizations: this.dataService.getAlOrganizations()
+        .pipe(
+          map(list => list.map(dto => organizationListDtoToView(dto))),
+          this.tableManager.handleError<OrganizationInfo[]>('Ошибка загрузки списка организаций', []),
         ),
     }).subscribe({
       next: (result) => {
@@ -160,9 +168,10 @@ export class UserListTableComponent implements OnInit, AfterViewInit {
 
   loadItem = (item: UserWithFullInfo): Observable<UserWithFullInfo | undefined> => {
     const roles = this.roles();
+    const organizationns = this.organizations();
     this.tableManager.snackError.set(null);
     return this.dataService.getUserById(item.id).pipe(
-      map(dto => userResponseDtoToFullView(dto, roles)),
+      map(dto => userResponseDtoToFullView(dto, roles, organizationns)),
       this.tableManager.handleError<UserWithFullInfo | undefined>('Ошибка загрузки информации о пользователе', undefined, this.tableManager.snackError),
       tap(_ => {
         const err = this.tableManager.snackError();
@@ -178,15 +187,17 @@ export class UserListTableComponent implements OnInit, AfterViewInit {
   addItem = (item: UserWithFullInfo): Observable<UserWithFullInfo> => {
     const reqItem = userViewToRequestDto(item);
     const roles = this.roles();
+    const organizations = this.organizations();
     return this.dataService.addUser(reqItem).pipe(
-      map(dto => userResponseDtoToFullView(dto, roles)));
+      map(dto => userResponseDtoToFullView(dto, roles, organizations)));
   }
 
   updateItem = (item: UserWithFullInfo): Observable<UserWithFullInfo> => {
     const reqItem = userViewToRequestDto(item);
     const roles = this.roles();
+    const organizations = this.organizations();
     return this.dataService.updateUser(item.id, reqItem).pipe(
-      map(dto => userResponseDtoToFullView(dto, roles)));
+      map(dto => userResponseDtoToFullView(dto, roles, organizations)));
   }
 
   deleteItem = (item: UserWithFullInfo): Observable<void> => {

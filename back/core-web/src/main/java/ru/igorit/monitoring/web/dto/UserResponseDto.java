@@ -25,6 +25,7 @@ public class UserResponseDto {
     private boolean emailVerified;
     private List<String> roles;
     private List<String> permissions;
+    private List<String> organizations;
     private boolean anonymous;
 
 }

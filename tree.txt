@@ -16,6 +16,7 @@
 |   |   |                           |-- dto
 |   |   |                           |   `-- command
 |   |   |                           |       |-- auth
+|   |   |                           |       |   |-- OrganizationInfoChangedEventCommandDto.java
 |   |   |                           |       |   |-- SecurityContextDto.java
 |   |   |                           |       |   |-- UserContextDto.java
 |   |   |                           |       |   |-- UserCreatedEventCommandDto.java
@@ -44,6 +45,7 @@
 |   |   |       |                       |   |-- Organization.java
 |   |   |       |                       |   `-- UserOrganization.java
 |   |   |       |                       `-- auth
+|   |   |       |                           |-- AuthOrganization.java
 |   |   |       |                           |-- Permission.java
 |   |   |       |                           |-- Role.java
 |   |   |       |                           |-- TelegramToken.java
@@ -60,7 +62,8 @@
 |   |   |                   `-- monitoring
 |   |   |                       `-- rabbit
 |   |   |                           |-- config
-|   |   |                           |   |-- RabbitMQConfig.java
+|   |   |                           |   |-- RabbitMQCommonConfig.java
+|   |   |                           |   |-- RabbitMQConfigProperties.java
 |   |   |                           |   |-- RabbitMQJacksonConfig.java
 |   |   |                           |   `-- RabbitMQSecurityConfig.java
 |   |   |                           `-- service
@@ -123,6 +126,7 @@
 |   |   |                   `-- monitoring
 |   |   |                       `-- web
 |   |   |                           `-- dto
+|   |   |                               |-- OrganizationListDto.java
 |   |   |                               |-- UserListItemDto.java
 |   |   |                               `-- UserResponseDto.java
 |   |   `-- pom.xml
@@ -135,16 +139,16 @@
 |   |   |       |           `-- monitoring
 |   |   |       |               `-- admin
 |   |   |       |                   |-- config
+|   |   |       |                   |   |-- RabbitMQConfig.java
 |   |   |       |                   |   `-- SecurityConfig.java
 |   |   |       |                   |-- controller
 |   |   |       |                   |   |-- MainModelController.java
 |   |   |       |                   |   `-- TestController.java
 |   |   |       |                   |-- dto
 |   |   |       |                   |   |-- OrganizationItemDto.java
-|   |   |       |                   |   |-- OrganizationListDto.java
 |   |   |       |                   |   `-- TestResponse.java
 |   |   |       |                   |-- listener
-|   |   |       |                   |   `-- UserCommandListener.java
+|   |   |       |                   |   `-- RabbitCommandListener.java
 |   |   |       |                   |-- mapper
 |   |   |       |                   |   |-- MainModelMapper.java
 |   |   |       |                   |   `-- UserEventCommandMapper.java
@@ -175,6 +179,7 @@
 |   |   |       |               `-- auth
 |   |   |       |                   |-- config
 |   |   |       |                   |   |-- MessageSourceConfig.java
+|   |   |       |                   |   |-- RabbitMQConfig.java
 |   |   |       |                   |   `-- SecurityConfig.java
 |   |   |       |                   |-- controller
 |   |   |       |                   |   |-- AdminController.java
@@ -196,9 +201,12 @@
 |   |   |       |                   |   |-- AuthErrorHelper.java
 |   |   |       |                   |   |-- LocaleHelper.java
 |   |   |       |                   |   `-- LoginMessageHelper.java
+|   |   |       |                   |-- listener
+|   |   |       |                   |   `-- RabbitCommandListener.java
 |   |   |       |                   |-- mapper
 |   |   |       |                   |   `-- UserManagementMapper.java
 |   |   |       |                   |-- repository
+|   |   |       |                   |   |-- AuthOrganizationRepository.java
 |   |   |       |                   |   |-- PermissionRepository.java
 |   |   |       |                   |   |-- RoleRepository.java
 |   |   |       |                   |   |-- TelegramTokenRepository.java
@@ -211,6 +219,7 @@
 |   |   |       |                   |   |-- AdminService.java
 |   |   |       |                   |   |-- AuthManagementPersistService.java
 |   |   |       |                   |   |-- AuthService.java
+|   |   |       |                   |   |-- OrganizationEventsReceiveService.java
 |   |   |       |                   |   |-- ResetPasswordService.java
 |   |   |       |                   |   |-- TelegramTokenServiceImpl.java
 |   |   |       |                   |   |-- UserDetailsServiceImpl.java
@@ -223,7 +232,8 @@
 |   |   |           |   `-- migration
 |   |   |           |       |-- V01.01__init_auth_schema.sql
 |   |   |           |       |-- V01.02__add_telegram_support.sql
-|   |   |           |       `-- V01.03__add_initial_data.sql
+|   |   |           |       |-- V01.03__add_initial_data.sql
+|   |   |           |       `-- V01.04__add_organizations.sql
 |   |   |           |-- org
 |   |   |           |   `-- springframework
 |   |   |           |       `-- security
@@ -672,4 +682,4 @@
 |-- README.md
 `-- tree.txt
 
-246 directories, 426 files
+247 directories, 435 files

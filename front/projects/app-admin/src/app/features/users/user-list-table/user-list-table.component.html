@@ -127,7 +127,8 @@
                     <ng-container matColumnDef="editor">
                         <td mat-cell *matCellDef="let row" [attr.colspan]="displayedColumns.length">
                             <div class="editor-row" *ngIf="row._expanded">
-                                <app-user-editor-inplace [userData]="row" [roles]="roles()" [loadItemFn]="loadItem"
+                                <app-user-editor-inplace [userData]="row" [roles]="roles()"
+                                    [organizations]="organizations()" [loadItemFn]="loadItem"
                                     [setPasswordFn]="setPassword" [resetPasswordFn]="resetPassword" ,
                                     [canFullUpdate]="canFullUpdate()" [canPartialUpdate]="canPartialUpdate()"
                                     [isSomeUser]="someUser()" (change)="doUpdate($event)"

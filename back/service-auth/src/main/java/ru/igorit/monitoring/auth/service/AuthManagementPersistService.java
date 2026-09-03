@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
+import ru.igorit.monitoring.auth.repository.AuthOrganizationRepository;
+import ru.igorit.monitoring.persistence.entity.auth.AuthOrganization;
 import ru.igorit.monitoring.persistence.entity.auth.Permission;
 import ru.igorit.monitoring.persistence.entity.auth.Role;
 import ru.igorit.monitoring.persistence.entity.auth.User;
@@ -24,6 +26,7 @@ public class AuthManagementPersistService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PermissionRepository permissionRepository;
+    private final AuthOrganizationRepository authOrganizationRepository;
 
     private final JdbcTemplate jdbcTemplate;
 
@@ -36,6 +39,10 @@ public class AuthManagementPersistService {
 
     public Optional<User> findByUsername(String userName) {
         return userRepository.findByUsername(userName);
+    }
+
+    public Optional<User> findByUsernameWithDetails(String userName) {
+        return userRepository.findUserWithFullDetails(userName);
     }
 
     public Optional<User> findUserById(String id) {
@@ -97,6 +104,14 @@ public class AuthManagementPersistService {
         if (!toAdd.isEmpty() || !toRemove.isEmpty()) {
             entityManager.clear();
         }
+    }
+
+    public List<User> getUsersByIds(List<String> userIds) {
+        return userRepository.findByIdIn(userIds);
+    }
+
+    public List<User> saveUsers(List<User> users) {
+        return userRepository.saveAll(users);
     }
 
 
@@ -183,5 +198,21 @@ public class AuthManagementPersistService {
     }
 
 
+    public List<String> getUserIdsByOrganizationId(String orgId) {
+        String sql = "SELECT user_id FROM user_organizations WHERE org_id = ?";
+        return jdbcTemplate.queryForList(sql, String.class, orgId);
+    }
+
+    public Optional<AuthOrganization> getOrganizationById(String orgId) {
+        return authOrganizationRepository.findById(orgId);
+    }
+
+    public AuthOrganization saveOrganization(AuthOrganization organization) {
+        return authOrganizationRepository.save(organization);
+    }
+
+    public List<AuthOrganization> findAllOrganizations() {
+        return authOrganizationRepository.findAll();
+    }
 
 }

@@ -1,4 +1,3 @@
-// core-rabbit/src/main/java/ru/igorit/monitoring/rabbit/service/CommandReceiver.java
 package ru.igorit.monitoring.rabbit.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;

@@ -17,7 +17,7 @@
             </mat-form-field>
             <div class="action-button-group">
                 <button mat-raised-button class="table-action-btn btn-success" (click)="callAddUser()"
-                    [disabled]="!canAddUserState()">
+                    [disabled]="!canAddUserState() || isEditNewItem()">
                     <mat-icon>add</mat-icon><span class="hide-on-small">Добавить</span>
                 </button>
                 <button mat-raised-button class="table-action-btn btn-danger" (click)="callDeleteUser()"

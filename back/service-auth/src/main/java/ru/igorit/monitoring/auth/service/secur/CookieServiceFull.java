@@ -17,15 +17,20 @@ import ru.igorit.monitoring.security.util.JwtUtils;
 @Log4j2
 public class CookieServiceFull implements CookieService {
     private final CookieProperties cookieProperties;
+    private final JwtCreateService jwtCreateService;
 
     @Override
     public void addAuthCookie(HttpServletResponse response, String token) {
         try {
-            Cookie cookie = new Cookie(cookieProperties.getName(), token);
-            cookie.setHttpOnly(cookieProperties.isHttpOnly());
+            //Cookie cookie = new Cookie(cookieProperties.getName(), token);
+            Cookie cookie = new Cookie(JwtUtils.COOKIE_NAME, token);
+            //cookie.setHttpOnly(cookieProperties.isHttpOnly());
+            cookie.setHttpOnly(true);
             cookie.setSecure(cookieProperties.isSecure());
-            cookie.setPath(cookieProperties.getPath());
-            cookie.setMaxAge(cookieProperties.getMaxAge());
+            //cookie.setPath(cookieProperties.getPath());
+            cookie.setPath("/");
+            //cookie.setMaxAge(cookieProperties.getMaxAge());
+            cookie.setMaxAge((int) jwtCreateService.getExpirationMs() / 1000);
             if (cookieProperties.getDomain() != null && !cookieProperties.getDomain().isEmpty()) {
                 cookie.setDomain(cookieProperties.getDomain());
             }
@@ -39,10 +44,13 @@ public class CookieServiceFull implements CookieService {
     @Override
     public void removeAuthCookie(HttpServletRequest request, HttpServletResponse response) {
         try {
-            Cookie cookie = new Cookie(cookieProperties.getName(), null);
-            cookie.setHttpOnly(cookieProperties.isHttpOnly());
+            //Cookie cookie = new Cookie(cookieProperties.getName(), null);
+            Cookie cookie = new Cookie(JwtUtils.COOKIE_NAME, null);
+            //cookie.setHttpOnly(cookieProperties.isHttpOnly());
+            cookie.setHttpOnly(true);
             cookie.setSecure(cookieProperties.isSecure());
-            cookie.setPath(cookieProperties.getPath());
+            //cookie.setPath(cookieProperties.getPath());
+            cookie.setPath("/");
             cookie.setMaxAge(0);
             if (cookieProperties.getDomain() != null && !cookieProperties.getDomain().isEmpty()) {
                 cookie.setDomain(cookieProperties.getDomain());

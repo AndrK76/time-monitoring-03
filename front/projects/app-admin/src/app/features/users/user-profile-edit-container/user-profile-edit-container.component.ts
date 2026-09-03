@@ -11,6 +11,7 @@ import { DialogService, hasChanges, NotificationService } from '@mon3/sc';
 import { authConstant } from '../../../auth-constants';
 import { RoleInfo } from '../../roles/role-view.models';
 import { roleResponseDtoToVIew } from '../../roles/role-view.utils';
+import { OrganizationInfo } from '../../organizations/organization-view.models';
 
 @Component({
   selector: 'app-user-profile-edit-container',
@@ -29,6 +30,7 @@ export class UserProfileEditContainerComponent implements OnInit {
   private readonly dialogService = inject(DialogService);
 
   roles = signal<RoleInfo[]>([]);
+  organizations = signal<OrganizationInfo[]>([]);
   user = signal<UserWithFullInfo | undefined>(undefined);
   userToSave = signal<UserWithFullInfo | undefined>(undefined);
 
@@ -82,10 +84,11 @@ export class UserProfileEditContainerComponent implements OnInit {
     this.userToSave.set(undefined);
     this.dataChanged.set(false);
     const roles = this.roles();
+    const organizations = this.organizations();
 
     this.dataService.getCurrentUser()
       .pipe(
-        map(dto => userResponseDtoToFullView(dto, roles)),
+        map(dto => userResponseDtoToFullView(dto, roles, organizations)),
         handleError<UserWithFullInfo | null>('Ошибка загрузки пользователей', null, this.error),
         finalize(() => this.isLoading.set(false))
       )
@@ -137,12 +140,13 @@ export class UserProfileEditContainerComponent implements OnInit {
     const reqItem = userViewToRequestDto(this.userToSave()!);
     const id = this.userToSave()!.id;
     const roles = this.roles();
+    const organizations = this.organizations();
     this.isSaving.set(true);
     //setTimeout(() => {
     return (this.canFullUpdate() ? this.dataService.updateUser(id, reqItem) : this.dataService.updateCurrentUser(reqItem))
       .pipe(
         finalize(() => this.isSaving.set(false)),
-        map(dto => userResponseDtoToFullView(dto, roles)),
+        map(dto => userResponseDtoToFullView(dto, roles, organizations)),
         tap(v => { this.user.set(v); this.userToSave.set(v); this.dataChanged.set(false) }),
         tap(_ => this.notificationService.success('Данные успешно сохранены')),
         catchError((_) => { this.notificationService.error('Ошибка сохранения'); return of(); })

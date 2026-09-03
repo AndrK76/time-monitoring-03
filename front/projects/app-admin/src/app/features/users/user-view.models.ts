@@ -1,5 +1,6 @@
 import { UserListItemDto, UserResponseDto } from "@mon3/sa";
 import { RoleInfo } from "../roles/role-view.models";
+import { OrganizationInfo } from "../organizations/organization-view.models";
 
 export class UserWithFullInfo implements UserResponseDto {
 
@@ -17,8 +18,11 @@ export class UserWithFullInfo implements UserResponseDto {
         public roles: string[],
         public permissions: string[],
         public anonymous: boolean,
-        public rolesWithInfo: RoleInfo[]
+        public rolesWithInfo: RoleInfo[],
+        public organizations: string[],
+        public organizationsWithInfo: OrganizationInfo[]
     ) { }
+    
 
 }
 

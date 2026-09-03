@@ -3,6 +3,7 @@ import { inject, Injectable } from '@angular/core';
 import { AuthService } from './auth.service';
 import { ChangePasswordRequestDto, PermissionResponseDto, RoleResponseDto, RoleWithPermissionDto, TestResponse, UpdateRoleRequestDto, UpdateUserRequestDto, UserListItemDto, UserResponseDto } from '../models/auth.models';
 import { Observable } from 'rxjs';
+import { OrganizationListDto } from '@mon3/sa';
 
 @Injectable({
   providedIn: 'root'
@@ -126,6 +127,14 @@ export class UserManageService {
     );
   }
 
+  // ============================================================
+  // Организации
+  // ============================================================
+  getAlOrganizations(): Observable<OrganizationListDto[]> {
+    return this.http.get<OrganizationListDto[]>(`${this.authApiUrl}/usermanage/organizations`
+      //, { headers: this.getHeaders() }
+    );
+  }
 
   // ============================================================
   // Пока не используем

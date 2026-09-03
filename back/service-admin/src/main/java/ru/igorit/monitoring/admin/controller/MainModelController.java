@@ -5,7 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.igorit.monitoring.admin.dto.OrganizationItemDto;
-import ru.igorit.monitoring.admin.dto.OrganizationListDto;
+import ru.igorit.monitoring.web.dto.OrganizationListDto;
 import ru.igorit.monitoring.admin.service.MainModelManageService;
 import ru.igorit.monitoring.web.dto.UserListItemDto;
 

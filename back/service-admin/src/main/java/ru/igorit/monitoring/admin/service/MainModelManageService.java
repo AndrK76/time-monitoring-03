@@ -8,21 +8,22 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import ru.igorit.monitoring.admin.dto.OrganizationItemDto;
-import ru.igorit.monitoring.admin.dto.OrganizationListDto;
+import ru.igorit.monitoring.web.dto.OrganizationListDto;
 import ru.igorit.monitoring.admin.mapper.MainModelMapper;
 import ru.igorit.monitoring.admin.repository.AppUserRepository;
 import ru.igorit.monitoring.admin.repository.OrganizationRepository;
 import ru.igorit.monitoring.admin.repository.UserOrganizationRepository;
+import ru.igorit.monitoring.common.dto.command.auth.OrganizationInfoChangedEventCommandDto;
+import ru.igorit.monitoring.common.enums.command.CommandMessageType;
 import ru.igorit.monitoring.persistence.entity.admin.AppUser;
 import ru.igorit.monitoring.persistence.entity.admin.Organization;
 import ru.igorit.monitoring.persistence.entity.admin.UserOrganization;
+import ru.igorit.monitoring.rabbit.service.CommandSender;
 import ru.igorit.monitoring.web.dto.UserListItemDto;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static ru.igorit.monitoring.security.util.AuthInfoUtils.extractUserId;
 import static ru.igorit.monitoring.security.util.AuthInfoUtils.getCurrentAuth;
@@ -35,6 +36,7 @@ public class MainModelManageService {
     private final UserOrganizationRepository userOrganizationRepo;
     private final AppUserRepository userRepo;
     private final MainModelMapper mapper;
+    private final CommandSender commandSender;
 
     @Transactional(readOnly = true)
     public List<OrganizationListDto> getOrganizations() {
@@ -56,7 +58,9 @@ public class MainModelManageService {
         var org = mapper.fromListDto(item);
         org.setCreatedBy(creatorId);
         org.setId(null);
-        return mapper.toListDto(organizationRepo.save(org));
+        var ret = organizationRepo.saveAndFlush(org);
+        sendOrgAddOrUpdatedEvent(ret, false);
+        return mapper.toListDto(organizationRepo.save(ret));
     }
 
     @PreAuthorize("hasAnyAuthority('SUPERUSER')")
@@ -92,6 +96,7 @@ public class MainModelManageService {
         }
 
         Organization saved = organizationRepo.save(existing);
+        sendOrgAddOrUpdatedEvent(saved, true);
         return mapper.toItemDto(saved);
     }
 
@@ -99,6 +104,7 @@ public class MainModelManageService {
     @Transactional
     public void deleteOrganization(String id) {
         userOrganizationRepo.deleteByOrganizationId(id);
+        sendOrgDeleteEvent(id);
         organizationRepo.deleteById(id);
     }
 
@@ -106,6 +112,34 @@ public class MainModelManageService {
     @Transactional(readOnly = true)
     public List<UserListItemDto> getUsers() {
         return userRepo.findAll().stream().map(mapper::toListDto).toList();
+    }
+
+    /**
+     * Приватный метод для отправки события
+     */
+    private void sendOrgAddOrUpdatedEvent(Organization organization, boolean fromUpdate) {
+        OrganizationInfoChangedEventCommandDto event = mapper.toOrgChangeEvent(organization);
+        if (!fromUpdate) {
+            event.setUpdatedBy(organization.getCreatedBy());
+            event.setUpdatedAt(organization.getCreatedAt());
+        }
+        event.setMode(fromUpdate ? OrganizationInfoChangedEventCommandDto.Mode.UPDATE : OrganizationInfoChangedEventCommandDto.Mode.ADD);
+        sendEvent(event);
+    }
+
+    private void sendOrgDeleteEvent(String orgId) {
+        OrganizationInfoChangedEventCommandDto event = OrganizationInfoChangedEventCommandDto.newDeleteEvent(orgId);
+        sendEvent(event);
+    }
+
+    private void sendEvent(OrganizationInfoChangedEventCommandDto event) {
+        try {
+            commandSender.sendCommandToInternal(commandSender.getConfig().getAuthServerRoute(),
+                    CommandMessageType.ORGANIZATION_INFO_CHANGED, event);
+            log.info("Organization {} event sent for organization: {}", event.getMode(), event.getOrgId());
+        } catch (Exception e) {
+            log.info("Failed to send organization {} event sent for organization: {}", event.getMode(), event.getOrgId());
+        }
     }
 
 

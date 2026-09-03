@@ -1,4 +1,4 @@
-package ru.igorit.monitoring.admin.dto;
+package ru.igorit.monitoring.web.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

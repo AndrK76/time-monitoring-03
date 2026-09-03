@@ -3,7 +3,7 @@ CREATE TABLE organizations
     id                 VARCHAR(255) NOT NULL,
     short_name         VARCHAR(40)  NOT NULL,
     full_name          VARCHAR(255) NOT NULL,
-    created_at         TIMESTAMP WITHOUT TIME ZONE,
+    created_at         TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     created_by         VARCHAR(255),
     updated_at         TIMESTAMP WITHOUT TIME ZONE,
     updated_by         VARCHAR(255),

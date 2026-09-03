@@ -1,12 +1,9 @@
 package ru.igorit.monitoring.auth.service;
 
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -48,7 +45,6 @@ public class AuthService {
     private final CookieService cookieService;
     private final PasswordEncoder passwordEncoder;
     private final UserManagementMapper userManagementMapper;
-    private final CookieProperties cookieProperties;
     private final AuthManagementPersistService persistService;
     private final CommandSender commandSender;
 
@@ -63,7 +59,7 @@ public class AuthService {
         );
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        User user = getUserByUsername(request.getUsername());
+        User user = getUserByUsernameWithAuthDetails(request.getUsername());
         TokenResponseDto tokenResponse = buildTokenResponse(user);
 
         cookieService.addAuthCookie(response, tokenResponse.getAccessToken());
@@ -109,7 +105,7 @@ public class AuthService {
     }
 
     public void logout(HttpServletRequest request, HttpServletResponse response) {
-        String token = extractTokenFromCookie(request);
+        String token = cookieService.extractToken(request);
         if (token != null) {
             jwtService.invalidateToken(token);
             log.info("Token invalidated");
@@ -137,13 +133,13 @@ public class AuthService {
 
     @Transactional
     public TokenResponseDto checkAuth(HttpServletRequest request) {
-        String token = extractTokenFromCookie(request);
+        String token = cookieService.extractToken(request);
         if (token == null || !jwtService.isTokenValid(token)) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid or expired token");
         }
 
         String username = jwtService.extractUsername(token);
-        User user = getUserByUsername(username);
+        User user = getUserByUsernameWithAuthDetails(username);
 
         return buildTokenResponse(user);
 
@@ -172,11 +168,16 @@ public class AuthService {
         if (auth == null || !auth.isAuthenticated()) {
             throw new RuntimeException("User not authenticated");
         }
-        return getUserByUsername(auth.getName());
+        return getUserByUsernameWithoutDetails(auth.getName());
     }
 
-    private User getUserByUsername(String username) {
-        return persistService.findByUsername(username)
+    private User getUserByUsernameWithAuthDetails(String username) {
+        return persistService.findByUsernameWithDetails(username)
+                .orElseThrow(() -> new RuntimeException("User not found: " + username));
+    }
+
+    private User getUserByUsernameWithoutDetails(String username) {
+        return persistService.findByUsernameWithDetails(username)
                 .orElseThrow(() -> new RuntimeException("User not found: " + username));
     }
 
@@ -189,7 +190,7 @@ public class AuthService {
         if (username == null || ANONYMOUS_USER.equals(username)) {
             return User.anonymous();
         }
-        return getUserByUsername(username);
+        return getUserByUsernameWithAuthDetails(username);
     }
 
     private String extractUsernameFromContextOrCookie(HttpServletRequest request) {
@@ -201,7 +202,7 @@ public class AuthService {
         }
 
         // Проверяем cookie
-        String token = extractTokenFromCookie(request);
+        String token = cookieService.extractToken(request);
         if (token != null && jwtService.isTokenValid(token)) {
             return jwtService.extractUsername(token);
         }
@@ -227,8 +228,7 @@ public class AuthService {
     }
 
     private List<String> extractOrganizations(User user) {
-        // TODO: Получать организации пользователя из БД
-        return List.of();
+        return user.getOrgIds().stream().toList();
     }
 
     // ============================================================
@@ -264,23 +264,6 @@ public class AuthService {
         }
     }
 
-    // ============================================================
-    // ПРИВАТНЫЕ МЕТОДЫ — COOKIE
-    // ============================================================
-
-
-    private String extractTokenFromCookie(HttpServletRequest request) {
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            String cookieName = cookieProperties.getName();
-            for (Cookie cookie : cookies) {
-                if (cookieName.equals(cookie.getName())) {
-                    return cookie.getValue();
-                }
-            }
-        }
-        return null;
-    }
 
     /**
      * Приватный метод для отправки события
@@ -289,7 +272,8 @@ public class AuthService {
         try {
             var event = userManagementMapper.toUserCreatedEvent(user);
 
-            commandSender.sendCommand(CommandMessageType.USER_CREATED, event);
+            commandSender.sendCommandToInternal(commandSender.getConfig().getAppServerRoute(),
+                    CommandMessageType.USER_CREATED, event);
             log.info("User created event sent for user: {}", user.getUsername());
         } catch (Exception e) {
             // Не даём упасть приложению, если RabbitMQ недоступен

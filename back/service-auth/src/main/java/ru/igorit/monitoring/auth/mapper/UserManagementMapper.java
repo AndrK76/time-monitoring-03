@@ -6,9 +6,11 @@ import ru.igorit.monitoring.common.dto.command.auth.UserCreatedEventCommandDto;
 import ru.igorit.monitoring.common.dto.command.auth.UserInfoUpdatedEventCommandDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import ru.igorit.monitoring.persistence.entity.auth.AuthOrganization;
 import ru.igorit.monitoring.persistence.entity.auth.Permission;
 import ru.igorit.monitoring.persistence.entity.auth.Role;
 import ru.igorit.monitoring.persistence.entity.auth.User;
+import ru.igorit.monitoring.web.dto.OrganizationListDto;
 import ru.igorit.monitoring.web.dto.UserListItemDto;
 import ru.igorit.monitoring.web.dto.UserResponseDto;
 
@@ -23,6 +25,7 @@ public interface UserManagementMapper {
     @Mapping(target = "active", source = "isActive")
     @Mapping(target = "roles", expression = "java(user.getRoles().stream().map(Role::getName).collect(java.util.stream.Collectors.toList()))")
     @Mapping(target = "permissions", expression = "java(user.getRoles().stream().flatMap(role -> role.getPermissions().stream()).map(ru.igorit.monitoring.persistence.entity.auth.Permission::getName).collect(java.util.stream.Collectors.toList()))")
+    @Mapping(target = "organizations", expression = "java(user.getOrgIds().stream().collect(java.util.stream.Collectors.toList()))")
     UserResponseDto toResponseDto(User user);
 
     List<UserResponseDto> toResponseList(List<User> users);
@@ -52,9 +55,10 @@ public interface UserManagementMapper {
 
     PermissionResponseDto toResponseDto(Permission permission);
 
+    OrganizationListDto toListDto(AuthOrganization org);
 
 
-    @Named("rolesToArray")
+                                  @Named("rolesToArray")
     default String[] rolesToArray(Set<Role> roles) {
         if (roles == null) {
             return new String[0];

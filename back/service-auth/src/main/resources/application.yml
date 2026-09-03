@@ -83,6 +83,9 @@ spring:
           max-interval: 10000
           multiplier: 2.0
           max-attempts: 3
+    app-config:
+      queue-name: "mon3-auth-queue"
+
 
 
   # ============================================================
@@ -112,10 +115,10 @@ cookie:
   #domain: andrk-ninkear.host           # ← общий домен для всех поддоменов
   #domain: host           # ← общий домен для всех поддоменов
   secure: false               # false для HTTP, true для HTTPS
-  http-only: true
-  max-age: 86400              # 24 часа
-  path: /
-  name: auth_token
+  #http-only: true
+  #max-age: 86400              # 24 часа
+  #path: /
+  #name: auth_token
 
 security:
   jwt:

@@ -40,6 +40,7 @@ export interface UserResponseDto {
   emailVerified: boolean;
   roles: string[];
   permissions: string[];
+  organizations: string[];
   anonymous: boolean;
 }
 

@@ -10,8 +10,8 @@ import org.springframework.stereotype.Component;
 public class CookieProperties {
     private String domain;
     private boolean secure = false;
-    private boolean httpOnly = true;
-    private int maxAge = 86400;
-    private String path = "/";
-    private String name = "auth_token";
+    //private boolean httpOnly = true;
+    //private int maxAge = 86400;
+    //private String path = "/";
+    //private String name = "auth_token";
 }

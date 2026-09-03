@@ -56,25 +56,78 @@
 |   |   |   |   |   |   |-- header.component.html
 |   |   |   |   |   |   |-- header.component.scss
 |   |   |   |   |   |   `-- header.component.ts
-|   |   |   |   |   |-- index
-|   |   |   |   |   |   |-- index.component.html
-|   |   |   |   |   |   |-- index.component.scss
-|   |   |   |   |   |   `-- index.component.ts
 |   |   |   |   |   `-- main
 |   |   |   |   |       |-- main.component.html
 |   |   |   |   |       |-- main.component.scss
 |   |   |   |   |       `-- main.component.ts
-|   |   |   |   |-- dialogs
-|   |   |   |   |   `-- user-profile-dialog
-|   |   |   |   |       |-- user-profile-dialog.component.html
-|   |   |   |   |       |-- user-profile-dialog.component.scss
-|   |   |   |   |       `-- user-profile-dialog.component.ts
 |   |   |   |   |-- features
+|   |   |   |   |   |-- index
+|   |   |   |   |   |   |-- index-auth
+|   |   |   |   |   |   |   |-- index-auth.component.html
+|   |   |   |   |   |   |   |-- index-auth.component.scss
+|   |   |   |   |   |   |   `-- index-auth.component.ts
+|   |   |   |   |   |   |-- index-noauth
+|   |   |   |   |   |   |   |-- index-noauth.component.html
+|   |   |   |   |   |   |   |-- index-noauth.component.scss
+|   |   |   |   |   |   |   `-- index-noauth.component.ts
+|   |   |   |   |   |   |-- index.component.html
+|   |   |   |   |   |   |-- index.component.scss
+|   |   |   |   |   |   `-- index.component.ts
+|   |   |   |   |   |-- organizations
+|   |   |   |   |   |   |-- organization-editor-inplace
+|   |   |   |   |   |   |   |-- organization-editor-inplace.component.html
+|   |   |   |   |   |   |   |-- organization-editor-inplace.component.scss
+|   |   |   |   |   |   |   `-- organization-editor-inplace.component.ts
+|   |   |   |   |   |   |-- organization-list-table
+|   |   |   |   |   |   |   |-- organization-list-table.component.html
+|   |   |   |   |   |   |   |-- organization-list-table.component.scss
+|   |   |   |   |   |   |   `-- organization-list-table.component.ts
+|   |   |   |   |   |   |-- organization-user-list
+|   |   |   |   |   |   |   |-- organization-user-list.component.html
+|   |   |   |   |   |   |   |-- organization-user-list.component.scss
+|   |   |   |   |   |   |   `-- organization-user-list.component.ts
+|   |   |   |   |   |   |-- organization-view.models.ts
+|   |   |   |   |   |   `-- organization-view.utils.ts
+|   |   |   |   |   |-- roles
+|   |   |   |   |   |   |-- role-editor-inplace
+|   |   |   |   |   |   |   |-- role-editor-inplace.component.html
+|   |   |   |   |   |   |   |-- role-editor-inplace.component.scss
+|   |   |   |   |   |   |   `-- role-editor-inplace.component.ts
+|   |   |   |   |   |   |-- role-list-table
+|   |   |   |   |   |   |   |-- role-list-table.component.html
+|   |   |   |   |   |   |   |-- role-list-table.component.scss
+|   |   |   |   |   |   |   `-- role-list-table.component.ts
+|   |   |   |   |   |   |-- role-view.models.ts
+|   |   |   |   |   |   `-- role-view.utils.ts
+|   |   |   |   |   |-- test
+|   |   |   |   |   |   |-- test.component.html
+|   |   |   |   |   |   |-- test.component.scss
+|   |   |   |   |   |   `-- test.component.ts
+|   |   |   |   |   `-- users
+|   |   |   |   |       |-- user-editor-inplace
+|   |   |   |   |       |   |-- user-editor-inplace.component.html
+|   |   |   |   |       |   |-- user-editor-inplace.component.scss
+|   |   |   |   |       |   `-- user-editor-inplace.component.ts
+|   |   |   |   |       |-- user-list-table
+|   |   |   |   |       |   |-- user-list-table.component.html
+|   |   |   |   |       |   |-- user-list-table.component.scss
+|   |   |   |   |       |   `-- user-list-table.component.ts
+|   |   |   |   |       |-- user-profile-dialog
+|   |   |   |   |       |   |-- user-profile-dialog.component.html
+|   |   |   |   |       |   |-- user-profile-dialog.component.scss
+|   |   |   |   |       |   `-- user-profile-dialog.component.ts
+|   |   |   |   |       |-- user-profile-edit-container
+|   |   |   |   |       |   |-- user-profile-edit-container.component.html
+|   |   |   |   |       |   |-- user-profile-edit-container.component.scss
+|   |   |   |   |       |   `-- user-profile-edit-container.component.ts
+|   |   |   |   |       |-- user-view.models.ts
+|   |   |   |   |       `-- user-view.utils.ts
 |   |   |   |   |-- app.component.html
 |   |   |   |   |-- app.component.scss
 |   |   |   |   |-- app.component.ts
 |   |   |   |   |-- app.config.ts
-|   |   |   |   `-- app.routes.ts
+|   |   |   |   |-- app.routes.ts
+|   |   |   |   `-- auth-constants.ts
 |   |   |   |-- environments
 |   |   |   |   |-- environment-interface.ts
 |   |   |   |   |-- environment-prod.ts
@@ -202,10 +255,16 @@
 |   |   |   |   |   |-- auth.interceptor.fn.ts
 |   |   |   |   |   `-- language.interceptor.fn.ts
 |   |   |   |   |-- models
-|   |   |   |   |   `-- auth.models.ts
-|   |   |   |   `-- services
-|   |   |   |       |-- admin.service.ts
-|   |   |   |       `-- auth.service.ts
+|   |   |   |   |   |-- admin-main.models.ts
+|   |   |   |   |   |-- auth.models.ts
+|   |   |   |   |   `-- permission.models.ts
+|   |   |   |   |-- services
+|   |   |   |   |   |-- admin-auth.service.ts
+|   |   |   |   |   |-- auth.service.ts
+|   |   |   |   |   |-- permission.service.ts
+|   |   |   |   |   `-- user-manage.service.ts
+|   |   |   |   `-- utils
+|   |   |   |       `-- http.utils.ts
 |   |   |   `-- public-api.ts
 |   |   |-- README.md
 |   |   |-- ng-package.json
@@ -216,10 +275,19 @@
 |   |   |-- src
 |   |   |   |-- lib
 |   |   |   |   |-- components
+|   |   |   |   |   |-- change-password-dialog
+|   |   |   |   |   |   |-- change-password-dialog.component.html
+|   |   |   |   |   |   |-- change-password-dialog.component.scss
+|   |   |   |   |   |   |-- change-password-dialog.component.ts
+|   |   |   |   |   |   `-- change-password-dialog.model.ts
 |   |   |   |   |   |-- confirm-dialog
 |   |   |   |   |   |   |-- confirm-dialog.component.html
 |   |   |   |   |   |   |-- confirm-dialog.component.scss
 |   |   |   |   |   |   `-- confirm-dialog.component.ts
+|   |   |   |   |   |-- confirm-dialog-cancel
+|   |   |   |   |   |   |-- confirm-dialog-cancel.component.html
+|   |   |   |   |   |   |-- confirm-dialog-cancel.component.scss
+|   |   |   |   |   |   `-- confirm-dialog-cancel.component.ts
 |   |   |   |   |   |-- filter-date
 |   |   |   |   |   |   |-- filter-date.component.html
 |   |   |   |   |   |   |-- filter-date.component.scss
@@ -262,7 +330,9 @@
 |   |   |   |   |   `-- table-filter-items.ts
 |   |   |   |   |-- services
 |   |   |   |   |   |-- dialog.service.ts
-|   |   |   |   |   `-- notification.service.ts
+|   |   |   |   |   |-- navigation.service.ts
+|   |   |   |   |   |-- notification.service.ts
+|   |   |   |   |   `-- table-manage.service.ts
 |   |   |   |   |-- styles
 |   |   |   |   |   |-- _auth-common.scss
 |   |   |   |   |   |-- _editor-common.scss
@@ -309,4 +379,4 @@
 |-- tsconfig.json
 `-- tsconfig.prod.json
 
-90 directories, 219 files
+106 directories, 273 files

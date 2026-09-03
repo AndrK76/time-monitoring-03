@@ -83,6 +83,8 @@ spring:
           max-interval: 10000
           multiplier: 2.0
           max-attempts: 3
+    app-config:
+      queue-name: "mon3-admin-queue"
 
 
   # ============================================================
@@ -118,7 +120,7 @@ logging:
     ru.igorit.monitoring: DEBUG
     org.springframework.security: INFO
     #org.flywaydb: DEBUG
-    org.hibernate.SQL: DEBUG
+    #org.hibernate.SQL: DEBUG
     root: info
 
 management:

@@ -14,6 +14,7 @@ import ru.igorit.monitoring.persistence.entity.auth.Permission;
 import ru.igorit.monitoring.persistence.entity.auth.Role;
 import ru.igorit.monitoring.persistence.entity.auth.User;
 import ru.igorit.monitoring.rabbit.service.CommandSender;
+import ru.igorit.monitoring.web.dto.OrganizationListDto;
 import ru.igorit.monitoring.web.dto.UserListItemDto;
 import ru.igorit.monitoring.web.dto.UserResponseDto;
 
@@ -231,6 +232,19 @@ public class UserManagementServiceImpl implements UserManagementService {
     }
 
 
+    // ============================================================
+    // Публичные методы. Организации — Просмотр
+    // ============================================================
+    @PreAuthorize("hasAnyAuthority('SUPERUSER','USER_WRITE','USER_READ')")
+    @Transactional(readOnly = true)
+    @Override
+    public List<OrganizationListDto> getAllOrganizations() {
+        return persistService.findAllOrganizations().stream()
+                .map(userManagementMapper::toListDto)
+                .collect(Collectors.toList());
+    }
+
+
     /**
      * Получение текущего пользователя из SecurityContext
      */
@@ -353,7 +367,8 @@ public class UserManagementServiceImpl implements UserManagementService {
             UserInfoUpdatedEventCommandDto event = userManagementMapper.toUserUpdatedEvent(user);
             event.setFullUpdate(fullUpdate);
 
-            commandSender.sendCommand(CommandMessageType.USER_INFO_UPDATED, event);
+            commandSender.sendCommandToInternal(commandSender.getConfig().getAppServerRoute(),
+                    CommandMessageType.USER_INFO_UPDATED, event);
             log.info("User updated event sent for user: {}", user.getUsername());
         } catch (Exception e) {
             // Не даём упасть приложению, если RabbitMQ недоступен

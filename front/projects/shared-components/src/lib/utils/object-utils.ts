@@ -160,6 +160,7 @@ export function isNewItem<T extends Record<string, any>>(source: T): boolean {
 /**
  * Устанавливает/снимает признак развернуто в объекте  (через аттрибут `_expanded`)
  * @param source - исходный объект
+ * @param expanded - устанавливеемый флаг (если не указан, то true)
  * @returns новый объект с добавленным полем `_expanded`
  */
 export function setExpanded<T extends Record<string, any>>(
@@ -205,7 +206,7 @@ export function isNotApplyItem<T extends Record<string, any>>(source: T): boolea
 }
 
 /**
- * Удаляет к объекту служебное поле `_dettached`, показывающее что объект не подтверждён
+ * Удаляет из объекта служебное поле `_dettached`, показывающее что объект не подтверждён
  * @param source - исходный объект
  * @returns новый объект с удаленным полем `_dettached`
  */
@@ -222,7 +223,7 @@ export function removeNotApplyItemFlag<T extends Record<string, any>>(
 /**
  * Добавляет к объекту служебное поле `_needload`, показывающее что объект нужно прочитать полностью
  * @param source - исходный объект
- * @returns новый объект с добавленным полем `_dettached`
+ * @returns новый объект с добавленным полем `_needload`
  */
 export function addNotFullLoadItemFlag<T extends Record<string, any>>(
     source: T
@@ -234,7 +235,7 @@ export function addNotFullLoadItemFlag<T extends Record<string, any>>(
 }
 
 /**
- * Проверяет является ли переданный элемент не полностью прочитанным (через аттрибут `_dettached`)
+ * Проверяет является ли переданный элемент не полностью прочитанным (через аттрибут `_needload`)
  * @param source - исходный объект
  * @returns является ли объект новым
  */
@@ -243,9 +244,9 @@ export function isNotFullLoadedItem<T extends Record<string, any>>(source: T): b
 }
 
 /**
- * Удаляет из объекта служебное поле `_needload`, показывающее что объект нужно прочитать полностью
+ * Устанавливает в объекте служебное поле `_needload` в false, показывающее что объект не нуждается в перечитывании
  * @param source - исходный объект
- * @returns новый объект с добавленным полем `_dettached`
+ * @returns новый объект с добавленным полем `_needload`
  */
 export function removeNotFullLoadItemFlag<T extends Record<string, any>>(
     source: T
@@ -261,7 +262,60 @@ export function removeNotFullLoadItemFlag<T extends Record<string, any>>(
     };
 }
 
+/**
+ * Получает массив из ключей объекта.
+ * @param arr - массив или null/undefined
+ * @param idGetter - функция получения идентификатора из элемента (например, (item) => item.id)
+ * @returns массив ключей объектов
+ */
+export function getIdsArray<T,V>(arr: T[] | undefined | null, idGetter: (item: T) => V): (V)[] {
+    return Array.from(new Set((arr || []).map(item => idGetter(item))));
+}
 
+/**
+ * Сравнивает два массива объектов по идентификаторам, игнорируя порядок и дубликаты.
+ * @param arr1 - первый массив или null/undefined
+ * @param arr2 - второй массив или null/undefined
+ * @param idGetter - функция получения идентификатора из элемента (например, (item) => item.id)
+ * @returns true, если оба массива содержат одинаковые множества идентификаторов,
+ *          или оба являются пустыми / null / undefined.
+ */
+export function isArrayEqualByKeys<T>(
+    arr1: T[] | undefined | null,
+    arr2: T[] | undefined | null,
+    idGetter: (item: T) => string | number
+): boolean {
+    // Приводим null/undefined к пустым массивам
+    const a1 = arr1 ?? [];
+    const a2 = arr2 ?? [];
 
+    // Если оба пусты – они равны
+    if (a1.length === 0 && a2.length === 0) {
+        return true;
+    }
+
+    // Если один пуст, а другой нет – не равны
+    if (a1.length === 0 || a2.length === 0) {
+        return false;
+    }
+
+    // Строим множества уникальных идентификаторов
+    const keys1 = new Set(a1.map(item => idGetter(item)));
+    const keys2 = new Set(a2.map(item => idGetter(item)));
+
+    // Сравниваем размеры множеств
+    if (keys1.size !== keys2.size) {
+        return false;
+    }
+
+    // Проверяем, что все ключи из первого присутствуют во втором
+    for (const key of keys1) {
+        if (!keys2.has(key)) {
+            return false;
+        }
+    }
+
+    return true;
+}
 
 

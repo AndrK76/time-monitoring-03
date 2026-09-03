@@ -1,5 +1,21 @@
 import { OrganizationItemDto, OrganizationListDto, UserListItemDto } from '@mon3/sa';
 import { OrganizationInfo } from './organization-view.models';
+import { UserShortInfo } from '../users/user-view.models';
+
+
+export function organizationUsersWithInfo(dto: OrganizationItemDto | OrganizationInfo, allUsers: UserShortInfo[]) {
+  return (dto.users || []).map(id => {
+    const found = allUsers.find(u => u.id === id);
+    return found || { id, username: '', displayName: 'Неизвестный' } as UserShortInfo;
+  });
+}
+
+export function organizationUsersWithInfoFromUserIds(users: string[] | undefined, allUsers: UserShortInfo[]) {
+  return (users || []).map(id => {
+    const found = allUsers.find(u => u.id === id);
+    return found || { id, username: '', displayName: 'Неизвестный' } as UserShortInfo;
+  });
+}
 
 export function organizationListDtoToView(dto: OrganizationListDto): OrganizationInfo {
   return new OrganizationInfo(
@@ -10,18 +26,14 @@ export function organizationListDtoToView(dto: OrganizationListDto): Organizatio
   );
 }
 
-export function organizationItemDtoToView(dto: OrganizationItemDto, allUsers: UserListItemDto[]): OrganizationInfo {
-  const usersWithInfo = (dto.users || []).map(id => {
-    const found = allUsers.find(u => u.id === id);
-    return found || { id, username: '', displayName: 'Неизвестный' } as UserListItemDto;
-  });
-  return new OrganizationInfo(
-    dto.id,
-    dto.shortName,
-    dto.fullName,
-    dto.users,
-    usersWithInfo
-  );
+export function organizationItemDtoToView(dto: OrganizationItemDto, allUsers: UserShortInfo[]): OrganizationInfo {
+  return {
+    id: dto.id,
+    shortName: dto.shortName,
+    fullName: dto.fullName,
+    users: dto.users,
+    usersWithInfo: organizationUsersWithInfo(dto, allUsers),
+  } as OrganizationInfo;
 }
 
 export function organizationViewToItemDto(view: OrganizationInfo): OrganizationItemDto {

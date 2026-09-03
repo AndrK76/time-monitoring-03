@@ -11,10 +11,11 @@ import { UserWithFullInfo } from '../user-view.models';
 import { debounceTime, distinctUntilChanged, filter, Observable } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ChangePasswordDialogData, ChangePasswordDialogResult, DialogService, isNewItem, isNotFullLoadedItem } from '@mon3/sc';
-import { rolesWithInfo } from '../user-view.utils';
+import { userOrganizationsWithInfo, userRolesWithInfo } from '../user-view.utils';
 import { MatIconModule } from '@angular/material/icon';
 import { ChangePasswordRequestDto } from '@mon3/sa';
 import { RoleInfo } from '../../roles/role-view.models';
+import { OrganizationInfo } from '../../organizations/organization-view.models';
 
 @Component({
   selector: 'app-user-editor-inplace',
@@ -36,6 +37,7 @@ import { RoleInfo } from '../../roles/role-view.models';
 export class UserEditorInplaceComponent implements OnInit {
   userData = input.required<UserWithFullInfo>();
   roles = input.required<RoleInfo[]>();
+  organizations = input.required<OrganizationInfo[]>();
   loadItemFn = input.required<(item: UserWithFullInfo) => Observable<UserWithFullInfo | undefined>>();
   setPasswordFn = input.required<(item: UserWithFullInfo, data: ChangePasswordRequestDto) => Observable<void>>();
   resetPasswordFn = input<(item: UserWithFullInfo) => Observable<void>>();
@@ -131,7 +133,9 @@ export class UserEditorInplaceComponent implements OnInit {
           values.roles || this.data.roles,
           this.data.permissions,
           this.data.anonymous,
-          rolesWithInfo((values.roles ? values : this.data), this.roles())
+          userRolesWithInfo((values.roles ? values : this.data), this.roles()),
+          this.data.organizations,
+          userOrganizationsWithInfo(this.data, this.organizations())
         );
         this.change.emit(updated);
       });

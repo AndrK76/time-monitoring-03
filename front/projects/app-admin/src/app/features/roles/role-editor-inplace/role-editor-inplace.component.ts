@@ -8,7 +8,7 @@ import { RoleWithPermissionsInfo } from '../role-view.models';
 import { PermissionResponseDto } from '@mon3/sa';
 import { debounceTime, distinctUntilChanged, filter } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { permissionsWithInfo } from '../role-view.utils';
+import { rolePermissionsWithInfo } from '../role-view.utils';
 
 @Component({
   selector: 'app-role-editor-inplace',
@@ -64,7 +64,7 @@ export class RoleEditorInplaceComponent implements OnInit {
           name: values.name,
           description: values.description || '',
           permissions: values.permissions || [],
-          permissionsWithInfo: permissionsWithInfo((values.permissions ? values : this.data), this.permissions())
+          permissionsWithInfo: rolePermissionsWithInfo((values.permissions ? values : this.data), this.permissions())
         };
         this.change.emit(updated);
       });

@@ -1,7 +1,7 @@
 import { UpdateRoleRequestDto, RoleWithPermissionDto, PermissionResponseDto, RoleResponseDto } from "@mon3/sa";
 import { PermissionInfo, RoleInfo, RoleWithPermissionsInfo } from "./role-view.models";
 
-export const permissionsWithInfo = (dto: RoleWithPermissionsInfo | RoleWithPermissionDto, allPermissions: PermissionInfo[]): PermissionInfo[] => {
+export const rolePermissionsWithInfo = (dto: RoleWithPermissionsInfo | RoleWithPermissionDto, allPermissions: PermissionInfo[]): PermissionInfo[] => {
     const ret = (dto.permissions || []).map(permissionName => {
         const found = allPermissions.find(r => r.name === permissionName);
         return found || new PermissionInfo('temp-' + permissionName, permissionName, '');
@@ -19,7 +19,7 @@ export function roleRespWithPermissDtoToViewWithPermiss(dto: RoleWithPermissionD
         dto.name,                                 //name
         dto.description || '',                    //description
         dto.permissions || [],                    //permissions
-        permissionsWithInfo(dto, allPermissions)  //permissionsWithInfo
+        rolePermissionsWithInfo(dto, allPermissions)  //permissionsWithInfo
     );
 }
 

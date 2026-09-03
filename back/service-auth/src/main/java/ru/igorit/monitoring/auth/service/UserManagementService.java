@@ -1,6 +1,7 @@
 package ru.igorit.monitoring.auth.service;
 
 import ru.igorit.monitoring.auth.dto.*;
+import ru.igorit.monitoring.web.dto.OrganizationListDto;
 import ru.igorit.monitoring.web.dto.UserListItemDto;
 import ru.igorit.monitoring.web.dto.UserResponseDto;
 
@@ -54,4 +55,9 @@ public interface UserManagementService {
     List<PermissionResponseDto> getUserPermissions(String userId);
 
     List<PermissionResponseDto> getCurrentUserPermissions();
+
+    // ============================================================
+    // Публичные методы. Организации — Просмотр
+    // ============================================================
+    List<OrganizationListDto> getAllOrganizations();
 }

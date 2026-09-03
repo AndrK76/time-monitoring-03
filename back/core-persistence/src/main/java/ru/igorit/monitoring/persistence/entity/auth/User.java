@@ -96,6 +96,15 @@ public class User implements Cloneable{
     @Builder.Default
     private Set<TelegramToken> telegramTokens = new HashSet<>();
 
+    @Builder.Default
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(
+            name = "user_organizations",
+            joinColumns = @JoinColumn(name = "user_id")
+    )
+    @Column(name = "org_id")
+    private Set<String> orgIds = new HashSet<>();
+
     public void addAuthProvider(UserAuthProvider provider) {
         authProviders.add(provider);
         provider.setUser(this);

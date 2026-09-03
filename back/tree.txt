@@ -1,0 +1,265 @@
+.
+|-- .mvn
+|   `-- wrapper
+|       `-- maven-wrapper.properties
+|-- core-common
+|   |-- src
+|   |   `-- main
+|   |       `-- java
+|   |           `-- ru
+|   |               `-- igorit
+|   |                   `-- monitoring
+|   |                       `-- common
+|   |                           |-- config
+|   |                           |   `-- JacksonConfig.java
+|   |                           |-- dto
+|   |                           |   `-- command
+|   |                           |       |-- auth
+|   |                           |       |   |-- OrganizationInfoChangedEventCommandDto.java
+|   |                           |       |   |-- SecurityContextDto.java
+|   |                           |       |   |-- UserContextDto.java
+|   |                           |       |   |-- UserCreatedEventCommandDto.java
+|   |                           |       |   `-- UserInfoUpdatedEventCommandDto.java
+|   |                           |       `-- CommandMessageDto.java
+|   |                           |-- enums
+|   |                           |   `-- command
+|   |                           |       `-- CommandMessageType.java
+|   |                           |-- exception
+|   |                           |-- service
+|   |                           `-- AuthConstants.java
+|   `-- pom.xml
+|-- core-persistence
+|   |-- src
+|   |   `-- main
+|   |       |-- java
+|   |       |   `-- ru
+|   |       |       `-- igorit
+|   |       |           `-- monitoring
+|   |       |               `-- persistence
+|   |       |                   |-- config
+|   |       |                   |   `-- PersistenceConfig.java
+|   |       |                   `-- entity
+|   |       |                       |-- admin
+|   |       |                       |   |-- AppUser.java
+|   |       |                       |   |-- Organization.java
+|   |       |                       |   `-- UserOrganization.java
+|   |       |                       `-- auth
+|   |       |                           |-- AuthOrganization.java
+|   |       |                           |-- Permission.java
+|   |       |                           |-- Role.java
+|   |       |                           |-- TelegramToken.java
+|   |       |                           |-- User.java
+|   |       |                           `-- UserAuthProvider.java
+|   |       `-- resources
+|   `-- pom.xml
+|-- core-rabbit
+|   |-- src
+|   |   `-- main
+|   |       `-- java
+|   |           `-- ru
+|   |               `-- igorit
+|   |                   `-- monitoring
+|   |                       `-- rabbit
+|   |                           |-- config
+|   |                           |   |-- RabbitMQCommonConfig.java
+|   |                           |   |-- RabbitMQConfigProperties.java
+|   |                           |   |-- RabbitMQJacksonConfig.java
+|   |                           |   `-- RabbitMQSecurityConfig.java
+|   |                           `-- service
+|   |                               |-- CommandReceiver.java
+|   |                               `-- CommandSender.java
+|   `-- pom.xml
+|-- core-security
+|   |-- src
+|   |   `-- main
+|   |       |-- java
+|   |       |   `-- ru
+|   |       |       `-- igorit
+|   |       |           `-- monitoring
+|   |       |               `-- security
+|   |       |                   |-- annotation
+|   |       |                   |   `-- WithSecurityContext.java
+|   |       |                   |-- aspect
+|   |       |                   |   `-- SecurityContextAspect.java
+|   |       |                   |-- config
+|   |       |                   |   |-- CookieProperties.java
+|   |       |                   |   |-- CorsConfig.java
+|   |       |                   |   |-- CorsProperties.java
+|   |       |                   |   |-- SecurityAspectConfig.java
+|   |       |                   |   `-- SecurityBeansConfig.java
+|   |       |                   |-- filter
+|   |       |                   |   `-- JwtAuthenticationFilter.java
+|   |       |                   |-- mapper
+|   |       |                   |   `-- SecurityContextMapper.java
+|   |       |                   |-- model
+|   |       |                   |   |-- AuthProvider.java
+|   |       |                   |   |-- CustomOAuth2User.java
+|   |       |                   |   |-- JwtAuthenticationToken.java
+|   |       |                   |   |-- SecurityContextAuthentication.java
+|   |       |                   |   `-- UserPrincipal.java
+|   |       |                   |-- service
+|   |       |                   |   |-- CookieService.java
+|   |       |                   |   |-- CookieServiceBase.java
+|   |       |                   |   |-- JwtService.java
+|   |       |                   |   `-- TelegramTokenService.java
+|   |       |                   `-- util
+|   |       |                       |-- AuthInfoUtils.java
+|   |       |                       `-- JwtUtils.java
+|   |       `-- resources
+|   `-- pom.xml
+|-- core-telegram
+|   |-- src
+|   |   `-- main
+|   |       `-- java
+|   |           `-- ru
+|   |               `-- igorit
+|   |                   `-- monitoring
+|   |                       `-- telegram
+|   `-- pom.xml
+|-- core-web
+|   |-- src
+|   |   `-- main
+|   |       `-- java
+|   |           `-- ru
+|   |               `-- igorit
+|   |                   `-- monitoring
+|   |                       `-- web
+|   |                           `-- dto
+|   |                               |-- OrganizationListDto.java
+|   |                               |-- UserListItemDto.java
+|   |                               `-- UserResponseDto.java
+|   `-- pom.xml
+|-- service-admin
+|   |-- src
+|   |   `-- main
+|   |       |-- java
+|   |       |   `-- ru
+|   |       |       `-- igorit
+|   |       |           `-- monitoring
+|   |       |               `-- admin
+|   |       |                   |-- config
+|   |       |                   |   |-- RabbitMQConfig.java
+|   |       |                   |   `-- SecurityConfig.java
+|   |       |                   |-- controller
+|   |       |                   |   |-- MainModelController.java
+|   |       |                   |   `-- TestController.java
+|   |       |                   |-- dto
+|   |       |                   |   |-- OrganizationItemDto.java
+|   |       |                   |   `-- TestResponse.java
+|   |       |                   |-- listener
+|   |       |                   |   `-- RabbitCommandListener.java
+|   |       |                   |-- mapper
+|   |       |                   |   |-- MainModelMapper.java
+|   |       |                   |   `-- UserEventCommandMapper.java
+|   |       |                   |-- repository
+|   |       |                   |   |-- AppUserRepository.java
+|   |       |                   |   |-- OrganizationRepository.java
+|   |       |                   |   `-- UserOrganizationRepository.java
+|   |       |                   |-- service
+|   |       |                   |   |-- MainModelManageService.java
+|   |       |                   |   |-- TestService.java
+|   |       |                   |   `-- UserEventsReceiveService.java
+|   |       |                   `-- AdminApplication.java
+|   |       `-- resources
+|   |           |-- db
+|   |           |   `-- migration
+|   |           |       |-- V01.01__init_admin_schema.sql
+|   |           |       `-- V01.02__add_organizations.sql
+|   |           `-- application.yml
+|   |-- .properties
+|   `-- pom.xml
+|-- service-auth
+|   |-- src
+|   |   `-- main
+|   |       |-- java
+|   |       |   `-- ru
+|   |       |       `-- igorit
+|   |       |           `-- monitoring
+|   |       |               `-- auth
+|   |       |                   |-- config
+|   |       |                   |   |-- MessageSourceConfig.java
+|   |       |                   |   |-- RabbitMQConfig.java
+|   |       |                   |   `-- SecurityConfig.java
+|   |       |                   |-- controller
+|   |       |                   |   |-- AdminController.java
+|   |       |                   |   |-- AuthController.java
+|   |       |                   |   |-- OAuth2Controller.java
+|   |       |                   |   `-- UserManageController.java
+|   |       |                   |-- dto
+|   |       |                   |   |-- ChangePasswordRequestDto.java
+|   |       |                   |   |-- LoginRequestDto.java
+|   |       |                   |   |-- PermissionResponseDto.java
+|   |       |                   |   |-- RegistrationRequestDto.java
+|   |       |                   |   |-- ResetPasswordRequestDto.java
+|   |       |                   |   |-- RoleResponseDto.java
+|   |       |                   |   |-- RoleWithPermissionDto.java
+|   |       |                   |   |-- TokenResponseDto.java
+|   |       |                   |   |-- UpdateRoleRequestDto.java
+|   |       |                   |   `-- UpdateUserRequestDto.java
+|   |       |                   |-- helper
+|   |       |                   |   |-- AuthErrorHelper.java
+|   |       |                   |   |-- LocaleHelper.java
+|   |       |                   |   `-- LoginMessageHelper.java
+|   |       |                   |-- listener
+|   |       |                   |   `-- RabbitCommandListener.java
+|   |       |                   |-- mapper
+|   |       |                   |   `-- UserManagementMapper.java
+|   |       |                   |-- repository
+|   |       |                   |   |-- AuthOrganizationRepository.java
+|   |       |                   |   |-- PermissionRepository.java
+|   |       |                   |   |-- RoleRepository.java
+|   |       |                   |   |-- TelegramTokenRepository.java
+|   |       |                   |   |-- UserAuthProviderRepository.java
+|   |       |                   |   `-- UserRepository.java
+|   |       |                   |-- service
+|   |       |                   |   |-- secur
+|   |       |                   |   |   |-- CookieServiceFull.java
+|   |       |                   |   |   `-- JwtCreateService.java
+|   |       |                   |   |-- AdminService.java
+|   |       |                   |   |-- AuthManagementPersistService.java
+|   |       |                   |   |-- AuthService.java
+|   |       |                   |   |-- OrganizationEventsReceiveService.java
+|   |       |                   |   |-- ResetPasswordService.java
+|   |       |                   |   |-- TelegramTokenServiceImpl.java
+|   |       |                   |   |-- UserDetailsServiceImpl.java
+|   |       |                   |   |-- UserManagementService.java
+|   |       |                   |   |-- UserManagementServiceImpl.java
+|   |       |                   |   `-- UserService.java
+|   |       |                   `-- AuthApplication.java
+|   |       `-- resources
+|   |           |-- db
+|   |           |   `-- migration
+|   |           |       |-- V01.01__init_auth_schema.sql
+|   |           |       |-- V01.02__add_telegram_support.sql
+|   |           |       |-- V01.03__add_initial_data.sql
+|   |           |       `-- V01.04__add_organizations.sql
+|   |           |-- org
+|   |           |   `-- springframework
+|   |           |       `-- security
+|   |           |           `-- messages_ru.properties
+|   |           `-- application.yml
+|   |-- .properties
+|   `-- pom.xml
+|-- service-monitoring
+|   |-- src
+|   |   `-- main
+|   |       |-- java
+|   |       |   `-- ru
+|   |       |       `-- igorit
+|   |       |           `-- monitoring
+|   |       |               `-- monitoring
+|   |       |                   `-- MonitoringApplication.java
+|   |       `-- resources
+|   |           `-- application.yml
+|   `-- pom.xml
+|-- spring-boot-parent
+|   `-- pom.xml
+|-- .gitignore
+|-- .properties
+|-- amplicode.xml
+|-- mvnw
+|-- mvnw.cmd
+|-- pom.xml
+`-- tree.txt
+
+126 directories, 136 files

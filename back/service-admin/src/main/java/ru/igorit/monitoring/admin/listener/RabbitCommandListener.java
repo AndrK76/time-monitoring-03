@@ -1,28 +1,28 @@
 // service-admin/src/main/java/ru/igorit/monitoring/admin/listener/UserCommandListener.java
 package ru.igorit.monitoring.admin.listener;
 
-import ru.igorit.monitoring.admin.service.UserEventsReceiveService;
-import ru.igorit.monitoring.common.dto.command.auth.UserCreatedEventCommandDto;
-import ru.igorit.monitoring.common.dto.command.auth.UserInfoUpdatedEventCommandDto;
-import ru.igorit.monitoring.rabbit.config.RabbitMQConfig;
-import ru.igorit.monitoring.common.dto.command.CommandMessageDto;
-import ru.igorit.monitoring.common.enums.command.CommandMessageType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
+import ru.igorit.monitoring.admin.service.UserEventsReceiveService;
+import ru.igorit.monitoring.common.dto.command.CommandMessageDto;
+import ru.igorit.monitoring.common.dto.command.auth.UserCreatedEventCommandDto;
+import ru.igorit.monitoring.common.dto.command.auth.UserInfoUpdatedEventCommandDto;
+import ru.igorit.monitoring.common.enums.command.CommandMessageType;
 import ru.igorit.monitoring.rabbit.service.CommandReceiver;
 
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class UserCommandListener {
+public class RabbitCommandListener {
 
     private final UserEventsReceiveService userService;
     private final CommandReceiver commandReceiver;
 
-    @RabbitListener(queues = RabbitMQConfig.QUEUE_NAME)
-    public void handleUserUpdated(CommandMessageDto command) {
+    //@RabbitListener(queues = RabbitMQCommonConfig.QUEUE_NAME)
+    @RabbitListener(queues = "#{rabbitMQConfigProperties.queueName}")
+    public void handleCommands(CommandMessageDto command) {
         log.info("Received command: {} from {}", command.getCommandType(), command.getSourceService());
 
         try {
@@ -40,7 +40,7 @@ public class UserCommandListener {
                     }
                     break;
                 default:
-                    log.warn("Unknown command type: {}", command.getCommandType());
+                    log.warn("Not processed command type: {}", command.getCommandType());
             }
         } catch (IllegalArgumentException e) {
             log.error("Unknown command type: {}", command.getCommandType(), e);
