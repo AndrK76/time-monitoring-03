@@ -64,6 +64,7 @@ export class RoleEditorInplaceComponent implements OnInit {
           name: values.name,
           description: values.description || '',
           permissions: values.permissions || [],
+          special: false,
           permissionsWithInfo: rolePermissionsWithInfo((values.permissions ? values : this.data), this.permissions())
         };
         this.change.emit(updated);

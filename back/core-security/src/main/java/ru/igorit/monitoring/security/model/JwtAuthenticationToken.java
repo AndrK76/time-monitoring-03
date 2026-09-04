@@ -10,8 +10,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static ru.igorit.monitoring.security.util.SecurityAccessUtils.ANY_ORG_PERMISSION;
+import static ru.igorit.monitoring.security.util.SecurityAccessUtils.SUPERUSER_PERMISSION;
+
 @Getter
-public class JwtAuthenticationToken implements Authentication {
+public class JwtAuthenticationToken implements Authentication, MonAppAuthentication {
 
     private final String userId;
     private final String username;
@@ -75,16 +78,9 @@ public class JwtAuthenticationToken implements Authentication {
     }
 
     /**
-     * Проверка наличия роли
-     */
-    public boolean hasRole(String role) {
-        String normalizedRole = role.startsWith("ROLE_") ? role : "ROLE_" + role;
-        return roles.contains(normalizedRole);
-    }
-
-    /**
      * Проверка наличия права
      */
+    @Override
     public boolean hasPermission(String permission) {
         return permissions.contains(permission);
     }
@@ -92,6 +88,7 @@ public class JwtAuthenticationToken implements Authentication {
     /**
      * Проверка наличия любого из прав
      */
+    @Override
     public boolean hasAnyPermission(String... permissions) {
         for (String perm : permissions) {
             if (this.permissions.contains(perm)) {
@@ -101,9 +98,30 @@ public class JwtAuthenticationToken implements Authentication {
         return false;
     }
 
+
+    /**
+     * Проверка доступа к организации
+     */
+    @Override
+    public boolean isAllowedOrganization(String organizationId) {
+        if (hasAnyPermission(SUPERUSER_PERMISSION, ANY_ORG_PERMISSION)) {
+            return true;
+        }
+        return allowedOrganizations.contains(organizationId);
+    }
+
+    /* *
+     * Проверка наличия роли
+     * /
+    public boolean hasRole(String role) {
+        String normalizedRole = role.startsWith("ROLE_") ? role : "ROLE_" + role;
+        return roles.contains(normalizedRole);
+    }
+
+
     /**
      * Проверка наличия любой из ролей
-     */
+     * /
     public boolean hasAnyRole(String... roles) {
         for (String role : roles) {
             if (hasRole(role)) {
@@ -112,13 +130,8 @@ public class JwtAuthenticationToken implements Authentication {
         }
         return false;
     }
+    * /
 
-    /**
-     * Проверка доступа к организации
-     */
-    public boolean isAllowedOrganization(String organizationId) {
-        return allowedOrganizations.contains(organizationId);
-    }
 
     @Override
     public String toString() {
@@ -130,4 +143,5 @@ public class JwtAuthenticationToken implements Authentication {
                 ", authenticated=" + authenticated +
                 '}';
     }
+    */
 }

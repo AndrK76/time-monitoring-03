@@ -12,7 +12,8 @@
         <div class="editor-header">
             <div class="editor-header-actions">
                 <button mat-raised-button [color]="data.active ? 'warn' : 'primary'"
-                    [disabled]="loading() || isSomeUser()" (click)="toggleActive()" *ngIf="canFullUpdate()">
+                    [disabled]="loading() || isSomeUser()" (click)="toggleActive()"
+                    *ngIf="canFullUpdate() && (isSuperUser() || !data.superUser)">
                     <mat-icon>{{ data.active ? 'lock' : 'lock_open' }}</mat-icon>
                     <span class="button-text">{{ data.active ? 'Заблокировать' : 'Разблокировать' }}</span>
                 </button>
@@ -22,7 +23,7 @@
                     <span class="button-text">{{ data.approved ? 'Подтверждён' : 'Подтвердить' }}</span>
                 </button>
                 <button mat-raised-button color="accent" [disabled]="loading()" (click)="openChangePassword()"
-                    *ngIf="canFullUpdate() || isSomeUser()">
+                    *ngIf="canFullUpdate() && (isSuperUser() || !data.superUser)|| isSomeUser()">
                     <mat-icon>vpn_key</mat-icon>
                     <span class="button-text">Сменить пароль</span>
                 </button>
@@ -63,15 +64,35 @@
                 </mat-form-field>
             </div>
 
+            <div class="form-row" *ngIf="staticRoles().length">
+                <div class="badges-container">
+                    Роли:
+                    <span class="badge" *ngFor="let role of staticRoles()">
+                        {{ roleById(role)?.description }}
+                    </span>
+                </div>
+            </div>
+
             <div class="form-row">
                 <mat-form-field appearance="outline" class="full-width">
                     <mat-label>Роли</mat-label>
                     <mat-select formControlName="roles" multiple>
-                        <mat-option *ngFor="let role of roles()" [value]="role.name">
-                            {{ role.description || role.name }}
+                        <mat-option *ngFor="let role of rolesForShow()" [value]="role.name">
+                            {{ role.description || role.name }} {{ role.special?'(!)':'' }}
                         </mat-option>
                     </mat-select>
                 </mat-form-field>
+            </div>
+
+            <!-- Строка с организациями -->
+            <div class="form-row">
+                <div class="badges-container">
+                    Организации:
+                    <span class="badge" *ngFor="let org of organizations()">
+                        {{ org.fullName }}
+                    </span>
+                    <span *ngIf="organizations().length === 0" class="empty-badge">—</span>
+                </div>
             </div>
         </form>
     </div>

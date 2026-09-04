@@ -75,6 +75,7 @@ export class UserListTableComponent implements OnInit, AfterViewInit {
     ['username', { key: 'username', type: TableFilterType.TEXT }],
     ['displayName', { key: 'displayName', type: TableFilterType.TEXT }],
     ['roles', { key: 'roles', type: TableFilterType.LIST, config: { dataSource: [] } }],
+    ['organizations', { key: 'organizations', type: TableFilterType.LIST, config: { dataSource: [] } }],
     ['active', { key: 'active', type: TableFilterType.LIST, config: { dataSource: [{ id: true, text: 'Да' }, { id: false, text: 'Нет' }] } }],
     ['approved', { key: 'approved', type: TableFilterType.LIST, config: { dataSource: [{ id: true, text: 'Да' }, { id: false, text: 'Нет' }] } }],
   ]);
@@ -82,10 +83,17 @@ export class UserListTableComponent implements OnInit, AfterViewInit {
   canFullUpdate = signal(false);
   canPartialUpdate = signal(true);
   someUser = signal(false);
+  anyOrgAllow = signal(false);
+  isSuperUser = signal(false);
 
   ngOnInit(): void {
-    this.canFullUpdate.set(this.permisService.checkPermissions(authConstant('fullUserUpdate')))
-    this.canPartialUpdate.set(this.permisService.checkPermissions(authConstant('partUserUpdate')))
+    this.canFullUpdate.set(this.permisService.checkPermissions(authConstant('fullUserUpdate')));
+    this.canPartialUpdate.set(this.permisService.checkPermissions(authConstant('partUserUpdate')));
+    this.anyOrgAllow.set(this.permisService.checkPermissions(authConstant('anyOrgAllow')));
+    if (this.anyOrgAllow()) {
+      this.displayedColumns = [...this.displayedColumns, 'organizationsWithInfo'];
+    }
+    this.isSuperUser.set(this.permisService.checkPermissions(authConstant('isSuperUser')));
     this.tableManager.breakpointsSubscribe();
     this.filterConfig.set(this._filterConfig);
     this.initializeData();
@@ -116,15 +124,26 @@ export class UserListTableComponent implements OnInit, AfterViewInit {
         ),
     }).subscribe({
       next: (result) => {
-        const { roles } = result as { roles: RoleInfo[]; };
+        const { roles, organizations } = result as { roles: RoleInfo[]; organizations: OrganizationInfo[] };
 
         this.roles.set(roles);
+        this.organizations.set(organizations);
         this.filterConfig.update(map => {
           const config = map.get('roles');
           if (config) {
             const dataSource = roles.map(p => ({ id: p.name, text: p.description }));
             const newMap = new Map(map);
             newMap.set('roles', { ...config, config: { ...config.config, dataSource } });
+            return newMap;
+          }
+          return map;
+        });
+        this.filterConfig.update(map => {
+          const config = map.get('organizations');
+          if (config) {
+            const dataSource = organizations.map(p => ({ id: p.id, text: p.shortName }));
+            const newMap = new Map(map);
+            newMap.set('organizations', { ...config, config: { ...config.config, dataSource } });
             return newMap;
           }
           return map;
@@ -141,17 +160,17 @@ export class UserListTableComponent implements OnInit, AfterViewInit {
     this.isLoading.set(true);
     this.error.set(null);
     const roles = this.roles();
+    const organizations = this.organizations();
 
     this.dataService.getUsersList()
       .pipe(
-        map(list => list.map(dto => userListDtoToFullView(dto, roles))),
+        map(list => list.map(dto => userListDtoToFullView(dto, roles, organizations))),
         this.tableManager.handleError<UserWithFullInfo[]>('Ошибка загрузки пользователей', []),
         finalize(() => this.isLoading.set(false))
       )
       .subscribe({
         next: (result) => {
           const rows = result as UserWithFullInfo[];
-
           this.tableManager.setData(rows);
           this.tableManager.handleUrlParams();
           if (this.selectedItem()) {
@@ -173,7 +192,7 @@ export class UserListTableComponent implements OnInit, AfterViewInit {
     return this.dataService.getUserById(item.id).pipe(
       map(dto => userResponseDtoToFullView(dto, roles, organizationns)),
       this.tableManager.handleError<UserWithFullInfo | undefined>('Ошибка загрузки информации о пользователе', undefined, this.tableManager.snackError),
-      tap(_ => {
+      tap(v => {
         const err = this.tableManager.snackError();
         if (err) {
           this.notificationService.error(err);

@@ -60,6 +60,7 @@ public interface MainModelMapper {
     @Mapping(target = "approved", ignore = true)
     @Mapping(target = "active", source = "valid")
     @Mapping(target = "roles", ignore = true)
+    @Mapping(target = "organizations", ignore = true)
     UserListItemDto toListDto(AppUser user);
 
 

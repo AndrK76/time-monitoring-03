@@ -2,10 +2,12 @@ package ru.igorit.monitoring.auth.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 import ru.igorit.monitoring.auth.dto.*;
 import ru.igorit.monitoring.auth.mapper.UserManagementMapper;
 import ru.igorit.monitoring.common.dto.command.auth.UserInfoUpdatedEventCommandDto;
@@ -14,17 +16,21 @@ import ru.igorit.monitoring.persistence.entity.auth.Permission;
 import ru.igorit.monitoring.persistence.entity.auth.Role;
 import ru.igorit.monitoring.persistence.entity.auth.User;
 import ru.igorit.monitoring.rabbit.service.CommandSender;
+import ru.igorit.monitoring.security.util.SecurityAccessUtils;
 import ru.igorit.monitoring.web.dto.OrganizationListDto;
 import ru.igorit.monitoring.web.dto.UserListItemDto;
 import ru.igorit.monitoring.web.dto.UserResponseDto;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static ru.igorit.monitoring.security.util.AuthInfoUtils.extractUserId;
 import static ru.igorit.monitoring.security.util.AuthInfoUtils.getCurrentAuth;
+import static ru.igorit.monitoring.security.util.SecurityAccessUtils.ANY_ORG_PERMISSION;
+import static ru.igorit.monitoring.security.util.SecurityAccessUtils.SUPERUSER_PERMISSION;
 
 @Service
 @RequiredArgsConstructor
@@ -36,37 +42,55 @@ public class UserManagementServiceImpl implements UserManagementService {
     private final CommandSender commandSender;
     private final ResetPasswordService resetPasswordService;
     private final UserService userService;
+    private final SecurityAccessUtils sa;
 
 
     // ============================================================
     // Публичные методы. Пользователь
     // ============================================================
 
-    @PreAuthorize("hasAnyAuthority('SUPERUSER', 'USER_WRITE', 'USER_READ')")
+    @PreAuthorize("@securityAccessUtils.isAllowedAllActions()")
     @Transactional(readOnly = true)
     @Override
     public List<UserListItemDto> getUserList() {
+        var allOrgs = getAllOrganizations().stream().map(OrganizationListDto::getId).toList();
         return persistService.findAllUsers().stream()
+                .map(userManagementMapper::toResponseDto)
+                .peek(u -> {
+                    if (inAnyOrganization(u)) u.setOrganizations(allOrgs);
+                })
                 .map(userManagementMapper::toListDto)
+                .filter((f -> sa.inSomeOrganization(f.getOrganizations())))
                 .collect(Collectors.toList());
+    }
+
+    private void beforeReturnUser(UserResponseDto user, List<String> allOrgs, boolean someUser) {
+        List<String> _allOrgs = allOrgs == null
+                ? _getAllOrganizations().stream().map(OrganizationListDto::getId).toList() : allOrgs;
+        user.setSuperUser(isSuperUser(user));
+        if (inAnyOrganization(user)) user.setOrganizations(_allOrgs);
+        if (!sa.inSomeOrganization(user.getOrganizations()) && !someUser) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User not available: " + user.getId());
+        }
     }
 
     @Transactional(readOnly = true)
     @Override
     public UserResponseDto getCurrentUser() {
-        return toResponse(getCurrentUserEntity());
+        var ret = userManagementMapper.toResponseDto(getCurrentUserEntity());
+        beforeReturnUser(ret, null, true);
+        return ret;
     }
 
-    @PreAuthorize("hasAnyAuthority('SUPERUSER', 'USER_WRITE', 'USER_READ')")
+    @PreAuthorize("@securityAccessUtils.isAllowedAllActions()")
     @Transactional(readOnly = true)
     @Override
     public UserResponseDto getUserById(String userId) {
-        return toResponse(getUserEntityById(userId));
+        var user = userManagementMapper.toResponseDto(getUserEntityById(userId));
+        beforeReturnUser(user, null, false);
+        return user;
     }
 
-    // ============================================================
-    // Публичные методы. Пользователь
-    // ============================================================
 
     @Transactional
     @Override
@@ -76,64 +100,87 @@ public class UserManagementServiceImpl implements UserManagementService {
         User saved = persistService.saveUser(user);
         sendUserUpdatedEvent(saved, false);
         log.info("User updated self-info: {}", user.getUsername());
-        return toResponse(saved);
+        var ret = userManagementMapper.toResponseDto(saved);
+        beforeReturnUser(ret, null, true);
+        return ret;
     }
 
-    @PreAuthorize("hasAnyAuthority('SUPERUSER', 'USER_WRITE', 'USER_READ')")
+    private record CanUpdateUserResult(User user, String updaterId, List<String> allOrgs) {
+    }
+
+    private CanUpdateUserResult canUpdateUser(String userId) {
+        User user = getUserEntityById(userId);
+        String updaterId = extractUserId(getCurrentAuth());
+        var allOrgs = _getAllOrganizations().stream().map(OrganizationListDto::getId).toList();
+        var srcUser = userManagementMapper.toResponseDto(user);
+        var orgs = inAnyOrganization(srcUser) ? allOrgs : srcUser.getOrganizations();
+        if (!sa.inSomeOrganization(srcUser.getOrganizations()) || !sa.isSuperUser() && isSuperUser(srcUser)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User not available: " + userId);
+        }
+        return new CanUpdateUserResult(user, updaterId, allOrgs);
+    }
+
+
+    @PreAuthorize("@securityAccessUtils.isAllowedAllActions()")
     @Transactional
     @Override
     public UserResponseDto updateUserPartial(String userId, UpdateUserRequestDto request) {
-        User user = getUserEntityById(userId);
-        String updaterId = extractUserId(getCurrentAuth());
-        updatePersonalFields(user, request, updaterId);
-        User saved = persistService.saveUser(user);
+        var checkRes = canUpdateUser(userId);
+        updatePersonalFields(checkRes.user(), request, checkRes.updaterId());
+        User saved = persistService.saveUser(checkRes.user());
         sendUserUpdatedEvent(saved, false);
-        log.info("User part updated: {}", user.getUsername());
-        return toResponse(saved);
+        log.info("User part updated: {}", checkRes.user().getUsername());
+        var ret = userManagementMapper.toResponseDto(saved);
+        beforeReturnUser(ret, checkRes.allOrgs(), false);
+        return ret;
     }
 
-    @PreAuthorize("hasAnyAuthority('SUPERUSER', 'USER_WRITE')")
+
+    @PreAuthorize("@securityAccessUtils.isAllowedAllActions()")
     @Transactional
     @Override
     public UserResponseDto updateUserFull(String userId, UpdateUserRequestDto request) {
-        User user = getUserEntityById(userId);
-        String updaterId = extractUserId(getCurrentAuth());
-        var saved = updateAllFields(user, request, updaterId);
+        var checkRes = canUpdateUser(userId);
+        var saved = updateAllFields(checkRes.user(), request, checkRes.updaterId());
         sendUserUpdatedEvent(saved, true);
         log.info("User fully updated: {}", saved.getUsername());
-        return toResponse(saved);
+        var ret = userManagementMapper.toResponseDto(saved);
+        beforeReturnUser(ret, checkRes.allOrgs(), false);
+        return ret;
     }
 
-    @PreAuthorize("hasAnyAuthority('SUPERUSER','USER_WRITE')")
+    @PreAuthorize("@securityAccessUtils.isSuperUser()")
     @Transactional
     @Override
     public UserResponseDto addUser(UpdateUserRequestDto request) {
         String creatorId = extractUserId(getCurrentAuth());
         User saved = userService.createLocalUser(request.getUsername(), request.getEmail(), null,
                 request.getFirstName(), request.getLastName(), request.getDisplayName(), creatorId);
-        return toResponse(saved);
+        var ret = userManagementMapper.toResponseDto(saved);
+        beforeReturnUser(ret, null, false);
+        return ret;
     }
 
-    @PreAuthorize("hasAnyAuthority('SUPERUSER','USER_WRITE')")
+    @PreAuthorize("@securityAccessUtils.isAllowedAllActions()")
     @Transactional
     @Override
     public void resetPasswordToDefault(String userId) {
-        User user = getUserEntityById(userId);
-        resetPasswordService.setDefaultPassword(user);
+        var checkRes = canUpdateUser(userId);
+        resetPasswordService.setDefaultPassword(checkRes.user());
     }
 
-    @PreAuthorize("hasAnyAuthority('SUPERUSER','USER_WRITE')")
+    @PreAuthorize("@securityAccessUtils.isAllowedAllActions()")
     @Transactional
     @Override
     public void setPassword(String userId, String newPassword) {
-        User user = getUserEntityById(userId);
-        resetPasswordService.setPassword(user, newPassword);
+        var checkRes = canUpdateUser(userId);
+        resetPasswordService.setPassword(checkRes.user(), newPassword);
     }
 
     // ============================================================
     // Публичные методы. Роль
     // ============================================================
-    @PreAuthorize("hasAnyAuthority('SUPERUSER','USER_WRITE','USER_READ')")
+    @PreAuthorize("@securityAccessUtils.isAllowedAllActions()")
     @Transactional(readOnly = true)
     @Override
     public List<RoleResponseDto> getAllRoles() {
@@ -235,13 +282,17 @@ public class UserManagementServiceImpl implements UserManagementService {
     // ============================================================
     // Публичные методы. Организации — Просмотр
     // ============================================================
-    @PreAuthorize("hasAnyAuthority('SUPERUSER','USER_WRITE','USER_READ')")
+    private List<OrganizationListDto> _getAllOrganizations() {
+        return persistService.findAllOrganizations().stream()
+                .filter(org -> sa.isAllowedOrganization(org.getId()))
+                .map(userManagementMapper::toListDto)
+                .collect(Collectors.toList());
+    }
+
     @Transactional(readOnly = true)
     @Override
     public List<OrganizationListDto> getAllOrganizations() {
-        return persistService.findAllOrganizations().stream()
-                .map(userManagementMapper::toListDto)
-                .collect(Collectors.toList());
+        return _getAllOrganizations();
     }
 
 
@@ -255,7 +306,7 @@ public class UserManagementServiceImpl implements UserManagementService {
         }
 
         return persistService.findByUsername(auth.getName())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found: " + auth.getName()));
     }
 
     /**
@@ -263,15 +314,9 @@ public class UserManagementServiceImpl implements UserManagementService {
      */
     private User getUserEntityById(String userId) {
         return persistService.findUserById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found: " + userId));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found: " + userId));
     }
 
-    /**
-     * Преобразование User в UserResponse
-     */
-    private UserResponseDto toResponse(User user) {
-        return userManagementMapper.toResponseDto(user);
-    }
 
     /**
      * Обновление полей пользователя из запроса (полный доступ)
@@ -302,7 +347,7 @@ public class UserManagementServiceImpl implements UserManagementService {
                 persistService.updateUserRoles(user, request.getRoles(), updaterId);
                 user.setRoles(new HashSet<>(persistService.findRoleByNameIn(request.getRoles())));
                 user = persistService.findUserById(user.getId())
-                        .orElseThrow(() -> new RuntimeException("User not found"));
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
             }
         }
         log.debug("result method: isApproved={}", user.getIsApproved());
@@ -326,6 +371,23 @@ public class UserManagementServiceImpl implements UserManagementService {
     private void updatePersonalFields(User user, UpdateUserRequestDto request) {
         updatePersonalFields(user, request, user.getId());
     }
+
+    private boolean inAnyOrganization(UserResponseDto user) {
+        if (user == null || user.getPermissions() == null) {
+            return false;
+        }
+        return user.getPermissions().stream()
+                .anyMatch(permission -> List.of(SUPERUSER_PERMISSION, ANY_ORG_PERMISSION).contains(permission));
+    }
+
+    private boolean isSuperUser(UserResponseDto user) {
+        if (user == null || user.getPermissions() == null) {
+            return false;
+        }
+        return user.getPermissions().stream()
+                .anyMatch(permission -> Objects.equals(SUPERUSER_PERMISSION, permission));
+    }
+
 
     /**
      * Получение пользователя по ID

@@ -42,6 +42,7 @@ export interface UserResponseDto {
   permissions: string[];
   organizations: string[];
   anonymous: boolean;
+  superUser: boolean;
 }
 
 export interface UserListItemDto {
@@ -50,6 +51,7 @@ export interface UserListItemDto {
   displayName: string;
   active: boolean;
   approved: boolean;
+  organizations?: string[];
   roles: string[];
 }
 
@@ -70,12 +72,14 @@ export interface RoleResponseDto {
   id: string;
   name: string;
   description: string;
+  special: boolean;
 }
 
 export interface RoleWithPermissionDto {
   id: string;
   name: string;
   description: string;
+  special: boolean;
   permissions: string[]
 }
 
@@ -89,6 +93,7 @@ export interface UpdateRoleRequestDto {
 export interface PermissionResponseDto {
   id: string;
   name: string;
+  special: boolean;
   description: string;
 }
 

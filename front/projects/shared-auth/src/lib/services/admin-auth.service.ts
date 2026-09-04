@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { OrganizationItemDto, OrganizationListDto } from '../models/admin-main.models';
+import { UserListItemDto } from '@mon3/sa';
 
 
 @Injectable({
@@ -37,5 +38,9 @@ export class AdminAuthService {
 
   deleteOrganization(id: string): Observable<void> {
     return this.http.delete<void>(`${this.adminApiUrl}/main/organizations/${id}`);
+  }
+
+  getUsersList(): Observable<UserListItemDto[]> {
+     return this.http.get<UserListItemDto[]>(`${this.adminApiUrl}/main/users`);
   }
 }

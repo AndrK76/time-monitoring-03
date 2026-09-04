@@ -12,6 +12,7 @@ import { authConstant } from '../../../auth-constants';
 import { RoleInfo } from '../../roles/role-view.models';
 import { roleResponseDtoToVIew } from '../../roles/role-view.utils';
 import { OrganizationInfo } from '../../organizations/organization-view.models';
+import { organizationListDtoToView } from '../../organizations/organization-view.utils';
 
 @Component({
   selector: 'app-user-profile-edit-container',
@@ -44,6 +45,8 @@ export class UserProfileEditContainerComponent implements OnInit {
   canFullUpdate = signal(false);
   canPartialUpdate = signal(true);
   someUser = signal(true);
+  anyOrgAllow = signal(false);
+  isSuperUser = signal(false);
 
   ngOnInit(): void {
     this.initializeData();
@@ -51,21 +54,26 @@ export class UserProfileEditContainerComponent implements OnInit {
 
   initializeData = (): void => {
     this.canFullUpdate.set(this.permisService.checkPermissions(authConstant('fullUserUpdate')))
+    this.anyOrgAllow.set(this.permisService.checkPermissions(authConstant('anyOrgAllow')));
+    this.isSuperUser.set(this.permisService.checkPermissions(authConstant('isSuperUser')));
     this.isLoading.set(true);
     this.error.set(null);
 
     forkJoin({
       roles:
         (this.canFullUpdate() ? this.dataService.getAllRoles() : this.dataService.getCurrentUserRoles())
-          //throwError(() => new Error('Тестовая ошибка загрузки'))
           .pipe(
             map(list => list.map(dto => roleResponseDtoToVIew(dto))),
             handleError<RoleInfo[]>('Ошибка загрузки списка ролей', [], this.error)),
+      organizations: this.dataService.getAlOrganizations().pipe(
+        map(list => list.map(dto => organizationListDtoToView(dto))),
+        handleError<OrganizationInfo[]>('Ошибка загрузки списка организаций', [], this.error)),
     }).subscribe({
       next: (result) => {
         if (!this.error()) {
-          const { roles } = result as { roles: RoleInfo[] };
+          const { roles, organizations } = result as { roles: RoleInfo[]; organizations: OrganizationInfo[] };
           this.roles.set(roles);
+          this.organizations.set(organizations);
           //setTimeout(() => {
           this.loadData();
           //}, 5000);

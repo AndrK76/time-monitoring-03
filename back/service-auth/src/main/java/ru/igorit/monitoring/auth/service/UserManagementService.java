@@ -60,4 +60,5 @@ public interface UserManagementService {
     // Публичные методы. Организации — Просмотр
     // ============================================================
     List<OrganizationListDto> getAllOrganizations();
+
 }

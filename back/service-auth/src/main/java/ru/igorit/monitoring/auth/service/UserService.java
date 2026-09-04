@@ -1,5 +1,8 @@
 package ru.igorit.monitoring.auth.service;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.web.server.ResponseStatusException;
 import ru.igorit.monitoring.persistence.entity.auth.User;
 import ru.igorit.monitoring.persistence.entity.auth.UserAuthProvider;
 import ru.igorit.monitoring.auth.repository.UserAuthProviderRepository;
@@ -28,10 +31,10 @@ public class UserService {
     public User createLocalUser(String username, String email, String password,
                                 String firstName, String lastName, String displayName, String creatorId) {
         if (userRepository.existsByUsername(username)) {
-            throw new IllegalArgumentException("Username already exists: " + username);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username already exists: " + username);
         }
         if (email != null && userRepository.existsByEmail(email)) {
-            throw new IllegalArgumentException("Email already exists: " + email);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email already exists: " + email);
         }
 
         User user = User.builder()

@@ -79,6 +79,30 @@
         width: 100%;
         max-width: 100%;
         box-sizing: border-box;
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-size: 0.8rem;
+            background-color: var(--menu-active-bg);
+            color: var(--toolbar-active-text);
+
+            margin: 2px;
+        }
+
+        .empty-badge {
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        .badges-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            align-items: center;
+            padding: 4px 0;
+        }
     }
 
     .full-width {

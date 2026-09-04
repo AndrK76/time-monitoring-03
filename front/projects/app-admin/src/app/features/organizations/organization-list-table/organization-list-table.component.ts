@@ -36,7 +36,7 @@ import { userListDtoToShortView } from '../../users/user-view.utils';
 })
 export class OrganizationListTableComponent implements OnInit, AfterViewInit {
   private dataService = inject(AdminAuthService);
-  private userService = inject(UserManageService);
+  //private userService = inject(UserManageService);
   private dialogService = inject(DialogService);
   private notificationService = inject(NotificationService);
   private tableManager = inject(TableManageService<OrganizationInfo>);
@@ -90,7 +90,7 @@ export class OrganizationListTableComponent implements OnInit, AfterViewInit {
     this.error.set(null);
 
     forkJoin({
-      users: this.userService.getUsersList().pipe(
+      users: this.dataService.getUsersList().pipe(
         map(list => list.map(dto => userListDtoToShortView(dto))),
         this.tableManager.handleError<UserShortInfo[]>('Ошибка загрузки пользователей', []),
       )

@@ -20,9 +20,10 @@ export class UserWithFullInfo implements UserResponseDto {
         public anonymous: boolean,
         public rolesWithInfo: RoleInfo[],
         public organizations: string[],
-        public organizationsWithInfo: OrganizationInfo[]
+        public organizationsWithInfo: OrganizationInfo[],
+        public superUser: boolean = false
     ) { }
-    
+
 
 }
 

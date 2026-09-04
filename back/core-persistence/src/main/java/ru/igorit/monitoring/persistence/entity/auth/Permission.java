@@ -24,6 +24,9 @@ public class Permission {
 
     private String description;
 
+    @Column(nullable = false)
+    private boolean special;
+
     @ManyToMany(mappedBy = "permissions")
     private Set<Role> roles = new HashSet<>();
 }

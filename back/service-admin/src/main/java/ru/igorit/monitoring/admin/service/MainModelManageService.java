@@ -43,7 +43,7 @@ public class MainModelManageService {
         return organizationRepo.findAll().stream().map(mapper::toListDto).toList();
     }
 
-    @PreAuthorize("hasAnyAuthority('SUPERUSER')")
+    @PreAuthorize("@securityAccessUtils.isAllowedOrganization(#id)")
     @Transactional(readOnly = true)
     public OrganizationItemDto getOrganization(String id) {
         Organization org = organizationRepo.findById(id)
@@ -51,7 +51,7 @@ public class MainModelManageService {
         return mapper.toItemDto(org);
     }
 
-    @PreAuthorize("hasAnyAuthority('SUPERUSER')")
+    @PreAuthorize("@securityAccessUtils.isSuperUser()")
     @Transactional()
     public OrganizationListDto addOrganization(OrganizationListDto item) {
         String creatorId = extractUserId(getCurrentAuth());
@@ -63,7 +63,7 @@ public class MainModelManageService {
         return mapper.toListDto(organizationRepo.save(ret));
     }
 
-    @PreAuthorize("hasAnyAuthority('SUPERUSER')")
+    @PreAuthorize("@securityAccessUtils.isSuperUser()")
     @Transactional
     public OrganizationItemDto updateOrganization(String id, OrganizationItemDto dto) {
         String updaterId = extractUserId(getCurrentAuth());
@@ -100,7 +100,7 @@ public class MainModelManageService {
         return mapper.toItemDto(saved);
     }
 
-    @PreAuthorize("hasAnyAuthority('SUPERUSER')")
+    @PreAuthorize("@securityAccessUtils.isSuperUser()")
     @Transactional
     public void deleteOrganization(String id) {
         userOrganizationRepo.deleteByOrganizationId(id);
@@ -108,10 +108,12 @@ public class MainModelManageService {
         organizationRepo.deleteById(id);
     }
 
-    @PreAuthorize("hasAnyAuthority('SUPERUSER')")
+    @PreAuthorize("@securityAccessUtils.isSuperUser()")
     @Transactional(readOnly = true)
     public List<UserListItemDto> getUsers() {
-        return userRepo.findAll().stream().map(mapper::toListDto).toList();
+        return userRepo.findAll().stream()
+                .filter((AppUser::isValid))
+                .map(mapper::toListDto).toList();
     }
 
     /**

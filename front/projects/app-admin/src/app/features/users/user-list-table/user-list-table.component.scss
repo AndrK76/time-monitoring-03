@@ -14,7 +14,8 @@
     min-width: none;
 }
 
-.mat-column-rolesWithInfo {
+.mat-column-rolesWithInfo,
+.mat-column-organizationsWithInfo {
     text-wrap: revert;
     min-width: 15rem;
 
@@ -23,6 +24,9 @@
         background-color: var(--menu-active-bg);
         color: var(--toolbar-active-text);
 
+        &.special {
+            background-color: var(--btn-danger-hover);
+        }
     }
 }
 

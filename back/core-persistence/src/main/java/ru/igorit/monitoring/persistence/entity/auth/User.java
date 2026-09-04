@@ -96,6 +96,7 @@ public class User implements Cloneable{
     @Builder.Default
     private Set<TelegramToken> telegramTokens = new HashSet<>();
 
+    @BatchSize(size = 20)
     @Builder.Default
     @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(

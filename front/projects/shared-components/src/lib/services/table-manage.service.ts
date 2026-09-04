@@ -199,6 +199,7 @@ export class TableManageService<T extends Record<string, any>> {
 
   // === Обновление ===
   doUpdateBase(item: T, renderFn: () => void, onUpdateFn: ((res: T) => void) | undefined = undefined): void {
+    //console.log(item);
     const result = updateDataSourceItem(
       this.dataSource.data, item, this.itemIdFn, undefined, true);
     if (result.updated) {

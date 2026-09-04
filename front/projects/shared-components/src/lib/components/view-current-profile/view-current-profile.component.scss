@@ -105,6 +105,7 @@
         display: flex;
         flex-wrap: wrap;
         gap: 8px;
+        padding-bottom: 1rem;
 
         .role-badge {
             display: inline-block;
@@ -121,6 +122,38 @@
         }
     }
 }
+
+.org-section {
+    margin-top: 16px;
+
+    .org-label {
+        font-weight: 500;
+        color: #555;
+        font-size: 0.95rem;
+        margin-bottom: 8px;
+    }
+
+    .org-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+
+        .org-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-size: 0.8rem;
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .no-orgs {
+            color: #888;
+            font-size: 0.9rem;
+        }
+    }
+}
+
 
 .state-container {
     display: flex;

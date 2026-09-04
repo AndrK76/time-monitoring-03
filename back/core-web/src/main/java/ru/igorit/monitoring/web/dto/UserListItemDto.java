@@ -18,4 +18,5 @@ public class UserListItemDto {
     private boolean active;
     private boolean approved;
     private List<String> roles;
+    private List<String> organizations;
 }

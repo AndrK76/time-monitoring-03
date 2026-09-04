@@ -1,4 +1,4 @@
-import { Component, input, output, inject, DestroyRef, OnInit, signal } from '@angular/core';
+import { Component, input, output, inject, DestroyRef, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -11,7 +11,7 @@ import { UserWithFullInfo } from '../user-view.models';
 import { debounceTime, distinctUntilChanged, filter, Observable } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ChangePasswordDialogData, ChangePasswordDialogResult, DialogService, isNewItem, isNotFullLoadedItem } from '@mon3/sc';
-import { userOrganizationsWithInfo, userRolesWithInfo } from '../user-view.utils';
+import { userOrganizationsWithInfo, userRolesWithInfo, userRolesWithInfoByRoles } from '../user-view.utils';
 import { MatIconModule } from '@angular/material/icon';
 import { ChangePasswordRequestDto } from '@mon3/sa';
 import { RoleInfo } from '../../roles/role-view.models';
@@ -44,6 +44,19 @@ export class UserEditorInplaceComponent implements OnInit {
   canFullUpdate = input.required<boolean>();
   canPartialUpdate = input.required<boolean>();
   isSomeUser = input.required<boolean>();
+  anyOrgAllow = input.required<boolean>();
+  isSuperUser = input.required<boolean>();
+
+  changedRoles = signal<string[]>([]);
+  staticRoles = signal<string[]>([]);
+  rolesForShow = computed(() => {
+    const ret: RoleInfo[] = [];
+    this.roles().forEach(r => {
+      if (this.isSuperUser() || !r.special)
+        ret.push(r);
+    });
+    return ret;
+  });
 
 
   loaded = output<UserWithFullInfo>();
@@ -70,16 +83,17 @@ export class UserEditorInplaceComponent implements OnInit {
   }
 
   private buildForm(): void {
+    this.bulldRoleSublists();
     this.form = this.fb.group({
       id: [{ value: this.data.id, disabled: true }],
-      username: [{ value: this.data.username, disabled: !this.canFullUpdate() }, Validators.required],
-      email: [this.data.email, [Validators.required, Validators.email]],
-      firstName: [this.data.firstName],
-      lastName: [this.data.lastName],
-      displayName: [this.data.displayName, Validators.required],
+      username: [{ value: this.data.username, disabled: !this.canFullUpdate() || (!this.isSuperUser() && this.data.superUser) }, Validators.required],
+      email: [{ value: this.data.email, disabled: !this.isSuperUser() && this.data.superUser }, [Validators.required, Validators.email]],
+      firstName: [{ value: this.data.firstName, disabled: !this.isSuperUser() && this.data.superUser }],
+      lastName: [{ value: this.data.lastName, disabled: !this.isSuperUser() && this.data.superUser }],
+      displayName: [{ value: this.data.displayName, disabled: !this.isSuperUser() && this.data.superUser }, Validators.required],
       active: [this.data.active],
       approved: [this.data.approved],
-      roles: [{ value: this.data.roles || [], disabled: !this.canFullUpdate() }]
+      roles: [{ value: this.changedRoles() || [], disabled: !this.canFullUpdate() || (!this.isSuperUser() && this.data.superUser) }]
     });
   }
 
@@ -108,6 +122,27 @@ export class UserEditorInplaceComponent implements OnInit {
 
   }
 
+  private bulldRoleSublists() {
+    const changedRoles: string[] = [];
+    const staticRoles: string[] = [];
+    if (this.isSuperUser()) {
+      this.data.roles.forEach(a => changedRoles.push(a));
+    } else if (!this.isSuperUser() && this.data.superUser) {
+      this.data.roles.forEach(a => staticRoles.push(a));
+    } else {
+      this.data.roles.forEach(roleId => {
+        const role = this.roleById(roleId);
+        if (role && !role.special) {
+          changedRoles.push(roleId);
+        } else {
+          staticRoles.push(roleId)
+        }
+      });
+    }
+    this.changedRoles.set(changedRoles);
+    this.staticRoles.set(staticRoles);
+  }
+
   private listenToChanges(): void {
     this.form.valueChanges
       .pipe(
@@ -119,6 +154,11 @@ export class UserEditorInplaceComponent implements OnInit {
         takeUntilDestroyed(this.destroyRef)
       )
       .subscribe(values => {
+        const formRoles = values.roles || [];
+        const staticRoles = this.staticRoles?.() || [];
+        const combinedRoles = [...new Set([...formRoles, ...staticRoles])];
+        //const finalRoles = combinedRoles.length > 0 ? combinedRoles : this.data.roles;
+
         const updated: UserWithFullInfo = new UserWithFullInfo(
           this.data.id,
           values.username || this.data.username,
@@ -130,10 +170,10 @@ export class UserEditorInplaceComponent implements OnInit {
           values.active || this.data.active,
           values.approved || this.data.approved,
           this.data.emailVerified,
-          values.roles || this.data.roles,
+          combinedRoles,
           this.data.permissions,
           this.data.anonymous,
-          userRolesWithInfo((values.roles ? values : this.data), this.roles()),
+          userRolesWithInfoByRoles(combinedRoles, this.roles()),
           this.data.organizations,
           userOrganizationsWithInfo(this.data, this.organizations())
         );
@@ -186,6 +226,11 @@ export class UserEditorInplaceComponent implements OnInit {
         this.resetPasswordFn()!(this.data).subscribe();
       }
     });
+  }
+
+  roleById(roleId?: string): RoleInfo | undefined {
+    if (!roleId) return undefined;
+    return this.roles().find(rl => rl.name === roleId);
   }
 
 }

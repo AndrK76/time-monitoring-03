@@ -3,24 +3,38 @@ import { UserShortInfo, UserWithFullInfo } from "./user-view.models";
 import { RoleInfo } from "../roles/role-view.models";
 import { OrganizationInfo } from "../organizations/organization-view.models";
 
+export const tempRole = (roleName: string): RoleInfo => {
+    return {
+        id: `temp-${roleName}`,
+        name: `${roleName}`,
+        description: `${roleName}`,
+        special: false
+    } as RoleInfo;
+}
 
 export const userRolesWithInfo = (dto: UserListItemDto | UserResponseDto | UserWithFullInfo, allRoles: RoleInfo[]): RoleInfo[] => {
-    const ret = (dto.roles || []).map(roleName => {
+    return userRolesWithInfoByRoles(dto.roles, allRoles);
+}
+
+export const userRolesWithInfoByRoles = (src: string[] | undefined, allRoles: RoleInfo[]): RoleInfo[] => {
+    const ret = (src || []).map(roleName => {
         const found = allRoles.find(r => r.name === roleName);
-        return found || new RoleInfo('temp-' + roleName, roleName, '');
+        return found || tempRole(roleName);
     });
     return ret;
 }
 
-export const userOrganizationsWithInfo = (dto: UserListItemDto | UserResponseDto | UserWithFullInfo, allOrganizations: OrganizationInfo[]): OrganizationInfo[] => {
-    const ret = (dto.roles || []).map(orgId => {
+export const userOrganizationsWithInfo = (dto: UserListItemDto | UserResponseDto | UserWithFullInfo, allOrganizations?: OrganizationInfo[]): OrganizationInfo[] => {
+    if (!allOrganizations) return [];
+    const ret = (dto.organizations || []).map(orgId => {
         const found = allOrganizations.find(r => r.id === orgId);
         return found || new OrganizationInfo(orgId, '', '');
     });
     return ret;
 }
 
-export function userListDtoToFullView(dto: UserListItemDto, allRoles: RoleInfo[]): UserWithFullInfo {
+export function userListDtoToFullView(dto: UserListItemDto, allRoles: RoleInfo[]
+    , allOrganizations?: OrganizationInfo[]): UserWithFullInfo {
     return new UserWithFullInfo(
         dto.id,                            // id
         dto.username,                      // username
@@ -36,8 +50,9 @@ export function userListDtoToFullView(dto: UserListItemDto, allRoles: RoleInfo[]
         [],                                // permissions
         false,                             // anonymous
         userRolesWithInfo(dto, allRoles),  // rolesWithInfo
-        [],                                // organizations
-        [],
+        dto.organizations || [],           // organizations
+        userOrganizationsWithInfo(dto, allOrganizations),
+        false,                             //superUser
 
     );
 }
@@ -91,8 +106,10 @@ export function userResponseDtoToFullView(dto: UserResponseDto, allRoles: RoleIn
         dto.permissions,                  // permissions
         dto.anonymous,                    // anonymous
         userRolesWithInfo(dto, allRoles), // rolesWithInfo
-        dto.organizations,                 // organizations
-        userOrganizationsWithInfo(dto, allOrganizations)
+        dto.organizations,                // organizations
+        userOrganizationsWithInfo(dto, allOrganizations),
+        dto.superUser,                    // superUser
+
     );
 }
 

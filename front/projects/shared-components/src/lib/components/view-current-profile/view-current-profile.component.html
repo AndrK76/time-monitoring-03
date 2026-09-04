@@ -22,7 +22,6 @@
         </div>
 
         <mat-divider></mat-divider>
-
         <!-- Info grid (вертикальные строки) -->
         <div class="info-grid">
             <div class="info-row">
@@ -62,7 +61,6 @@
         </div>
 
         <mat-divider></mat-divider>
-
         <!-- Роли -->
         <div class="roles-section">
             <div class="roles-label">Роли</div>
@@ -71,6 +69,18 @@
                     {{ getRoleDescription(role) }}
                 </span>
                 <span *ngIf="!user()!.roles.length" class="no-roles">—</span>
+            </div>
+        </div>
+
+        <mat-divider></mat-divider>
+        <!-- Организации -->
+        <div class="org-section">
+            <div class="org-label">Организации</div>
+            <div class="org-list">
+                <span class="org-badge" *ngFor="let org of organizations()">
+                    {{ org.shortName }}
+                </span>
+                <span *ngIf="!organizations().length" class="no-orgs">—</span>
             </div>
         </div>
     </ng-container>

@@ -16,4 +16,5 @@ public class RoleWithPermissionDto {
     private String name;
     private String description;
     private String[] permissions;
+    private boolean special;
 }

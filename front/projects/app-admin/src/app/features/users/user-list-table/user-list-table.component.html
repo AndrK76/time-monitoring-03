@@ -17,11 +17,11 @@
         <mat-card-actions align="end">
             <div class="action-button-group">
                 <button mat-raised-button class="table-action-btn btn-success" (click)="callAdd()"
-                    [disabled]="isLoading() || isSaving()" *ngIf="canFullUpdate()">
+                    [disabled]="isLoading() || isSaving()" *ngIf="isSuperUser()">
                     <mat-icon>add</mat-icon><span class="hide-on-small">Добавить</span>
                 </button>
                 <button mat-raised-button class="table-action-btn btn-danger" (click)="callDelete(selectedItem()!)"
-                    [disabled]="isLoading() || isSaving() || !isNewItem()" *ngIf="canFullUpdate()">
+                    [disabled]="isLoading() || isSaving() || !isNewItem()" *ngIf="isSuperUser()">
                     <mat-icon>delete</mat-icon><span class="hide-on-small">Удалить</span>
                 </button>
                 <button mat-raised-button class="table-action-btn btn-light" (click)="callRefresh()"
@@ -117,8 +117,22 @@
                                 (change)="onFilterChange($event)"></sc-filter-root>
                         </th>
                         <td mat-cell *matCellDef="let row">
-                            <span *ngFor="let role of row.rolesWithInfo" class="status-badge">
+                            <span *ngFor="let role of row.rolesWithInfo" class="status-badge"
+                                [ngClass]="{'special': role.special}">
                                 {{ role.description }}
+                            </span>
+                        </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="organizationsWithInfo">
+                        <th mat-header-cell *matHeaderCellDef>
+                            <sc-filter-root key="organizations" label="Организации" [showFilter]="showFilter()"
+                                [sort]="true" [config]="filterConfig().get('organizations')!"
+                                (change)="onFilterChange($event)"></sc-filter-root>
+                        </th>
+                        <td mat-cell *matCellDef="let row">
+                            <span *ngFor="let org of row.organizationsWithInfo" class="status-badge">
+                                {{ org.shortName }}
                             </span>
                         </td>
                     </ng-container>
@@ -128,10 +142,11 @@
                         <td mat-cell *matCellDef="let row" [attr.colspan]="displayedColumns.length">
                             <div class="editor-row" *ngIf="row._expanded">
                                 <app-user-editor-inplace [userData]="row" [roles]="roles()"
-                                    [organizations]="organizations()" [loadItemFn]="loadItem"
+                                    [organizations]="selectedItem()?.organizationsWithInfo||[]" [loadItemFn]="loadItem"
                                     [setPasswordFn]="setPassword" [resetPasswordFn]="resetPassword" ,
                                     [canFullUpdate]="canFullUpdate()" [canPartialUpdate]="canPartialUpdate()"
-                                    [isSomeUser]="someUser()" (change)="doUpdate($event)"
+                                    [isSomeUser]="someUser()" [anyOrgAllow]="anyOrgAllow()"
+                                    [isSuperUser]="isSuperUser()" (change)="doUpdate($event)"
                                     (loaded)="doLoadedItem($event)"></app-user-editor-inplace>
                             </div>
                         </td>

@@ -4,7 +4,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { handleError, RoleResponseDto, UserManageService, UserResponseDto } from '@mon3/sa';
+import { handleError, OrganizationListDto, RoleResponseDto, UserManageService, UserResponseDto } from '@mon3/sa';
 import { forkJoin } from 'rxjs';
 
 @Component({
@@ -19,6 +19,7 @@ export class ViewCurrentProfileComponent implements OnInit {
 
   roles = signal<RoleResponseDto[]>([]);
   user = signal<UserResponseDto | null>(null);
+  organizations = signal<OrganizationListDto[]>([]);
 
   isLoading = signal(true);
   error = signal<string | null>(null);
@@ -36,14 +37,21 @@ export class ViewCurrentProfileComponent implements OnInit {
         .pipe(handleError<RoleResponseDto[]>('Ошибка загрузки списка ролей пользователя', [], this.error)),
       user: this.dataService.getCurrentUser()
         .pipe(handleError<UserResponseDto | null>('Ошибка загрузки профиля пользователя', null, this.error)),
+      organizations: this.dataService.getAlOrganizations()
+        .pipe(handleError<OrganizationListDto[]>('Ошибка загрузки списка организаций', [], this.error)),
     }).subscribe({
       next: (result) => {
         if (this.error()) {
           this.error.set('Не удалось загрузить данные профиля');
         } else {
-          const { roles, user } = result as { roles: RoleResponseDto[]; user: UserResponseDto | null };
+          const { roles, user, organizations } = result as { 
+            roles: RoleResponseDto[]; 
+            user: UserResponseDto | null 
+            organizations: OrganizationListDto[]
+          };
           this.roles.set(roles);
           this.user.set(user);
+          this.organizations.set(organizations);
           this.isLoading.set(false);
         }
       },

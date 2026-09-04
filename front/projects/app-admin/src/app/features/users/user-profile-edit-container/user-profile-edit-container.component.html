@@ -34,8 +34,8 @@
         @if(!isLoading() && !error()) {
         <app-user-editor-inplace [userData]="user()!" [roles]="roles()" [organizations]="organizations()"
             [loadItemFn]="loadItem" [setPasswordFn]="setPassword" [canFullUpdate]="canFullUpdate()"
-            [canPartialUpdate]="canPartialUpdate()" [isSomeUser]="someUser()"
-            (change)="onUpdate($event)"></app-user-editor-inplace>
+            [canPartialUpdate]="canPartialUpdate()" [isSomeUser]="someUser()" [anyOrgAllow]="anyOrgAllow()"
+            [isSuperUser]="isSuperUser()" (change)="onUpdate($event)"></app-user-editor-inplace>
         }
     </div>
 </div>

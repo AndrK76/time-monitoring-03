@@ -100,7 +100,8 @@
                                 (change)="onFilterChange($event)"></sc-filter-root>
                         </th>
                         <td mat-cell *matCellDef="let row">
-                            <span *ngFor="let perm of row.permissions" class="status-badge">
+                            <span *ngFor="let perm of row.permissions" class="status-badge"
+                                [ngClass]="{'special': row.special}">
                                 {{ perm }}
                             </span>
                         </td>

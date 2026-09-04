@@ -54,6 +54,7 @@ public class Role {
     )
     private Set<Permission> permissions = new HashSet<>();
 
+
     public static Role newRole(String name, String description, String creatorId) {
         Role role = new Role();
         role.setName(name);

@@ -27,5 +27,6 @@ public class UserResponseDto {
     private List<String> permissions;
     private List<String> organizations;
     private boolean anonymous;
+    private boolean superUser;
 
 }

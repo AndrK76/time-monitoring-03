@@ -1,47 +1,49 @@
 import { UpdateRoleRequestDto, RoleWithPermissionDto, PermissionResponseDto, RoleResponseDto } from "@mon3/sa";
 import { PermissionInfo, RoleInfo, RoleWithPermissionsInfo } from "./role-view.models";
 
+export const tempPermission = (permissionName: string): PermissionInfo => {
+    return {
+        id: `temp-${permissionName}`,
+        name: `${permissionName}`,
+        description: `${permissionName}`,
+        special: false
+    } as PermissionInfo;
+}
+
 export const rolePermissionsWithInfo = (dto: RoleWithPermissionsInfo | RoleWithPermissionDto, allPermissions: PermissionInfo[]): PermissionInfo[] => {
     const ret = (dto.permissions || []).map(permissionName => {
         const found = allPermissions.find(r => r.name === permissionName);
-        return found || new PermissionInfo('temp-' + permissionName, permissionName, '');
+        return found || tempPermission(permissionName);
     });
     return ret;
 }
 
 export function roleResponseDtoToVIew(dto: RoleResponseDto): RoleInfo {
-    return new RoleInfo(dto.id, dto.name, dto.description);
+    return { ...dto } as RoleInfo;
 }
 
 export function roleRespWithPermissDtoToViewWithPermiss(dto: RoleWithPermissionDto, allPermissions: PermissionInfo[]): RoleWithPermissionsInfo {
-    return new RoleWithPermissionsInfo(
-        dto.id,                                   //id
-        dto.name,                                 //name
-        dto.description || '',                    //description
-        dto.permissions || [],                    //permissions
-        rolePermissionsWithInfo(dto, allPermissions)  //permissionsWithInfo
-    );
+    return {
+        ...dto,
+        description: dto.description || '', permissions: dto.permissions || [],
+        permissionsWithInfo: rolePermissionsWithInfo(dto, allPermissions)
+    } as RoleWithPermissionsInfo
 }
 
 export function createEmptyRoleWithPermiss(): RoleWithPermissionsInfo {
-    return new RoleWithPermissionsInfo(
-        'temp-' + Date.now(),      //id
-        '',                        //name
-        '',                        //description
-        [],                        //permissions
-        []                        //permissionsWithInfo
-    );
-}
-
-export function roleViewWithPermissToRequestDto(item: RoleWithPermissionsInfo): UpdateRoleRequestDto {
     return {
-        name: item.name,
-        description: item.description,
-        permissions: item.permissions
-    };
+        id: `temp-${Date.now()}`,
+        name: '', description: '', permissions: [],
+        special: false, permissionsWithInfo: []
+    } as RoleWithPermissionsInfo;
+
 }
 
-export function permissionDtoToVIew(dto: PermissionResponseDto): PermissionInfo {
-    return new PermissionInfo(dto.id, dto.name, dto.description);
+export const roleViewWithPermissToRequestDto = ({ name, description, permissions }
+    : RoleWithPermissionsInfo): UpdateRoleRequestDto => ({ name, description, permissions });
+
+
+export const permissionDtoToVIew = (dto: PermissionResponseDto): PermissionInfo => {
+    return { ...dto };
 }
 

@@ -20,6 +20,7 @@ import java.util.Set;
 @Mapper(componentModel = "spring")
 public interface UserManagementMapper {
 
+    @Mapping(target = "superUser", ignore = true)
     @Mapping(target = "approved", source = "isApproved")
     @Mapping(target = "emailVerified", source = "isEmailVerified")
     @Mapping(target = "active", source = "isActive")
@@ -33,7 +34,13 @@ public interface UserManagementMapper {
     @Mapping(target = "active", source = "isActive")
     @Mapping(target = "approved", source = "isApproved")
     @Mapping(target = "roles", expression = "java(user.getRoles().stream().map(Role::getName).collect(java.util.stream.Collectors.toList()))")
+    @Mapping(target = "organizations", expression = "java(user.getOrgIds().stream().collect(java.util.stream.Collectors.toList()))")
     UserListItemDto toListDto(User user);
+
+
+    UserListItemDto toListDto(UserResponseDto dtoFull);
+
+
 
 
     @Mapping(target = "approved", source = "isApproved")
@@ -47,10 +54,12 @@ public interface UserManagementMapper {
     @Mapping(target = "active", source = "isActive")
     UserCreatedEventCommandDto toUserCreatedEvent(User user);
 
+    @Mapping(target = "special", source = "permissions", qualifiedByName = "containsSpecialPermission")
     RoleResponseDto toResponseDto(Role role);
 
 
     @Mapping(target = "permissions", source = "permissions", qualifiedByName = "permissionsToArray")
+    @Mapping(target = "special", source = "permissions", qualifiedByName = "containsSpecialPermission")
     RoleWithPermissionDto toRoleWithPermissionDto(Role role);
 
     PermissionResponseDto toResponseDto(Permission permission);
@@ -58,7 +67,7 @@ public interface UserManagementMapper {
     OrganizationListDto toListDto(AuthOrganization org);
 
 
-                                  @Named("rolesToArray")
+    @Named("rolesToArray")
     default String[] rolesToArray(Set<Role> roles) {
         if (roles == null) {
             return new String[0];
@@ -72,5 +81,10 @@ public interface UserManagementMapper {
             return new String[0];
         }
         return permissions.stream().map(Permission::getName).toArray(String[]::new);
+    }
+
+    @Named("containsSpecialPermission")
+    default boolean containsSpecialPermission(Set<Permission> permissions) {
+        return permissions != null && permissions.stream().anyMatch(Permission::isSpecial);
     }
 }

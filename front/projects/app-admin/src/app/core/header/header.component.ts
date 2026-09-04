@@ -81,7 +81,6 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewInit {
       const _route = item.route?.length === 1 ? ''
         : (item.route?.startsWith('/') ? item.route.substring(1) : item.route);
       const ret = _route ? this.permissionService.checkPermissions(authConstant(_route!)) : true;
-      //console.log(`route=${item.route} res=${ret}`);
       return ret;
     };
     for (const item of items) {
