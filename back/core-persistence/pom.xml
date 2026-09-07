@@ -16,7 +16,7 @@
     <packaging>jar</packaging>
 
     <name>Core Persistence</name>
-    <description>Database entities and repositories</description>
+    <description>Core Database entities and repositories</description>
 
     <dependencies>
         <dependency>

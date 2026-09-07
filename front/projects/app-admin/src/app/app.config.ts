@@ -3,11 +3,12 @@ import { provideRouter } from '@angular/router';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { routes } from './app.routes';
-import { UserManageService, AuthService, authInterceptorFn, AdminAuthService } from '@mon3/sa';
+import { UserManageService, AuthService, authInterceptorFn, AdminAccessService } from '@mon3/sa';
 import { environment } from '../environments/environment';
 import { lastValueFrom } from 'rxjs';
 import { registerLocaleData } from '@angular/common';
 import localeRu from '@angular/common/locales/ru';
+import { MainStructManageService } from './services/main-struct-manage.service';
 
 registerLocaleData(localeRu);
 
@@ -28,13 +29,16 @@ export const appConfig: ApplicationConfig = {
 function initializeApp() {
   const authService = inject(AuthService);
   const userManageService = inject(UserManageService);
-  const adminAuthService = inject(AdminAuthService);
+  const adminAccessService = inject(AdminAccessService);
+  const mainStructManageService = inject(MainStructManageService);
+
 
   return () => {
     authService.setApiUrl(environment.authApiUrl);
     userManageService.setAdminApiUrl(environment.adminApiUrl);
     userManageService.setAuthApiUrl(environment.authApiUrl);
-    adminAuthService.setAdminApiUrl(environment.adminApiUrl);
+    adminAccessService.setAdminApiUrl(environment.adminApiUrl);
+    mainStructManageService.setAdminApiUrl(environment.adminApiUrl);
 
     return lastValueFrom(authService.checkAuth())
       .then((response) => {

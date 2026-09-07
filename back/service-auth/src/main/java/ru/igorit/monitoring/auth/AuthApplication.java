@@ -9,7 +9,6 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 
 @SpringBootApplication
 @EnableMethodSecurity
-//@EnableRedisRepositories
 @ComponentScan(basePackages = {
         "ru.igorit.monitoring.auth",
         "ru.igorit.monitoring.security",
@@ -20,7 +19,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
         "ru.igorit.monitoring.rabbit"
 })
 @EntityScan(basePackages = {"ru.igorit.monitoring.persistence.entity.auth"})
-@EnableJpaRepositories()
+@EnableJpaRepositories({"ru.igorit.monitoring.persistence.repository.auth"})
 public class AuthApplication {
     public static void main(String[] args) {
         SpringApplication.run(AuthApplication.class, args);

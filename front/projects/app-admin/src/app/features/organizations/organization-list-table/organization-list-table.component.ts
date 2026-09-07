@@ -11,7 +11,7 @@ import {
   FilterRootComponent, TableManageService, DialogService, NotificationService, TableFilterInfo,
   TableFilterType, isExpanded, SaveDataResult, isNewItem
 } from '@mon3/sc';
-import { UserManageService, UserListItemDto, AdminAuthService } from '@mon3/sa';
+import { AdminAccessService } from '@mon3/sa';
 import { OrganizationEditorInplaceComponent } from '../organization-editor-inplace/organization-editor-inplace.component';
 import { finalize, forkJoin, map, Observable, tap } from 'rxjs';
 import { OrganizationInfo } from '../organization-view.models';
@@ -35,7 +35,7 @@ import { userListDtoToShortView } from '../../users/user-view.utils';
   styleUrl: './organization-list-table.component.scss'
 })
 export class OrganizationListTableComponent implements OnInit, AfterViewInit {
-  private dataService = inject(AdminAuthService);
+  private dataService = inject(AdminAccessService);
   //private userService = inject(UserManageService);
   private dialogService = inject(DialogService);
   private notificationService = inject(NotificationService);

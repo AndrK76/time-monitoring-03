@@ -30,6 +30,35 @@ export const routes: Routes = [
     data: authConstant('access/roles')
   },
   {
+    path: 'struct/org',
+    loadComponent: () => import('./features/struct-org/struct-org-list/struct-org-list.component').then(m => m.StructOrgListComponent),
+    canActivate: [authGuard],
+    data: authConstant('struct/org')
+  },
+  {
+    path: 'crm/agent-list',
+    loadComponent: () => import('./features/crm-agent/crm-agent-list/crm-agent-list.component').then(m => m.CrmAgentListComponent),
+    canActivate: [authGuard],
+    data: authConstant('crm/agent-list')
+  },
+  {
+    path: 'crm/agent',
+    loadComponent: () => import('./features/crm-agent/crm-agent-editor-container/crm-agent-editor-container.component').then(m => m.CrmAgentEditorContainerComponent),
+    canActivate: [authGuard],
+    data: authConstant('crm/agent')
+  },
+  {
+    path: 'event/agent-list',
+    loadComponent: () => import('./features/event-agent/event-agent-list/event-agent-list.component').then(m => m.EventAgentListComponent),
+    canActivate: [authGuard],
+    data: authConstant('event/agent-lis')
+  }, {
+    path: 'camera/agent-list',
+    loadComponent: () => import('./features/camera-agent/camera-agent-list/camera-agent-list.component').then(m => m.CameraAgentListComponent),
+    canActivate: [authGuard],
+    data: authConstant('camera/agent-list')
+  },
+  {
     path: 'test',
     loadComponent: () => import('./features/test/test.component').then(m => m.TestComponent),
     canActivate: [authGuard],

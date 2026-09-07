@@ -6,14 +6,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
-import ru.igorit.monitoring.auth.repository.AuthOrganizationRepository;
+import ru.igorit.monitoring.persistence.repository.auth.AuthOrganizationRepository;
 import ru.igorit.monitoring.persistence.entity.auth.AuthOrganization;
 import ru.igorit.monitoring.persistence.entity.auth.Permission;
 import ru.igorit.monitoring.persistence.entity.auth.Role;
 import ru.igorit.monitoring.persistence.entity.auth.User;
-import ru.igorit.monitoring.auth.repository.PermissionRepository;
-import ru.igorit.monitoring.auth.repository.RoleRepository;
-import ru.igorit.monitoring.auth.repository.UserRepository;
+import ru.igorit.monitoring.persistence.repository.auth.PermissionRepository;
+import ru.igorit.monitoring.persistence.repository.auth.RoleRepository;
+import ru.igorit.monitoring.persistence.repository.auth.UserRepository;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -209,6 +209,10 @@ public class AuthManagementPersistService {
 
     public AuthOrganization saveOrganization(AuthOrganization organization) {
         return authOrganizationRepository.save(organization);
+    }
+
+    public void deleteOrganizationById(String organizationId) {
+        authOrganizationRepository.deleteById(organizationId);
     }
 
     public List<AuthOrganization> findAllOrganizations() {

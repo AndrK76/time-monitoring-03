@@ -295,9 +295,9 @@ export function doSaveData<T extends Record<string, any>>(
     data: T[],
     idGetter: (item: T) => string | number,
     changes: TableDataChanges,
-    addFn: (item: T) => Observable<T>,
-    updateFn: (item: T) => Observable<T>,
-    deleteFn: (item: T) => Observable<void>,
+    addFn: ((item: T) => Observable<T>) | undefined,
+    updateFn: ((item: T) => Observable<T>) | undefined,
+    deleteFn: ((item: T) => Observable<void>) | undefined,
 ): Observable<SaveDataResult<T>> {
     return new Observable(subscriber => {
         let currentData = [...data];
@@ -324,11 +324,11 @@ export function doSaveData<T extends Record<string, any>>(
                 return of(undefined);
             } let observable: Observable<any>;
             if (type === 'add') {
-                observable = addFn(item!);
+                observable = addFn ? addFn(item!) : of(item!);
             } else if (type === 'update') {
-                observable = updateFn(item!);
+                observable = updateFn ? updateFn(item!) : of(item!);
             } else {
-                observable = deleteFn(item!);
+                observable = deleteFn ? deleteFn(item!) : of();
             }
             return observable.pipe(
                 map(result => {
@@ -339,8 +339,6 @@ export function doSaveData<T extends Record<string, any>>(
                     } else if (type === 'update') {
                         currentChanges.modified = currentChanges.modified.filter(i => i !== id);
                     } else if (type === 'delete') {
-                        //currentData.splice(index, 1);
-                        // Удаляем из deleted
                         currentChanges.deleted = currentChanges.deleted.filter(i => i !== id);
                         currentChanges.deletedItems = currentChanges.deletedItems.filter(i => idGetter(i) !== id);
                     }

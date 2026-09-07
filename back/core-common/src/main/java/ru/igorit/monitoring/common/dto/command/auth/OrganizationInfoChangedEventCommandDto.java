@@ -40,7 +40,8 @@ public class OrganizationInfoChangedEventCommandDto implements Serializable {
     public enum Mode {
         DELETE,
         ADD,
-        UPDATE
+        UPDATE,
+        UPDATE_NAME
     }
 
 

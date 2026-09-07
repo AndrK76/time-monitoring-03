@@ -66,6 +66,12 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewInit {
         { label: 'Управление ролями', route: '/access/roles' },
       ]
     },
+    {
+      label: 'Структура', route: '/struct',
+      children: [
+        { label: 'Организации', route: '/struct/org' },
+      ]
+    },
     { label: 'Тест', route: '/test' },
   ]
 

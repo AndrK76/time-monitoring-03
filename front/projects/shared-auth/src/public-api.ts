@@ -5,7 +5,7 @@ export * from './lib/models/admin-main.models';
 export * from './lib/services/auth.service';
 export * from './lib/services/permission.service';
 export * from './lib/services/user-manage.service';
-export * from './lib/services/admin-auth.service';
+export * from './lib/services/admin-access.service';
 
 export * from './lib/guards/auth.guard';
 export * from './lib/interceptors/auth.interceptor.fn';

@@ -226,7 +226,8 @@ export class TableManageService<T extends Record<string, any>> {
 
   // === Сохранение изменений ===
   doSaveBase(isSaving: WritableSignal<boolean>,
-    addFn: (item: T) => Observable<T>, updateFn: (item: T) => Observable<T>, deleteFn: (item: T) => Observable<void>,
+    addFn: ((item: T) => Observable<T>) | undefined, updateFn: ((item: T) => Observable<T>) | undefined,
+    deleteFn: ((item: T) => Observable<void>) | undefined,
     applyFn: (result: SaveDataResult<T>) => void
   ): void {
     isSaving.set(true);

@@ -24,6 +24,7 @@
         <module>service-admin</module>
         <module>service-auth</module>
         <module>core-rabbit</module>
+        <module>lib-monitoring</module>
     </modules>
 
 </project>

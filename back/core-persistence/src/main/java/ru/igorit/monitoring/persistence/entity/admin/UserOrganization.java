@@ -24,7 +24,7 @@ public class UserOrganization {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "organization_id", nullable = false)
-    private Organization organization;
+    private AppOrganization organization;
 
     @Column(name = "created_at", updatable = false)
     @CreationTimestamp
@@ -33,7 +33,7 @@ public class UserOrganization {
     @Column(name = "created_by", updatable = false)
     private String createdBy;
 
-    public static UserOrganization create(AppUser user, Organization organization, String creator) {
+    public static UserOrganization create(AppUser user, AppOrganization organization, String creator) {
         return UserOrganization.builder()
                 .user(user).organization(organization).createdBy(creator)
                 .build();

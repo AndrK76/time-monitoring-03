@@ -39,18 +39,30 @@
 |   |   |       |               `-- persistence
 |   |   |       |                   |-- config
 |   |   |       |                   |   `-- PersistenceConfig.java
-|   |   |       |                   `-- entity
+|   |   |       |                   |-- entity
+|   |   |       |                   |   |-- admin
+|   |   |       |                   |   |   |-- AppOrganization.java
+|   |   |       |                   |   |   |-- AppUser.java
+|   |   |       |                   |   |   `-- UserOrganization.java
+|   |   |       |                   |   `-- auth
+|   |   |       |                   |       |-- AuthOrganization.java
+|   |   |       |                   |       |-- Permission.java
+|   |   |       |                   |       |-- Role.java
+|   |   |       |                   |       |-- TelegramToken.java
+|   |   |       |                   |       |-- User.java
+|   |   |       |                   |       `-- UserAuthProvider.java
+|   |   |       |                   `-- repository
 |   |   |       |                       |-- admin
-|   |   |       |                       |   |-- AppUser.java
-|   |   |       |                       |   |-- Organization.java
-|   |   |       |                       |   `-- UserOrganization.java
+|   |   |       |                       |   |-- AppOrganizationRepository.java
+|   |   |       |                       |   |-- AppUserRepository.java
+|   |   |       |                       |   `-- UserOrganizationRepository.java
 |   |   |       |                       `-- auth
-|   |   |       |                           |-- AuthOrganization.java
-|   |   |       |                           |-- Permission.java
-|   |   |       |                           |-- Role.java
-|   |   |       |                           |-- TelegramToken.java
-|   |   |       |                           |-- User.java
-|   |   |       |                           `-- UserAuthProvider.java
+|   |   |       |                           |-- AuthOrganizationRepository.java
+|   |   |       |                           |-- PermissionRepository.java
+|   |   |       |                           |-- RoleRepository.java
+|   |   |       |                           |-- TelegramTokenRepository.java
+|   |   |       |                           |-- UserAuthProviderRepository.java
+|   |   |       |                           `-- UserRepository.java
 |   |   |       `-- resources
 |   |   `-- pom.xml
 |   |-- core-rabbit
@@ -96,6 +108,7 @@
 |   |   |       |                   |   |-- AuthProvider.java
 |   |   |       |                   |   |-- CustomOAuth2User.java
 |   |   |       |                   |   |-- JwtAuthenticationToken.java
+|   |   |       |                   |   |-- MonAppAuthentication.java
 |   |   |       |                   |   |-- SecurityContextAuthentication.java
 |   |   |       |                   |   `-- UserPrincipal.java
 |   |   |       |                   |-- service
@@ -105,7 +118,8 @@
 |   |   |       |                   |   `-- TelegramTokenService.java
 |   |   |       |                   `-- util
 |   |   |       |                       |-- AuthInfoUtils.java
-|   |   |       |                       `-- JwtUtils.java
+|   |   |       |                       |-- JwtUtils.java
+|   |   |       |                       `-- SecurityAccessUtils.java
 |   |   |       `-- resources
 |   |   `-- pom.xml
 |   |-- core-telegram
@@ -130,6 +144,28 @@
 |   |   |                               |-- UserListItemDto.java
 |   |   |                               `-- UserResponseDto.java
 |   |   `-- pom.xml
+|   |-- lib-monitoring
+|   |   |-- src
+|   |   |   `-- main
+|   |   |       `-- java
+|   |   |           `-- ru
+|   |   |               `-- igorit
+|   |   |                   `-- monitoring
+|   |   |                       `-- lib
+|   |   |                           |-- dto
+|   |   |                           |   `-- OrgStructListDto.java
+|   |   |                           |-- enums
+|   |   |                           |   `-- CrmAgentType.java
+|   |   |                           `-- persistence
+|   |   |                               |-- entity
+|   |   |                               |   |-- admin
+|   |   |                               |   `-- common
+|   |   |                               |       `-- Organization.java
+|   |   |                               `-- repository
+|   |   |                                   |-- admin
+|   |   |                                   `-- common
+|   |   |                                       `-- OrganizationRepository.java
+|   |   `-- pom.xml
 |   |-- service-admin
 |   |   |-- src
 |   |   |   `-- main
@@ -142,7 +178,8 @@
 |   |   |       |                   |   |-- RabbitMQConfig.java
 |   |   |       |                   |   `-- SecurityConfig.java
 |   |   |       |                   |-- controller
-|   |   |       |                   |   |-- MainModelController.java
+|   |   |       |                   |   |-- AccessModelController.java
+|   |   |       |                   |   |-- MainDictController.java
 |   |   |       |                   |   `-- TestController.java
 |   |   |       |                   |-- dto
 |   |   |       |                   |   |-- OrganizationItemDto.java
@@ -150,14 +187,12 @@
 |   |   |       |                   |-- listener
 |   |   |       |                   |   `-- RabbitCommandListener.java
 |   |   |       |                   |-- mapper
-|   |   |       |                   |   |-- MainModelMapper.java
-|   |   |       |                   |   `-- UserEventCommandMapper.java
-|   |   |       |                   |-- repository
-|   |   |       |                   |   |-- AppUserRepository.java
-|   |   |       |                   |   |-- OrganizationRepository.java
-|   |   |       |                   |   `-- UserOrganizationRepository.java
+|   |   |       |                   |   |-- AccessModelMapper.java
+|   |   |       |                   |   |-- EventCommandMapper.java
+|   |   |       |                   |   `-- StructModelMapper.java
 |   |   |       |                   |-- service
-|   |   |       |                   |   |-- MainModelManageService.java
+|   |   |       |                   |   |-- AccessManageService.java
+|   |   |       |                   |   |-- StructManageService.java
 |   |   |       |                   |   |-- TestService.java
 |   |   |       |                   |   `-- UserEventsReceiveService.java
 |   |   |       |                   `-- AdminApplication.java
@@ -165,7 +200,8 @@
 |   |   |           |-- db
 |   |   |           |   `-- migration
 |   |   |           |       |-- V01.01__init_admin_schema.sql
-|   |   |           |       `-- V01.02__add_organizations.sql
+|   |   |           |       |-- V01.02__add_organizations.sql
+|   |   |           |       `-- V01.03__add_agent_cols_to_org.sql
 |   |   |           `-- application.yml
 |   |   |-- .properties
 |   |   `-- pom.xml
@@ -205,13 +241,6 @@
 |   |   |       |                   |   `-- RabbitCommandListener.java
 |   |   |       |                   |-- mapper
 |   |   |       |                   |   `-- UserManagementMapper.java
-|   |   |       |                   |-- repository
-|   |   |       |                   |   |-- AuthOrganizationRepository.java
-|   |   |       |                   |   |-- PermissionRepository.java
-|   |   |       |                   |   |-- RoleRepository.java
-|   |   |       |                   |   |-- TelegramTokenRepository.java
-|   |   |       |                   |   |-- UserAuthProviderRepository.java
-|   |   |       |                   |   `-- UserRepository.java
 |   |   |       |                   |-- service
 |   |   |       |                   |   |-- secur
 |   |   |       |                   |   |   |-- CookieServiceFull.java
@@ -233,7 +262,9 @@
 |   |   |           |       |-- V01.01__init_auth_schema.sql
 |   |   |           |       |-- V01.02__add_telegram_support.sql
 |   |   |           |       |-- V01.03__add_initial_data.sql
-|   |   |           |       `-- V01.04__add_organizations.sql
+|   |   |           |       |-- V01.04__add_organizations.sql
+|   |   |           |       |-- V01.05__add_special_permissions_flag.sql
+|   |   |           |       `-- V01.06__add_special_permissions_data.sql
 |   |   |           |-- org
 |   |   |           |   `-- springframework
 |   |   |           |       `-- security
@@ -249,9 +280,21 @@
 |   |   |       |       `-- igorit
 |   |   |       |           `-- monitoring
 |   |   |       |               `-- monitoring
+|   |   |       |                   |-- config
+|   |   |       |                   |   |-- RabbitMQConfig.java
+|   |   |       |                   |   `-- SecurityConfig.java
+|   |   |       |                   |-- listener
+|   |   |       |                   |   `-- RabbitCommandListener.java
+|   |   |       |                   |-- service
+|   |   |       |                   |   `-- DictEventsReceiveService.java
 |   |   |       |                   `-- MonitoringApplication.java
 |   |   |       `-- resources
+|   |   |           |-- db
+|   |   |           |   `-- migration
+|   |   |           |       |-- V01.01__add_organizations.sql
+|   |   |           |       `-- V01.02__add_agent_cols_to_org.sql
 |   |   |           `-- application.yml
+|   |   |-- .properties
 |   |   `-- pom.xml
 |   |-- spring-boot-parent
 |   |   `-- pom.xml
@@ -260,7 +303,8 @@
 |   |-- amplicode.xml
 |   |-- mvnw
 |   |-- mvnw.cmd
-|   `-- pom.xml
+|   |-- pom.xml
+|   `-- tree.txt
 |-- docker
 |   |-- postgres
 |   |   |-- 01-init.sh
@@ -350,6 +394,33 @@
 |   |   |   |   |   |       |-- main.component.scss
 |   |   |   |   |   |       `-- main.component.ts
 |   |   |   |   |   |-- features
+|   |   |   |   |   |   |-- camera-agent
+|   |   |   |   |   |   |   `-- camera-agent-list
+|   |   |   |   |   |   |       |-- camera-agent-list.component.html
+|   |   |   |   |   |   |       |-- camera-agent-list.component.scss
+|   |   |   |   |   |   |       `-- camera-agent-list.component.ts
+|   |   |   |   |   |   |-- crm-agent
+|   |   |   |   |   |   |   |-- crm-agent-editor
+|   |   |   |   |   |   |   |   |-- crm-agent-editor.component.html
+|   |   |   |   |   |   |   |   |-- crm-agent-editor.component.scss
+|   |   |   |   |   |   |   |   `-- crm-agent-editor.component.ts
+|   |   |   |   |   |   |   |-- crm-agent-editor-container
+|   |   |   |   |   |   |   |   |-- crm-agent-editor-container.component.html
+|   |   |   |   |   |   |   |   |-- crm-agent-editor-container.component.scss
+|   |   |   |   |   |   |   |   `-- crm-agent-editor-container.component.ts
+|   |   |   |   |   |   |   `-- crm-agent-list
+|   |   |   |   |   |   |       |-- crm-agent-list.component.html
+|   |   |   |   |   |   |       |-- crm-agent-list.component.scss
+|   |   |   |   |   |   |       `-- crm-agent-list.component.ts
+|   |   |   |   |   |   |-- event-agent
+|   |   |   |   |   |   |   |-- event-agent-editor
+|   |   |   |   |   |   |   |   |-- event-agent-editor.component.html
+|   |   |   |   |   |   |   |   |-- event-agent-editor.component.scss
+|   |   |   |   |   |   |   |   `-- event-agent-editor.component.ts
+|   |   |   |   |   |   |   `-- event-agent-list
+|   |   |   |   |   |   |       |-- event-agent-list.component.html
+|   |   |   |   |   |   |       |-- event-agent-list.component.scss
+|   |   |   |   |   |   |       `-- event-agent-list.component.ts
 |   |   |   |   |   |   |-- index
 |   |   |   |   |   |   |   |-- index-auth
 |   |   |   |   |   |   |   |   |-- index-auth.component.html
@@ -388,6 +459,17 @@
 |   |   |   |   |   |   |   |   `-- role-list-table.component.ts
 |   |   |   |   |   |   |   |-- role-view.models.ts
 |   |   |   |   |   |   |   `-- role-view.utils.ts
+|   |   |   |   |   |   |-- struct-org
+|   |   |   |   |   |   |   |-- struct-org-editor
+|   |   |   |   |   |   |   |   |-- struct-org-editor.component.html
+|   |   |   |   |   |   |   |   |-- struct-org-editor.component.scss
+|   |   |   |   |   |   |   |   `-- struct-org-editor.component.ts
+|   |   |   |   |   |   |   |-- struct-org-list
+|   |   |   |   |   |   |   |   |-- struct-org-list.component.html
+|   |   |   |   |   |   |   |   |-- struct-org-list.component.scss
+|   |   |   |   |   |   |   |   `-- struct-org-list.component.ts
+|   |   |   |   |   |   |   |-- struct-org-view.models.ts
+|   |   |   |   |   |   |   `-- struct-org-view.utils.ts
 |   |   |   |   |   |   |-- test
 |   |   |   |   |   |   |   |-- test.component.html
 |   |   |   |   |   |   |   |-- test.component.scss
@@ -411,6 +493,8 @@
 |   |   |   |   |   |       |   `-- user-profile-edit-container.component.ts
 |   |   |   |   |   |       |-- user-view.models.ts
 |   |   |   |   |   |       `-- user-view.utils.ts
+|   |   |   |   |   |-- services
+|   |   |   |   |   |   `-- main-struct-manage.service.ts
 |   |   |   |   |   |-- app.component.html
 |   |   |   |   |   |-- app.component.scss
 |   |   |   |   |   |-- app.component.ts
@@ -548,7 +632,7 @@
 |   |   |   |   |   |   |-- auth.models.ts
 |   |   |   |   |   |   `-- permission.models.ts
 |   |   |   |   |   |-- services
-|   |   |   |   |   |   |-- admin-auth.service.ts
+|   |   |   |   |   |   |-- admin-access.service.ts
 |   |   |   |   |   |   |-- auth.service.ts
 |   |   |   |   |   |   |-- permission.service.ts
 |   |   |   |   |   |   `-- user-manage.service.ts
@@ -614,6 +698,8 @@
 |   |   |   |   |   |       |-- view-current-profile.component.scss
 |   |   |   |   |   |       `-- view-current-profile.component.ts
 |   |   |   |   |   |-- models
+|   |   |   |   |   |   |-- struct
+|   |   |   |   |   |   |   `-- struct-dto-items.ts
 |   |   |   |   |   |   |-- menu-item.ts
 |   |   |   |   |   |   |-- table-data-items.ts
 |   |   |   |   |   |   `-- table-filter-items.ts
@@ -682,4 +768,4 @@
 |-- README.md
 `-- tree.txt
 
-247 directories, 435 files
+284 directories, 484 files

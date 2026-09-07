@@ -1,12 +1,11 @@
 package ru.igorit.monitoring.auth.service;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.web.server.ResponseStatusException;
 import ru.igorit.monitoring.persistence.entity.auth.User;
 import ru.igorit.monitoring.persistence.entity.auth.UserAuthProvider;
-import ru.igorit.monitoring.auth.repository.UserAuthProviderRepository;
-import ru.igorit.monitoring.auth.repository.UserRepository;
+import ru.igorit.monitoring.persistence.repository.auth.UserAuthProviderRepository;
+import ru.igorit.monitoring.persistence.repository.auth.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;

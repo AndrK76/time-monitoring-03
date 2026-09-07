@@ -61,6 +61,33 @@
 |   |   |   |   |       |-- main.component.scss
 |   |   |   |   |       `-- main.component.ts
 |   |   |   |   |-- features
+|   |   |   |   |   |-- camera-agent
+|   |   |   |   |   |   `-- camera-agent-list
+|   |   |   |   |   |       |-- camera-agent-list.component.html
+|   |   |   |   |   |       |-- camera-agent-list.component.scss
+|   |   |   |   |   |       `-- camera-agent-list.component.ts
+|   |   |   |   |   |-- crm-agent
+|   |   |   |   |   |   |-- crm-agent-editor
+|   |   |   |   |   |   |   |-- crm-agent-editor.component.html
+|   |   |   |   |   |   |   |-- crm-agent-editor.component.scss
+|   |   |   |   |   |   |   `-- crm-agent-editor.component.ts
+|   |   |   |   |   |   |-- crm-agent-editor-container
+|   |   |   |   |   |   |   |-- crm-agent-editor-container.component.html
+|   |   |   |   |   |   |   |-- crm-agent-editor-container.component.scss
+|   |   |   |   |   |   |   `-- crm-agent-editor-container.component.ts
+|   |   |   |   |   |   `-- crm-agent-list
+|   |   |   |   |   |       |-- crm-agent-list.component.html
+|   |   |   |   |   |       |-- crm-agent-list.component.scss
+|   |   |   |   |   |       `-- crm-agent-list.component.ts
+|   |   |   |   |   |-- event-agent
+|   |   |   |   |   |   |-- event-agent-editor
+|   |   |   |   |   |   |   |-- event-agent-editor.component.html
+|   |   |   |   |   |   |   |-- event-agent-editor.component.scss
+|   |   |   |   |   |   |   `-- event-agent-editor.component.ts
+|   |   |   |   |   |   `-- event-agent-list
+|   |   |   |   |   |       |-- event-agent-list.component.html
+|   |   |   |   |   |       |-- event-agent-list.component.scss
+|   |   |   |   |   |       `-- event-agent-list.component.ts
 |   |   |   |   |   |-- index
 |   |   |   |   |   |   |-- index-auth
 |   |   |   |   |   |   |   |-- index-auth.component.html
@@ -99,6 +126,17 @@
 |   |   |   |   |   |   |   `-- role-list-table.component.ts
 |   |   |   |   |   |   |-- role-view.models.ts
 |   |   |   |   |   |   `-- role-view.utils.ts
+|   |   |   |   |   |-- struct-org
+|   |   |   |   |   |   |-- struct-org-editor
+|   |   |   |   |   |   |   |-- struct-org-editor.component.html
+|   |   |   |   |   |   |   |-- struct-org-editor.component.scss
+|   |   |   |   |   |   |   `-- struct-org-editor.component.ts
+|   |   |   |   |   |   |-- struct-org-list
+|   |   |   |   |   |   |   |-- struct-org-list.component.html
+|   |   |   |   |   |   |   |-- struct-org-list.component.scss
+|   |   |   |   |   |   |   `-- struct-org-list.component.ts
+|   |   |   |   |   |   |-- struct-org-view.models.ts
+|   |   |   |   |   |   `-- struct-org-view.utils.ts
 |   |   |   |   |   |-- test
 |   |   |   |   |   |   |-- test.component.html
 |   |   |   |   |   |   |-- test.component.scss
@@ -122,6 +160,8 @@
 |   |   |   |   |       |   `-- user-profile-edit-container.component.ts
 |   |   |   |   |       |-- user-view.models.ts
 |   |   |   |   |       `-- user-view.utils.ts
+|   |   |   |   |-- services
+|   |   |   |   |   `-- main-struct-manage.service.ts
 |   |   |   |   |-- app.component.html
 |   |   |   |   |-- app.component.scss
 |   |   |   |   |-- app.component.ts
@@ -259,7 +299,7 @@
 |   |   |   |   |   |-- auth.models.ts
 |   |   |   |   |   `-- permission.models.ts
 |   |   |   |   |-- services
-|   |   |   |   |   |-- admin-auth.service.ts
+|   |   |   |   |   |-- admin-access.service.ts
 |   |   |   |   |   |-- auth.service.ts
 |   |   |   |   |   |-- permission.service.ts
 |   |   |   |   |   `-- user-manage.service.ts
@@ -325,6 +365,8 @@
 |   |   |   |   |       |-- view-current-profile.component.scss
 |   |   |   |   |       `-- view-current-profile.component.ts
 |   |   |   |   |-- models
+|   |   |   |   |   |-- struct
+|   |   |   |   |   |   `-- struct-dto-items.ts
 |   |   |   |   |   |-- menu-item.ts
 |   |   |   |   |   |-- table-data-items.ts
 |   |   |   |   |   `-- table-filter-items.ts
@@ -379,4 +421,4 @@
 |-- tsconfig.json
 `-- tsconfig.prod.json
 
-106 directories, 273 files
+120 directories, 301 files

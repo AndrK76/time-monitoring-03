@@ -35,3 +35,5 @@ export * from './lib/services/table-manage.service';
 export * from './lib/components/change-password-dialog/change-password-dialog.model';
 export * from './lib/components/change-password-dialog/change-password-dialog.component';
 
+export * from './lib/models/struct/struct-dto-items';
+

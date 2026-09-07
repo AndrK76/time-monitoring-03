@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.igorit.monitoring.admin.mapper.UserEventCommandMapper;
-import ru.igorit.monitoring.admin.repository.AppUserRepository;
+import ru.igorit.monitoring.admin.mapper.EventCommandMapper;
+import ru.igorit.monitoring.persistence.repository.admin.AppUserRepository;
 import ru.igorit.monitoring.common.dto.command.auth.UserContextDto;
 import ru.igorit.monitoring.common.dto.command.auth.UserCreatedEventCommandDto;
 import ru.igorit.monitoring.common.dto.command.auth.UserInfoUpdatedEventCommandDto;
@@ -15,7 +15,7 @@ import ru.igorit.monitoring.common.dto.command.auth.UserInfoUpdatedEventCommandD
 @Slf4j
 public class UserEventsReceiveService {
     private final AppUserRepository repo;
-    private final UserEventCommandMapper mapper;
+    private final EventCommandMapper mapper;
 
     @Transactional
     public void updateUser(UserInfoUpdatedEventCommandDto event, UserContextDto userContextDto, String sourceService) {

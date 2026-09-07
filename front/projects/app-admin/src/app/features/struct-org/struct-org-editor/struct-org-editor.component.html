@@ -1,0 +1,88 @@
+<div class="editor-container">
+    <form [formGroup]="form" class="editor-form">
+        <div class="form-row">
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Краткое название</mat-label>
+                <input matInput formControlName="shortName" (change)="$event.stopPropagation()">
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Полное название</mat-label>
+                <input matInput formControlName="fullName" (change)="$event.stopPropagation()">
+            </mat-form-field>
+        </div>
+
+        <!-- CRM агент -->
+        <div class="form-row agent-row">
+            <span class="label">CRM агент</span>
+            <span class="spacer"></span>
+            <div class="actions">
+                @if (!canChangeAgents() && !organization().crmAgentSet) {
+                <button mat-stroked-button disabled>Не настроено</button>
+                }
+                @if (canChangeAgents()) {
+                <div class="action-button-group">
+                    <button mat-raised-button class="table-action-btn btn-success" (click)="selectCrmAgent()">
+                        <mat-icon>search</mat-icon>
+                        <span class="hide-on-small">Выбрать</span>
+                    </button>
+                    @if (organization().crmAgentSet) {
+                    <a mat-stroked-button color="primary" [routerLink]="['/crm/agent']"
+                        [queryParams]="{org: organization().id}">
+                        <mat-icon>settings</mat-icon>
+                        <span class="hide-on-small">Настроить</span>
+                    </a>
+                    }
+                </div>
+                } @else {
+                @if (organization().crmAgentSet) {
+                <div class="action-button-group">
+                    <a mat-stroked-button color="primary" [routerLink]="['/crm-agent']"
+                        [queryParams]="{org: organization().id}">
+                        <mat-icon>settings</mat-icon>
+                        <span class="hide-on-small">Настроить</span>
+                    </a>
+                </div>
+                }
+                }
+            </div>
+        </div>
+
+        <!-- Агенты событий -->
+        <div class="form-row agent-row">
+            <span class="label">Агенты событий</span>
+            <span class="spacer"></span>
+            <div class="actions">
+                @if (!canChangeAgents() && !organization().eventAgentsSet) {
+                <button mat-stroked-button disabled>Не настроено</button>
+                } @else {
+                <div class="action-button-group">
+                    <a mat-stroked-button color="primary" [routerLink]="['/event/agent-list']"
+                        [queryParams]="{org: organization().id}">
+                        <mat-icon>settings</mat-icon>
+                        <span class="hide-on-small">Настроить</span>
+                    </a>
+                </div>
+                }
+            </div>
+        </div>
+
+        <!-- Агенты камер -->
+        <div class="form-row agent-row">
+            <span class="label">Агенты камер</span>
+            <span class="spacer"></span>
+            <div class="actions">
+                @if (!canChangeAgents() && !organization().cameraAgentsSet) {
+                <button mat-stroked-button disabled>Не настроено</button>
+                } @else {
+                <div class="action-button-group">
+                    <a mat-stroked-button color="primary" [routerLink]="['/camera/agent-list']"
+                        [queryParams]="{org: organization().id}">
+                        <mat-icon>settings</mat-icon>
+                        <span class="hide-on-small">Настроить</span>
+                    </a>
+                </div>
+                }
+            </div>
+        </div>
+    </form>
+</div>

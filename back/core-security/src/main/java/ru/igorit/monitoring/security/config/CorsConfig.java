@@ -1,4 +1,3 @@
-// core-security/src/main/java/ru/igorit/monitoring/security/config/CorsConfig.java
 package ru.igorit.monitoring.security.config;
 
 import lombok.RequiredArgsConstructor;

@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.igorit.monitoring.auth.repository.AuthOrganizationRepository;
+import ru.igorit.monitoring.persistence.repository.auth.AuthOrganizationRepository;
 import ru.igorit.monitoring.common.dto.command.auth.OrganizationInfoChangedEventCommandDto;
 import ru.igorit.monitoring.common.dto.command.auth.UserContextDto;
 import ru.igorit.monitoring.persistence.entity.auth.AuthOrganization;
@@ -27,40 +27,60 @@ public class OrganizationEventsReceiveService {
 
     @Transactional
     public void applyChangeEvent(OrganizationInfoChangedEventCommandDto event, UserContextDto userContext, String sourceService) {
-        var existingUsers = persistService.getUsersByIds(
-                persistService.getUserIdsByOrganizationId(event.getOrgId()));
+        if (event.getMode() == OrganizationInfoChangedEventCommandDto.Mode.ADD
+                || event.getMode() == OrganizationInfoChangedEventCommandDto.Mode.UPDATE
+                || event.getMode() == OrganizationInfoChangedEventCommandDto.Mode.UPDATE_NAME) {
+            var existingUsers = persistService.getUsersByIds(
+                    persistService.getUserIdsByOrganizationId(event.getOrgId()));
 
-        List<User> newUsers = event.getUsers() == null || event.getUsers().length == 0
-                ? List.of()
-                : persistService.getUsersByIds(Arrays.asList(event.getUsers()));
+            List<User> newUsers = event.getUsers() == null || event.getUsers().length == 0
+                    ? List.of()
+                    : persistService.getUsersByIds(Arrays.asList(event.getUsers()));
 
-        var org = persistService.getOrganizationById(event.getOrgId()).orElse(new AuthOrganization(event.getOrgId()));
-        org.setShortName(event.getShortName());
-        org.setFullName(event.getFullName());
-        persistService.saveOrganization(org);
+            var org = persistService.getOrganizationById(event.getOrgId()).orElse(new AuthOrganization(event.getOrgId()));
+            org.setShortName(event.getShortName());
+            org.setFullName(event.getFullName());
+            persistService.saveOrganization(org);
 
-        Set<String> existingIds = existingUsers.stream().map(User::getId).collect(Collectors.toSet());
-        Set<String> newIds = newUsers.stream().map(User::getId).collect(Collectors.toSet());
+            if (event.getMode() == OrganizationInfoChangedEventCommandDto.Mode.ADD || event.getMode() == OrganizationInfoChangedEventCommandDto.Mode.UPDATE) {
+                Set<String> existingIds = existingUsers.stream().map(User::getId).collect(Collectors.toSet());
+                Set<String> newIds = newUsers.stream().map(User::getId).collect(Collectors.toSet());
 
-        List<User> usersToSave = new ArrayList<>();
+                List<User> usersToSave = new ArrayList<>();
 
-        existingUsers.stream()
-                .filter(user -> !newIds.contains(user.getId()))
-                .forEach(user -> {
-                    user.getOrgIds().remove(event.getOrgId());
-                    usersToSave.add(user);
-                });
+                existingUsers.stream()
+                        .filter(user -> !newIds.contains(user.getId()))
+                        .forEach(user -> {
+                            user.getOrgIds().remove(event.getOrgId());
+                            usersToSave.add(user);
+                        });
 
-        newUsers.stream()
-                .filter(user -> !existingIds.contains(user.getId()))
-                .forEach(user -> {
-                    user.getOrgIds().add(event.getOrgId());
-                    usersToSave.add(user);
-                });
+                newUsers.stream()
+                        .filter(user -> !existingIds.contains(user.getId()))
+                        .forEach(user -> {
+                            user.getOrgIds().add(event.getOrgId());
+                            usersToSave.add(user);
+                        });
 
-        if (!usersToSave.isEmpty()) {
-            persistService.saveUsers(usersToSave);
+                if (!usersToSave.isEmpty()) {
+                    persistService.saveUsers(usersToSave);
+                }
+            }
+        } else if (event.getMode() == OrganizationInfoChangedEventCommandDto.Mode.DELETE) {
+            var existingUsers = persistService.getUsersByIds(
+                    persistService.getUserIdsByOrganizationId(event.getOrgId()));
+            List<User> usersToSave = new ArrayList<>();
+            existingUsers.forEach(user -> {
+                user.getOrgIds().remove(event.getOrgId());
+                usersToSave.add(user);
+            });
+            if (!usersToSave.isEmpty()) {
+                persistService.saveUsers(usersToSave);
+            }
+            persistService.deleteOrganizationById(event.getOrgId());
         }
+
+
         log.info("OrganizationInfoChangedEvent with mode {} applied for org: {}", event.getMode(), event.getOrgId());
     }
 }

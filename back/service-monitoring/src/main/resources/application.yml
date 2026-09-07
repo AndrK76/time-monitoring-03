@@ -2,80 +2,114 @@ spring:
   application:
     name: service-monitoring
   config:
-    import: optional:file:.properties
-  
+    import: optional:file:../.properties,optional:file:.properties,optional:file:service-monitoring/.properties
+
+  web:
+    cors:
+      allowed-origins:
+        - "http://localhost:4301"
+        - "http://localhost:4302"
+        - "http://crm.host:4301"
+        - "http://admin.crm.host:4302"
+        - "http://crm.host:8701"
+        - "http://admin.crm.host:8702"
+        - "http://crm.host:8888"
+        - "http://admin.crm.host:8888"
+        - "http://crm.host:8881"
+        - "http://admin.crm.host:8882"
+        - "http://admin.crm.host:4311"
+        - "http://crm.host:4312"
+      allowed-methods: "GET,POST,PUT,DELETE,OPTIONS,PATCH"
+      allowed-headers: "Authorization,Content-Type,X-Requested-With,Accept,Origin,Access-Control-Request-Method,Access-Control-Request-Headers"
+      exposed-headers: "Authorization,Set-Cookie"
+      allow-credentials: true
+      max-age: 3600
+
   datasource:
-    url: jdbc:postgresql://localhost:5432/monitoring_db
-    username: monitoring_user
-    password: monitoring_password
+    url: ${POSTGRES_URL}
+    username: ${PG_USER}
+    password: ${PG_PASSWORD}
     driver-class-name: org.postgresql.Driver
-  
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: none
+      #ddl-auto: validate
+    open-in-view: false
     show-sql: false
+    #show-sql: true
     properties:
       hibernate:
-        format_sql: true
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-  
+        #format_sql: true
+        #dialect: org.hibernate.dialect.PostgreSQLDialect
+        hbm2ddl.auto: validate
+        schema-validation: none
+
   flyway:
     enabled: true
+    #enabled: false
     baseline-on-migrate: true
     locations: classpath:db/migration
-  
-  security:
-    oauth2:
-      client:
-        registration:
-          yandex:
-            client-id: ${YANDEX_CLIENT_ID:}
-            client-secret: ${YANDEX_CLIENT_SECRET:}
-            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
-            scope:
-              - login:email
-              - login:info
-          vk:
-            client-id: ${VK_CLIENT_ID:}
-            client-secret: ${VK_CLIENT_SECRET:}
-            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
-            scope:
-              - email
-        provider:
-          yandex:
-            authorization-uri: https://oauth.yandex.ru/authorize
-            token-uri: https://oauth.yandex.ru/token
-            user-info-uri: https://login.yandex.ru/info
-            user-name-attribute: id
-          vk:
-            authorization-uri: https://oauth.vk.com/authorize
-            token-uri: https://oauth.vk.com/access_token
-            user-info-uri: https://api.vk.com/method/users.get
-            user-name-attribute: id
-  
-  data:
-    redis:
-      host: localhost
-      port: 6379
+    schemas: mon
+    baseline-version: 0
+
+  rabbitmq:
+    host: ${RABBIT_HOST}
+    port: ${RABBIT_PORT}
+    username: ${RABBIT_USER}
+    password: ${RABBIT_PASSWORD}
+    virtual-host: /
+    listener:
+      simple:
+        acknowledge-mode: auto
+        concurrency: 2
+        max-concurrency: 5
+        retry:
+          enabled: true
+          initial-interval: 1000
+          max-interval: 10000
+          multiplier: 2.0
+          max-attempts: 3
+      template:
+        retry:
+          enabled: true
+          initial-interval: 1000
+          max-interval: 10000
+          multiplier: 2.0
+          max-attempts: 3
+    app-config:
+      queue-name: "mon3-monitoring-queue"
 
 server:
   port: 8081
 
+security:
+  jwt:
+    secret: ${JWT_SECRET:your-256-bit-secret-key-change-in-production}
+  telegram:
+    token-ttl: 300
+
 logging:
   level:
     ru.igorit.monitoring: DEBUG
-
-security:
-  jwt:
-    secret: ${JWT_SECRET:your-256-bit-secret-key-change-in-production00}
-    expiration: 86400000
-  telegram:
-    token-ttl: 300
-    bot-token: ${TELEGRAM_BOT_TOKEN:}
-    bot-name: ${TELEGRAM_BOT_NAME:}
+    org.springframework.security: INFO
+    #org.flywaydb: DEBUG
+    #org.hibernate.SQL: DEBUG
+    root: info
 
 management:
   endpoints:
     web:
       exposure:
         include: health,info,metrics
+  health:
+    rabbit:
+      enabled: false
+    redis:
+      enabled: false

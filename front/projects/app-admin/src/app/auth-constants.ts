@@ -9,6 +9,10 @@ export const AUTH_CONSTANTS: Record<string, any> = {
     'partUserUpdate': { mode: 'or', groups: ['superuser', 'any_action_allow'] },
     'anyOrgAllow': { mode: 'or', groups: ['superuser', 'any_org_allow'] },
     'isSuperUser': { mode: 'or', groups: ['superuser'] },
+    'struct': { mode: 'or', groups: ['superuser', 'any_action_allow'] },
+    'struct/org': { mode: 'or', groups: ['superuser', 'any_action_allow'] },
+    'structChangeOrg': { mode: 'or', groups: ['superuser', 'any_action_allow'] },
+    'structModifyAgents': ['superuser'],
 
 }
 

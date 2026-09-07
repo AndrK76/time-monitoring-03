@@ -11,10 +11,12 @@ public class RabbitMQConfigProperties {
     public static final String INTERNAL_EXCHANGE = "mon3.exchange";
     public static final String ADMIN_SERVER_ROUTE = "mon3.admin";
     public static final String AUTH_SERVER_ROUTE = "mon3.auth";
+    public static final String MON_SERVER_ROUTE = "mon3.mon";
 
     private String internalExchange = INTERNAL_EXCHANGE;
     private String appServerRoute = ADMIN_SERVER_ROUTE;
     private String authServerRoute = AUTH_SERVER_ROUTE;
+    private String monServerRoute = MON_SERVER_ROUTE;
     private String queueName;
 
 }
