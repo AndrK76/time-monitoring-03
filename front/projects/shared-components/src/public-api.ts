@@ -36,4 +36,5 @@ export * from './lib/components/change-password-dialog/change-password-dialog.mo
 export * from './lib/components/change-password-dialog/change-password-dialog.component';
 
 export * from './lib/models/struct/struct-dto-items';
+export * from './lib/models/struct/crm-dto-items';
 

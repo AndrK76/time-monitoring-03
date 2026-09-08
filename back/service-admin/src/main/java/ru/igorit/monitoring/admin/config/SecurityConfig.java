@@ -11,6 +11,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import ru.igorit.monitoring.security.filter.JwtAuthenticationFilter;
@@ -37,6 +38,8 @@ public class SecurityConfig {
                             //if (!(authException instanceof AuthenticationCredentialsNotFoundException) ){
                             if (response.getStatus() >= 200 && response.getStatus() < 300) {
                                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                                //throw new AuthenticationException(authException.getMessage(),authException);
+                                //throw authException;
                             }
                         })
                 )

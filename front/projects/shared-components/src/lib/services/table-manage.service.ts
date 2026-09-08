@@ -20,7 +20,9 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 @Injectable() // Без providedIn, регистрируем в компоненте
 export class TableManageService<T extends Record<string, any>> {
   private router = inject(Router);
+  getRouter = () => this.router;
   private route = inject(ActivatedRoute);
+  getRoute = () => this.route;
   private breakpointObserver = inject(BreakpointObserver);
 
   // === Публичные сигналы ===
@@ -108,9 +110,9 @@ export class TableManageService<T extends Record<string, any>> {
   }
 
   //Работа с Url
-  handleUrlParams(): void {
+  handleUrlParams(idVal: string | undefined = undefined): void {
     if (!this.doUpdateUrl()) return;
-    const idParam = this.route.snapshot.queryParamMap.get('id');
+    const idParam = idVal ?? this.route.snapshot.queryParamMap.get('id');
     if (idParam) {
       const item = this.dataSource.data.find(row => this.itemIdFn(row) === idParam);
       this.doSelectFn(item, true, item ? false : true, true);

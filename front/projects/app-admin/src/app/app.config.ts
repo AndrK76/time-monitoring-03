@@ -9,6 +9,7 @@ import { lastValueFrom } from 'rxjs';
 import { registerLocaleData } from '@angular/common';
 import localeRu from '@angular/common/locales/ru';
 import { MainStructManageService } from './services/main-struct-manage.service';
+import { CrmStructManageService } from './services/crm-struct-manage.service';
 
 registerLocaleData(localeRu);
 
@@ -31,6 +32,7 @@ function initializeApp() {
   const userManageService = inject(UserManageService);
   const adminAccessService = inject(AdminAccessService);
   const mainStructManageService = inject(MainStructManageService);
+  const crmStructManageService = inject(CrmStructManageService);
 
 
   return () => {
@@ -39,6 +41,7 @@ function initializeApp() {
     userManageService.setAuthApiUrl(environment.authApiUrl);
     adminAccessService.setAdminApiUrl(environment.adminApiUrl);
     mainStructManageService.setAdminApiUrl(environment.adminApiUrl);
+    crmStructManageService.setAdminApiUrl(environment.adminApiUrl);
 
     return lastValueFrom(authService.checkAuth())
       .then((response) => {

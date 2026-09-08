@@ -17,7 +17,7 @@ public enum CrmAgentType {
     public static CrmAgentType byId(String id) {
         if (id == null) return null;
         return Arrays.stream(CrmAgentType.values())
-                .filter(f -> id.equals(f.name()))
+                .filter(f -> id.equalsIgnoreCase(f.name()))
                 .findFirst().orElse(null);
     }
 
