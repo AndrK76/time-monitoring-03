@@ -12,6 +12,7 @@ export const AUTH_CONSTANTS: Record<string, any> = {
     'struct': { mode: 'or', groups: ['superuser', 'any_action_allow'] },
     'struct/org': { mode: 'or', groups: ['superuser', 'any_action_allow'] },
     'structChangeOrg': { mode: 'or', groups: ['superuser', 'any_action_allow'] },
+    'crm/agent-list': { mode: 'or', groups: ['superuser', 'any_action_allow'] },
     'structModifyAgents': ['superuser'],
 
 }

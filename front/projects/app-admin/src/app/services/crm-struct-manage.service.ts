@@ -37,13 +37,18 @@ export class CrmStructManageService {
     return this.http.get<CrmAgentListDto[]>(`${this.adminApiUrl}${this.CRM_CONTROLLER}/agents?org=${orgId}&with_unbounded`);
   }
 
-  getAgentsById(id: string): Observable<CrmAgentItemDto> {
+  getAgentById(id: string): Observable<CrmAgentItemDto> {
     return this.http.get<CrmAgentItemDto>(`${this.adminApiUrl}${this.CRM_CONTROLLER}/agents/${id}`);
   }
 
   addAgent(agent: CrmAgentListDto): Observable<CrmAgentItemDto> {
     return this.http.post<CrmAgentItemDto>(`${this.adminApiUrl}${this.CRM_CONTROLLER}/agents`, agent);
   }
+
+  updateAgent(agent: CrmAgentItemDto): Observable<CrmAgentItemDto> {
+    return this.http.put<CrmAgentItemDto>(`${this.adminApiUrl}${this.CRM_CONTROLLER}/agents/${agent.id}`, agent);
+  }
+
 
   deleteAgentsById(id: string): Observable<void> {
     return this.http.delete<void>(`${this.adminApiUrl}${this.CRM_CONTROLLER}/agents/${id}`);

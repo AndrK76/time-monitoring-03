@@ -12,6 +12,7 @@ import ru.igorit.monitoring.lib.dto.crm.CrmAgentItemDto;
 import ru.igorit.monitoring.lib.dto.crm.CrmAgentListDto;
 import ru.igorit.monitoring.lib.dto.crm.CrmAgentTypeDto;
 import ru.igorit.monitoring.lib.enums.CrmAgentType;
+import ru.igorit.monitoring.lib.persistence.entity.common.Organization;
 import ru.igorit.monitoring.lib.persistence.entity.crm.CrmAgent;
 import ru.igorit.monitoring.lib.persistence.entity.crm.CrmOrganization;
 import ru.igorit.monitoring.lib.persistence.entity.yclients.YClientsAgent;
@@ -19,6 +20,7 @@ import ru.igorit.monitoring.lib.persistence.entity.yclients.YClientsOrganization
 import ru.igorit.monitoring.lib.persistence.repository.common.OrganizationRepository;
 import ru.igorit.monitoring.lib.persistence.repository.crm.CrmAgentRepository;
 import ru.igorit.monitoring.lib.persistence.repository.crm.CrmOrganizationRepository;
+import ru.igorit.monitoring.security.util.SecurityAccessUtils;
 
 import java.util.Arrays;
 import java.util.List;
@@ -33,15 +35,19 @@ public class CrmManageService {
     private final CrmAgentRepository agentRepo;
     private final CrmOrganizationRepository orgRepo;
     private final OrganizationRepository commonOrgRepo;
+    private final SecurityAccessUtils sa;
 
     public List<CrmAgentTypeDto> getAgentTypes() {
         return Arrays.stream(CrmAgentType.values()).map(crmModelMapper::toDto).toList();
     }
 
     @Transactional(readOnly = true)
-    @PreAuthorize("@securityAccessUtils.isSuperUser()")
+    @PreAuthorize("@securityAccessUtils.isAllowedAllActions()")
     public List<CrmAgentListDto> getAllAgents() {
-        return agentRepo.findAllProjectedBy().stream().map(crmModelMapper::toListDto).toList();
+        return agentRepo.findAllProjectedBy().stream()
+                .map(crmModelMapper::toListDto)
+                .filter(f -> sa.isSuperUser() || sa.isAllowedOrganization(f.getOrganizationId()))
+                .toList();
     }
 
     @Transactional(readOnly = true)
@@ -55,8 +61,20 @@ public class CrmManageService {
     @PreAuthorize("@securityAccessUtils.isSuperUser()")
     public List<CrmAgentListDto> getAgentsByOrganizationWithUnbounded(String organizationId) {
         return agentRepo.findAllProjectedBy().stream()
-                .filter(f->f.getOrganization()==null || Objects.equals(f.getOrganization().getId(), organizationId))
+                .filter(f -> f.getOrganization() == null || Objects.equals(f.getOrganization().getId(), organizationId))
                 .map(crmModelMapper::toListDto).toList();
+    }
+
+    @Transactional(readOnly = true)
+    @PreAuthorize("@securityAccessUtils.isAllowedAllActions()")
+    public CrmAgentItemDto getAgent(String agentId) {
+        var stored = agentRepo.findById(agentId).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "CRM Agent with id " + agentId + " not found"));
+        var ret = crmModelMapper.toDto(stored);
+        if (!(sa.isAllowedAllOrganizations() || sa.isAllowedOrganization(ret.getOrganizationId()))) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "CRM Agent with id " + agentId + " not found");
+        }
+        return ret;
     }
 
     @Transactional
@@ -64,11 +82,12 @@ public class CrmManageService {
     public CrmAgentItemDto addAgent(CrmAgentListDto dto) {
         var agentType = Optional.ofNullable(CrmAgentType.byId(dto.getAgentType())).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Not known CRM agent type"));
-        if (!(agentRepo.findByOrganizationId(dto.getOrganizationId()).isEmpty())) {
+        if (dto.getOrganizationId() != null && !(agentRepo.findByOrganizationId(dto.getOrganizationId()).isEmpty())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Crm agent for organization " + dto.getOrganizationId() + " already exists");
         }
-        var org = commonOrgRepo.findById(dto.getOrganizationId()).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Not exists organization"));
+        var org = dto.getOrganizationId() == null ? null :
+                commonOrgRepo.findById(dto.getOrganizationId()).orElseThrow(
+                        () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Not exists organization"));
         var crmOrg = new CrmOrganization();
         var agent = CrmAgent.builder()
                 .type(agentType)
@@ -87,15 +106,43 @@ public class CrmManageService {
         agent.setCrmOrganization(crmOrg);
         agent.setOrganization(org);
         var stored = agentRepo.save(agent);
-        commonOrgRepo.save(org);
+        if (org != null) {
+            commonOrgRepo.save(org);
+        }
         return crmModelMapper.toDto(stored);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     @PreAuthorize("@securityAccessUtils.isAllowedAllActions()")
-    public CrmAgentItemDto getAgent(String agentId) {
+    public CrmAgentItemDto updateAgent(String agentId, CrmAgentItemDto dto) {
+        if (dto == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Request data for CRM Agent is empty");
+        }
+        if (!agentId.equalsIgnoreCase(dto.getId())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Request Id not equal CRM Agent id=" + dto.getId());
+        }
         var stored = agentRepo.findById(agentId).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "CRM Agent with id " + agentId + " not found"));
+        String storedOrgId = Optional.ofNullable(stored.getOrganization()).map(Organization::getId).orElse(null);
+        if (!(sa.isAllowedAllOrganizations() || sa.isAllowedOrganization(storedOrgId))) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "CRM Agent with id " + agentId + " not allowed for change");
+        }
+        var changeOrg = !Objects.equals(storedOrgId, dto.getOrganizationId());
+        if (changeOrg && !sa.isSuperUser()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "CRM Agent organization binding not allowed");
+        }
+        if (!Objects.equals(stored.getName(), dto.getName())) {
+            stored.setName(dto.getName());
+        }
+        if (!Objects.equals(stored.getDescription(), dto.getDescription())) {
+            stored.setDescription(dto.getDescription());
+        }
+        stored = agentRepo.saveAndFlush(stored);
+        if (changeOrg && dto.getOrganizationId() != null) {
+            stored = _bindAgent(stored.getId(), dto.getOrganizationId());
+        } else if (changeOrg) {
+            stored = _unbindAgent(stored.getId());
+        }
         return crmModelMapper.toDto(stored);
     }
 
@@ -110,9 +157,21 @@ public class CrmManageService {
         }
     }
 
+
     @Transactional
     @PreAuthorize("@securityAccessUtils.isSuperUser()")
     public CrmAgentItemDto unbindAgent(String agentId) {
+        return crmModelMapper.toDto(_unbindAgent(agentId));
+    }
+
+    @Transactional
+    @PreAuthorize("@securityAccessUtils.isSuperUser()")
+    public CrmAgentItemDto bindAgent(String agentId, String orgId) {
+        return crmModelMapper.toDto(_bindAgent(agentId, orgId));
+    }
+
+
+    private CrmAgent _unbindAgent(String agentId) {
         var stored = agentRepo.findById(agentId).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "CRM Agent with id " + agentId + " not found"));
         var currOrg = stored.getOrganization();
@@ -121,12 +180,10 @@ public class CrmManageService {
         if (currOrg != null) {
             commonOrgRepo.save(currOrg);
         }
-        return crmModelMapper.toDto(ret);
+        return ret;
     }
 
-    @Transactional
-    @PreAuthorize("@securityAccessUtils.isSuperUser()")
-    public CrmAgentItemDto bindAgent(String agentId, String orgId) {
+    public CrmAgent _bindAgent(String agentId, String orgId) {
         var stored = agentRepo.findById(agentId).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "CRM Agent with id " + agentId + " not found"));
         var currOrg = stored.getOrganization();
@@ -143,8 +200,8 @@ public class CrmManageService {
         }
         stored.setOrganization(newOrg);
         commonOrgRepo.save(newOrg);
-        var ret = agentRepo.save(stored);
-        return crmModelMapper.toDto(ret);
+        return agentRepo.save(stored);
     }
+
 
 }

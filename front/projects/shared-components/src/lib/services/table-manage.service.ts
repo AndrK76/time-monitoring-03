@@ -165,6 +165,7 @@ export class TableManageService<T extends Record<string, any>> {
   doAfterLoadItem(item: T | undefined, renderFn: (() => void) | undefined) {
     //console.log(item);
     const result = actualizeDataSourceItem(this.dataSource.data, this.expandedItem(), item, this.itemIdFn);
+    //console.log(result)
     if (result.actualized) {
       this.dataSource.data = result.data;
       this.selectedItem.set(result.item);

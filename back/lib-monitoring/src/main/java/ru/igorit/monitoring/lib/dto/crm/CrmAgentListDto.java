@@ -12,7 +12,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class CrmAgentListDto {
     private String id;
-    @NotBlank(message = "organizationId is required")
     private String organizationId;
     @NotBlank(message = "agentType is required")
     private String agentType;

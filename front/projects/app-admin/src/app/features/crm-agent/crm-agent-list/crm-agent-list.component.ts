@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, Component, ElementRef, inject, OnInit, signal, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, computed, ElementRef, inject, OnInit, signal, ViewChild } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
@@ -7,23 +7,25 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTable, MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { DialogService, FilterRootComponent, isExpanded, NotificationService, SaveDataResult, TableFilterInfo, TableFilterListValue, TableFilterType, TableManageService } from '@mon3/sc';
+import { DialogService, FilterRootComponent, isExpanded, isNewItem, NotificationService, SaveDataResult, TableFilterInfo, TableFilterListValue, TableFilterType, TableManageService } from '@mon3/sc';
 import { CrmStructManageService } from '../../../services/crm-struct-manage.service';
 import { CrmAgentItemView, CrmAgentTypeView } from '../crm-agent-view.models';
 import { PermissionService } from '@mon3/sa';
 import { authConstant } from '../../../auth-constants';
-import { finalize, forkJoin, map } from 'rxjs';
-import { crmAgentItemDtoToView, crmAgentListDtoToView, crmAgentTypeDtoToView } from '../crm-agent-view.utils';
+import { finalize, forkJoin, map, Observable, of, tap } from 'rxjs';
+import { createNewAgent, crmAgentItemDtoToView, crmAgentListDtoToView, crmAgentTypeDtoToView, crmAgentViewToItemDto, crmAgentViewToListDto } from '../crm-agent-view.utils';
 import { MainStructManageService } from '../../../services/main-struct-manage.service';
 import { OrgStructInfo } from '../../struct-org/struct-org-view.models';
 import { orgStructListDtoToView } from '../../struct-org/struct-org-view.utils';
+import { RouterModule } from '@angular/router';
+import { CrmAgentBindEditorComponent } from './crm-agent-bind-editor/crm-agent-bind-editor.component';
 
 @Component({
   selector: 'app-crm-agent-list',
   standalone: true,
   imports: [CommonModule, MatTableModule, MatCardModule, MatButtonModule, MatProgressSpinnerModule, MatIconModule,
-    MatTooltipModule, MatSortModule,
-    FilterRootComponent],
+    MatTooltipModule, MatSortModule, RouterModule,
+    FilterRootComponent, CrmAgentBindEditorComponent],
   providers: [TableManageService],
   templateUrl: './crm-agent-list.component.html',
   styleUrl: './crm-agent-list.component.scss'
@@ -63,7 +65,13 @@ export class CrmAgentListComponent implements OnInit, AfterViewInit {
 
   isLoading = signal(false);
   isSaving = signal(false);
-
+  currentOrg = signal<string | undefined>(undefined);
+  orgName = computed(() => {
+    if (!this.currentOrg()) return '';
+    const org = this.organizations().find(f => f.id === this.currentOrg());
+    return org ? 'для ' + org.shortName : '';
+  });
+  canAddAgent = signal(false);
   canBindAgent = signal(false);
 
   // Фильтры
@@ -150,7 +158,7 @@ export class CrmAgentListComponent implements OnInit, AfterViewInit {
     this.dataService.getAllAgents()
       .pipe(
         map(list => list.map(dto => crmAgentListDtoToView(dto, this.agentTypes(), this.organizations()))),
-        this.tableManager.handleError<CrmAgentItemView[]>('Ошибка загрузки организаций', []),
+        this.tableManager.handleError<CrmAgentItemView[]>('Ошибка загрузки списка агентов', []),
         finalize(() => this.isLoading.set(false))
       )
       .subscribe({
@@ -158,12 +166,17 @@ export class CrmAgentListComponent implements OnInit, AfterViewInit {
           let idVal: string | undefined = undefined;
           const orgParam = this.tableManager.getRoute().snapshot.queryParamMap.get('org');
           if (orgParam) {
-            idVal = result.find(f => f.organizationId === orgParam)?.id;
+            this.currentOrg.set(orgParam);
+            const idRec = result.find(f => f.organizationId === orgParam);
+            this.canAddAgent.set(!(idRec?.organizationId));
+            idVal = idRec?.id;
             this.tableManager.getRouter().navigate([], {
               relativeTo: this.tableManager.getRoute(),
               queryParams: { id: idVal },
               queryParamsHandling: 'replace'
             });
+          } else {
+            this.canAddAgent.set(true);
           }
 
           const rows = result as CrmAgentItemView[];
@@ -172,6 +185,8 @@ export class CrmAgentListComponent implements OnInit, AfterViewInit {
 
           if (this.selectedItem()) {
             const _item = this.selectedItem();
+            this.canAddAgent.set(!(_item?.organizationId));
+            this.currentOrg.set(_item?.organizationId);
             this.selectedItem.set(undefined);
             this.tableManager.scrollToItemId(_item?.id);
             setTimeout(() => {
@@ -182,10 +197,46 @@ export class CrmAgentListComponent implements OnInit, AfterViewInit {
       });
   };
 
+  loadItem = (item: CrmAgentItemView): Observable<CrmAgentItemView | undefined> => {
+    const agentTypes = this.agentTypes();
+    const organizationns = this.organizations();
+    this.tableManager.snackError.set(null);
+    return this.dataService.getAgentById(item.id).pipe(
+      map(dto => crmAgentItemDtoToView(dto, agentTypes, organizationns)),
+      this.tableManager.handleError<CrmAgentItemView | undefined>('Ошибка загрузки информации об агенте', undefined, this.tableManager.snackError),
+      tap(v => {
+        const err = this.tableManager.snackError();
+        if (err) {
+          this.notificationService.error(err);
+          this.tableManager.snackError.set(null);
+        }
+      })
+    );
+  }
+
+  addItem = (item: CrmAgentItemView): Observable<CrmAgentItemView> => {
+    const req = crmAgentViewToListDto(item);
+    return this.dataService.addAgent(req).pipe(
+      map(dto => crmAgentItemDtoToView(dto, this.agentTypes(), this.organizations())));
+  };
+
+  updateItem = (item: CrmAgentItemView): Observable<CrmAgentItemView> => {
+    const req = crmAgentViewToItemDto(item);
+    return this.dataService.updateAgent(req).pipe(
+      map(dto => crmAgentItemDtoToView(dto, this.agentTypes(), this.organizations())));
+  };
+
+  deleteItem = (item: CrmAgentItemView): Observable<void> => {
+    return this.dataService.deleteAgentsById(item.id);
+  };
 
   onFilterChange = (val: TableFilterInfo) => this.tableManager.onFilterChange(val);
   toggleFilter = (reset?: boolean) => this.tableManager.toggleFilter();
   isExpanded = (index: number, item: any): boolean => isExpanded(item);
+  isNewItem = () => {
+    if (!this.selectedItem()) return false;
+    return isNewItem(this.selectedItem()!);
+  }
 
   callSelect = (item: CrmAgentItemView) => this.doSelect(item, true);
   callRefresh() {
@@ -193,6 +244,17 @@ export class CrmAgentListComponent implements OnInit, AfterViewInit {
       if (confirmed) this.doRefresh();
     });
   }
+  callAdd = () => this.doAdd();
+  callDelete(item: CrmAgentItemView) {
+    if (isNewItem(item)) {
+      this.doDelete(item);
+    } else {
+      this.dialogService.confirm(`Удалить агента "${item.name}"?`).subscribe(confirmed => {
+        if (confirmed) this.doDelete(item);
+      });
+    }
+  }
+
   callSave(): void {
     this.dialogService.confirm('Сохранить изменения?').subscribe(confirmed => {
       if (confirmed) this.doSave();
@@ -203,16 +265,22 @@ export class CrmAgentListComponent implements OnInit, AfterViewInit {
   private doSelect = (item: CrmAgentItemView | undefined, newState: boolean, updateUrl: boolean = true, scrollTo: boolean = false) => {
     this.tableManager.doSelectBaseWithCollapse(item, newState, () => this.table.renderRows(), updateUrl, scrollTo, true, undefined);
   };
-
-
+  doLoadedItem = (item: CrmAgentItemView | undefined) => {
+    this.tableManager.doAfterLoadItem(item, () => this.table.renderRows());
+  }
   private doRefresh = () => this.tableManager.doRefreshBase(() => this.loadData());
+
+  private doAdd(): void {
+    const agentType = this.agentTypes()!.at(0)!.value;
+    const newItem = createNewAgent(this.currentOrg(), agentType, this.agentTypes(), this.organizations());
+    this.tableManager.doAddBase(newItem, () => this.table.renderRows(), false, true);
+  }
+  private doDelete = (item: CrmAgentItemView) => this.tableManager.doDeleteBase(item, () => this.table.renderRows());
 
 
   doUpdate = (item: CrmAgentItemView) => this.tableManager.doUpdateBase(item, () => this.table.renderRows());
 
   private doSave(): void {
-
-    /*
     const resApply = (result: SaveDataResult<CrmAgentItemView>) => {
       if (result.success) {
         this.notificationService.success('Все изменения сохранены успешно');
@@ -222,8 +290,12 @@ export class CrmAgentListComponent implements OnInit, AfterViewInit {
       }
     };
     this.tableManager.doSaveBase(
-      this.isSaving, undefined, (item) => this.updateItem(item), undefined, resApply);
-      */
+      this.isSaving,
+      (item) => this.addItem(item),
+      (item) => this.updateItem(item),
+      (item) => this.deleteItem(item),
+      resApply
+    );
   }
 
 

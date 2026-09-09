@@ -29,6 +29,8 @@ $primary-500: mat.m2-get-color-from-palette($my-primary, 500);
 $warn-500: mat.m2-get-color-from-palette($my-warn, 500);
 //Светлый фон для ошибок (оттенок 50)
 $warn-50: mat.m2-get-color-from-palette($my-warn, 50);
+$warn-200: mat.m2-get-color-from-palette($my-warn, 200);
+$warn-300: mat.m2-get-color-from-palette($my-warn, 300);
 
 //Контрастные цвета (через map.get)
 $primary-contrast: map.get($my-primary, 'contrast', 500);

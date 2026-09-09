@@ -21,6 +21,10 @@
     mat-card-actions {
         flex-shrink: 0;
         padding: 8px 16px;
+
+        &.full-row {
+            justify-content: space-between;
+        }
     }
 
     mat-card-content {
@@ -419,99 +423,6 @@
 }
 
 
-.action-button-group {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-    flex-wrap: wrap;
-
-    // Кнопки действий (общие стили)
-    .table-action-btn {
-        min-width: 100px;
-        font-weight: 500;
-
-        &.btn-primary {
-            background-color: var(--btn-primary-bg);
-            color: var(--btn-primary-text);
-
-            &:hover:not(:disabled) {
-                background-color: var(--btn-primary-hover);
-            }
-        }
-
-        &.btn-danger {
-            background-color: var(--btn-danger-bg);
-            color: var(--btn-danger-text);
-
-            &:hover:not(:disabled) {
-                background-color: var(--btn-danger-hover);
-            }
-
-            &:disabled {
-                background-color: var(--mat-raised-button-disabled-container-color, rgba(0, 0, 0, 0.12)) !important;
-                color: var(--mat-raised-button-disabled-label-text-color, rgba(0, 0, 0, 0.38)) !important;
-            }
-        }
-
-        &.btn-success {
-            background-color: var(--btn-success-bg);
-            color: var(--btn-success-text);
-
-            &:hover:not(:disabled) {
-                background-color: var(--btn-success-hover);
-            }
-
-            &:disabled {
-                background-color: var(--mat-raised-button-disabled-container-color, rgba(0, 0, 0, 0.12)) !important;
-                color: var(--mat-raised-button-disabled-label-text-color, rgba(0, 0, 0, 0.38)) !important;
-            }
-        }
-
-        &.btn-light {
-            background-color: var(--btn-light-bg);
-            color: var(--btn-light-text);
-
-            &:hover:not(:disabled) {
-                background-color: var(--btn-light-hover);
-            }
-
-            &:disabled {
-                background-color: var(--mat-raised-button-disabled-container-color, rgba(0, 0, 0, 0.12)) !important;
-                color: var(--mat-raised-button-disabled-label-text-color, rgba(0, 0, 0, 0.38)) !important;
-            }
-        }
-
-    }
-
-    .hide-on-small {
-        display: inline;
-    }
-
-    @media (max-width: 599.98px) {
-        .hide-on-small {
-            display: none;
-        }
-
-        .mat-mdc-raised-button {
-            padding-left: 8px !important;
-            padding-right: 8px !important;
-        }
-
-        .mat-mdc-button-base {
-            min-width: unset;
-        }
-
-        .table-action-btn {
-            min-width: 40px !important;
-            padding: 0 8px !important;
-
-            .mat-icon {
-                margin-right: 0 !important;
-            }
-        }
-    }
-}
-
 .btn-icon-danger {
     //width: 32px;
     //height: 24px;
@@ -639,5 +550,127 @@ mat-card-actions,
 mat-card-content {
     &.inner-table {
         padding: 0 !important;
+    }
+}
+
+.action-button-group {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+
+    // Кнопки действий (общие стили)
+    .table-action-btn {
+        min-width: 100px;
+        font-weight: 500;
+
+        &.btn-primary {
+            background-color: var(--btn-primary-bg);
+            color: var(--btn-primary-text);
+
+            &:hover:not(:disabled) {
+                background-color: var(--btn-primary-hover);
+            }
+        }
+
+        &.btn-danger {
+            background-color: var(--btn-danger-bg);
+            color: var(--btn-danger-text);
+
+            &:hover:not(:disabled) {
+                background-color: var(--btn-danger-hover);
+            }
+
+            &:disabled {
+                background-color: var(--mat-raised-button-disabled-container-color, rgba(0, 0, 0, 0.12)) !important;
+                color: var(--mat-raised-button-disabled-label-text-color, rgba(0, 0, 0, 0.38)) !important;
+            }
+        }
+
+        &.btn-success {
+            background-color: var(--btn-success-bg);
+            color: var(--btn-success-text);
+
+            &:hover:not(:disabled) {
+                background-color: var(--btn-success-hover);
+            }
+
+            &:disabled {
+                background-color: var(--mat-raised-button-disabled-container-color, rgba(0, 0, 0, 0.12)) !important;
+                color: var(--mat-raised-button-disabled-label-text-color, rgba(0, 0, 0, 0.38)) !important;
+            }
+        }
+
+        &.btn-light {
+            background-color: var(--btn-light-bg);
+            color: var(--btn-light-text);
+
+            &:hover:not(:disabled) {
+                background-color: var(--btn-light-hover);
+            }
+
+            &:disabled {
+                background-color: var(--mat-raised-button-disabled-container-color, rgba(0, 0, 0, 0.12)) !important;
+                color: var(--mat-raised-button-disabled-label-text-color, rgba(0, 0, 0, 0.38)) !important;
+            }
+        }
+
+        &.btn-gray {
+            background-color: var(--menu-hover-bg);
+            color: var(--btn-light-text);
+
+            &:hover:not(:disabled) {
+                background-color: var(--menu-bg);
+            }
+
+            &:disabled {
+                background-color: var(--mat-raised-button-disabled-container-color, rgba(0, 0, 0, 0.12)) !important;
+                color: var(--mat-raised-button-disabled-label-text-color, rgba(0, 0, 0, 0.38)) !important;
+            }
+        }
+
+        &.btn-danger-light {
+            background-color: var(  --btn-danger-bg-light);
+            color: var(--btn-danger-text);
+
+            &:hover:not(:disabled) {
+                background-color: var(--btn-danger-hover);
+            }
+
+            &:disabled {
+                background-color: var(--mat-raised-button-disabled-container-color, rgba(0, 0, 0, 0.12)) !important;
+                color: var(--mat-raised-button-disabled-label-text-color, rgba(0, 0, 0, 0.38)) !important;
+            }
+        }
+
+
+    }
+
+    .hide-on-small {
+        display: inline;
+    }
+
+    @media (max-width: 599.98px) {
+        .hide-on-small {
+            display: none;
+        }
+
+        .mat-mdc-raised-button {
+            padding-left: 8px !important;
+            padding-right: 8px !important;
+        }
+
+        .mat-mdc-button-base {
+            min-width: unset;
+        }
+
+        .table-action-btn {
+            min-width: 40px !important;
+            padding: 0 8px !important;
+
+            .mat-icon {
+                margin-right: 0 !important;
+            }
+        }
     }
 }

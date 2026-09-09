@@ -111,6 +111,7 @@ body {
   --btn-primary-hover: #{darken(vars.$primary-500, 10%)};
 
   --btn-danger-bg: #{vars.$warn-500};
+  --btn-danger-bg-light: #{vars.$warn-300};
   --btn-danger-text: #{vars.$warn-contrast};
   --btn-danger-hover: #{darken(vars.$warn-500, 10%)};
   --btn-danger-bg-rgb: #{red(vars.$warn-500)},

@@ -20,15 +20,6 @@ export const orgStructFromId = (dtoOrg: String | undefined, allOrgs: OrgStructIn
     return allOrgs.find(f => f.id === dtoOrg);
 }
 
-/*
-export const agentTypeFromId = (dtoId: String | undefined, allTypes: CrmAgentTypeView[]): CrmAgentTypeView | undefined => {
-    const ret = (dto.permissions || []).map(permissionName => {
-        const found = allPermissions.find(r => r.name === permissionName);
-        return found || tempPermission(permissionName);
-    });
-    return ret;
-}
-*/
 
 export const crmAgentListDtoToView = (dto: CrmAgentListDto,
     agentTypes: CrmAgentTypeView[] | undefined = undefined,
@@ -49,11 +40,16 @@ export const crmAgentListDtoToView = (dto: CrmAgentListDto,
     } as CrmAgentItemView
 }
 
-export const crmAgentItemDtoToView = (dto: CrmAgentItemDto): CrmAgentItemView => {
+export const crmAgentItemDtoToView = (dto: CrmAgentItemDto,
+    agentTypes: CrmAgentTypeView[] | undefined = undefined,
+    organizations: OrgStructInfo[] | undefined = undefined,
+): CrmAgentItemView => {
     return {
         id: dto.id,
         organizationId: dto.organizationId,
+        organization: orgStructFromId(dto.organizationId, organizations),
         agentType: dto.agentType,
+        agentTypeWithInfo: agentTypeFromId(dto.agentType, agentTypes),
         name: dto.name,
         description: dto.description,
         configured: dto.configured,
@@ -74,27 +70,34 @@ export const crmAgentViewToListDto = (item: CrmAgentItemView): CrmAgentListDto =
     } as CrmAgentListDto;
 }
 
-/*
-export function orgStructListDtoToView(dto: OrgStructListDto): OrgStructInfo {
+export const crmAgentViewToItemDto = (item: CrmAgentItemView): CrmAgentItemDto => {
     return {
-        id: dto.id,
-        shortName: dto.shortName,
-        fullName: dto.fullName,
-        crmAgentSet: dto.crmAgentSet,
-        eventAgentsSet: dto.eventAgentsSet,
-        cameraAgentsSet: dto.cameraAgentsSet,
-    } as OrgStructInfo
+        id: item.id,
+        organizationId: item.organizationId,
+        agentType: item.agentType,
+        name: item.name,
+        description: item.description,
+        configured: item.configured,
+        config: item.config,
+        crmOrganization: item.crmOrganization,
+        services: item.services
+    } as CrmAgentItemDto;
 }
 
-export function orgStructListDtofromView(data: OrgStructInfo): OrgStructListDto {
+export const createNewAgent = (orgId: string | undefined, agentType: string,
+    agentTypes: CrmAgentTypeView[] | undefined = undefined,
+    organizations: OrgStructInfo[] | undefined = undefined): CrmAgentItemView => {
     return {
-        id: data.id,
-        shortName: data.shortName,
-        fullName: data.fullName,
-        crmAgentSet: data.crmAgentSet,
-        eventAgentsSet: data.eventAgentsSet,
-        cameraAgentsSet: data.cameraAgentsSet,
-    } as OrgStructInfo
-}
-*/
-
+        id: 'temp-' + Date.now(),
+        organizationId: orgId,
+        organization: orgStructFromId(orgId, organizations),
+        agentType: agentType,
+        agentTypeWithInfo: agentTypeFromId(agentType, agentTypes),
+        name: '',
+        description: undefined,
+        configured: false,
+        config: undefined,
+        crmOrganization: undefined,
+        services: []
+    } as CrmAgentItemView
+} 

@@ -33,7 +33,7 @@ public class CrmManageController {
         return service.getAgentsByOrganization(organizationId);
     }
 
-    @GetMapping(value = {"/agents"}, params = {"org","with_unbounded"})
+    @GetMapping(value = {"/agents"}, params = {"org", "with_unbounded"})
     public List<CrmAgentListDto> getAgentsByOrganizationWithUnbounded(@RequestParam("org") String organizationId) {
         return service.getAgentsByOrganizationWithUnbounded(organizationId);
     }
@@ -47,6 +47,12 @@ public class CrmManageController {
     public ResponseEntity<?> addAgent(@Valid @RequestBody CrmAgentListDto dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.addAgent(dto));
     }
+
+    @PutMapping({"/agents/{id}"})
+    public CrmAgentItemDto updateAgent(@PathVariable(name = "id") String agentId, @Valid @RequestBody CrmAgentItemDto dto) {
+        return service.updateAgent(agentId, dto);
+    }
+
 
     @DeleteMapping({"/agents/{id}"})
     public ResponseEntity<?> deleteAgentsById(@PathVariable("id") String agentId) {

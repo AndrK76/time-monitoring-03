@@ -103,6 +103,26 @@
             align-items: center;
             padding: 4px 0;
         }
+
+        .spacer {
+            flex: 1;
+        }
+
+        .label {
+            font-weight: 500;
+            min-width: 120px;
+        }
+
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+
+            .status {
+                font-style: italic;
+            }
+        }
     }
 
     .full-width {

@@ -1,7 +1,9 @@
 <div class="standard-table-container">
     <mat-card>
         <mat-card-header>
-            <mat-card-title>CRM: Агенты</mat-card-title>
+            <mat-card-title>CRM: Агенты
+                <span class="hide-on-small">{{orgName()}}</span>
+            </mat-card-title>
             <mat-card-subtitle class="hide-on-small">
                 Всего: {{ dataSource.data.length }}
                 @if (hasChanges()) {
@@ -14,8 +16,23 @@
             </mat-card-subtitle>
         </mat-card-header>
 
-        <mat-card-actions align="end">
+        <mat-card-actions class="full-row">
             <div class="action-button-group">
+                <a mat-button matTooltip="К списку организаций" class="table-action-btn back-button"
+                    [routerLink]="['/struct/org']" [queryParams]="{id: currentOrg()}" *ngIf="currentOrg()">
+                    <mat-icon>arrow_back</mat-icon>
+                    <span class="hide-on-small">К списку организаций</span>
+                </a>
+            </div>
+            <div class="action-button-group">
+                <button mat-raised-button class="table-action-btn btn-success" (click)="callAdd()"
+                    [disabled]="isLoading() || isSaving() || !canAddAgent()" *ngIf="canBindAgent()">
+                    <mat-icon>add</mat-icon><span class="hide-on-small">Добавить</span>
+                </button>
+                <button mat-raised-button class="table-action-btn btn-danger" (click)="callDelete(selectedItem()!)"
+                    [disabled]="isLoading() || isSaving() || !selectedItem()" *ngIf="canBindAgent()">
+                    <mat-icon>delete</mat-icon><span class="hide-on-small">Удалить</span>
+                </button>
                 <button mat-raised-button class="table-action-btn btn-light" (click)="callRefresh()"
                     [disabled]="isLoading() || isSaving()">
                     <mat-icon>refresh</mat-icon>
@@ -105,10 +122,10 @@
                     <ng-container matColumnDef="editor">
                         <td mat-cell *matCellDef="let row" [attr.colspan]="displayedColumns.length">
                             <div class="editor-row" *ngIf="row._expanded">
-                                <!--<app-struct-org-editor [organization]="row" [canChangeInfo]="canChangeInfo()"
-                                    [canChangeAgents]="canSetAgents()" (change)="doUpdate($event)">
-                                </app-struct-org-editor>-->
-                                Редактор
+                                <app-crm-agent-bind-editor [agentData]="row" [loadItemFn]="loadItem"
+                                    [agentTypes]="agentTypes()" [organizations]="organizations()"
+                                    [curOrg]="currentOrg()" (loaded)="doLoadedItem($event)"
+                                    (change)="doUpdate($event)"></app-crm-agent-bind-editor>
                             </div>
                         </td>
                     </ng-container>

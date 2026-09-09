@@ -144,7 +144,7 @@ export class AuthService {
       }
     }),
       catchError((err) => {
-        console.log(JSON.stringify(err));
+        //console.log(JSON.stringify(err));
         this.clearSession();
         this.notifyListeners(false);
         return of(null);
