@@ -1,0 +1,7 @@
+<mat-dialog-content>
+    <sc-login-dialog-content [title]="data.title" [submitLabel]="data.submitLabel"
+        [cancelLabel]="data.cancelLabel ?? 'Отмена'" [extraLinkLabel]="data.extraLinkLabel"
+        [extraLinkRoute]="data.extraLinkRoute" [isLoading]="isLoading" [errorMessage]="errorMessage"
+        (submitted)="onSubmit($event)" (cancelled)="onCancel()">
+    </sc-login-dialog-content>
+</mat-dialog-content>

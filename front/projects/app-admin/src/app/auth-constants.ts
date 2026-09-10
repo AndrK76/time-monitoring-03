@@ -14,6 +14,8 @@ export const AUTH_CONSTANTS: Record<string, any> = {
     'structChangeOrg': { mode: 'or', groups: ['superuser', 'any_action_allow'] },
     'crm/agent-list': { mode: 'or', groups: ['superuser', 'any_action_allow'] },
     'structModifyAgents': ['superuser'],
+    'crm/agent': { mode: 'or', groups: ['superuser', 'any_action_allow'] },
+    'yclients/config': { mode: 'or', groups: ['superuser', 'any_action_allow'] },
 
 }
 

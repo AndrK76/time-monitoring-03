@@ -22,6 +22,7 @@ import ru.igorit.monitoring.persistence.entity.admin.UserOrganization;
 import ru.igorit.monitoring.rabbit.service.CommandSender;
 import ru.igorit.monitoring.web.dto.UserListItemDto;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -75,6 +76,7 @@ public class AccessManageService {
 
         existing.fillFrom(mapper.fromListDto(mapper.toShortDto(dto)));
         existing.setUpdatedBy(updaterId);
+        existing.setUpdatedAt(LocalDateTime.now());
 
         if (dto.getUsers() != null) {
 

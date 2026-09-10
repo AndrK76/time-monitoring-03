@@ -27,7 +27,6 @@ export interface CrmAgentItemDto {
 
 export interface CrmAgentConfigDto {
     id: string;
-    agentId: string;
     agentType: string;
 }
 

@@ -11,6 +11,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class CrmAgentConfigDto {
     private String id;
-    private String agentId;
     private String agentType;
 }

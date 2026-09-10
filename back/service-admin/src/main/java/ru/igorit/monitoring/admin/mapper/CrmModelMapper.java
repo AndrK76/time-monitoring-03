@@ -24,7 +24,6 @@ public interface CrmModelMapper {
     CrmAgentItemDto toDto(CrmAgent item);
 
     @Mapping(target = "agentType", source = "item.agent", qualifiedByName = "agentTypeToString")
-    @Mapping(target = "agentId", source = "item.agent.id")
     CrmAgentConfigDto toDto(CrmAgentConfig item);
 
     CrmOrganizationDto toDto(CrmOrganization item);

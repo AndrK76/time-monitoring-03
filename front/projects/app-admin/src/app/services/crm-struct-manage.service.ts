@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { CrmAgentItemDto, CrmAgentListDto, CrmAgentTypeDto, OrgStructListDto } from '@mon3/sc';
+import { CrmAgentConfigDto, CrmAgentItemDto, CrmAgentListDto, CrmAgentTypeDto, OrgStructListDto } from '@mon3/sc';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -60,6 +60,10 @@ export class CrmStructManageService {
 
   bindAgentToOrg(id: string, orgId: string): Observable<CrmAgentItemDto> {
     return this.http.put<CrmAgentItemDto>(`${this.adminApiUrl}${this.CRM_CONTROLLER}/agents/${id}/bind?org=${orgId}`, null);
+  }
+
+  getAgentConfig(id: string): Observable<CrmAgentConfigDto> {
+    return this.http.get<CrmAgentItemDto>(`${this.adminApiUrl}${this.CRM_CONTROLLER}/configs/${id}`);
   }
 
 

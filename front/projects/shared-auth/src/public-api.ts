@@ -12,3 +12,4 @@ export * from './lib/interceptors/auth.interceptor.fn';
 export * from './lib/interceptors/language.interceptor.fn';
 
 export * from './lib/utils/http.utils';
+export * from './lib/utils/error.utils';

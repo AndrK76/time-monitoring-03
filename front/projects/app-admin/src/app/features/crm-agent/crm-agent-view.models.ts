@@ -12,7 +12,6 @@ export class CrmAgentTypeView implements CrmAgentTypeDto {
 export class CrmAgentConfigView implements CrmAgentConfigDto {
     constructor(
         public id: string,
-        public agentId: string,
         public agentType: string,
     ) { }
 }

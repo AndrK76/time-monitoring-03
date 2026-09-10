@@ -31,10 +31,14 @@ export * from './lib/components/filter-date/filter-date.component';
 export * from './lib/components/filter-text/filter-text.component';
 
 export * from './lib/services/table-manage.service';
+export * from './lib/services/size.service';
 
 export * from './lib/components/change-password-dialog/change-password-dialog.model';
 export * from './lib/components/change-password-dialog/change-password-dialog.component';
 
 export * from './lib/models/struct/struct-dto-items';
 export * from './lib/models/struct/crm-dto-items';
+export * from './lib/models/yclients/yclients-dto-items';
+
+export * from './lib/components/login-dialog/login-dialog.model';
 

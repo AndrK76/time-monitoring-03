@@ -1,0 +1,28 @@
+<h2 class="auth-title">{{ title() }}</h2>
+<form (ngSubmit)="onSubmit(loginForm)" #loginForm="ngForm">
+    <mat-form-field appearance="fill" class="full-width compact-field">
+        <mat-label>Имя пользователя</mat-label>
+        <input matInput type="text" [(ngModel)]="credentials.username" name="username" required>
+    </mat-form-field>
+    <mat-form-field appearance="fill" class="full-width compact-field">
+        <mat-label>Пароль</mat-label>
+        <input matInput type="password" [(ngModel)]="credentials.password" name="password" required>
+    </mat-form-field>
+
+    <!-- Блок ошибки -->
+    <div *ngIf="errorMessage()" class="error-message">{{ errorMessage() }}</div>
+
+    <div class="button-row">
+        <button mat-raised-button color="primary" type="submit" class="action-button"
+            [disabled]="loginForm.invalid || isLoading()">
+            {{ isLoading() ? submitLabel() + '...' : submitLabel() }}
+        </button>
+        <button mat-raised-button color="accent" type="button" class="action-button" (click)="onCancel()">
+            {{ cancelLabel() }}
+        </button>
+    </div>
+
+    <div class="auth-links" *ngIf="extraLinkLabel() && extraLinkRoute()">
+        <a [routerLink]="extraLinkRoute()!">{{ extraLinkLabel() }}</a>
+    </div>
+</form>

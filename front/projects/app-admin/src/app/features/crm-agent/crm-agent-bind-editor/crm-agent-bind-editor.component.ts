@@ -11,12 +11,12 @@ import { RouterModule } from '@angular/router';
 import { debounceTime, distinctUntilChanged, filter, Observable } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DialogService, isNewItem, isNotFullLoadedItem } from '@mon3/sc';
-import { CrmAgentItemView, CrmAgentTypeView } from '../../crm-agent-view.models';
+import { CrmAgentItemView, CrmAgentTypeView } from '../crm-agent-view.models';
 import { MatSelectModule } from '@angular/material/select';
 import { PermissionService } from '@mon3/sa';
-import { authConstant } from '../../../../auth-constants';
-import { OrgStructInfo } from '../../../struct-org/struct-org-view.models';
-import { agentTypeFromId, orgStructFromId } from '../../crm-agent-view.utils';
+import { authConstant } from '../../../auth-constants';
+import { OrgStructInfo } from '../../struct-org/struct-org-view.models';
+import { agentTypeFromId, orgStructFromId } from '../crm-agent-view.utils';
 
 @Component({
   selector: 'app-crm-agent-bind-editor',
@@ -171,14 +171,6 @@ export class CrmAgentBindEditorComponent implements OnInit {
           this.emitChange();
         }
       });
-  }
-
-
-
-  onConfigure(): void {
-    // Переход на страницу настройки агента
-    // Пример: this.router.navigate(['/crm/agent', this.data.id]);
-    console.warn('Configure agent');
   }
 
 

@@ -8,24 +8,35 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import ru.igorit.monitoring.admin.mapper.CrmModelMapper;
+import ru.igorit.monitoring.admin.mapper.EventCommandMapper;
+import ru.igorit.monitoring.common.dto.command.auth.OrganizationInfoChangedEventCommandDto;
+import ru.igorit.monitoring.common.enums.command.CommandMessageType;
+import ru.igorit.monitoring.lib.dto.crm.CrmAgentConfigDto;
 import ru.igorit.monitoring.lib.dto.crm.CrmAgentItemDto;
 import ru.igorit.monitoring.lib.dto.crm.CrmAgentListDto;
 import ru.igorit.monitoring.lib.dto.crm.CrmAgentTypeDto;
 import ru.igorit.monitoring.lib.enums.CrmAgentType;
 import ru.igorit.monitoring.lib.persistence.entity.common.Organization;
 import ru.igorit.monitoring.lib.persistence.entity.crm.CrmAgent;
+import ru.igorit.monitoring.lib.persistence.entity.crm.CrmAgentConfig;
 import ru.igorit.monitoring.lib.persistence.entity.crm.CrmOrganization;
 import ru.igorit.monitoring.lib.persistence.entity.yclients.YClientsAgent;
+import ru.igorit.monitoring.lib.persistence.entity.yclients.YClientsAgentConfig;
 import ru.igorit.monitoring.lib.persistence.entity.yclients.YClientsOrganization;
 import ru.igorit.monitoring.lib.persistence.repository.common.OrganizationRepository;
+import ru.igorit.monitoring.lib.persistence.repository.crm.CrmAgentConfigRepository;
 import ru.igorit.monitoring.lib.persistence.repository.crm.CrmAgentRepository;
 import ru.igorit.monitoring.lib.persistence.repository.crm.CrmOrganizationRepository;
+import ru.igorit.monitoring.rabbit.service.CommandSender;
 import ru.igorit.monitoring.security.util.SecurityAccessUtils;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+
+import static ru.igorit.monitoring.security.util.AuthInfoUtils.extractUserId;
+import static ru.igorit.monitoring.security.util.AuthInfoUtils.getCurrentAuth;
 
 @Service
 @RequiredArgsConstructor
@@ -34,8 +45,11 @@ public class CrmManageService {
     private final CrmModelMapper crmModelMapper;
     private final CrmAgentRepository agentRepo;
     private final CrmOrganizationRepository orgRepo;
+    private final CrmAgentConfigRepository cfgRepo;
     private final OrganizationRepository commonOrgRepo;
     private final SecurityAccessUtils sa;
+    private final CommandSender commandSender;
+    private final EventCommandMapper eventCommandMapper;
 
     public List<CrmAgentTypeDto> getAgentTypes() {
         return Arrays.stream(CrmAgentType.values()).map(crmModelMapper::toDto).toList();
@@ -151,6 +165,9 @@ public class CrmManageService {
     public void deleteAgent(String agentId) {
         var curr = agentRepo.findById(agentId).orElse(null);
         String orgId = curr == null ? null : curr.getCrmOrganization().getId();
+        if (curr!= null && curr.getOrganization() != null) {
+            _unbindAgent(agentId);
+        }
         agentRepo.deleteById(agentId);
         if (orgId != null) {
             orgRepo.deleteById(orgId);
@@ -170,6 +187,28 @@ public class CrmManageService {
         return crmModelMapper.toDto(_bindAgent(agentId, orgId));
     }
 
+    @Transactional
+    @PreAuthorize("@securityAccessUtils.isAllowedAllActions()")
+    public CrmAgentConfigDto getAgentConfig(String agentId) {
+        getAgent(agentId);
+        var agent = agentRepo.findById(agentId).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "CRM Agent with id " + agentId + " not found"));
+        var config = agent.getConfig();
+        if (config == null) {
+            switch (agent.getType()) {
+                case YClients -> {
+                    config = new YClientsAgentConfig(agent);
+                    config = cfgRepo.saveAndFlush(config);
+                    agent.setConfig(config);
+                    agentRepo.save(agent);
+                }
+                default ->
+                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unsupported CRM agent type: " + agent.getType());
+            }
+        }
+        return crmModelMapper.toDto(config);
+    }
+
 
     private CrmAgent _unbindAgent(String agentId) {
         var stored = agentRepo.findById(agentId).orElseThrow(
@@ -178,7 +217,9 @@ public class CrmManageService {
         stored.setOrganization(null);
         var ret = agentRepo.save(stored);
         if (currOrg != null) {
-            commonOrgRepo.save(currOrg);
+            currOrg.setUpdatedBy(extractUserId(getCurrentAuth()));
+            currOrg = commonOrgRepo.save(currOrg);
+            sendOrgChangeEvent(currOrg);
         }
         return ret;
     }
@@ -189,7 +230,9 @@ public class CrmManageService {
         var currOrg = stored.getOrganization();
         if (currOrg != null) {
             stored.setOrganization(null);
-            commonOrgRepo.saveAndFlush(currOrg);
+            currOrg.setUpdatedBy(extractUserId(getCurrentAuth()));
+            currOrg = commonOrgRepo.saveAndFlush(currOrg);
+            sendOrgChangeEvent(currOrg);
         }
         var newOrg = commonOrgRepo.findById(orgId).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Organization with id " + orgId + " not found"));
@@ -199,9 +242,26 @@ public class CrmManageService {
             agentRepo.saveAndFlush(newOrgAgent.get(0));
         }
         stored.setOrganization(newOrg);
-        commonOrgRepo.save(newOrg);
+        newOrg.setUpdatedBy(extractUserId(getCurrentAuth()));
+        newOrg = commonOrgRepo.save(newOrg);
+        sendOrgChangeEvent(newOrg);
         return agentRepo.save(stored);
     }
 
+
+    private void sendOrgChangeEvent(Organization organization) {
+        var targets = List.of(commandSender.getConfig().getMonServerRoute());
+        OrganizationInfoChangedEventCommandDto event = eventCommandMapper.toOrgChangeEvent(organization);
+        event.setMode(OrganizationInfoChangedEventCommandDto.Mode.UPDATE_CRM_BIND);
+        targets.forEach(target -> {
+            try {
+                commandSender.sendCommandToInternal(target,
+                        CommandMessageType.ORGANIZATION_INFO_CHANGED, event);
+                log.info("Organization {} event sent for organization: {}", event.getMode(), event.getOrgId());
+            } catch (Exception e) {
+                log.info("Failed to send organization {} event sent for organization: {}", event.getMode(), event.getOrgId());
+            }
+        });
+    }
 
 }

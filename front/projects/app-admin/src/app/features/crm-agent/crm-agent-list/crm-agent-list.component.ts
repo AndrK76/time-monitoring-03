@@ -18,7 +18,7 @@ import { MainStructManageService } from '../../../services/main-struct-manage.se
 import { OrgStructInfo } from '../../struct-org/struct-org-view.models';
 import { orgStructListDtoToView } from '../../struct-org/struct-org-view.utils';
 import { RouterModule } from '@angular/router';
-import { CrmAgentBindEditorComponent } from './crm-agent-bind-editor/crm-agent-bind-editor.component';
+import { CrmAgentBindEditorComponent } from '../crm-agent-bind-editor/crm-agent-bind-editor.component';
 
 @Component({
   selector: 'app-crm-agent-list',

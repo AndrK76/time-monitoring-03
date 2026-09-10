@@ -36,7 +36,7 @@
                 } @else {
                 @if (organization().crmAgentSet) {
                 <div class="action-button-group">
-                    <a mat-stroked-button color="primary" [routerLink]="['/crm-agent']"
+                    <a mat-stroked-button color="primary" [routerLink]="['/crm/agent']"
                         [queryParams]="{org: organization().id}">
                         <mat-icon>settings</mat-icon>
                         <span class="hide-on-small">Настроить</span>

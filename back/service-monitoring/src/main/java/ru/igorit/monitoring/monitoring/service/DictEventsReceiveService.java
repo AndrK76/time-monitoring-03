@@ -28,9 +28,17 @@ public class DictEventsReceiveService {
                 var src = orgRepo.findById(event.getOrgId()).orElse(new Organization(event.getOrgId()));
                 src.setShortName(event.getShortName());
                 src.setFullName(event.getFullName());
+                src.setUpdatedAt(event.getUpdatedAt());
+                src.setUpdatedBy(event.getUpdatedBy());
                 orgRepo.save(src);
             } else if (event.getMode() == OrganizationInfoChangedEventCommandDto.Mode.DELETE) {
                 orgRepo.deleteById(event.getOrgId());
+            } else if (event.getMode() == OrganizationInfoChangedEventCommandDto.Mode.UPDATE_CRM_BIND) {
+                var src = orgRepo.findById(event.getOrgId()).orElse(new Organization(event.getOrgId()));
+                src.setCrmAgentSet(event.isCrmAgentSet());
+                src.setUpdatedAt(event.getUpdatedAt());
+                src.setUpdatedBy(event.getUpdatedBy());
+                orgRepo.save(src);
             }
             log.info("OrganizationInfoChangedEvent with mode {} applied for org: {}", event.getMode(), event.getOrgId());
         } catch (Exception e) {

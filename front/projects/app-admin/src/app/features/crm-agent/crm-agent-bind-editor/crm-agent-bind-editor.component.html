@@ -22,10 +22,11 @@
                 </mat-select>
             </mat-form-field>
             <div class="action-button-group">
-                <button mat-raised-button class="table-action-btn btn-gray" (click)="onConfigure()">
+                <a mat-raised-button class="table-action-btn btn-gray" [routerLink]="['/crm/agent']"
+                    [queryParams]="{id: agentData().id}">
                     <mat-icon>settings</mat-icon>
                     <span class="hide-on-small">Настроить</span>
-                </button>
+                </a>
                 <button mat-raised-button color="primary" class="action-btn"
                     *ngIf="canFullChange() && curOrg() && !orgIsCurrOrg()" (click)="callBind()">
                     <mat-icon>link</mat-icon>

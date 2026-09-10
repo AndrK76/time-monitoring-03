@@ -1,8 +1,10 @@
 package ru.igorit.monitoring.lib.persistence.entity.crm;
 
 import jakarta.persistence.*;
-import lombok.*;
-import org.hibernate.annotations.BatchSize;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "crm_agent_configs")
@@ -20,4 +22,5 @@ public abstract class CrmAgentConfig {
     @MapsId
     @JoinColumn(name = "id")
     private CrmAgent agent;
+
 }

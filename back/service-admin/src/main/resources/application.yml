@@ -114,6 +114,8 @@ security:
     secret: ${JWT_SECRET:your-256-bit-secret-key-change-in-production}
   telegram:
     token-ttl: 300
+  store:
+    xor: ${STORE_XOR:your-256-bit-secret-key-change-in-production}
 
 logging:
   level:

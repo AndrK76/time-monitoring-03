@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.igorit.monitoring.persistence.repository.auth.AuthOrganizationRepository;
 import ru.igorit.monitoring.common.dto.command.auth.OrganizationInfoChangedEventCommandDto;
 import ru.igorit.monitoring.common.dto.command.auth.UserContextDto;
 import ru.igorit.monitoring.persistence.entity.auth.AuthOrganization;
@@ -20,8 +19,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Log4j2
 public class OrganizationEventsReceiveService {
-
-    private final AuthOrganizationRepository authOrganizationRepository;
 
     private final AuthManagementPersistService persistService;
 

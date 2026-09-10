@@ -19,6 +19,9 @@ import ru.igorit.monitoring.security.util.SecurityAccessUtils;
 
 import java.util.List;
 
+import static ru.igorit.monitoring.security.util.AuthInfoUtils.extractUserId;
+import static ru.igorit.monitoring.security.util.AuthInfoUtils.getCurrentAuth;
+
 @Service
 @RequiredArgsConstructor
 @Log4j2
@@ -51,8 +54,10 @@ public class StructManageService {
         checkOrgId(id);
         var stored = orgRepo.findById(id).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        String updaterId = extractUserId(getCurrentAuth());
         stored.setShortName(org.getShortName());
         stored.setFullName(org.getFullName());
+        stored.setUpdatedBy(updaterId);
         var ret = orgRepo.save(stored);
         sendOrgAddOrUpdatedEvent(stored);
         return structMapper.toListDto(ret);

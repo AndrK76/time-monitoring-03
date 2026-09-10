@@ -1,21 +1,21 @@
 import { Injectable, signal, WritableSignal, computed, ElementRef, inject, Signal } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 
-import { catchError, Observable, of } from 'rxjs';
+import { Observable } from 'rxjs';
 import { SaveDataResult, TableDataChanges } from '../models/table-data-items';
 import {
   actualizeDataSourceItem,
   addDataSourceItem, addDeleteChangeToState, addModifyChangeToState, addNewChangeToState, applyFilters,
   clearFilterValues, deleteDataSourceItem, doSaveData, formatTableChanges, hasTableChanges,
   initFilterPredicate, ItemIdFn, newTableDataChanges, selectDataSourceItem,
-  SelectFn,
-  updateDataSourceItem, updateFilterConfig
+  SelectFn, updateDataSourceItem
 } from '../utils/table-manage-utils';
 import { TableFilterInfo } from '../models/table-filter-items';
 import { ActivatedRoute, Router } from '@angular/router';
 import { addNotApplyItemFlag } from '../utils/object-utils';
 import { handleError } from '@mon3/sa';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import { SizeService } from './size.service';
 
 @Injectable() // Без providedIn, регистрируем в компоненте
 export class TableManageService<T extends Record<string, any>> {
@@ -24,6 +24,9 @@ export class TableManageService<T extends Record<string, any>> {
   private route = inject(ActivatedRoute);
   getRoute = () => this.route;
   private breakpointObserver = inject(BreakpointObserver);
+
+  private sizeService = inject(SizeService);
+  getSizeService = () => this.sizeService;
 
   // === Публичные сигналы ===
   readonly dataSource = new MatTableDataSource<T>([]);
@@ -41,15 +44,10 @@ export class TableManageService<T extends Record<string, any>> {
   readonly changesSummary = computed(() => formatTableChanges(this.dataState()));
 
   // === Сигналы размеров ===
-  isSmallScreen = signal(false);
+  isSmallScreen = this.sizeService.isSmallScreen;
 
   // Отслеживаем размер экрана
-  breakpointsSubscribe() {
-    this.breakpointObserver.observe([Breakpoints.XSmall, Breakpoints.Small])
-      .subscribe(result => {
-        this.isSmallScreen.set(result.matches);
-      });
-  }
+  breakpointsSubscribe = () => this.sizeService.breakpointsSubscribe();
 
 
   // === Функция выбора строки ===

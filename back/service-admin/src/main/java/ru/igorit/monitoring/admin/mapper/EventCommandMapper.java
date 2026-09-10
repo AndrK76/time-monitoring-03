@@ -30,6 +30,9 @@ public interface EventCommandMapper {
     @Mapping(target = "orgId", source = "id")
     @Mapping(target = "mode", ignore = true)
     @Mapping(target = "users", source = "users", qualifiedByName = "userOrganizationsToIdsArray")
+    @Mapping(target = "eventAgentsSet", ignore = true)
+    @Mapping(target = "crmAgentSet", ignore = true)
+    @Mapping(target = "cameraAgentsSet", ignore = true)
     OrganizationInfoChangedEventCommandDto toOrgChangeEvent(AppOrganization data);
 
     @Named("userOrganizationsToIdsArray")
@@ -51,8 +54,6 @@ public interface EventCommandMapper {
     @Mapping(target = "orgId", source = "id")
     @Mapping(target = "mode", ignore = true)
     @Mapping(target = "users", ignore = true)
-    @Mapping(target = "updatedAt", ignore = true)
-    @Mapping(target = "updatedBy", ignore = true)
     OrganizationInfoChangedEventCommandDto toOrgChangeEvent(Organization data);
 
 

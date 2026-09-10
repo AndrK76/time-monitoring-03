@@ -43,7 +43,7 @@ export const routes: Routes = [
   },
   {
     path: 'crm/agent',
-    loadComponent: () => import('./features/crm-agent/crm-agent-editor-container/crm-agent-editor-container.component').then(m => m.CrmAgentEditorContainerComponent),
+    loadComponent: () => import('./features/crm-agent/crm-agent-config/crm-agent-config.component').then(m => m.CrmAgentConfigComponent),
     canActivate: [authGuard],
     data: authConstant('crm/agent')
   },
@@ -57,6 +57,12 @@ export const routes: Routes = [
     loadComponent: () => import('./features/camera-agent/camera-agent-list/camera-agent-list.component').then(m => m.CameraAgentListComponent),
     canActivate: [authGuard],
     data: authConstant('camera/agent-list')
+  },
+  {
+    path: 'yclients/config',
+    loadComponent: () => import('./features/yclients/yc-config-editor/yc-config-editor.component').then(m => m.YcConfigEditorComponent),
+    canActivate: [authGuard],
+    data: authConstant('yclients/config')
   },
   {
     path: 'test',

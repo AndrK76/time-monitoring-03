@@ -38,6 +38,13 @@ public class Organization {
     @Column(name = "camera_agents_set", nullable = false)
     private boolean cameraAgentsSet;
 
+    @UpdateTimestamp
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    @Column(name = "updated_by")
+    private String updatedBy;
+
 
     public Organization(String id) {
         this.id = id;

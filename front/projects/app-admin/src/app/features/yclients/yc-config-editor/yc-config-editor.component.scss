@@ -1,0 +1,11 @@
+:host {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    box-sizing: border-box;
+}
+
+/* Отступ для разделителя между readonly-формой и реактивной формой */
+.section-divider {
+    margin: 12px 0;
+}

@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.igorit.monitoring.admin.service.CrmManageService;
+import ru.igorit.monitoring.lib.dto.crm.CrmAgentConfigDto;
 import ru.igorit.monitoring.lib.dto.crm.CrmAgentItemDto;
 import ru.igorit.monitoring.lib.dto.crm.CrmAgentListDto;
 import ru.igorit.monitoring.lib.dto.crm.CrmAgentTypeDto;
@@ -71,6 +72,12 @@ public class CrmManageController {
             @RequestParam(name = "org") String orgId) {
         return service.bindAgent(agentId, orgId);
     }
+
+    @GetMapping({"/configs/{id}"})
+    CrmAgentConfigDto getAgentConfig(@PathVariable(name = "id") String agentId) {
+        return service.getAgentConfig(agentId);
+    }
+
 
 
 }

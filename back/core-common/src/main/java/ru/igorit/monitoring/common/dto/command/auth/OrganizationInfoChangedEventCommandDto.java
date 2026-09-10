@@ -24,6 +24,9 @@ public class OrganizationInfoChangedEventCommandDto implements Serializable {
     private LocalDateTime updatedAt;
     private String updatedBy;
     private String[] users;
+    private boolean crmAgentSet;
+    private boolean eventAgentsSet;
+    private boolean cameraAgentsSet;
 
     public static OrganizationInfoChangedEventCommandDto newDeleteEvent(String orgId) {
         return builder().orgId(orgId).mode(Mode.DELETE).build();
@@ -41,7 +44,8 @@ public class OrganizationInfoChangedEventCommandDto implements Serializable {
         DELETE,
         ADD,
         UPDATE,
-        UPDATE_NAME
+        UPDATE_NAME,
+        UPDATE_CRM_BIND
     }
 
 
