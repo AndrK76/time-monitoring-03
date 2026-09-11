@@ -133,6 +133,14 @@
         box-sizing: border-box;
     }
 
+    .no-full-width {
+        flex: 0 1 0;
+        min-width: 0;
+        max-width: 100%;
+        //width: 100%;
+        box-sizing: border-box;
+    }
+
     @media (max-width: 599.98px) {
         .form-row {
             flex-wrap: wrap;
@@ -141,6 +149,14 @@
 
         .full-width {
             flex: 1 1 100%;
+        }
+
+        .no-full-width {
+            flex: 0 1 0;
+            min-width: 0;
+            max-width: 100%;
+            //width: 100%;
+            box-sizing: border-box;
         }
 
         .editor-form {

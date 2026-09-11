@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class YClientsTokenRequest {
+public class YClientsTokenRequestDto {
     @NotBlank
     private String partnerToken;
     @NotBlank

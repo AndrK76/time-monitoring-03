@@ -1,4 +1,4 @@
-package ru.igorit.monitoring.bl.model.yclients.api;
+package ru.igorit.monitoring.yclients.api.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -10,10 +10,10 @@ import org.springframework.http.HttpStatusCode;
 @NoArgsConstructor
 @Getter
 @Setter
-public class YCResponse {
+public class YCResponse<TData, TMeta> {
     private HttpStatusCode status;
     private boolean success;
-    private Object data;
-    private Object meta;
+    private TData data;
+    private TMeta meta;
 
 }

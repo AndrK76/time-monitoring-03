@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class YClientCredentialsDto {
-    private String apiUrl;
     private String partnerToken;
     private String userToken;
 }

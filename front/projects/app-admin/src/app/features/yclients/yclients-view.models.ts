@@ -1,4 +1,4 @@
-import { YClientCredentialsDto, YClientsAgentConfigDto } from "@mon3/sc";
+import { YClientCredentialsDto, YClientsAgentConfigDto, YClientsOrganizationDto } from "@mon3/sc";
 
 export class YClientsAgentConfigView implements YClientsAgentConfigDto {
     constructor(
@@ -9,7 +9,19 @@ export class YClientsAgentConfigView implements YClientsAgentConfigDto {
 }
 
 export class YClientCredentialsView implements YClientCredentialsDto {
-    public apiUrl?: string;
     public partnerToken?: string;
     public userToken?: string;
+}
+
+
+export class YClientsOrganizationView implements YClientsOrganizationDto {
+    constructor(
+        public id: string,
+        public places: string[] | undefined,
+        public agentId: string,
+        public ycId: number | undefined,
+        public name: string | undefined,
+        public timezone: string | undefined,
+        public _selected: boolean = false
+    ) { }
 }

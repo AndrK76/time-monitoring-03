@@ -3,9 +3,47 @@
     flex-direction: column;
     height: 100%;
     box-sizing: border-box;
+    overflow: hidden;
 }
 
 /* Отступ для разделителя между readonly-формой и реактивной формой */
 .section-divider {
     margin: 12px 0;
+}
+
+.ycId {
+    min-width: 8rem;
+}
+
+
+.ycName {
+    min-width: 10rem;
+}
+
+
+.ycTz {
+    min-width: 6rem;
+}
+
+.crm-org-list-wrapper {
+    margin-top: 12px;
+    overflow: auto;
+
+    table {
+        width: 100%;
+    }
+
+    .mat-mdc-row {
+        cursor: pointer;
+    }
+
+    .mat-mdc-row.selected {
+        font-weight: 600;
+        background-color: var(--table-row-hover-bg);
+    }
+
+    .mat-mdc-cell,
+    .mat-mdc-header-cell {
+        padding: 6px 12px;
+    }
 }

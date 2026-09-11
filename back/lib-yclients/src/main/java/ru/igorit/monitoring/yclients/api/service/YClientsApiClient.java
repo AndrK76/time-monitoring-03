@@ -1,4 +1,4 @@
-package ru.igorit.monitoring.yclients.service;
+package ru.igorit.monitoring.yclients.api.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -9,9 +9,11 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 import ru.igorit.monitoring.yclients.api.dto.YCResponse;
 
+import java.net.URI;
 import java.util.Map;
 import java.util.Optional;
 
@@ -75,8 +77,14 @@ public class YClientsApiClient {
             TypeReference<TData> dataType,
             TypeReference<TMeta> metaType) {
 
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(url);
+        if (params != null && !params.isEmpty()) {
+            params.forEach(uriBuilder::queryParam);
+        }
+        URI uri = uriBuilder.build().encode().toUri();
+
         WebClient.RequestBodySpec spec = webClient.method(method)
-                .uri(url)
+                .uri(uri)
                 .accept(YC_ACCEPT)
                 .contentType(MediaType.APPLICATION_JSON);
 

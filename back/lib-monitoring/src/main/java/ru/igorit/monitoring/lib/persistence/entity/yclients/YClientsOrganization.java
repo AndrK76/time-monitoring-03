@@ -26,12 +26,20 @@ public class YClientsOrganization extends CrmOrganization {
     @Column(name = "yc_name", length = 2000)
     private String yclientsName;
 
+    @Column(name = "yc_tz")
+    private String yclientsTimezone;
+
     @OneToMany(mappedBy = "organization", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<YClientsServiceCategory> serviceCategories = new ArrayList<>();
 
     @Override
     public String getName() {
         return this.yclientsName;
+    }
+
+    @Override
+    public String getTimeZone() {
+        return this.yclientsTimezone;
     }
 
     public YClientsOrganization(CrmOrganization org) {

@@ -58,4 +58,8 @@ public class CrmOrganization {
         return null;
     }
 
+    public String getTimeZone() {
+        return null;
+    }
+
 }

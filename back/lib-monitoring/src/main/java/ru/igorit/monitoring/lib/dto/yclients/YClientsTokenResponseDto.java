@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class YClientsTokenResponse {
+public class YClientsTokenResponseDto {
     private int statusCode;
     private String statusMessage;
     private boolean success;

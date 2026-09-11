@@ -1,4 +1,4 @@
-package ru.igorit.monitoring.bl.model.yclients.api;
+package ru.igorit.monitoring.yclients.api.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;

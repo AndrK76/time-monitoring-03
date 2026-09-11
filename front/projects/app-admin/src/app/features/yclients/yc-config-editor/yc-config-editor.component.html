@@ -24,7 +24,7 @@
                 <span class="hide-on-small">{{ isLoading() ? 'Загрузка...' : 'Перечитать' }}</span>
             </button>
             <button mat-raised-button color="primary" (click)="callSave()"
-                [disabled]="isLoading() || hasError() || !hasChanges()">
+                [disabled]="isLoading() || hasError() || !(hasConfigChanged() || hasCrmOrgChanged())">
                 <mat-icon>save</mat-icon>
                 <span class="hide-on-small">Сохранить</span>
             </button>
@@ -44,58 +44,109 @@
         <span>{{ error().message }}</span>
     </div>
     } @else {
-
-    <!-- Readonly-форма с информацией об агенте -->
-    <div class="editor-container">
-        <div class="editor-form">
-            <div class="form-row">
-                <mat-form-field appearance="outline" class="full-width">
-                    <mat-label>Название агента</mat-label>
-                    <input matInput [value]="agent()?.name ?? ''" readonly>
-                </mat-form-field>
-                <mat-form-field appearance="outline" class="full-width">
-                    <mat-label>Организация</mat-label>
-                    <input matInput [value]="agent()?.organization?.shortName ?? ''" readonly>
-                </mat-form-field>
-            </div>
-        </div>
-    </div>
-
-    <mat-divider class="section-divider"></mat-divider>
-
-    <!-- Реактивная форма настроек (несколько областей) -->
-    <div class="editor-container">
-        <form [formGroup]="form" class="editor-form">
-            <div class="form-row"><span class="label">Настройка API</span></div>
-
-            <!-- Область: доступы (API) -->
-            <div class="form-row">
-                <mat-form-field appearance="outline" class="full-width">
-                    <mat-label>API URL</mat-label>
-                    <input matInput formControlName="apiUrl">
-                </mat-form-field>
-                <mat-form-field appearance="outline" class="full-width">
-                    <mat-label>Токен партнера</mat-label>
-                    <input matInput formControlName="partnerToken">
-                </mat-form-field>
-            </div>
-            <div class="form-row">
-                <mat-form-field appearance="outline" class="full-width">
-                    <mat-label>Токен пользователя</mat-label>
-                    <input matInput formControlName="userToken">
-                </mat-form-field>
-                <div class="action-button-group">
-                    <button mat-raised-button class="table-action-btn btn-gray" (click)="callGetUserToken()">
-                        <mat-icon>vpn_key</mat-icon>
-                        <span>Получить токен</span>
-                    </button>
+    <div class="editor-scroll-wrapper">
+        <!-- Readonly-форма с информацией об агенте -->
+        <div class="editor-container">
+            <div class="editor-form">
+                <div class="form-row">
+                    <mat-form-field appearance="outline" class="full-width">
+                        <mat-label>Название агента</mat-label>
+                        <input matInput [value]="agent()?.name ?? ''" readonly>
+                    </mat-form-field>
+                    <mat-form-field appearance="outline" class="full-width">
+                        <mat-label>Организация</mat-label>
+                        <input matInput [value]="agent()?.organization?.shortName ?? ''" readonly>
+                    </mat-form-field>
                 </div>
             </div>
+        </div>
 
-            <!-- Здесь позже появятся другие области -->
+        <mat-divider class="section-divider"></mat-divider>
 
-        </form>
+        <div class="editor-container">
+            <form [formGroup]="formConfig" class="editor-form">
+                <div class="form-row"><span class="label">Настройка API</span></div>
+
+                <!-- Область: доступы (API) -->
+                <div class="form-row">
+                    <mat-form-field appearance="outline" class="full-width">
+                        <mat-label>Токен партнера</mat-label>
+                        <input matInput formControlName="partnerToken">
+                    </mat-form-field>
+                </div>
+                <div class="form-row">
+                    <mat-form-field appearance="outline" class="full-width">
+                        <mat-label>Токен пользователя</mat-label>
+                        <input matInput formControlName="userToken">
+                    </mat-form-field>
+                    <div class="action-button-group">
+                        <button mat-raised-button class="table-action-btn btn-gray" (click)="callGetUserToken()"
+                            [disabled]="isGetUserToken()">
+                            <mat-icon>vpn_key</mat-icon>
+                            <span>Получить токен</span>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <mat-divider class="section-divider"></mat-divider>
+
+
+        <div class="editor-container">
+            <form [formGroup]="formCrmOrg" class="editor-form">
+                <div class="form-row"><span class="label">Организация</span></div>
+
+                <div class="form-row">
+                    <mat-form-field appearance="outline" class="no-full-width ycId">
+                        <mat-label>Id</mat-label>
+                        <input matInput formControlName="ycId" readonly>
+                    </mat-form-field>
+                    <mat-form-field appearance="outline" class="full-width ycName">
+                        <mat-label>Название</mat-label>
+                        <input matInput formControlName="name" readonly>
+                    </mat-form-field>
+                    <mat-form-field appearance="outline" class="no-full-width ycTz">
+                        <mat-label>Tz</mat-label>
+                        <input matInput formControlName="timezone" readonly>
+                    </mat-form-field>
+                    <div class="action-button-group">
+                        <button mat-raised-button class="table-action-btn  btn-gray" (click)="callLoadAvaibleOrgs()"
+                            [disabled]="!canLoadCrmOrg()">
+                            <mat-icon>cloud_download</mat-icon>
+                            <span>Выбрать из CRM</span>
+                        </button>
+                    </div>
+                </div>
+            </form>
+
+
+            <!-- Таблица доступных организаций из CRM -->
+            @if (lstYcOrgs().length > 0) {
+            <div class="crm-org-list-wrapper">
+                <table mat-table [dataSource]="lstYcOrgs()" class="mat-elevation-z0">
+                    <ng-container matColumnDef="ycId">
+                        <th mat-header-cell *matHeaderCellDef>Id</th>
+                        <td mat-cell *matCellDef="let row">{{ row.ycId }}</td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="name">
+                        <th mat-header-cell *matHeaderCellDef>Название</th>
+                        <td mat-cell *matCellDef="let row">{{ row.name }}</td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="timezone">
+                        <th mat-header-cell *matHeaderCellDef>Tz</th>
+                        <td mat-cell *matCellDef="let row">{{ row.timezone }}</td>
+                    </ng-container>
+
+                    <tr mat-header-row *matHeaderRowDef=" ['ycId', 'name', 'timezone']"></tr>
+                    <tr mat-row *matRowDef="let row; columns:  ['ycId', 'name', 'timezone']"
+                        (click)="onSelectYcOrg(row)" [class.selected]="row._selected"></tr>
+                </table>
+            </div>
+            }
+        </div>
     </div>
-
     }
 </div>

@@ -102,8 +102,12 @@ spring:
   #         min-idle: 0
 
 
-
-
+yclients:
+  config:
+    api:
+      api-url: ${YCLIENTS_API_URL}
+      auth-api: "/auth"
+      companies-api: "/companies"
 
 server:
   port: 8082
