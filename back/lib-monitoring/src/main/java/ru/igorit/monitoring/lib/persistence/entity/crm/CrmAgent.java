@@ -3,9 +3,12 @@ package ru.igorit.monitoring.lib.persistence.entity.crm;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.BatchSize;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 import ru.igorit.monitoring.lib.enums.CrmAgentType;
 import ru.igorit.monitoring.lib.persistence.entity.common.Organization;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,6 +55,21 @@ public class CrmAgent {
     @OneToMany(mappedBy = "agent", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<CrmService> services = new ArrayList<>();
+
+
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
+
+    @Column(name = "created_by")
+    private String createdBy;
+
+    @UpdateTimestamp
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    @Column(name = "updated_by")
+    private String updatedBy;
 
     public void setConfig(CrmAgentConfig config) {
         this.config = config;

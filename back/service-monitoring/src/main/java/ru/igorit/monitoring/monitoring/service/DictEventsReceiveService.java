@@ -28,8 +28,13 @@ public class DictEventsReceiveService {
                 var src = orgRepo.findById(event.getOrgId()).orElse(new Organization(event.getOrgId()));
                 src.setShortName(event.getShortName());
                 src.setFullName(event.getFullName());
-                src.setUpdatedAt(event.getUpdatedAt());
-                src.setUpdatedBy(event.getUpdatedBy());
+                if (OrganizationInfoChangedEventCommandDto.Mode.ADD.equals(event.getMode())) {
+                    src.setCreatedAt(event.getUpdatedAt());
+                    src.setCreatedBy(event.getUpdatedBy());
+                } else {
+                    src.setUpdatedAt(event.getUpdatedAt());
+                    src.setUpdatedBy(event.getUpdatedBy());
+                }
                 orgRepo.save(src);
             } else if (event.getMode() == OrganizationInfoChangedEventCommandDto.Mode.DELETE) {
                 orgRepo.deleteById(event.getOrgId());

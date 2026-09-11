@@ -36,6 +36,7 @@ public class YClientsAgent extends CrmAgent {
             if (agent.getServices() != null) {
                 this.setServices(new ArrayList<>(agent.getServices()));
             }
+            this.setCreatedBy(agent.getCreatedBy());
         }
     }
 

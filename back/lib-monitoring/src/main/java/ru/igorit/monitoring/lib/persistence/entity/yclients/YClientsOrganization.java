@@ -41,6 +41,7 @@ public class YClientsOrganization extends CrmOrganization {
             if (org.getPlaces() != null) {
                 this.setPlaces(org.getPlaces());
             }
+            this.setCreatedBy(org.getCreatedBy());
         }
     }
 }

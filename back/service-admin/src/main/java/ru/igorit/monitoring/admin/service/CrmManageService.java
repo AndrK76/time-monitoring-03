@@ -103,11 +103,13 @@ public class CrmManageService {
                 commonOrgRepo.findById(dto.getOrganizationId()).orElseThrow(
                         () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Not exists organization"));
         var crmOrg = new CrmOrganization();
+        crmOrg.setCreatedBy(extractUserId(getCurrentAuth()));
         var agent = CrmAgent.builder()
                 .type(agentType)
                 .name(dto.getName())
                 .description(dto.getDescription())
                 .configured(false)
+                .createdBy(extractUserId(getCurrentAuth()))
                 .build();
         switch (agentType) {
             case YClients -> {
@@ -121,6 +123,7 @@ public class CrmManageService {
         agent.setOrganization(org);
         var stored = agentRepo.save(agent);
         if (org != null) {
+            org.setUpdatedBy(extractUserId(getCurrentAuth()));
             commonOrgRepo.save(org);
         }
         return crmModelMapper.toDto(stored);
@@ -151,6 +154,7 @@ public class CrmManageService {
         if (!Objects.equals(stored.getDescription(), dto.getDescription())) {
             stored.setDescription(dto.getDescription());
         }
+        stored.setUpdatedBy(extractUserId(getCurrentAuth()));
         stored = agentRepo.saveAndFlush(stored);
         if (changeOrg && dto.getOrganizationId() != null) {
             stored = _bindAgent(stored.getId(), dto.getOrganizationId());
@@ -198,8 +202,10 @@ public class CrmManageService {
             switch (agent.getType()) {
                 case YClients -> {
                     config = new YClientsAgentConfig(agent);
+                    config.setCreatedBy(extractUserId(getCurrentAuth()));
                     config = cfgRepo.saveAndFlush(config);
                     agent.setConfig(config);
+                    agent.setCreatedBy(extractUserId(getCurrentAuth()));
                     agentRepo.save(agent);
                 }
                 default ->
@@ -215,6 +221,7 @@ public class CrmManageService {
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "CRM Agent with id " + agentId + " not found"));
         var currOrg = stored.getOrganization();
         stored.setOrganization(null);
+        stored.setUpdatedBy(extractUserId(getCurrentAuth()));
         var ret = agentRepo.save(stored);
         if (currOrg != null) {
             currOrg.setUpdatedBy(extractUserId(getCurrentAuth()));
@@ -239,12 +246,14 @@ public class CrmManageService {
         var newOrgAgent = agentRepo.findByOrganizationId(newOrg.getId());
         if (!newOrgAgent.isEmpty()) {
             newOrgAgent.get(0).setOrganization(null);
+            newOrgAgent.get(0).setUpdatedBy(extractUserId(getCurrentAuth()));
             agentRepo.saveAndFlush(newOrgAgent.get(0));
         }
         stored.setOrganization(newOrg);
         newOrg.setUpdatedBy(extractUserId(getCurrentAuth()));
         newOrg = commonOrgRepo.save(newOrg);
         sendOrgChangeEvent(newOrg);
+        stored.setUpdatedBy(extractUserId(getCurrentAuth()));
         return agentRepo.save(stored);
     }
 

@@ -38,6 +38,13 @@ public class Organization {
     @Column(name = "camera_agents_set", nullable = false)
     private boolean cameraAgentsSet;
 
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
+
+    @Column(name = "created_by")
+    private String createdBy;
+
     @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;

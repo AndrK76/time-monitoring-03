@@ -16,6 +16,9 @@ import ru.igorit.monitoring.lib.persistence.entity.yclients.YClientCredentials;
 import ru.igorit.monitoring.lib.persistence.entity.yclients.YClientsAgentConfig;
 import ru.igorit.monitoring.lib.persistence.repository.yclients.YClientsAgentConfigRepository;
 
+import static ru.igorit.monitoring.security.util.AuthInfoUtils.extractUserId;
+import static ru.igorit.monitoring.security.util.AuthInfoUtils.getCurrentAuth;
+
 @Service
 @RequiredArgsConstructor
 @Log4j2
@@ -50,6 +53,7 @@ public class YClientsManageService {
         currCreds.fillFrom(newCreds);
         currCreds = maskCreds(currCreds);
         stored.setCredentials(currCreds);
+        stored.setUpdatedBy(extractUserId(getCurrentAuth()));
         return unmaskCreds(mapper.toDto(configRepo.save(stored)));
     }
 
