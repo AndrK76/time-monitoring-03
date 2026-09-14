@@ -8,8 +8,8 @@ import { ErrorResponseResult, LoginRequestDto, processResponseError } from '@mon
 import { YclientsManageService } from '../../../services/yclients-manage.service';
 import { CrmStructManageService } from '../../../services/crm-struct-manage.service';
 import { MainStructManageService } from '../../../services/main-struct-manage.service';
-import { YClientCredentialsView, YClientsAgentConfigView, YClientsOrganizationView } from '../yclients-view.models';
-import { yClientsAgentConfigDtoFromView, yClientsAgentConfigDtoToView, yClientsOrganizationDtoFromView, yClientsOrganizationDtoPopulate, yClientsOrganizationDtoToView } from '../yclients-view.utils';
+import { YClientCredentialsView, YClientsAgentConfigView, YClientsOrganizationView, YClientsServiceCategoryListView } from '../yclients-view.models';
+import { yClientsAgentConfigDtoFromView, yClientsAgentConfigDtoToView, yClientsOrganizationDtoFromView, yClientsOrganizationDtoPopulate, yClientsOrganizationDtoToView, yClientsServiceCategoryDtoToListView } from '../yclients-view.utils';
 import { CrmAgentItemView, CrmAgentTypeView } from '../../crm-agent/crm-agent-view.models';
 import { crmAgentItemDtoToView, crmAgentTypeDtoToView } from '../../crm-agent/crm-agent-view.utils';
 import { OrgStructInfo } from '../../struct-org/struct-org-view.models';
@@ -23,13 +23,16 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatCardModule } from '@angular/material/card';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatTableModule } from '@angular/material/table';
+import { YcServiceCategoryListComponent } from './yc-service-category-list/yc-service-category-list.component';
 
 @Component({
   selector: 'app-yc-config-editor',
   standalone: true,
   imports: [CommonModule, RouterModule, ReactiveFormsModule,
     MatProgressSpinnerModule, MatIconModule, MatButtonModule,
-    MatFormFieldModule, MatInputModule, MatDividerModule, MatCardModule, MatTableModule],
+    MatFormFieldModule, MatInputModule, MatDividerModule, MatCardModule, MatTableModule,
+    YcServiceCategoryListComponent,
+  ],
   templateUrl: './yc-config-editor.component.html',
   styleUrl: './yc-config-editor.component.scss'
 })
@@ -63,6 +66,7 @@ export class YcConfigEditorComponent implements OnInit {
   dataConfig = signal<YClientsAgentConfigView | undefined>(undefined);
   currentConfig = signal<YClientsAgentConfigView | undefined>(undefined);
   currentCrmOrg = signal<YClientsOrganizationView | undefined>(undefined);
+  currentServiceCategories = signal<YClientsServiceCategoryListView[]>([]);
 
   agent = signal<CrmAgentItemView | undefined>(undefined);
   organizations = signal<OrgStructInfo[]>([]);
@@ -160,14 +164,16 @@ export class YcConfigEditorComponent implements OnInit {
           agent: this.crmService.getAgentById(this.configId!).pipe(
             map(dto => crmAgentItemDtoToView(dto, types, organizations))
           ),
+          serviceCategories: this.loadServiceCategories(),
         });
       }),
       finalize(() => this.isLoading.set(false))
     ).subscribe({
-      next: ({ config, crmorg: org, agent }) => {
+      next: ({ config, crmorg: org, agent, serviceCategories }) => {
         this.agent.set(agent);
         this.afterLoadCrmOrg(org);
         this.afterLoadItem(config, undefined);
+        this.afterLoadServiceCategories(serviceCategories);
         this.listenToChanges();
       },
       error: err => this.processError(err),
@@ -230,6 +236,19 @@ export class YcConfigEditorComponent implements OnInit {
   }
 
 
+  private _beforeLoadServiceCategories = () => {
+    this.currentServiceCategories.set([]);
+  }
+
+  private loadServiceCategories = (): Observable<YClientsServiceCategoryListView[]> => {
+    return this.dataService.getServiceCategoriesForAgent(this.configId!).pipe(
+      map(dto => dto.map(v => yClientsServiceCategoryDtoToListView(v, true, undefined)))
+    );
+  }
+  private afterLoadServiceCategories = (lst: YClientsServiceCategoryListView[]): void => {
+    this.currentServiceCategories.set(lst);
+  }
+
 
   private updateItem = (item: YClientsAgentConfigView): Observable<YClientsAgentConfigView> => {
     const value = yClientsAgentConfigDtoFromView(item);
@@ -266,6 +285,12 @@ export class YcConfigEditorComponent implements OnInit {
     this.doLoadAvaibleOrgs();
   }
 
+  callLoadCategories(): void {
+    this.dialogService.confirm('Считать актуальный список категорий?').subscribe(confirmed => {
+      if (confirmed) this.doLoadCategories();
+    });
+  }
+
   callSave(): void {
     this.dialogService.confirm('Сохранить изменения?').subscribe(confirmed => {
       if (confirmed) this.doSave();
@@ -294,15 +319,18 @@ export class YcConfigEditorComponent implements OnInit {
     if (!this.configId) return;
     this._beforeLoad();
     this._beforeLoadCrmOrgList();
+    this._beforeLoadServiceCategories();
     forkJoin({
       config: this.loadItem(),
       org: this.loadCrmOrg(),
+      serviceCatgories: this.loadServiceCategories(),
     }).pipe(
       finalize(() => this.isLoading.set(false))
     ).subscribe({
-      next: ({ config, org }) => {
+      next: ({ config, org, serviceCatgories }) => {
         this.afterLoadItem(config, undefined);
-        this.afterLoadCrmOrg(org)
+        this.afterLoadCrmOrg(org);
+        this.afterLoadServiceCategories(serviceCatgories);
       },
       error: err => this.afterLoadItem(undefined, err),
     });
@@ -349,7 +377,7 @@ export class YcConfigEditorComponent implements OnInit {
     if (!this.canLoadCrmOrg()) return;
     this.isLoadCrmOrgList.set(true);
     this._beforeLoadCrmOrgList();
-    this.dataService.getAllowedOrganizations(this.currentConfig()!.id).pipe(
+    this.dataService.getAllowedOrganizationsForAgent(this.currentConfig()!.id).pipe(
       finalize(() => this.isLoadCrmOrgList.set(false))
     ).subscribe({
       next: result => {
@@ -365,6 +393,47 @@ export class YcConfigEditorComponent implements OnInit {
         }
       },
       error: err => this.afterLoadItem(undefined, err, 'при запросе списка доступных организаций'),
+    });
+  }
+
+  doLoadCategories(): void {
+    const id = this.curLstYcOrg()?.ycId ?? this.currentCrmOrg()?.ycId;
+    if (!id) return;
+    const idExact = id === this.curLstYcOrg()?.ycId;
+    this.dataService.getAllowedServiceCategories(id).pipe(
+    ).subscribe({
+      next: result => {
+        if (!result.success) {
+          this.notificationService.error(result.errorMessage ?? 'Ошибка при запросе списка категорий')
+        } else if (!result.data?.length) {
+          this.notificationService.error(result.errorMessage ?? 'Получен пустой список категорий')
+        } else {
+          const current = idExact ? this.currentServiceCategories() : [];
+          const currentMap = new Map(current.map(c => [c.id, c]));
+          const resultIds = new Set(result.data.map(d => d.id));
+          const newList: YClientsServiceCategoryListView[] = result.data.map(dto => {
+            const existing = currentMap.get(dto.id);
+            if (idExact && existing) {
+              existing.name = dto.name;
+              existing.existsNow = true;
+              existing.existsCRM = true;
+              return existing;
+            }
+            return yClientsServiceCategoryDtoToListView(dto, false, true);
+          });
+          if (idExact) {
+            for (const cat of current) {
+              if (!resultIds.has(cat.id)) {
+                cat.existsNow = true;
+                cat.existsCRM = false;
+                newList.push(cat);
+              }
+            }
+          }
+          this.currentServiceCategories.set(newList);
+        }
+      },
+      error: err => this.afterLoadItem(undefined, err, 'при запросе списка категорий'),
     });
   }
 
@@ -393,7 +462,7 @@ export class YcConfigEditorComponent implements OnInit {
           if (config) this.afterLoadItem(config, undefined);
           if (org) this.afterLoadCrmOrg(org);
 
-          this.notificationService.success('Все изменения сохранены успешно');
+          this.notificationService.success('Все изменения сохранены успешно. Если изменяли организацию, то обновите список услуг и их категорий');
         },
         error: err => {
           const resError = processResponseError(err);

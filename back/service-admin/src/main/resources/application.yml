@@ -108,6 +108,8 @@ yclients:
       api-url: ${YCLIENTS_API_URL}
       auth-api: "/auth"
       companies-api: "/companies"
+      company-api: "/company"
+      service-categories-api: "/service_categories"
 
 server:
   port: 8082

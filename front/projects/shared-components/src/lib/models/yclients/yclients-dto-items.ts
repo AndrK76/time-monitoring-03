@@ -31,6 +31,12 @@ export interface YClientsOrganizationDto {
     timezone?: string;
 }
 
+export interface YClientsServiceCategoryListDto {
+    id: number;
+    name: string;
+    orgId: number;
+}
+
 export interface YClientsDataResponseDto<T = unknown> {
     statusCode?: number;
     statusMessage?: string;
@@ -39,3 +45,4 @@ export interface YClientsDataResponseDto<T = unknown> {
     data?: T;
     meta?: Record<string, string>;
 }
+

@@ -5,9 +5,11 @@ import org.mapstruct.Mapping;
 import ru.igorit.monitoring.lib.dto.yclients.YClientCredentialsDto;
 import ru.igorit.monitoring.lib.dto.yclients.YClientsAgentConfigDto;
 import ru.igorit.monitoring.lib.dto.yclients.YClientsOrganizationDto;
+import ru.igorit.monitoring.lib.dto.yclients.YClientsServiceCategoryListDto;
 import ru.igorit.monitoring.lib.persistence.entity.yclients.YClientCredentials;
 import ru.igorit.monitoring.lib.persistence.entity.yclients.YClientsAgentConfig;
 import ru.igorit.monitoring.lib.persistence.entity.yclients.YClientsOrganization;
+import ru.igorit.monitoring.lib.persistence.entity.yclients.YClientsServiceCategory;
 
 @Mapper(componentModel = "spring")
 public interface YClientsModelMapper {
@@ -23,5 +25,10 @@ public interface YClientsModelMapper {
     @Mapping(target = "ycId", source = "yclientsId")
     @Mapping(target = "timezone", source = "timeZone")
     YClientsOrganizationDto toDto(YClientsOrganization item);
+
+    @Mapping(target = "id", source = "YClientsId")
+    @Mapping(target = "name", source = "YClientsName")
+    @Mapping(target = "orgId", source = "organization.yclientsId")
+    YClientsServiceCategoryListDto toDto(YClientsServiceCategory item);
 
 }

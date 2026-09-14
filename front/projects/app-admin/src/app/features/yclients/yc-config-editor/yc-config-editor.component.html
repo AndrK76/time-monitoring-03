@@ -45,7 +45,6 @@
     </div>
     } @else {
     <div class="editor-scroll-wrapper">
-        <!-- Readonly-форма с информацией об агенте -->
         <div class="editor-container">
             <div class="editor-form">
                 <div class="form-row">
@@ -91,7 +90,6 @@
         </div>
 
         <mat-divider class="section-divider"></mat-divider>
-
 
         <div class="editor-container">
             <form [formGroup]="formCrmOrg" class="editor-form">
@@ -146,6 +144,18 @@
                 </table>
             </div>
             }
+        </div>
+
+        <mat-divider class="section-divider"></mat-divider>
+
+        <div class="editor-container">
+            <div class="form-row">
+                <span class="label">Категории услуг</span>
+            </div>
+            <app-yc-service-category-list [categoriesData]="currentServiceCategories()"
+                [currentOrgId]="currentCrmOrg()?.ycId" [selectedOrgId]="curLstYcOrg()?.ycId"
+                (loadFromCrm)="callLoadCategories()">
+            </app-yc-service-category-list>
         </div>
     </div>
     }

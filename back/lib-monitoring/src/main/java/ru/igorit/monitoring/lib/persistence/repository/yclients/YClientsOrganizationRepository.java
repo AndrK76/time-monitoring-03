@@ -7,4 +7,6 @@ import java.util.Optional;
 
 public interface YClientsOrganizationRepository extends JpaRepository<YClientsOrganization, String> {
     Optional<YClientsOrganization> findByAgentId(String id);
+
+    Optional<YClientsOrganization> findByYclientsId(Long id);
 }

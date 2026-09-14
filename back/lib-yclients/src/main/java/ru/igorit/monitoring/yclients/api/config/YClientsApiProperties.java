@@ -11,7 +11,9 @@ public class YClientsApiProperties {
     private String apiUrl;
     private String authApi;
     private String companiesApi;
-    private int connectTimeout = 5000;
-    private int responseTimeout = 5000;
+    private String companyApi;
+    private String serviceCategoriesApi;
+    private int connectTimeout = 15000;
+    private int responseTimeout = 15000;
     private int maxMemorySizeMb = 1;
 }

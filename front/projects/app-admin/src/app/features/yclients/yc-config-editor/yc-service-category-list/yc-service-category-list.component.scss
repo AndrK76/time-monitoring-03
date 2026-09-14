@@ -1,0 +1,25 @@
+:host {
+    display: block;
+    width: 100%;
+}
+
+.mat-column-orgId {
+    min-width: 8rem;
+    max-width: 12rem;
+}
+
+.mat-column-exists {
+    min-width: 6rem;
+    max-width: 8rem;
+}
+
+.category-list-actions {
+    display: flex;
+    justify-content: flex-end;
+    padding: 4px 0 8px 0;
+    flex-shrink: 0;
+
+    .spacer {
+        flex: 1;
+    }
+}

@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { YClientsAgentConfigDto, YClientsDataResponseDto, YClientsOrganizationDto, YClientsTokenRequestDto, YClientsTokenResponseDto } from '@mon3/sc';
+import { YClientsAgentConfigDto, YClientsDataResponseDto, YClientsOrganizationDto, YClientsServiceCategoryListDto, YClientsTokenRequestDto, YClientsTokenResponseDto } from '@mon3/sc';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -36,8 +36,16 @@ export class YclientsManageService {
     return this.http.put<YClientsOrganizationDto>(`${this.adminApiUrl}${this.YC_CONTROLLER}/agents/${id}/organization`, data);
   }
 
-  getAllowedOrganizations(id: string): Observable<YClientsDataResponseDto<YClientsOrganizationDto[]>> {
+  getServiceCategoriesForAgent(id: string): Observable<YClientsServiceCategoryListDto[]> {
+    return this.http.get<YClientsServiceCategoryListDto[]>(`${this.adminApiUrl}${this.YC_CONTROLLER}/agents/${id}/service-categories`);
+  }
+
+  getAllowedOrganizationsForAgent(id: string): Observable<YClientsDataResponseDto<YClientsOrganizationDto[]>> {
     return this.http.get<YClientsDataResponseDto<YClientsOrganizationDto[]>>(`${this.adminApiUrl}${this.YC_CONTROLLER}/misc/agent/${id}/allowed-orgs`);
+  }
+
+  getAllowedServiceCategories(orgId?: number): Observable<YClientsDataResponseDto<YClientsServiceCategoryListDto[]>> {
+    return this.http.get<YClientsDataResponseDto<YClientsServiceCategoryListDto[]>>(`${this.adminApiUrl}${this.YC_CONTROLLER}/misc/org/${orgId}/service-categories`);
   }
 
 

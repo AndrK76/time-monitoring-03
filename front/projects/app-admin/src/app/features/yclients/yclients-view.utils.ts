@@ -1,5 +1,5 @@
-import { YClientsAgentConfigDto, YClientsOrganizationDto } from "@mon3/sc"
-import { YClientsAgentConfigView, YClientsOrganizationView } from "./yclients-view.models"
+import { YClientsAgentConfigDto, YClientsOrganizationDto, YClientsServiceCategoryListDto } from "@mon3/sc"
+import { YClientsAgentConfigView, YClientsOrganizationView, YClientsServiceCategoryListView } from "./yclients-view.models"
 
 export const yClientsAgentConfigDtoToView = (dto: YClientsAgentConfigDto): YClientsAgentConfigView => {
     return {
@@ -52,6 +52,17 @@ export const yClientsOrganizationDtoPopulate = (dto: YClientsOrganizationDto, ne
         ycId: newInfo.ycId,
         name: newInfo.name,
         timezone: newInfo.timezone,
+    }
+}
+
+export const yClientsServiceCategoryDtoToListView = (dto: YClientsServiceCategoryListDto,
+    existsNow: boolean, existsCrm: boolean | undefined,): YClientsServiceCategoryListView => {
+    return {
+        id: dto.id,
+        name: dto.name,
+        orgId: dto.orgId,
+        existsNow: existsNow,
+        existsCRM: existsCrm
     }
 }
 

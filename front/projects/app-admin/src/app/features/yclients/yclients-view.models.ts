@@ -1,4 +1,4 @@
-import { YClientCredentialsDto, YClientsAgentConfigDto, YClientsOrganizationDto } from "@mon3/sc";
+import { YClientCredentialsDto, YClientsAgentConfigDto, YClientsOrganizationDto, YClientsServiceCategoryListDto } from "@mon3/sc";
 
 export class YClientsAgentConfigView implements YClientsAgentConfigDto {
     constructor(
@@ -24,4 +24,15 @@ export class YClientsOrganizationView implements YClientsOrganizationDto {
         public timezone: string | undefined,
         public _selected: boolean = false
     ) { }
+}
+
+export class YClientsServiceCategoryListView implements YClientsServiceCategoryListDto {
+    constructor(
+        public id: number,
+        public name: string,
+        public orgId: number,
+        public existsNow: boolean,
+        public existsCRM: boolean | undefined,
+    ) { }
+
 }

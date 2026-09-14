@@ -7,10 +7,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import ru.igorit.monitoring.lib.dto.yclients.*;
 import ru.igorit.monitoring.yclients.api.config.YClientsApiProperties;
-import ru.igorit.monitoring.yclients.api.dto.YCAuthParams;
-import ru.igorit.monitoring.yclients.api.dto.YCAuthResponse;
-import ru.igorit.monitoring.yclients.api.dto.YCOrgInfo;
-import ru.igorit.monitoring.yclients.api.dto.YCResponse;
+import ru.igorit.monitoring.yclients.api.dto.*;
 import ru.igorit.monitoring.yclients.api.service.YClientsApiClient;
 
 import java.time.ZoneOffset;
@@ -25,6 +22,9 @@ public class ConfigManageService {
     private final YClientsApiProperties apiProperties;
     private final YClientsApiClient apiClient;
 
+    private final TypeReference<Map<String, String>> metaType = new TypeReference<>() {
+    };
+
 
     public YClientsTokenResponseDto getClientToken(YClientsTokenRequestDto request) {
         var response = _getClientToken(request);
@@ -33,8 +33,6 @@ public class ConfigManageService {
 
     private YCResponse<YCAuthResponse, Map<String, String>> _getClientToken(YClientsTokenRequestDto request) {
         YCAuthParams params = new YCAuthParams(request.getLogin(), request.getPassword());
-        TypeReference<Map<String, String>> metaType = new TypeReference<>() {
-        };
 
         return apiClient.exchange(
                 apiProperties.getApiUrl() + apiProperties.getAuthApi(),
@@ -74,9 +72,6 @@ public class ConfigManageService {
     }
 
     private YCResponse<List<YCOrgInfo>, Map<String, String>> _getClientOrganizations(YClientCredentialsDto request) {
-        TypeReference<Map<String, String>> metaType = new TypeReference<>() {
-        };
-
         return apiClient.exchange(
                 apiProperties.getApiUrl() + apiProperties.getCompaniesApi(),
                 HttpMethod.GET,
@@ -90,14 +85,13 @@ public class ConfigManageService {
         ).orElse(apiClient.emptyErrorResponse(metaType));
     }
 
-
     private YClientsDataResponse<List<YClientsOrganizationDto>> parseClientOrganizationsResponse(YCResponse<List<YCOrgInfo>, Map<String, String>> response) {
         if (response.isSuccess()) {
             return YClientsDataResponse.<List<YClientsOrganizationDto>>builder()
                     .statusCode(response.getStatus().value())
                     .statusMessage(response.getStatus().toString())
                     .success(true)
-                    .data(response.getData().stream().map(v->
+                    .data(response.getData().stream().map(v ->
                             YClientsOrganizationDto.builder()
                                     .ycId((long) v.getId())
                                     .name(v.getTitle())
@@ -116,5 +110,54 @@ public class ConfigManageService {
                     .build();
         }
     }
+
+
+    public YClientsDataResponse<List<YClientsServiceCategoryListDto>> getOrganizationServiceCategories(long orgId, YClientCredentialsDto request) {
+        var response = _getOrganizationServiceCategories(orgId, request);
+        return parseOrganizationServiceCategoriesResponse(orgId, response);
+    }
+
+    private YCResponse<List<YCServiceCategoryInfo>, Map<String, String>> _getOrganizationServiceCategories(long orgId, YClientCredentialsDto request) {
+        return apiClient.exchange(
+                apiProperties.getApiUrl() + apiProperties.getCompanyApi() + "/" + orgId + apiProperties.getServiceCategoriesApi(),
+                HttpMethod.GET,
+                request.getPartnerToken(),
+                request.getUserToken(),
+                null,
+                null,
+                new TypeReference<List<YCServiceCategoryInfo>>() {
+                },
+                metaType
+        ).orElse(apiClient.emptyErrorResponse(metaType));
+    }
+
+    private YClientsDataResponse<List<YClientsServiceCategoryListDto>> parseOrganizationServiceCategoriesResponse(
+            Long orgId,
+            YCResponse<List<YCServiceCategoryInfo>, Map<String, String>> response) {
+        if (response.isSuccess()) {
+            return YClientsDataResponse.<List<YClientsServiceCategoryListDto>>builder()
+                    .statusCode(response.getStatus().value())
+                    .statusMessage(response.getStatus().toString())
+                    .success(true)
+                    .data(response.getData().stream().map(v ->
+                            YClientsServiceCategoryListDto.builder()
+                                    .id((long) v.getId())
+                                    .name(v.getTitle())
+                                    .orgId(orgId)
+                                    .build()
+                    ).toList())
+                    .meta(response.getMeta())
+                    .build();
+        } else {
+            return YClientsDataResponse.<List<YClientsServiceCategoryListDto>>builder()
+                    .statusCode(response.getStatus().value())
+                    .statusMessage(response.getStatus().toString())
+                    .success(false)
+                    .errorMessage(response.getMeta().get("message"))
+                    .meta(response.getMeta())
+                    .build();
+        }
+    }
+
 
 }

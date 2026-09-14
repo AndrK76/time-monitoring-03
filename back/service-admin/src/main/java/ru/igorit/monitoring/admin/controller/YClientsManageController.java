@@ -39,6 +39,11 @@ public class YClientsManageController {
         return service.updateOrganizationForAgent(agentId, data);
     }
 
+    @GetMapping("/agents/{id}/service-categories")
+    public List<YClientsServiceCategoryListDto> getServiceCategoriesForAgent(@PathVariable("id") String agentId) {
+        return service.getServiceCategoriesForAgent(agentId);
+    }
+
     @PostMapping("/misc/get-token")
     public YClientsTokenResponseDto getClientToken(@Valid @RequestBody YClientsTokenRequestDto request) {
         log.debug("Start get client-token");
@@ -48,7 +53,12 @@ public class YClientsManageController {
     }
 
     @GetMapping("/misc/agent/{id}/allowed-orgs")
-    public YClientsDataResponse<List<YClientsOrganizationDto>> getAllowedOrganizations(@PathVariable(name = "id") String agentId) {
-        return service.getAllowedOrganizations(agentId);
+    public YClientsDataResponse<List<YClientsOrganizationDto>> getAllowedOrganizationsForAgent(@PathVariable(name = "id") String agentId) {
+        return service.getAllowedOrganizationsForAgent(agentId);
+    }
+
+    @GetMapping("/misc/org/{id}/service-categories")
+    public YClientsDataResponse<List<YClientsServiceCategoryListDto>> getAllowedServiceCategories(@PathVariable(name = "id") Long orgId) {
+        return service.getAllowedServiceCategories(orgId);
     }
 }
