@@ -4,15 +4,24 @@
         <mat-card-actions class="category-list-actions">
             <span class="spacer"></span>
             <div class="action-button-group">
-                <button mat-raised-button [color]="orgsMatch() ? '' : 'primary'" class="table-action-btn"
-                    [ngClass]="orgsMatch()?'btn-gray':''" [disabled]="!canLoadFromCrm()" (click)="onLoadFromCrm()">
+                <button mat-raised-button [color]="hasNoCategories() ? 'primary' : ''"
+                    [ngClass]="hasNoCategories() ? '' : 'btn-gray'" class="table-action-btn"
+                    [disabled]="!canLoadFromCrm()" (click)="onLoadFromCrm()">
                     <mat-icon>cloud_download</mat-icon>
-                    <span class="hide-on-small">Получить из CRM</span>
+                    <span>Получить из CRM</span>
                 </button>
             </div>
         </mat-card-actions>
 
         <mat-card-content class="inner-table">
+            @if (loadingCategories()) {
+            <div class="table-overlay">
+                <div class="loading-spinner">
+                    <mat-spinner diameter="40"></mat-spinner>
+                    <p>Загрузка данных...</p>
+                </div>
+            </div>
+            }
             @if (dataSource.data.length === 0) {
             <div class="empty-state inner-table">
                 <mat-icon>info</mat-icon>
@@ -30,34 +39,28 @@
                                 <mat-icon>filter_list</mat-icon>
                             </button>
                         </th>
-                        <td mat-cell *matCellDef="let row"></td>
+                        <td mat-cell *matCellDef="let row">
+                            <mat-checkbox [checked]="row.selected" (change)="onSelectedChange(row, $event.checked)"
+                                (click)="$event.stopPropagation()">
+                            </mat-checkbox>
+                        </td>
                     </ng-container>
 
                     <ng-container matColumnDef="name">
                         <th mat-header-cell *matHeaderCellDef>
-                            <sc-filter-root key="name" label="Название" [showFilter]="showFilter()" [sort]="true"
+                            <sc-filter-root key="name" label="Наименование" [showFilter]="showFilter()" [sort]="true"
                                 [config]="filterConfig().get('name')!"
                                 (change)="onFilterChange($event)"></sc-filter-root>
                         </th>
                         <td mat-cell *matCellDef="let row">{{ row.name }}</td>
                     </ng-container>
 
-                    <ng-container matColumnDef="orgId">
+                    <ng-container matColumnDef="id">
                         <th mat-header-cell *matHeaderCellDef>
-                            <sc-filter-root key="orgId" label="Org Id" [showFilter]="showFilter()" [sort]="true"
-                                [config]="filterConfig().get('orgId')!"
-                                (change)="onFilterChange($event)"></sc-filter-root>
+                            <sc-filter-root key="id" label="Id" [showFilter]="showFilter()" [sort]="true"
+                                [config]="filterConfig().get('id')!" (change)="onFilterChange($event)"></sc-filter-root>
                         </th>
-                        <td mat-cell *matCellDef="let row">{{ row.orgId }}</td>
-                    </ng-container>
-
-                    <ng-container matColumnDef="exists">
-                        <th mat-header-cell *matHeaderCellDef>
-                            <sc-filter-root key="exists" label="Привязана" [showFilter]="showFilter()" [sort]="true"
-                                [config]="filterConfig().get('exists')!"
-                                (change)="onFilterChange($event)"></sc-filter-root>
-                        </th>
-                        <td mat-cell *matCellDef="let row">{{ row.exists ? 'Да' : 'Нет' }}</td>
+                        <td mat-cell *matCellDef="let row">{{ row.id }}</td>
                     </ng-container>
 
                     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>

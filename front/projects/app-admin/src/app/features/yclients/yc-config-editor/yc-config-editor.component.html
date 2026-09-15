@@ -24,7 +24,7 @@
                 <span class="hide-on-small">{{ isLoading() ? 'Загрузка...' : 'Перечитать' }}</span>
             </button>
             <button mat-raised-button color="primary" (click)="callSave()"
-                [disabled]="isLoading() || hasError() || !(hasConfigChanged() || hasCrmOrgChanged())">
+                [disabled]="isLoading() || hasError() || !(hasConfigChanged() || hasCrmOrgChanged()|| hasServiceCategoriesChanged())">
                 <mat-icon>save</mat-icon>
                 <span class="hide-on-small">Сохранить</span>
             </button>
@@ -154,7 +154,8 @@
             </div>
             <app-yc-service-category-list [categoriesData]="currentServiceCategories()"
                 [currentOrgId]="currentCrmOrg()?.ycId" [selectedOrgId]="curLstYcOrg()?.ycId"
-                (loadFromCrm)="callLoadCategories()">
+                [loadingCategories]="isLoadServiceCategories()" (loadFromCrm)="callLoadCategories()"
+                (selectedChange)="onCategorySelectedChange($event)">
             </app-yc-service-category-list>
         </div>
     </div>

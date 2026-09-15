@@ -56,13 +56,22 @@ export const yClientsOrganizationDtoPopulate = (dto: YClientsOrganizationDto, ne
 }
 
 export const yClientsServiceCategoryDtoToListView = (dto: YClientsServiceCategoryListDto,
-    existsNow: boolean, existsCrm: boolean | undefined,): YClientsServiceCategoryListView => {
+    existsNow: boolean, existsCrm: boolean | undefined, selected: boolean): YClientsServiceCategoryListView => {
     return {
         id: dto.id,
         name: dto.name,
         orgId: dto.orgId,
         existsNow: existsNow,
-        existsCRM: existsCrm
+        existsCRM: existsCrm,
+        selected: selected,
+    }
+}
+
+export const yClientsServiceCategoryListFromView = (item: YClientsServiceCategoryListView): YClientsServiceCategoryListDto => {
+    return {
+        id: item.id,
+        name: item.name,
+        orgId: item.orgId,
     }
 }
 

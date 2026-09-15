@@ -9,7 +9,7 @@ import { YclientsManageService } from '../../../services/yclients-manage.service
 import { CrmStructManageService } from '../../../services/crm-struct-manage.service';
 import { MainStructManageService } from '../../../services/main-struct-manage.service';
 import { YClientCredentialsView, YClientsAgentConfigView, YClientsOrganizationView, YClientsServiceCategoryListView } from '../yclients-view.models';
-import { yClientsAgentConfigDtoFromView, yClientsAgentConfigDtoToView, yClientsOrganizationDtoFromView, yClientsOrganizationDtoPopulate, yClientsOrganizationDtoToView, yClientsServiceCategoryDtoToListView } from '../yclients-view.utils';
+import { yClientsAgentConfigDtoFromView, yClientsAgentConfigDtoToView, yClientsOrganizationDtoFromView, yClientsOrganizationDtoPopulate, yClientsOrganizationDtoToView, yClientsServiceCategoryDtoToListView, yClientsServiceCategoryListFromView } from '../yclients-view.utils';
 import { CrmAgentItemView, CrmAgentTypeView } from '../../crm-agent/crm-agent-view.models';
 import { crmAgentItemDtoToView, crmAgentTypeDtoToView } from '../../crm-agent/crm-agent-view.utils';
 import { OrgStructInfo } from '../../struct-org/struct-org-view.models';
@@ -53,6 +53,7 @@ export class YcConfigEditorComponent implements OnInit {
   isSaving = signal<boolean>(false);
   isGetUserToken = signal<boolean>(false);
   isLoadCrmOrgList = signal<boolean>(false);
+  isLoadServiceCategories = signal<boolean>(false);
   canLoadCrmOrg = computed(() => {
     if (this.isLoading() || this.isSaving() || this.isLoadCrmOrgList()) return false;
     if (!this.currentConfig()?.credentials.partnerToken || !this.currentConfig()?.credentials.userToken) return false;
@@ -67,6 +68,7 @@ export class YcConfigEditorComponent implements OnInit {
   currentConfig = signal<YClientsAgentConfigView | undefined>(undefined);
   currentCrmOrg = signal<YClientsOrganizationView | undefined>(undefined);
   currentServiceCategories = signal<YClientsServiceCategoryListView[]>([]);
+  private categoriesByOrg: Map<number, YClientsServiceCategoryListView[]> = new Map();
 
   agent = signal<CrmAgentItemView | undefined>(undefined);
   organizations = signal<OrgStructInfo[]>([]);
@@ -81,6 +83,10 @@ export class YcConfigEditorComponent implements OnInit {
   isSmallScreen = this.sizeService.isSmallScreen;
   hasConfigChanged = signal<boolean>(false);
   hasCrmOrgChanged = signal<boolean>(false);
+  hasServiceCategoriesChanged = computed(() => {
+    const list = this.currentServiceCategories();
+    return list.some(c => c.selected !== c.existsNow);
+  });
 
   formConfig!: FormGroup;
   formCrmOrg!: FormGroup;
@@ -242,12 +248,17 @@ export class YcConfigEditorComponent implements OnInit {
 
   private loadServiceCategories = (): Observable<YClientsServiceCategoryListView[]> => {
     return this.dataService.getServiceCategoriesForAgent(this.configId!).pipe(
-      map(dto => dto.map(v => yClientsServiceCategoryDtoToListView(v, true, undefined)))
+      map(dto => dto.map(v => yClientsServiceCategoryDtoToListView(v, true, undefined, true)))
     );
   }
   private afterLoadServiceCategories = (lst: YClientsServiceCategoryListView[]): void => {
     this.currentServiceCategories.set(lst);
-  }
+    const activeOrgId = this.curLstYcOrg()?.ycId ?? this.currentCrmOrg()?.ycId;
+    this.categoriesByOrg.clear();
+    if (activeOrgId !== undefined) {
+      this.categoriesByOrg.set(activeOrgId, lst);
+    }
+  };
 
 
   private updateItem = (item: YClientsAgentConfigView): Observable<YClientsAgentConfigView> => {
@@ -262,6 +273,17 @@ export class YcConfigEditorComponent implements OnInit {
       map(dto => yClientsOrganizationDtoToView(dto))
     );
   }
+  private updateCategories = (items: YClientsServiceCategoryListView[]): Observable<YClientsServiceCategoryListView[]> => {
+    const toSave = items
+      .filter(c => c.selected)
+      .map(v => yClientsServiceCategoryListFromView(v));
+    console.log(this.configId);
+    console.log(this.currentCrmOrg()?.id);
+    console.log(JSON.stringify(toSave));
+    return this.dataService.updateServiceCategoriesForAgent(this.configId!, toSave).pipe(
+      map(dto => dto.map(v => yClientsServiceCategoryDtoToListView(v, true, undefined, true)))
+    );
+  };
 
 
 
@@ -299,6 +321,7 @@ export class YcConfigEditorComponent implements OnInit {
 
 
   onSelectYcOrg(row: YClientsOrganizationView): void {
+    const oldId = this.lstYcOrgs().find(f => f._selected)?.ycId;
     this.lstYcOrgs.update(list =>
       list.map(v => {
         v._selected = v === row;
@@ -312,8 +335,25 @@ export class YcConfigEditorComponent implements OnInit {
     });
     this.curLstYcOrg.set(row);
     this.hasCrmOrgChanged.set((this.curLstYcOrg()?.ycId !== this.currentCrmOrg()?.ycId));
+    const newId = this.lstYcOrgs().find(f => f._selected)?.ycId;
+    if (oldId != newId) {
+      if (oldId) {
+        this.categoriesByOrg.set(oldId!, this.currentServiceCategories() ?? [])
+      }
+      if (newId && this.categoriesByOrg.has(newId!)) {
+        this.currentServiceCategories.set(this.categoriesByOrg.get(newId)!);
+      } else {
+        this.currentServiceCategories.set([]);
+      }
+    }
   }
 
+  onCategorySelectedChange(event: { id: number; selected: boolean }): void {
+    const newList = this.currentServiceCategories().map(c =>
+      c.id === event.id ? { ...c, selected: event.selected } : c
+    );
+    this.currentServiceCategories.set(newList);
+  }
 
   doRefresh = (): void => {
     if (!this.configId) return;
@@ -399,39 +439,52 @@ export class YcConfigEditorComponent implements OnInit {
   doLoadCategories(): void {
     const id = this.curLstYcOrg()?.ycId ?? this.currentCrmOrg()?.ycId;
     if (!id) return;
-    const idExact = id === this.curLstYcOrg()?.ycId;
-    this.dataService.getAllowedServiceCategories(id).pipe(
+
+    this.isLoadServiceCategories.set(true);
+    this.dataService.getAllowedServiceCategories(this.configId!, id).pipe(
+      finalize(() => this.isLoadServiceCategories.set(false))
     ).subscribe({
       next: result => {
         if (!result.success) {
-          this.notificationService.error(result.errorMessage ?? 'Ошибка при запросе списка категорий')
-        } else if (!result.data?.length) {
-          this.notificationService.error(result.errorMessage ?? 'Получен пустой список категорий')
-        } else {
-          const current = idExact ? this.currentServiceCategories() : [];
-          const currentMap = new Map(current.map(c => [c.id, c]));
-          const resultIds = new Set(result.data.map(d => d.id));
-          const newList: YClientsServiceCategoryListView[] = result.data.map(dto => {
-            const existing = currentMap.get(dto.id);
-            if (idExact && existing) {
-              existing.name = dto.name;
-              existing.existsNow = true;
-              existing.existsCRM = true;
-              return existing;
-            }
-            return yClientsServiceCategoryDtoToListView(dto, false, true);
-          });
-          if (idExact) {
-            for (const cat of current) {
-              if (!resultIds.has(cat.id)) {
-                cat.existsNow = true;
-                cat.existsCRM = false;
-                newList.push(cat);
-              }
-            }
-          }
-          this.currentServiceCategories.set(newList);
+          this.notificationService.error(result.errorMessage ?? 'Ошибка при запросе списка категорий');
+          return;
         }
+        if (!result.data?.length) {
+          this.notificationService.error(result.errorMessage ?? 'Получен пустой список категорий');
+          return;
+        }
+
+        const current = this.currentServiceCategories();
+        const currentMap = new Map(current.map(c => [c.id, c]));
+        const resultMap = new Map(result.data.map(d => [d.id, d]));
+
+        const newList: YClientsServiceCategoryListView[] = [];
+
+        // 1. Корректируем существующий список
+        for (const cat of current) {
+          const dto = resultMap.get(cat.id);
+          if (dto) {
+            // Есть и у нас, и в CRM:
+            // existsCRM=true, название и orgId из CRM, selected и existsNow не трогаем
+            cat.existsCRM = true;
+            cat.name = dto.name;
+            cat.orgId = dto.orgId;
+          } else {
+            // В CRM не найдена: снимаем selected и existsCRM
+            cat.selected = false;
+            cat.existsCRM = false;
+          }
+          newList.push(cat);
+        }
+
+        // 2. Добавляем новые записи из CRM (которых у нас ещё нет)
+        for (const dto of result.data) {
+          if (!currentMap.has(dto.id)) {
+            newList.push(yClientsServiceCategoryDtoToListView(dto, false, true, false));
+          }
+        }
+
+        this.currentServiceCategories.set(newList);
       },
       error: err => this.afterLoadItem(undefined, err, 'при запросе списка категорий'),
     });
@@ -440,8 +493,9 @@ export class YcConfigEditorComponent implements OnInit {
   doSave = (): void => {
     const saveConfig = this.hasConfigChanged() && this.currentConfig();
     const saveOrg = this.hasCrmOrgChanged() && this.curLstYcOrg() && this.currentCrmOrg();
+    const saveCategories = this.hasServiceCategoriesChanged();
 
-    if (!saveConfig && !saveOrg) {
+    if (!saveConfig && !saveOrg && !saveCategories) {
       this.notificationService.error('Нет изменений для сохранения');
       return;
     }
@@ -454,26 +508,29 @@ export class YcConfigEditorComponent implements OnInit {
     const org$ = saveOrg
       ? this.updateCrmOrg(this.currentCrmOrg()!, this.curLstYcOrg()!)
       : of(null);
+    const categories$ = saveCategories
+      ? this.updateCategories(this.currentServiceCategories())
+      : of(null);
 
-    forkJoin({ config: config$, org: org$ })
+    forkJoin({ config: config$, org: org$, categories: categories$ })
       .pipe(finalize(() => this.isSaving.set(false)))
       .subscribe({
-        next: ({ config, org }) => {
+        next: ({ config, org, categories }) => {
           if (config) this.afterLoadItem(config, undefined);
           if (org) this.afterLoadCrmOrg(org);
+          if (categories) this.afterLoadServiceCategories(categories);
 
           this.notificationService.success('Все изменения сохранены успешно. Если изменяли организацию, то обновите список услуг и их категорий');
         },
         error: err => {
           const resError = processResponseError(err);
-          const what = saveConfig && saveOrg
-            ? 'сохранения конфигурации и организации'
-            : saveConfig
-              ? 'сохранения конфигурации'
-              : 'сохранения организации';
-          this.notificationService.error(`Ошибка ${what}: ${resError.message}`);
+          const parts: string[] = [];
+          if (saveConfig) parts.push('конфигурации');
+          if (saveOrg) parts.push('организации');
+          if (saveCategories) parts.push('категорий услуг');
+          this.notificationService.error(`Ошибка сохранения ${parts.join(' и ')}: ${resError.message}`);
         },
       });
-  }
+  };
 
 }

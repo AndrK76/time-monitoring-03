@@ -5,22 +5,25 @@ import {
 } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTable, MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import {
-  FilterRootComponent, isExpanded, TableFilterInfo, TableFilterListValue,
+  FilterRootComponent, TableFilterInfo, TableFilterListValue,
   TableFilterType, TableManageService
 } from '@mon3/sc';
 import { YClientsServiceCategoryListView } from '../../yclients-view.models';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-yc-service-category-list',
   standalone: true,
   imports: [
-    CommonModule, MatCardModule, MatTableModule, MatIconModule,
-    MatTooltipModule, MatSortModule, MatButtonModule, FilterRootComponent
+    CommonModule, MatCardModule, MatTableModule, MatIconModule, MatProgressSpinnerModule,
+    MatTooltipModule, MatSortModule, MatButtonModule, MatCheckboxModule,
+    FilterRootComponent
   ],
   providers: [TableManageService],
   templateUrl: './yc-service-category-list.component.html',
@@ -32,8 +35,10 @@ export class YcServiceCategoryListComponent implements OnInit, AfterViewInit {
   categoriesData = input.required<YClientsServiceCategoryListView[]>();
   currentOrgId = input<number | undefined>(undefined);
   selectedOrgId = input<number | undefined>(undefined);
+  loadingCategories = input<boolean>(false);
 
   loadFromCrm = output<void>();
+  selectedChange = output<{ id: number; selected: boolean }>();
 
   dataSource = this.tableManager.dataSource;
   filterConfig = this.tableManager.filterConfig;
@@ -44,30 +49,23 @@ export class YcServiceCategoryListComponent implements OnInit, AfterViewInit {
   @ViewChild(MatSort) sort!: MatSort;
   @ViewChild('tableWrapper') tableWrapper!: ElementRef<HTMLDivElement>;
 
-  displayedColumns = ['expand', 'name', 'orgId', 'exists'];
+  displayedColumns = ['expand', 'name', 'id'];
   trackById = (index: number, item: YClientsServiceCategoryListView) => item.id;
   itemId = (item: YClientsServiceCategoryListView) => item.id;
 
-  _yesNoSource: TableFilterListValue[] = [{ id: true, text: 'Да' }, { id: false, text: 'Нет' }];
-
   _filterConfig: Map<string, TableFilterInfo> = new Map([
     ['name', { key: 'name', type: TableFilterType.TEXT }],
-    ['orgId', { key: 'orgId', type: TableFilterType.TEXT }],
-    ['exists', { key: 'exists', type: TableFilterType.LIST, config: { dataSource: this._yesNoSource } }],
+    ['id', { key: 'id', type: TableFilterType.TEXT }],
   ]);
 
   canLoadFromCrm = computed(() => {
+    if (this.loadingCategories()) return false;
     return this.currentOrgId() !== undefined || this.selectedOrgId() !== undefined;
   });
 
-  orgsMatch = computed(() => {
-    const current = this.currentOrgId();
-    const selected = this.selectedOrgId();
-    return current !== undefined && selected !== undefined && current === selected;
-  });
+  hasNoCategories = computed(() => this.categoriesData().length === 0);
 
   constructor() {
-    // Автоматически обновляем данные таблицы при изменении входного сигнала
     effect(() => {
       const data = this.categoriesData();
       this.tableManager.setData(data ?? []);
@@ -93,9 +91,12 @@ export class YcServiceCategoryListComponent implements OnInit, AfterViewInit {
 
   onFilterChange = (val: TableFilterInfo) => this.tableManager.onFilterChange(val);
   toggleFilter = (reset?: boolean) => this.tableManager.toggleFilter();
-  isExpanded = (index: number, item: any): boolean => isExpanded(item);
 
   onLoadFromCrm(): void {
     this.loadFromCrm.emit();
+  }
+
+  onSelectedChange(row: YClientsServiceCategoryListView, checked: boolean): void {
+    this.selectedChange.emit({ id: row.id, selected: checked });
   }
 }

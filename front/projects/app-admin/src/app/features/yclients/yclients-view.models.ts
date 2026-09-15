@@ -33,6 +33,7 @@ export class YClientsServiceCategoryListView implements YClientsServiceCategoryL
         public orgId: number,
         public existsNow: boolean,
         public existsCRM: boolean | undefined,
+        public selected: boolean,
     ) { }
 
 }
