@@ -48,6 +48,12 @@ export const routes: Routes = [
     data: authConstant('crm/agent')
   },
   {
+    path: 'crm/service-list',
+    loadComponent: () => import('./features/crm-service/crm-service-list/crm-service-list.component').then(m => m.CrmServiceListComponent),
+    canActivate: [authGuard],
+    data: authConstant('crm/service-list')
+  },
+  {
     path: 'event/agent-list',
     loadComponent: () => import('./features/event-agent/event-agent-list/event-agent-list.component').then(m => m.EventAgentListComponent),
     canActivate: [authGuard],
@@ -63,12 +69,6 @@ export const routes: Routes = [
     loadComponent: () => import('./features/yclients/yc-config-editor/yc-config-editor.component').then(m => m.YcConfigEditorComponent),
     canActivate: [authGuard],
     data: authConstant('yclients/config')
-  },
-  {
-    path: 'test',
-    loadComponent: () => import('./features/test/test.component').then(m => m.TestComponent),
-    canActivate: [authGuard],
-    data: authConstant('data')
   },
 
 

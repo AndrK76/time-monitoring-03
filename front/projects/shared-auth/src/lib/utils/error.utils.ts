@@ -11,6 +11,6 @@ export function processResponseError(err: any): ErrorResponseResult {
 
     return {
         status: !!err.status ? err.status : undefined,
-        message: err.error?.detail ?? err.statusText
+        message: (err.error?.detail ?? err.statusText)??err.message,
     } as ErrorResponseResult;;
 }

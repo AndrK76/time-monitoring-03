@@ -24,6 +24,8 @@
 
         &.full-row {
             justify-content: space-between;
+            flex-wrap: wrap; // ← добавили
+            //row-gap: 4px; // ← добавили
         }
     }
 
@@ -630,7 +632,7 @@ mat-card-content {
         }
 
         &.btn-danger-light {
-            background-color: var(  --btn-danger-bg-light);
+            background-color: var(--btn-danger-bg-light);
             color: var(--btn-danger-text);
 
             &:hover:not(:disabled) {

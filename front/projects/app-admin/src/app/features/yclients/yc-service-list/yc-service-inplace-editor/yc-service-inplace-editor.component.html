@@ -1,0 +1,32 @@
+<div class="editor-container">
+    <form [formGroup]="form" class="editor-form">
+        <div class="form-row">
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Наименование</mat-label>
+                <input matInput formControlName="name" (change)="$event.stopPropagation()">
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Категория</mat-label>
+                <input matInput formControlName="categoryName" readonly>
+            </mat-form-field>
+        </div>
+        <div class="form-row">
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Наименование в CRM</mat-label>
+                <input matInput formControlName="ycName" readonly>
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+                <mat-label>Id в CRM</mat-label>
+                <input matInput formControlName="ycId" readonly>
+            </mat-form-field>
+            @if (canDelete()) {
+            <div class="action-button-group">
+                <button mat-raised-button class="table-action-btn btn-danger" (click)="callDelete()">
+                    <mat-icon>delete</mat-icon>
+                    <span class="hide-on-small">Удалить</span>
+                </button>
+            </div>
+            }
+        </div>
+    </form>
+</div>

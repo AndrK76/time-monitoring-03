@@ -2,14 +2,8 @@ package ru.igorit.monitoring.admin.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import ru.igorit.monitoring.lib.dto.yclients.YClientCredentialsDto;
-import ru.igorit.monitoring.lib.dto.yclients.YClientsAgentConfigDto;
-import ru.igorit.monitoring.lib.dto.yclients.YClientsOrganizationDto;
-import ru.igorit.monitoring.lib.dto.yclients.YClientsServiceCategoryListDto;
-import ru.igorit.monitoring.lib.persistence.entity.yclients.YClientCredentials;
-import ru.igorit.monitoring.lib.persistence.entity.yclients.YClientsAgentConfig;
-import ru.igorit.monitoring.lib.persistence.entity.yclients.YClientsOrganization;
-import ru.igorit.monitoring.lib.persistence.entity.yclients.YClientsServiceCategory;
+import ru.igorit.monitoring.lib.dto.yclients.*;
+import ru.igorit.monitoring.lib.persistence.entity.yclients.*;
 
 @Mapper(componentModel = "spring")
 public interface YClientsModelMapper {
@@ -30,5 +24,10 @@ public interface YClientsModelMapper {
     @Mapping(target = "name", source = "YClientsName")
     @Mapping(target = "orgId", source = "organization.yclientsId")
     YClientsServiceCategoryListDto toDto(YClientsServiceCategory item);
+
+    @Mapping(target = "categoryId", source = "serviceCategory.YClientsId")
+    @Mapping(target = "ycId", source = "YClientsId")
+    @Mapping(target = "ycName", source = "YClientsName")
+    YClientsServiceDto toDto(YClientsService item);
 
 }

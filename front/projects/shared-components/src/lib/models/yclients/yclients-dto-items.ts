@@ -46,3 +46,11 @@ export interface YClientsDataResponseDto<T = unknown> {
     meta?: Record<string, string>;
 }
 
+export interface YClientsServiceDto {
+    id?: string;
+    name?: string;
+    ycId: number;
+    ycName: string;
+    categoryId: number;
+}
+

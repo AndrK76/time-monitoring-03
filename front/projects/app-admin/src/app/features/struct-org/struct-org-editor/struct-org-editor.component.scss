@@ -1,0 +1,10 @@
+.editor-link {
+    text-decoration: underline dashed;
+    text-underline-offset: 4px;
+    transition: text-decoration-color 0.2s;
+    font-weight: 400;
+
+    &:hover {
+        text-decoration: underline;
+    }
+}

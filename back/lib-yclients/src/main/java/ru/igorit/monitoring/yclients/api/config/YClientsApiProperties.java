@@ -13,6 +13,7 @@ public class YClientsApiProperties {
     private String companiesApi;
     private String companyApi;
     private String serviceCategoriesApi;
+    private String servicesApi;
     private int connectTimeout = 15000;
     private int responseTimeout = 15000;
     private int maxMemorySizeMb = 1;

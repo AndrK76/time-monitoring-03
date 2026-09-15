@@ -11,7 +11,7 @@ import { OrgStructInfo } from '../struct-org-view.models';
 import { debounceTime, distinctUntilChanged, filter } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DestroyRef } from '@angular/core';
-import { DialogService } from '@mon3/sc';
+import { DialogService, SizeService } from '@mon3/sc';
 
 @Component({
   selector: 'app-struct-org-editor',
@@ -24,6 +24,7 @@ import { DialogService } from '@mon3/sc';
   styleUrl: './struct-org-editor.component.scss'
 })
 export class StructOrgEditorComponent implements OnInit {
+
   organization = input.required<OrgStructInfo>();
   canChangeInfo = input<boolean>(false);
   canChangeAgents = input<boolean>(false);
@@ -31,14 +32,18 @@ export class StructOrgEditorComponent implements OnInit {
   change = output<OrgStructInfo>();
 
   private fb = inject(FormBuilder);
+  private router = inject(Router);
   private destroyRef = inject(DestroyRef);
   private dialogService = inject(DialogService);
-  private router = inject(Router);
+  private readonly sizeService = inject(SizeService);
 
   form!: FormGroup;
   data!: OrgStructInfo;
 
+  isSmallScreen = this.sizeService.isSmallScreen;
+
   ngOnInit(): void {
+    this.sizeService.breakpointsSubscribe();
     this.data = this.organization();
     this.buildForm();
     this.listenToChanges();

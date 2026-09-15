@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { YClientsAgentConfigDto, YClientsDataResponseDto, YClientsOrganizationDto, YClientsServiceCategoryListDto, YClientsTokenRequestDto, YClientsTokenResponseDto } from '@mon3/sc';
+import { YClientsAgentConfigDto, YClientsDataResponseDto, YClientsOrganizationDto, YClientsServiceCategoryListDto, YClientsServiceDto, YClientsTokenRequestDto, YClientsTokenResponseDto } from '@mon3/sc';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -53,5 +53,29 @@ export class YclientsManageService {
       `${this.adminApiUrl}${this.YC_CONTROLLER}/misc/agent/${id}/org/${orgId}/service-categories`);
   }
 
+  getServicesForAgent(id: string): Observable<YClientsServiceDto[]> {
+    return this.http.get<YClientsServiceDto[]>(
+      `${this.adminApiUrl}${this.YC_CONTROLLER}/agents/${id}/services`);
+  }
+
+  addServiceForAgent(id: string, data: YClientsServiceDto): Observable<YClientsServiceDto> {
+    return this.http.post<YClientsServiceDto>(
+      `${this.adminApiUrl}${this.YC_CONTROLLER}/agents/${id}/services`, data);
+  }
+
+  updateServiceForAgent(id: string, serviceId: string, data: YClientsServiceDto): Observable<YClientsServiceDto> {
+    return this.http.put<YClientsServiceDto>(
+      `${this.adminApiUrl}${this.YC_CONTROLLER}/agents/${id}/services/${serviceId}`, data);
+  }
+
+  deleteServiceForAgent(id: string, serviceId: string): Observable<void> {
+    return this.http.delete<void>(
+      `${this.adminApiUrl}${this.YC_CONTROLLER}/agents/${id}/services/${serviceId}`);
+  }
+
+  getAllowedServices(id: string): Observable<YClientsDataResponseDto<YClientsServiceDto[]>> {
+    return this.http.get<YClientsDataResponseDto<YClientsServiceDto[]>>(
+      `${this.adminApiUrl}${this.YC_CONTROLLER}/misc/agent/${id}/services`);
+  }
 
 }

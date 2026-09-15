@@ -1,0 +1,114 @@
+<div class="standard-table-container">
+    <mat-card>
+        <mat-card-content>
+            @if (isLoadingFromCrm() || isLoading() || isSaving() || error()) {
+            <div class="table-overlay">
+                @if (isLoadingFromCrm()) {
+                <div class="loading-spinner">
+                    <mat-spinner diameter="40"></mat-spinner>
+                    <p>Запрос к CRM...</p>
+                </div>
+                } @else if (isLoading() || isSaving()) {
+                <div class="loading-spinner">
+                    <mat-spinner diameter="40"></mat-spinner>
+                    <p>{{ isLoading() ? 'Загрузка' : 'Сохранение' }} данных...</p>
+                </div>
+                }
+                @if (error()) {
+                <div class="error-message">
+                    <mat-icon color="warn">error</mat-icon>
+                    <span>{{ error() }}</span>
+                </div>
+                }
+            </div>
+            }
+
+            <div class="table-wrapper sticky-header-table sticky-firstcol-table nowrap-table inrow-editor-table filtered-table click-edit-table"
+                #tableWrapper>
+                <table mat-table [dataSource]="dataSource" [trackBy]="trackById" class="mat-elevation-z0"
+                    multiTemplateDataRows matSort>
+
+                    <ng-container matColumnDef="expand">
+                        <th mat-header-cell *matHeaderCellDef>
+                            <button mat-icon-button (click)="toggleFilter()" matTooltip="Фильтр">
+                                <mat-icon>filter_list</mat-icon>
+                            </button>
+                            @if (hasChanges()) {
+                            <span class="changes-indicator" matTooltip="{{ changesSummary() }}">*</span>
+                            }
+                        </th>
+                        <td mat-cell *matCellDef="let row"></td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="isNew">
+                        <th mat-header-cell *matHeaderCellDef>
+                            <sc-filter-root key="isNew" label="Нов?" [showFilter]="showFilter()" [sort]="true"
+                                [config]="filterConfig().get('isNew')!"
+                                (change)="onFilterChange($event)"></sc-filter-root>
+                        </th>
+                        <td mat-cell *matCellDef="let row">{{ row.isNew ? 'Да' : '' }}</td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="name">
+                        <th mat-header-cell *matHeaderCellDef>
+                            <sc-filter-root key="name" label="Наименование" [showFilter]="showFilter()" [sort]="true"
+                                [config]="filterConfig().get('name')!"
+                                (change)="onFilterChange($event)"></sc-filter-root>
+                        </th>
+                        <td mat-cell *matCellDef="let row"> {{ row.name }} </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="categoryName">
+                        <th mat-header-cell *matHeaderCellDef>
+                            <sc-filter-root key="categoryId" label="Категория" [showFilter]="showFilter()" [sort]="true"
+                                [config]="filterConfig().get('categoryId')!"
+                                (change)="onFilterChange($event)"></sc-filter-root>
+                        </th>
+                        <td mat-cell *matCellDef="let row">
+                            {{ row.categoryWithInfo?.name ?? row.categoryId }}
+                        </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="ycId">
+                        <th mat-header-cell *matHeaderCellDef>Id CRM </th>
+                        <td mat-cell *matCellDef="let row"> {{ row.ycId }} </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="ycName">
+                        <th mat-header-cell *matHeaderCellDef>
+                            <sc-filter-root key="ycName" label="Наименование CRM" [showFilter]="showFilter()"
+                                [sort]="true" [config]="filterConfig().get('ycName')!"
+                                (change)="onFilterChange($event)"></sc-filter-root>
+                        </th>
+                        <td mat-cell *matCellDef="let row"> {{ row.ycName }} </td>
+                    </ng-container>
+
+
+                    <ng-container matColumnDef="editor">
+                        <td mat-cell *matCellDef="let row" [attr.colspan]="displayedColumns.length">
+                            <div class="editor-row" *ngIf="row._expanded">
+                                <app-yc-service-inplace-editor [serviceData]="row" [categories]="categories"
+                                    (change)="doUpdate($event)" (delete)="callDelete()"></app-yc-service-inplace-editor>
+                            </div>
+                        </td>
+                    </ng-container>
+
+                    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                    <tr mat-row *matRowDef="let row; columns: displayedColumns;"
+                        [style.display]="row._expanded && selectedItem() ? 'none' : ''" (click)="callSelect(row)"
+                        class="simple-row" [attr.data-id]="trackById(0, row)"></tr>
+                    <tr mat-row *matRowDef="let row; columns: ['editor']; when: isExpanded;" class="editor-row"></tr>
+
+                    <tr class="mat-row" *matNoDataRow>
+                        <td class="mat-cell" [attr.colspan]="displayedColumns.length">
+                            <div class="empty-state">
+                                <mat-icon>info</mat-icon>
+                                <p>Услуги не найдены</p>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </mat-card-content>
+    </mat-card>
+</div>

@@ -1,0 +1,83 @@
+<div class="standard-table-container">
+    <mat-card>
+        <mat-card-header>
+            <mat-card-title>CRM: Услуги
+                <span class="hide-on-small">{{ orgName() }}</span>
+            </mat-card-title>
+        </mat-card-header>
+        <mat-card-actions class="crm-service-actions full-row">
+            <div class="action-button-group">
+                @if (showBackLink()) {
+                <a mat-button matTooltip="К списку организаций" class="table-action-btn back-button"
+                    [routerLink]="['/struct/org']" [queryParams]="{id: orgId()}">
+                    <mat-icon>arrow_back</mat-icon>
+                    <span class="hide-on-small">К списку организаций</span>
+                </a>
+                } @else {
+                <mat-form-field appearance="outline" class="org-select">
+                    <mat-label>Организация</mat-label>
+                    <mat-select [formControl]="orgSelect" 
+                        (selectionChange)="onSelectOrganization($event.value)">
+                        <mat-option *ngFor="let org of organizations()" [value]="org.id">
+                            {{ org.shortName }}
+                        </mat-option>
+                    </mat-select><!--[disabled]="isSelectingAgent()"-->
+                </mat-form-field>
+                }
+            </div>
+
+            @if (agent()) {
+            <div class="action-button-group">
+                <button mat-raised-button class="table-action-btn btn-success" (click)="actions.triggerAdd()"
+                    [disabled]="actions.isLoading() || actions.isSaving() || actions.isLoadingFromCrm()">
+                    <mat-icon>cloud_download</mat-icon><span class="hide-on-small">Добавить из CRM</span>
+                </button>
+                <button mat-raised-button class="table-action-btn btn-danger" (click)="actions.triggerDelete()"
+                    [disabled]="actions.isLoading() || actions.isSaving() || !actions.canDelete()">
+                    <mat-icon>delete</mat-icon><span class="hide-on-small">Удалить</span>
+                </button>
+                <button mat-raised-button class="table-action-btn btn-light" (click)="actions.triggerRefresh()"
+                    [disabled]="actions.isLoading() || actions.isSaving()">
+                    <mat-icon>refresh</mat-icon>
+                    <span class="hide-on-small">{{ actions.isLoading() ? 'Загрузка...' : 'Перечитать' }}</span>
+                </button>
+                <button mat-raised-button color="primary" (click)="actions.triggerSave()"
+                    [disabled]="!actions.hasChanges() || actions.isLoading() || actions.isSaving()">
+                    <mat-icon>save</mat-icon><span class="hide-on-small">Сохранить</span>
+                </button>
+            </div>
+            }
+        </mat-card-actions>
+
+        <mat-card-content>
+            @if (hasError()) {
+            <div class="error-message">
+                <mat-icon color="warn">error</mat-icon>
+                <span>Ошибка:</span>
+                <span>{{ error().message }}</span>
+            </div>
+            } @else {
+            @if (agent()) {
+            <app-yc-service-list [actions]="actions"></app-yc-service-list>
+            } @else if (orgId()) {
+            <div class="empty-state">
+                <mat-icon>info</mat-icon>
+                <p>Организация не выбрана</p>
+            </div>
+            } @else if (isLoading()) {
+            <div class="table-overlay">
+                <div class="loading-spinner">
+                    <mat-spinner diameter="40"></mat-spinner>
+                    <p>Загрузка данных...</p>
+                </div>
+            </div>
+            } @else {
+            <div class="empty-state">
+                <mat-icon>info</mat-icon>
+                <p>Выберите организацию</p>
+            </div>
+            }
+            }
+        </mat-card-content>
+    </mat-card>
+</div>

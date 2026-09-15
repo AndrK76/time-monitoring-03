@@ -3,6 +3,7 @@ package ru.igorit.monitoring.admin.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.igorit.monitoring.admin.service.YClientsManageService;
 import ru.igorit.monitoring.lib.dto.yclients.*;
@@ -51,6 +52,34 @@ public class YClientsManageController {
         return service.updateServiceCategoriesForAgent(agentId, request);
     }
 
+    @GetMapping("/agents/{id}/services")
+    public List<YClientsServiceDto> getServicesForAgent(@PathVariable("id") String agentId) {
+        return service.getServicesForAgent(agentId);
+    }
+
+    @PostMapping("/agents/{id}/services")
+    public YClientsServiceDto addServicesForAgent(
+            @PathVariable("id") String agentId,
+            @Valid @RequestBody YClientsServiceDto request) {
+        return service.addServiceForAgent(agentId, request);
+    }
+
+    @PutMapping("/agents/{agent}/services/{id}")
+    public YClientsServiceDto updateServiceForAgent(
+            @PathVariable("agent") String agentId,
+            @PathVariable("id") String serviceId,
+            @Valid @RequestBody YClientsServiceDto request) {
+        return service.updateServiceForAgent(agentId, serviceId, request);
+    }
+
+    @DeleteMapping("/agents/{agent}/services/{id}")
+    public ResponseEntity<?> deleteServiceForAgent(
+            @PathVariable("agent") String agentId,
+            @PathVariable("id") String serviceId) {
+        service.deleteServiceForAgent(agentId, serviceId);
+        return ResponseEntity.noContent().build();
+    }
+
 
     @PostMapping("/misc/get-token")
     public YClientsTokenResponseDto getClientToken(@Valid @RequestBody YClientsTokenRequestDto request) {
@@ -69,5 +98,11 @@ public class YClientsManageController {
     public YClientsDataResponse<List<YClientsServiceCategoryListDto>> getAllowedServiceCategories
             (@PathVariable(name = "id") String agentId, @PathVariable(name = "org") Long orgId) {
         return service.getAllowedServiceCategories(agentId, orgId);
+    }
+
+    @GetMapping("/misc/agent/{id}/services")
+    public YClientsDataResponse<List<YClientsServiceDto>> getAllowedServices
+            (@PathVariable(name = "id") String agentId) {
+        return service.getAllowedServices(agentId);
     }
 }

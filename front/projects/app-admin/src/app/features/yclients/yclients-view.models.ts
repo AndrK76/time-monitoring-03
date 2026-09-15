@@ -1,4 +1,4 @@
-import { YClientCredentialsDto, YClientsAgentConfigDto, YClientsOrganizationDto, YClientsServiceCategoryListDto } from "@mon3/sc";
+import { YClientCredentialsDto, YClientsAgentConfigDto, YClientsOrganizationDto, YClientsServiceCategoryListDto, YClientsServiceDto } from "@mon3/sc";
 
 export class YClientsAgentConfigView implements YClientsAgentConfigDto {
     constructor(
@@ -36,4 +36,16 @@ export class YClientsServiceCategoryListView implements YClientsServiceCategoryL
         public selected: boolean,
     ) { }
 
+}
+
+export class YClientsServiceView implements YClientsServiceDto {
+    constructor(
+        public id: string | undefined,
+        public name: string | undefined,
+        public ycId: number,
+        public ycName: string,
+        public categoryId: number,
+        public categoryWithInfo: YClientsServiceCategoryListView | undefined,
+        public isNew: boolean = false,
+    ) { }
 }

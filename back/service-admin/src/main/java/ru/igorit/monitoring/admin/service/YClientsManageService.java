@@ -13,19 +13,13 @@ import ru.igorit.monitoring.common.util.XorCipher;
 import ru.igorit.monitoring.lib.dto.yclients.*;
 import ru.igorit.monitoring.lib.persistence.entity.crm.CrmAgent;
 import ru.igorit.monitoring.lib.persistence.entity.crm.CrmOrganization;
-import ru.igorit.monitoring.lib.persistence.entity.yclients.YClientCredentials;
-import ru.igorit.monitoring.lib.persistence.entity.yclients.YClientsAgentConfig;
-import ru.igorit.monitoring.lib.persistence.entity.yclients.YClientsOrganization;
-import ru.igorit.monitoring.lib.persistence.entity.yclients.YClientsServiceCategory;
+import ru.igorit.monitoring.lib.persistence.entity.yclients.*;
 import ru.igorit.monitoring.lib.persistence.repository.crm.CrmAgentRepository;
 import ru.igorit.monitoring.lib.persistence.repository.crm.CrmOrganizationRepository;
-import ru.igorit.monitoring.lib.persistence.repository.yclients.YClientsAgentConfigRepository;
-import ru.igorit.monitoring.lib.persistence.repository.yclients.YClientsAgentRepository;
-import ru.igorit.monitoring.lib.persistence.repository.yclients.YClientsOrganizationRepository;
-import ru.igorit.monitoring.lib.persistence.repository.yclients.YClientsServiceCategoryRepository;
+import ru.igorit.monitoring.lib.persistence.repository.crm.CrmServiceRepository;
+import ru.igorit.monitoring.lib.persistence.repository.yclients.*;
 import ru.igorit.monitoring.yclients.service.manage.ConfigManageService;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -46,8 +40,10 @@ public class YClientsManageService {
     private final YClientsAgentConfigRepository configRepo;
     private final YClientsOrganizationRepository orgRepo;
     private final YClientsServiceCategoryRepository serviceCategoryRepo;
+    private final YClientsServiceRepository serviceRepo;
     private final CrmOrganizationRepository crmOrgRepo;
     private final CrmAgentRepository crmAgentRepo;
+    private final CrmServiceRepository crmServiceRepo;
     private final CrmManageService crmService;
     private final ConfigManageService ycManageService;
 
@@ -170,6 +166,61 @@ public class YClientsManageService {
                 .toList();
     }
 
+    @Transactional
+    @PreAuthorize("@securityAccessUtils.isAllowedAllActions()")
+    public List<YClientsServiceDto> getServicesForAgent(String agentId) {
+        crmService.getAgent(agentId);
+        return serviceRepo.findByAgentId(agentId).stream().map(mapper::toDto).toList();
+    }
+
+    @Transactional
+    @PreAuthorize("@securityAccessUtils.isAllowedAllActions()")
+    public YClientsServiceDto addServiceForAgent(String agentId, YClientsServiceDto dto) {
+        crmService.getAgent(agentId);
+        var agent = agentRepo.findById(agentId).orElseThrow(); //Throw не будет, так как на getAgent есть все проверки
+        serviceRepo.findByAgent_IdAndYClientsId(agentId, dto.getYcId()).ifPresent(ignored -> {
+                    throw new ResponseStatusException(HttpStatus.CONFLICT, "service with id=" + dto.getYcId()
+                            + " already registered for agent " + agentId);
+                }
+        );
+        var category = serviceCategoryRepo.findById(dto.getCategoryId()).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unknown category id=" + dto.getCategoryId())
+        );
+        if (!Objects.equals(category.getAgent().getId(), agentId)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "service category " + dto.getCategoryId()
+                    + "not registered for agent " + agentId);
+        }
+        YClientsService ret = new YClientsService();
+        ret.setName(dto.getName() == null ? dto.getYcName() : dto.getName());
+        ret.setAgent(agent);
+        ret.setCreatedBy(extractUserId(getCurrentAuth()));
+        ret.setYClientsId(dto.getYcId());
+        ret.setYClientsName(dto.getYcName());
+        ret.setServiceCategory(category);
+        ret = serviceRepo.save(ret);
+        return mapper.toDto(ret);
+    }
+
+    @Transactional
+    @PreAuthorize("@securityAccessUtils.isAllowedAllActions()")
+    public YClientsServiceDto updateServiceForAgent(String agentId, String id, YClientsServiceDto dto) {
+        crmService.getAgent(agentId);
+        YClientsService ret = serviceRepo.findById(id).orElseThrow(()->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Service with id="+id+" not found"));
+        ret.setYClientsName(dto.getYcName());
+        ret.setName(dto.getName() == null ? dto.getYcName() : dto.getName());
+        ret.setUpdatedBy(extractUserId(getCurrentAuth()));
+        ret = serviceRepo.save(ret);
+        return mapper.toDto(ret);
+    }
+
+    @Transactional
+    @PreAuthorize("@securityAccessUtils.isAllowedAllActions()")
+    public void deleteServiceForAgent(String agentId, String id) {
+        crmService.getAgent(agentId);
+        serviceRepo.deleteServiceById(id);
+    }
+
 
     @PreAuthorize("@securityAccessUtils.isAllowedAllActions()")
     public YClientsTokenResponseDto getClientToken(YClientsTokenRequestDto request) {
@@ -189,6 +240,22 @@ public class YClientsManageService {
         var agent = crmService.getAgent(agentId);
         var config = unmaskCreds(mapper.toDto(_getConfig(agent.getId())));
         return ycManageService.getOrganizationServiceCategories(orgId, config.getCredentials());
+    }
+
+    @Transactional(readOnly = true)
+    @PreAuthorize("@securityAccessUtils.isAllowedAllActions()")
+    public YClientsDataResponse<List<YClientsServiceDto>> getAllowedServices(String agentId) {
+        var agent = crmService.getAgent(agentId);
+        var config = unmaskCreds(mapper.toDto(_getConfig(agent.getId())));
+        var orgId = orgRepo.findByAgentId(agentId)
+                .map(YClientsOrganization::getYclientsId)
+                .orElseThrow(() ->
+                        new ResponseStatusException(HttpStatus.BAD_REQUEST, "Organization for agent=" + agentId + " not set"));
+        var categoryIds = serviceCategoryRepo.findByAgentId(agentId).stream().map(YClientsServiceCategory::getYClientsId).toList();
+        if (categoryIds.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Service categories not set for agent=" + agentId);
+        }
+        return ycManageService.getServicesForOrganization(orgId, categoryIds, config.getCredentials());
     }
 
 

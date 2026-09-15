@@ -57,7 +57,20 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewInit {
 
   // Структура меню (можно вынести в сервис позже)
   menuItems: MenuItem[] = [
-    { label: 'Главная', route: '/', exact: true, hideOnSmall: true },
+    //{ label: 'Главная', route: '/', exact: true, hideOnSmall: true },
+    {
+      label: 'Структура', route: '/struct',
+      children: [
+        { label: 'Организации', route: '/struct/org' },
+        {
+          label: 'CRM', route: '/crm',
+          children: [
+            { label: 'Агенты CRM', route: '/crm/agent-list' },
+            { label: 'Услуги', route: '/crm/service-list' },
+          ]
+        },
+      ]
+    },
     {
       label: 'Доступ', route: '/access',
       children: [
@@ -66,19 +79,6 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewInit {
         { label: 'Управление ролями', route: '/access/roles' },
       ]
     },
-    {
-      label: 'Структура', route: '/struct',
-      children: [
-        { label: 'Организации', route: '/struct/org' },
-        {
-          label: 'Агенты', route: '/agent',
-          children: [
-            { label: 'Агенты CRM', route: '/crm/agent-list' },
-          ]
-        },
-      ]
-    },
-    { label: 'Тест', route: '/test' },
   ]
 
   exitMenuItem: MenuItem = { label: 'Выход', route: '/logout' };

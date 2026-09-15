@@ -1,5 +1,5 @@
-import { YClientsAgentConfigDto, YClientsOrganizationDto, YClientsServiceCategoryListDto } from "@mon3/sc"
-import { YClientsAgentConfigView, YClientsOrganizationView, YClientsServiceCategoryListView } from "./yclients-view.models"
+import { YClientsAgentConfigDto, YClientsOrganizationDto, YClientsServiceCategoryListDto, YClientsServiceDto } from "@mon3/sc"
+import { YClientsAgentConfigView, YClientsOrganizationView, YClientsServiceCategoryListView, YClientsServiceView } from "./yclients-view.models"
 
 export const yClientsAgentConfigDtoToView = (dto: YClientsAgentConfigDto): YClientsAgentConfigView => {
     return {
@@ -75,3 +75,52 @@ export const yClientsServiceCategoryListFromView = (item: YClientsServiceCategor
     }
 }
 
+
+export const yClientsServiceCategoryFromId = (
+    categoryId: number | undefined,
+    allCategories: YClientsServiceCategoryListView[] | undefined
+): YClientsServiceCategoryListView | undefined => {
+    if (categoryId === undefined || !allCategories) return undefined;
+    return allCategories.find(c => c.id === categoryId);
+};
+
+export const yClientsServiceDtoToView = (
+    dto: YClientsServiceDto,
+    categories: YClientsServiceCategoryListView[] | undefined = undefined
+): YClientsServiceView => {
+    return {
+        id: dto.id,
+        name: dto.name,
+        ycId: dto.ycId,
+        ycName: dto.ycName,
+        categoryId: dto.categoryId,
+        categoryWithInfo: yClientsServiceCategoryFromId(dto.categoryId, categories),
+        isNew: false,
+    } as YClientsServiceView;
+};
+
+
+export const yClientsServiceCrmDtoToView = (dto: YClientsServiceDto,
+    categories: YClientsServiceCategoryListView[] | undefined = undefined
+): YClientsServiceView => {
+    return {
+        //id: 'temp-' + Date.now(),
+        id: undefined!,
+        name: dto.ycName,
+        ycId: dto.ycId,
+        ycName: dto.ycName,
+        categoryId: dto.categoryId,
+        categoryWithInfo: yClientsServiceCategoryFromId(dto.categoryId, categories),
+        isNew: true,
+    } as YClientsServiceView;
+}
+
+export const yClientsServiceViewToDto = (item: YClientsServiceView): YClientsServiceDto => {
+    return {
+        id: item.id,
+        name: item.name,
+        ycId: item.ycId,
+        ycName: item.ycName,
+        categoryId: item.categoryId,
+    };
+};
