@@ -17,6 +17,7 @@ import ru.igorit.monitoring.lib.persistence.repository.common.OrganizationReposi
 import ru.igorit.monitoring.rabbit.service.CommandSender;
 import ru.igorit.monitoring.security.util.SecurityAccessUtils;
 
+import java.util.Comparator;
 import java.util.List;
 
 import static ru.igorit.monitoring.security.util.AuthInfoUtils.extractUserId;
@@ -38,6 +39,13 @@ public class StructManageService {
         return orgRepo.findAll().stream()
                 .map(structMapper::toListDto)
                 .filter(this::filterOrganization)
+                .sorted(Comparator
+                        .comparing(OrgStructListDto::getShortName,
+                                Comparator.nullsLast(String::compareToIgnoreCase))
+                        .thenComparing(OrgStructListDto::getFullName,
+                                Comparator.nullsLast(String::compareToIgnoreCase))
+                        .thenComparing(OrgStructListDto::getId,
+                                Comparator.nullsLast(String::compareTo)))
                 .toList();
     }
 

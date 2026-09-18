@@ -8,8 +8,8 @@ import { ErrorResponseResult, LoginRequestDto, processResponseError } from '@mon
 import { YclientsManageService } from '../../../services/yclients-manage.service';
 import { CrmStructManageService } from '../../../services/crm-struct-manage.service';
 import { MainStructManageService } from '../../../services/main-struct-manage.service';
-import { YClientCredentialsView, YClientsAgentConfigView, YClientsOrganizationView, YClientsServiceCategoryListView } from '../yclients-view.models';
-import { yClientsAgentConfigDtoFromView, yClientsAgentConfigDtoToView, yClientsOrganizationDtoFromView, yClientsOrganizationDtoPopulate, yClientsOrganizationDtoToView, yClientsServiceCategoryDtoToListView, yClientsServiceCategoryListFromView } from '../yclients-view.utils';
+import { YClientCredentialsView, YClientsAgentConfigView, YClientsOrganizationView, YClientsServiceCategoryView } from '../yclients-view.models';
+import { yClientsAgentConfigDtoFromView, yClientsAgentConfigDtoToView, yClientsOrganizationDtoFromView, yClientsOrganizationDtoPopulate, yClientsOrganizationDtoToView, yClientsServiceCategoryDtoToView, yClientsServiceCategoryFromView } from '../yclients-view.utils';
 import { CrmAgentItemView, CrmAgentTypeView } from '../../crm-agent/crm-agent-view.models';
 import { crmAgentItemDtoToView, crmAgentTypeDtoToView } from '../../crm-agent/crm-agent-view.utils';
 import { OrgStructInfo } from '../../struct-org/struct-org-view.models';
@@ -67,8 +67,8 @@ export class YcConfigEditorComponent implements OnInit {
   dataConfig = signal<YClientsAgentConfigView | undefined>(undefined);
   currentConfig = signal<YClientsAgentConfigView | undefined>(undefined);
   currentCrmOrg = signal<YClientsOrganizationView | undefined>(undefined);
-  currentServiceCategories = signal<YClientsServiceCategoryListView[]>([]);
-  private categoriesByOrg: Map<number, YClientsServiceCategoryListView[]> = new Map();
+  currentServiceCategories = signal<YClientsServiceCategoryView[]>([]);
+  private categoriesByOrg: Map<number, YClientsServiceCategoryView[]> = new Map();
 
   agent = signal<CrmAgentItemView | undefined>(undefined);
   organizations = signal<OrgStructInfo[]>([]);
@@ -246,12 +246,12 @@ export class YcConfigEditorComponent implements OnInit {
     this.currentServiceCategories.set([]);
   }
 
-  private loadServiceCategories = (): Observable<YClientsServiceCategoryListView[]> => {
+  private loadServiceCategories = (): Observable<YClientsServiceCategoryView[]> => {
     return this.dataService.getServiceCategoriesForAgent(this.configId!).pipe(
-      map(dto => dto.map(v => yClientsServiceCategoryDtoToListView(v, true, undefined, true)))
+      map(dto => dto.map(v => yClientsServiceCategoryDtoToView(v, true, undefined, true)))
     );
   }
-  private afterLoadServiceCategories = (lst: YClientsServiceCategoryListView[]): void => {
+  private afterLoadServiceCategories = (lst: YClientsServiceCategoryView[]): void => {
     this.currentServiceCategories.set(lst);
     const activeOrgId = this.curLstYcOrg()?.ycId ?? this.currentCrmOrg()?.ycId;
     this.categoriesByOrg.clear();
@@ -273,15 +273,15 @@ export class YcConfigEditorComponent implements OnInit {
       map(dto => yClientsOrganizationDtoToView(dto))
     );
   }
-  private updateCategories = (items: YClientsServiceCategoryListView[]): Observable<YClientsServiceCategoryListView[]> => {
+  private updateCategories = (items: YClientsServiceCategoryView[]): Observable<YClientsServiceCategoryView[]> => {
     const toSave = items
       .filter(c => c.selected)
-      .map(v => yClientsServiceCategoryListFromView(v));
+      .map(v => yClientsServiceCategoryFromView(v));
     console.log(this.configId);
     console.log(this.currentCrmOrg()?.id);
     console.log(JSON.stringify(toSave));
     return this.dataService.updateServiceCategoriesForAgent(this.configId!, toSave).pipe(
-      map(dto => dto.map(v => yClientsServiceCategoryDtoToListView(v, true, undefined, true)))
+      map(dto => dto.map(v => yClientsServiceCategoryDtoToView(v, true, undefined, true)))
     );
   };
 
@@ -458,7 +458,7 @@ export class YcConfigEditorComponent implements OnInit {
         const currentMap = new Map(current.map(c => [c.id, c]));
         const resultMap = new Map(result.data.map(d => [d.id, d]));
 
-        const newList: YClientsServiceCategoryListView[] = [];
+        const newList: YClientsServiceCategoryView[] = [];
 
         // 1. Корректируем существующий список
         for (const cat of current) {
@@ -480,7 +480,7 @@ export class YcConfigEditorComponent implements OnInit {
         // 2. Добавляем новые записи из CRM (которых у нас ещё нет)
         for (const dto of result.data) {
           if (!currentMap.has(dto.id)) {
-            newList.push(yClientsServiceCategoryDtoToListView(dto, false, true, false));
+            newList.push(yClientsServiceCategoryDtoToView(dto, false, true, false));
           }
         }
 

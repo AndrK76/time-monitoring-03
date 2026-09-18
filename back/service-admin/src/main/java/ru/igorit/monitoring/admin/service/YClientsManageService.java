@@ -20,6 +20,7 @@ import ru.igorit.monitoring.lib.persistence.repository.crm.CrmServiceRepository;
 import ru.igorit.monitoring.lib.persistence.repository.yclients.*;
 import ru.igorit.monitoring.yclients.service.manage.ConfigManageService;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -41,9 +42,10 @@ public class YClientsManageService {
     private final YClientsOrganizationRepository orgRepo;
     private final YClientsServiceCategoryRepository serviceCategoryRepo;
     private final YClientsServiceRepository serviceRepo;
+    private final YClientsPlaceRepository placeRepo;
+
     private final CrmOrganizationRepository crmOrgRepo;
     private final CrmAgentRepository crmAgentRepo;
-    private final CrmServiceRepository crmServiceRepo;
     private final CrmManageService crmService;
     private final ConfigManageService ycManageService;
 
@@ -114,16 +116,18 @@ public class YClientsManageService {
 
     @Transactional
     @PreAuthorize("@securityAccessUtils.isAllowedAllActions()")
-    public List<YClientsServiceCategoryListDto> getServiceCategoriesForAgent(String agentId) {
+    public List<YClientsServiceCategoryDto> getServiceCategoriesForAgent(String agentId) {
         crmService.getAgent(agentId);
         return serviceCategoryRepo.findByAgentId(agentId).stream()
-                .map(mapper::toDto).toList();
+                .map(mapper::toDto)
+                .sorted(Comparator.comparing(YClientsServiceCategoryDto::getName))
+                .toList();
     }
 
     @Transactional
     @PreAuthorize("@securityAccessUtils.isAllowedAllActions()")
-    public List<YClientsServiceCategoryListDto> updateServiceCategoriesForAgent(
-            String agentId, List<YClientsServiceCategoryListDto> dto) {
+    public List<YClientsServiceCategoryDto> updateServiceCategoriesForAgent(
+            String agentId, List<YClientsServiceCategoryDto> dto) {
         crmService.getAgent(agentId);
         var agent = agentRepo.findById(agentId).orElseThrow(); //Throw не будет, так как на getAgent есть все проверки
         var org = orgRepo.findByAgentId(agentId).orElseThrow(
@@ -134,12 +138,13 @@ public class YClientsManageService {
         var existMap = exists.stream()
                 .collect(Collectors.toMap(YClientsServiceCategory::getYClientsId, e -> e, (a, b) -> a));
         var dtoMap = dto.stream()
-                .collect(Collectors.toMap(YClientsServiceCategoryListDto::getId, d -> d, (a, b) -> a));
+                .collect(Collectors.toMap(YClientsServiceCategoryDto::getId, d -> d, (a, b) -> a));
         var toDelete = exists.stream()
                 .filter(e -> !dtoMap.containsKey(e.getYClientsId()))
                 .toList();
         if (!toDelete.isEmpty()) {
-            serviceCategoryRepo.deleteAll(toDelete);
+            serviceCategoryRepo.deleteServiceCategoriesByIds(
+                    toDelete.stream().map(YClientsServiceCategory::getYClientsId).toList());
         }
         var toSave = dto.stream()
                 .map(d -> {
@@ -163,6 +168,7 @@ public class YClientsManageService {
         }
         return serviceCategoryRepo.findByAgentId(agentId).stream()
                 .map(mapper::toDto)
+                .sorted(Comparator.comparing(YClientsServiceCategoryDto::getName))
                 .toList();
     }
 
@@ -170,7 +176,12 @@ public class YClientsManageService {
     @PreAuthorize("@securityAccessUtils.isAllowedAllActions()")
     public List<YClientsServiceDto> getServicesForAgent(String agentId) {
         crmService.getAgent(agentId);
-        return serviceRepo.findByAgentId(agentId).stream().map(mapper::toDto).toList();
+        return serviceRepo.findByAgentId(agentId).stream().map(mapper::toDto)
+                .sorted(Comparator.comparing(YClientsServiceDto::getCategoryId)
+                        .thenComparing(YClientsServiceDto::getName)
+                        .thenComparing(YClientsServiceDto::getYcName)
+                        .thenComparing(YClientsServiceDto::getYcId))
+                .toList();
     }
 
     @Transactional
@@ -205,8 +216,8 @@ public class YClientsManageService {
     @PreAuthorize("@securityAccessUtils.isAllowedAllActions()")
     public YClientsServiceDto updateServiceForAgent(String agentId, String id, YClientsServiceDto dto) {
         crmService.getAgent(agentId);
-        YClientsService ret = serviceRepo.findById(id).orElseThrow(()->
-                new ResponseStatusException(HttpStatus.NOT_FOUND, "Service with id="+id+" not found"));
+        YClientsService ret = serviceRepo.findById(id).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Service with id=" + id + " not found"));
         ret.setYClientsName(dto.getYcName());
         ret.setName(dto.getName() == null ? dto.getYcName() : dto.getName());
         ret.setUpdatedBy(extractUserId(getCurrentAuth()));
@@ -219,6 +230,59 @@ public class YClientsManageService {
     public void deleteServiceForAgent(String agentId, String id) {
         crmService.getAgent(agentId);
         serviceRepo.deleteServiceById(id);
+    }
+
+    @Transactional
+    @PreAuthorize("@securityAccessUtils.isAllowedAllActions()")
+    public List<YClientsPlaceDto> getPlacesForAgent(String agentId) {
+        crmService.getAgent(agentId);
+        return placeRepo.findByAgentId(agentId).stream().map(mapper::toDto)
+                .sorted(Comparator.comparing(YClientsPlaceDto::getName)
+                        .thenComparing(YClientsPlaceDto::getYcName)
+                        .thenComparing(YClientsPlaceDto::getYcId))
+                .toList();
+    }
+
+    @Transactional
+    @PreAuthorize("@securityAccessUtils.isAllowedAllActions()")
+    public YClientsPlaceDto addPlacesForAgent(String agentId, YClientsPlaceDto dto) {
+        crmService.getAgent(agentId);
+        var agent = agentRepo.findById(agentId).orElseThrow(); //Throw не будет, так как на getAgent есть все проверки
+        placeRepo.findByAgent_IdAndYClientsId(agentId, dto.getYcId()).ifPresent(ignored -> {
+                    throw new ResponseStatusException(HttpStatus.CONFLICT, "place with id=" + dto.getYcId()
+                            + " already registered for agent " + agentId);
+                }
+        );
+        YClientsPlace ret = new YClientsPlace();
+        ret.setName(dto.getName() == null ? dto.getYcName() : dto.getName());
+        ret.setOrganization(agent.getCrmOrganization());
+        ret.setCreatedBy(extractUserId(getCurrentAuth()));
+        ret.setYclientsId(dto.getYcId());
+        ret.setYclientsName(dto.getYcName());
+        ret.setAvailable(dto.isAvailable());
+        ret = placeRepo.save(ret);
+        return mapper.toDto(ret);
+    }
+
+    @Transactional
+    @PreAuthorize("@securityAccessUtils.isAllowedAllActions()")
+    public YClientsPlaceDto updatePlaceForAgent(String agentId, String id, YClientsPlaceDto dto) {
+        crmService.getAgent(agentId);
+        YClientsPlace ret = placeRepo.findById(id).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Place with id=" + id + " not found"));
+        ret.setYclientsName(dto.getYcName());
+        ret.setName(dto.getName() == null ? dto.getYcName() : dto.getName());
+        ret.setUpdatedBy(extractUserId(getCurrentAuth()));
+        ret.setAvailable(dto.isAvailable());
+        ret = placeRepo.save(ret);
+        return mapper.toDto(ret);
+    }
+
+    @Transactional
+    @PreAuthorize("@securityAccessUtils.isAllowedAllActions()")
+    public void deletePlaceForAgent(String agentId, String id) {
+        crmService.getAgent(agentId);
+        placeRepo.deletePlaceById(id);
     }
 
 
@@ -236,7 +300,7 @@ public class YClientsManageService {
 
     @Transactional(readOnly = true)
     @PreAuthorize("@securityAccessUtils.isAllowedAllActions()")
-    public YClientsDataResponse<List<YClientsServiceCategoryListDto>> getAllowedServiceCategories(String agentId, Long orgId) {
+    public YClientsDataResponse<List<YClientsServiceCategoryDto>> getAllowedServiceCategories(String agentId, Long orgId) {
         var agent = crmService.getAgent(agentId);
         var config = unmaskCreds(mapper.toDto(_getConfig(agent.getId())));
         return ycManageService.getOrganizationServiceCategories(orgId, config.getCredentials());
@@ -245,17 +309,16 @@ public class YClientsManageService {
     @Transactional(readOnly = true)
     @PreAuthorize("@securityAccessUtils.isAllowedAllActions()")
     public YClientsDataResponse<List<YClientsServiceDto>> getAllowedServices(String agentId) {
-        var agent = crmService.getAgent(agentId);
-        var config = unmaskCreds(mapper.toDto(_getConfig(agent.getId())));
-        var orgId = orgRepo.findByAgentId(agentId)
-                .map(YClientsOrganization::getYclientsId)
-                .orElseThrow(() ->
-                        new ResponseStatusException(HttpStatus.BAD_REQUEST, "Organization for agent=" + agentId + " not set"));
-        var categoryIds = serviceCategoryRepo.findByAgentId(agentId).stream().map(YClientsServiceCategory::getYClientsId).toList();
-        if (categoryIds.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Service categories not set for agent=" + agentId);
-        }
-        return ycManageService.getServicesForOrganization(orgId, categoryIds, config.getCredentials());
+        var queryParams = getInfoForOrgStructRequest(agentId);
+        return ycManageService.getServicesForOrganization(queryParams.orgId(), queryParams.categoryIds(), queryParams.config().getCredentials());
+    }
+
+
+    @Transactional(readOnly = true)
+    @PreAuthorize("@securityAccessUtils.isAllowedAllActions()")
+    public YClientsDataResponse<List<YClientsPlaceDto>> getAllowedPlaces(String agentId) {
+        var queryParams = getInfoForOrgStructRequest(agentId);
+        return ycManageService.getPlacesForOrganization(queryParams.orgId(), queryParams.categoryIds(), queryParams.config().getCredentials());
     }
 
 
@@ -290,6 +353,23 @@ public class YClientsManageService {
                     mapper.toDto(unmaskCreds(mapper.fromDto(dto.getCredentials()))));
         }
         return dto;
+    }
+
+    private record InfoForOrgStructRequest(YClientsAgentConfigDto config, Long orgId, List<Long> categoryIds) {
+    }
+
+    private InfoForOrgStructRequest getInfoForOrgStructRequest(String agentId) {
+        var agent = crmService.getAgent(agentId);
+        var config = unmaskCreds(mapper.toDto(_getConfig(agent.getId())));
+        var orgId = orgRepo.findByAgentId(agentId)
+                .map(YClientsOrganization::getYclientsId)
+                .orElseThrow(() ->
+                        new ResponseStatusException(HttpStatus.BAD_REQUEST, "Organization for agent=" + agentId + " not set"));
+        var categoryIds = serviceCategoryRepo.findByAgentId(agentId).stream().map(YClientsServiceCategory::getYClientsId).toList();
+        if (categoryIds.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Service categories not set for agent=" + agentId);
+        }
+        return new InfoForOrgStructRequest(config, orgId, categoryIds);
     }
 
 

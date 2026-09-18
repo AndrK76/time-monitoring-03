@@ -27,6 +27,8 @@
 |   |   |                           |       `-- CommandMessageType.java
 |   |   |                           |-- exception
 |   |   |                           |-- service
+|   |   |                           |-- util
+|   |   |                           |   `-- XorCipher.java
 |   |   |                           `-- AuthConstants.java
 |   |   `-- pom.xml
 |   |-- core-persistence
@@ -139,10 +141,16 @@
 |   |   |               `-- igorit
 |   |   |                   `-- monitoring
 |   |   |                       `-- web
-|   |   |                           `-- dto
-|   |   |                               |-- OrganizationListDto.java
-|   |   |                               |-- UserListItemDto.java
-|   |   |                               `-- UserResponseDto.java
+|   |   |                           |-- adviser
+|   |   |                           |   `-- GlobalExceptionHandler.java
+|   |   |                           |-- config
+|   |   |                           |   `-- DefaultObjectMapperConfig.java
+|   |   |                           |-- dto
+|   |   |                           |   |-- OrganizationListDto.java
+|   |   |                           |   |-- UserListItemDto.java
+|   |   |                           |   `-- UserResponseDto.java
+|   |   |                           `-- utils
+|   |   |                               `-- WebClientFactory.java
 |   |   `-- pom.xml
 |   |-- lib-monitoring
 |   |   |-- src
@@ -153,18 +161,89 @@
 |   |   |                   `-- monitoring
 |   |   |                       `-- lib
 |   |   |                           |-- dto
+|   |   |                           |   |-- crm
+|   |   |                           |   |   |-- CrmAgentConfigDto.java
+|   |   |                           |   |   |-- CrmAgentItemDto.java
+|   |   |                           |   |   |-- CrmAgentListDto.java
+|   |   |                           |   |   |-- CrmAgentTypeDto.java
+|   |   |                           |   |   |-- CrmOrganizationDto.java
+|   |   |                           |   |   `-- CrmServiceDto.java
+|   |   |                           |   |-- yclients
+|   |   |                           |   |   |-- YClientCredentialsDto.java
+|   |   |                           |   |   |-- YClientsAgentConfigDto.java
+|   |   |                           |   |   |-- YClientsDataResponse.java
+|   |   |                           |   |   |-- YClientsOrganizationDto.java
+|   |   |                           |   |   |-- YClientsPlaceDto.java
+|   |   |                           |   |   |-- YClientsServiceCategoryDto.java
+|   |   |                           |   |   |-- YClientsServiceDto.java
+|   |   |                           |   |   |-- YClientsTokenRequestDto.java
+|   |   |                           |   |   `-- YClientsTokenResponseDto.java
 |   |   |                           |   `-- OrgStructListDto.java
 |   |   |                           |-- enums
 |   |   |                           |   `-- CrmAgentType.java
 |   |   |                           `-- persistence
 |   |   |                               |-- entity
 |   |   |                               |   |-- admin
-|   |   |                               |   `-- common
-|   |   |                               |       `-- Organization.java
+|   |   |                               |   |-- common
+|   |   |                               |   |   `-- Organization.java
+|   |   |                               |   |-- crm
+|   |   |                               |   |   |-- CrmAgent.java
+|   |   |                               |   |   |-- CrmAgentConfig.java
+|   |   |                               |   |   |-- CrmAgentListProjection.java
+|   |   |                               |   |   |-- CrmOrganization.java
+|   |   |                               |   |   |-- CrmPlace.java
+|   |   |                               |   |   `-- CrmService.java
+|   |   |                               |   `-- yclients
+|   |   |                               |       |-- YClientCredentials.java
+|   |   |                               |       |-- YClientsAgent.java
+|   |   |                               |       |-- YClientsAgentConfig.java
+|   |   |                               |       |-- YClientsOrganization.java
+|   |   |                               |       |-- YClientsPlace.java
+|   |   |                               |       |-- YClientsService.java
+|   |   |                               |       `-- YClientsServiceCategory.java
 |   |   |                               `-- repository
 |   |   |                                   |-- admin
-|   |   |                                   `-- common
-|   |   |                                       `-- OrganizationRepository.java
+|   |   |                                   |-- common
+|   |   |                                   |   `-- OrganizationRepository.java
+|   |   |                                   |-- crm
+|   |   |                                   |   |-- CrmAgentConfigRepository.java
+|   |   |                                   |   |-- CrmAgentRepository.java
+|   |   |                                   |   |-- CrmOrganizationRepository.java
+|   |   |                                   |   |-- CrmPlaceRepository.java
+|   |   |                                   |   `-- CrmServiceRepository.java
+|   |   |                                   `-- yclients
+|   |   |                                       |-- YClientsAgentConfigRepository.java
+|   |   |                                       |-- YClientsAgentRepository.java
+|   |   |                                       |-- YClientsOrganizationRepository.java
+|   |   |                                       |-- YClientsPlaceRepository.java
+|   |   |                                       |-- YClientsServiceCategoryRepository.java
+|   |   |                                       `-- YClientsServiceRepository.java
+|   |   `-- pom.xml
+|   |-- lib-yclients
+|   |   |-- src
+|   |   |   `-- main
+|   |   |       `-- java
+|   |   |           `-- ru
+|   |   |               `-- igorit
+|   |   |                   `-- monitoring
+|   |   |                       `-- yclients
+|   |   |                           |-- api
+|   |   |                           |   |-- config
+|   |   |                           |   |   |-- YClientsApiProperties.java
+|   |   |                           |   |   `-- YClientsWebClientFactory.java
+|   |   |                           |   |-- dto
+|   |   |                           |   |   |-- YCAuthParams.java
+|   |   |                           |   |   |-- YCAuthResponse.java
+|   |   |                           |   |   |-- YCOrgInfo.java
+|   |   |                           |   |   |-- YCResponse.java
+|   |   |                           |   |   |-- YCServiceCategoryInfo.java
+|   |   |                           |   |   |-- YCServiceInfo.java
+|   |   |                           |   |   `-- YCStaffInfo.java
+|   |   |                           |   `-- service
+|   |   |                           |       `-- YClientsApiClient.java
+|   |   |                           `-- service
+|   |   |                               `-- manage
+|   |   |                                   `-- ConfigManageService.java
 |   |   `-- pom.xml
 |   |-- service-admin
 |   |   |-- src
@@ -179,8 +258,10 @@
 |   |   |       |                   |   `-- SecurityConfig.java
 |   |   |       |                   |-- controller
 |   |   |       |                   |   |-- AccessModelController.java
+|   |   |       |                   |   |-- CrmManageController.java
 |   |   |       |                   |   |-- MainDictController.java
-|   |   |       |                   |   `-- TestController.java
+|   |   |       |                   |   |-- TestController.java
+|   |   |       |                   |   `-- YClientsManageController.java
 |   |   |       |                   |-- dto
 |   |   |       |                   |   |-- OrganizationItemDto.java
 |   |   |       |                   |   `-- TestResponse.java
@@ -188,20 +269,30 @@
 |   |   |       |                   |   `-- RabbitCommandListener.java
 |   |   |       |                   |-- mapper
 |   |   |       |                   |   |-- AccessModelMapper.java
+|   |   |       |                   |   |-- CrmModelMapper.java
 |   |   |       |                   |   |-- EventCommandMapper.java
-|   |   |       |                   |   `-- StructModelMapper.java
+|   |   |       |                   |   |-- StructModelMapper.java
+|   |   |       |                   |   `-- YClientsModelMapper.java
 |   |   |       |                   |-- service
 |   |   |       |                   |   |-- AccessManageService.java
+|   |   |       |                   |   |-- CrmManageService.java
 |   |   |       |                   |   |-- StructManageService.java
 |   |   |       |                   |   |-- TestService.java
-|   |   |       |                   |   `-- UserEventsReceiveService.java
+|   |   |       |                   |   |-- UserEventsReceiveService.java
+|   |   |       |                   |   `-- YClientsManageService.java
 |   |   |       |                   `-- AdminApplication.java
 |   |   |       `-- resources
 |   |   |           |-- db
 |   |   |           |   `-- migration
 |   |   |           |       |-- V01.01__init_admin_schema.sql
 |   |   |           |       |-- V01.02__add_organizations.sql
-|   |   |           |       `-- V01.03__add_agent_cols_to_org.sql
+|   |   |           |       |-- V01.03__add_agent_cols_to_org.sql
+|   |   |           |       |-- V01.04__add_crm_entities.sql
+|   |   |           |       |-- V01.05__remove_not_nulls_in_yc_cfg.sql
+|   |   |           |       |-- V01.06__add_logging_fields.sql
+|   |   |           |       |-- V01.07__remove_yc_apiurl.sql
+|   |   |           |       |-- V01.08__add_tz_to_yc_org.sql
+|   |   |           |       `-- V01.09__add_aviable_org_flag.sql
 |   |   |           `-- application.yml
 |   |   |-- .properties
 |   |   `-- pom.xml
@@ -292,7 +383,8 @@
 |   |   |           |-- db
 |   |   |           |   `-- migration
 |   |   |           |       |-- V01.01__add_organizations.sql
-|   |   |           |       `-- V01.02__add_agent_cols_to_org.sql
+|   |   |           |       |-- V01.02__add_agent_cols_to_org.sql
+|   |   |           |       `-- V01.03__add_logging_cols_to_org.sql
 |   |   |           `-- application.yml
 |   |   |-- .properties
 |   |   `-- pom.xml
@@ -400,18 +492,30 @@
 |   |   |   |   |   |   |       |-- camera-agent-list.component.scss
 |   |   |   |   |   |   |       `-- camera-agent-list.component.ts
 |   |   |   |   |   |   |-- crm-agent
-|   |   |   |   |   |   |   |-- crm-agent-editor
-|   |   |   |   |   |   |   |   |-- crm-agent-editor.component.html
-|   |   |   |   |   |   |   |   |-- crm-agent-editor.component.scss
-|   |   |   |   |   |   |   |   `-- crm-agent-editor.component.ts
-|   |   |   |   |   |   |   |-- crm-agent-editor-container
-|   |   |   |   |   |   |   |   |-- crm-agent-editor-container.component.html
-|   |   |   |   |   |   |   |   |-- crm-agent-editor-container.component.scss
-|   |   |   |   |   |   |   |   `-- crm-agent-editor-container.component.ts
-|   |   |   |   |   |   |   `-- crm-agent-list
-|   |   |   |   |   |   |       |-- crm-agent-list.component.html
-|   |   |   |   |   |   |       |-- crm-agent-list.component.scss
-|   |   |   |   |   |   |       `-- crm-agent-list.component.ts
+|   |   |   |   |   |   |   |-- crm-agent-bind-editor
+|   |   |   |   |   |   |   |   |-- crm-agent-bind-editor.component.html
+|   |   |   |   |   |   |   |   |-- crm-agent-bind-editor.component.scss
+|   |   |   |   |   |   |   |   `-- crm-agent-bind-editor.component.ts
+|   |   |   |   |   |   |   |-- crm-agent-config
+|   |   |   |   |   |   |   |   |-- crm-agent-config.component.html
+|   |   |   |   |   |   |   |   |-- crm-agent-config.component.scss
+|   |   |   |   |   |   |   |   `-- crm-agent-config.component.ts
+|   |   |   |   |   |   |   |-- crm-agent-list
+|   |   |   |   |   |   |   |   |-- crm-agent-list.component.html
+|   |   |   |   |   |   |   |   |-- crm-agent-list.component.scss
+|   |   |   |   |   |   |   |   `-- crm-agent-list.component.ts
+|   |   |   |   |   |   |   |-- crm-agent-view.models.ts
+|   |   |   |   |   |   |   `-- crm-agent-view.utils.ts
+|   |   |   |   |   |   |-- crm-place
+|   |   |   |   |   |   |   `-- crm-place-list
+|   |   |   |   |   |   |       |-- crm-place-list.component.html
+|   |   |   |   |   |   |       |-- crm-place-list.component.scss
+|   |   |   |   |   |   |       `-- crm-place-list.component.ts
+|   |   |   |   |   |   |-- crm-service
+|   |   |   |   |   |   |   `-- crm-service-list
+|   |   |   |   |   |   |       |-- crm-service-list.component.html
+|   |   |   |   |   |   |       |-- crm-service-list.component.scss
+|   |   |   |   |   |   |       `-- crm-service-list.component.ts
 |   |   |   |   |   |   |-- event-agent
 |   |   |   |   |   |   |   |-- event-agent-editor
 |   |   |   |   |   |   |   |   |-- event-agent-editor.component.html
@@ -470,31 +574,56 @@
 |   |   |   |   |   |   |   |   `-- struct-org-list.component.ts
 |   |   |   |   |   |   |   |-- struct-org-view.models.ts
 |   |   |   |   |   |   |   `-- struct-org-view.utils.ts
-|   |   |   |   |   |   |-- test
-|   |   |   |   |   |   |   |-- test.component.html
-|   |   |   |   |   |   |   |-- test.component.scss
-|   |   |   |   |   |   |   `-- test.component.ts
-|   |   |   |   |   |   `-- users
-|   |   |   |   |   |       |-- user-editor-inplace
-|   |   |   |   |   |       |   |-- user-editor-inplace.component.html
-|   |   |   |   |   |       |   |-- user-editor-inplace.component.scss
-|   |   |   |   |   |       |   `-- user-editor-inplace.component.ts
-|   |   |   |   |   |       |-- user-list-table
-|   |   |   |   |   |       |   |-- user-list-table.component.html
-|   |   |   |   |   |       |   |-- user-list-table.component.scss
-|   |   |   |   |   |       |   `-- user-list-table.component.ts
-|   |   |   |   |   |       |-- user-profile-dialog
-|   |   |   |   |   |       |   |-- user-profile-dialog.component.html
-|   |   |   |   |   |       |   |-- user-profile-dialog.component.scss
-|   |   |   |   |   |       |   `-- user-profile-dialog.component.ts
-|   |   |   |   |   |       |-- user-profile-edit-container
-|   |   |   |   |   |       |   |-- user-profile-edit-container.component.html
-|   |   |   |   |   |       |   |-- user-profile-edit-container.component.scss
-|   |   |   |   |   |       |   `-- user-profile-edit-container.component.ts
-|   |   |   |   |   |       |-- user-view.models.ts
-|   |   |   |   |   |       `-- user-view.utils.ts
+|   |   |   |   |   |   |-- users
+|   |   |   |   |   |   |   |-- user-editor-inplace
+|   |   |   |   |   |   |   |   |-- user-editor-inplace.component.html
+|   |   |   |   |   |   |   |   |-- user-editor-inplace.component.scss
+|   |   |   |   |   |   |   |   `-- user-editor-inplace.component.ts
+|   |   |   |   |   |   |   |-- user-list-table
+|   |   |   |   |   |   |   |   |-- user-list-table.component.html
+|   |   |   |   |   |   |   |   |-- user-list-table.component.scss
+|   |   |   |   |   |   |   |   `-- user-list-table.component.ts
+|   |   |   |   |   |   |   |-- user-profile-dialog
+|   |   |   |   |   |   |   |   |-- user-profile-dialog.component.html
+|   |   |   |   |   |   |   |   |-- user-profile-dialog.component.scss
+|   |   |   |   |   |   |   |   `-- user-profile-dialog.component.ts
+|   |   |   |   |   |   |   |-- user-profile-edit-container
+|   |   |   |   |   |   |   |   |-- user-profile-edit-container.component.html
+|   |   |   |   |   |   |   |   |-- user-profile-edit-container.component.scss
+|   |   |   |   |   |   |   |   `-- user-profile-edit-container.component.ts
+|   |   |   |   |   |   |   |-- user-view.models.ts
+|   |   |   |   |   |   |   `-- user-view.utils.ts
+|   |   |   |   |   |   `-- yclients
+|   |   |   |   |   |       |-- yc-config-editor
+|   |   |   |   |   |       |   |-- yc-service-category-list
+|   |   |   |   |   |       |   |   |-- yc-service-category-list.component.html
+|   |   |   |   |   |       |   |   |-- yc-service-category-list.component.scss
+|   |   |   |   |   |       |   |   `-- yc-service-category-list.component.ts
+|   |   |   |   |   |       |   |-- yc-config-editor.component.html
+|   |   |   |   |   |       |   |-- yc-config-editor.component.scss
+|   |   |   |   |   |       |   `-- yc-config-editor.component.ts
+|   |   |   |   |   |       |-- yc-place-list
+|   |   |   |   |   |       |   |-- yc-place-inplace-editor
+|   |   |   |   |   |       |   |   |-- yc-place-inplace-editor.component.html
+|   |   |   |   |   |       |   |   |-- yc-place-inplace-editor.component.scss
+|   |   |   |   |   |       |   |   `-- yc-place-inplace-editor.component.ts
+|   |   |   |   |   |       |   |-- yc-place-list.component.html
+|   |   |   |   |   |       |   |-- yc-place-list.component.scss
+|   |   |   |   |   |       |   `-- yc-place-list.component.ts
+|   |   |   |   |   |       |-- yc-service-list
+|   |   |   |   |   |       |   |-- yc-service-inplace-editor
+|   |   |   |   |   |       |   |   |-- yc-service-inplace-editor.component.html
+|   |   |   |   |   |       |   |   |-- yc-service-inplace-editor.component.scss
+|   |   |   |   |   |       |   |   `-- yc-service-inplace-editor.component.ts
+|   |   |   |   |   |       |   |-- yc-service-list.component.html
+|   |   |   |   |   |       |   |-- yc-service-list.component.scss
+|   |   |   |   |   |       |   `-- yc-service-list.component.ts
+|   |   |   |   |   |       |-- yclients-view.models.ts
+|   |   |   |   |   |       `-- yclients-view.utils.ts
 |   |   |   |   |   |-- services
-|   |   |   |   |   |   `-- main-struct-manage.service.ts
+|   |   |   |   |   |   |-- crm-struct-manage.service.ts
+|   |   |   |   |   |   |-- main-struct-manage.service.ts
+|   |   |   |   |   |   `-- yclients-manage.service.ts
 |   |   |   |   |   |-- app.component.html
 |   |   |   |   |   |-- app.component.scss
 |   |   |   |   |   |-- app.component.ts
@@ -637,6 +766,7 @@
 |   |   |   |   |   |   |-- permission.service.ts
 |   |   |   |   |   |   `-- user-manage.service.ts
 |   |   |   |   |   `-- utils
+|   |   |   |   |       |-- error.utils.ts
 |   |   |   |   |       `-- http.utils.ts
 |   |   |   |   `-- public-api.ts
 |   |   |   |-- README.md
@@ -681,6 +811,15 @@
 |   |   |   |   |   |   |   |-- login.component.html
 |   |   |   |   |   |   |   |-- login.component.scss
 |   |   |   |   |   |   |   `-- login.component.ts
+|   |   |   |   |   |   |-- login-dialog
+|   |   |   |   |   |   |   |-- login-dialog.component.html
+|   |   |   |   |   |   |   |-- login-dialog.component.scss
+|   |   |   |   |   |   |   |-- login-dialog.component.ts
+|   |   |   |   |   |   |   `-- login-dialog.model.ts
+|   |   |   |   |   |   |-- login-dialog-content
+|   |   |   |   |   |   |   |-- login-dialog-content.component.html
+|   |   |   |   |   |   |   |-- login-dialog-content.component.scss
+|   |   |   |   |   |   |   `-- login-dialog-content.component.ts
 |   |   |   |   |   |   |-- logout
 |   |   |   |   |   |   |   |-- logout.component.html
 |   |   |   |   |   |   |   |-- logout.component.scss
@@ -699,7 +838,10 @@
 |   |   |   |   |   |       `-- view-current-profile.component.ts
 |   |   |   |   |   |-- models
 |   |   |   |   |   |   |-- struct
+|   |   |   |   |   |   |   |-- crm-dto-items.ts
 |   |   |   |   |   |   |   `-- struct-dto-items.ts
+|   |   |   |   |   |   |-- yclients
+|   |   |   |   |   |   |   `-- yclients-dto-items.ts
 |   |   |   |   |   |   |-- menu-item.ts
 |   |   |   |   |   |   |-- table-data-items.ts
 |   |   |   |   |   |   `-- table-filter-items.ts
@@ -707,6 +849,8 @@
 |   |   |   |   |   |   |-- dialog.service.ts
 |   |   |   |   |   |   |-- navigation.service.ts
 |   |   |   |   |   |   |-- notification.service.ts
+|   |   |   |   |   |   |-- size.service.ts
+|   |   |   |   |   |   |-- table-actions-informer.service.ts
 |   |   |   |   |   |   `-- table-manage.service.ts
 |   |   |   |   |   |-- styles
 |   |   |   |   |   |   |-- _auth-common.scss
@@ -768,4 +912,4 @@
 |-- README.md
 `-- tree.txt
 
-284 directories, 484 files
+321 directories, 591 files

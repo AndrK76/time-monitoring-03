@@ -15,25 +15,25 @@ import { CrmStructManageService } from '../../../services/crm-struct-manage.serv
 import { MainStructManageService } from '../../../services/main-struct-manage.service';
 import { OrgStructInfo } from '../../struct-org/struct-org-view.models';
 import { orgStructListDtoToView } from '../../struct-org/struct-org-view.utils';
-import { YcServiceListComponent } from '../../yclients/yc-service-list/yc-service-list.component';
+import { YcPlaceListComponent } from '../../yclients/yc-place-list/yc-place-list.component';
 import { CrmAgentItemView, CrmAgentTypeView } from '../../crm-agent/crm-agent-view.models';
 import { crmAgentItemDtoToView, crmAgentTypeDtoToView } from '../../crm-agent/crm-agent-view.utils';
-import { NotificationService, TableActionsInformerService } from '@mon3/sc';
+import { DialogService, NotificationService, TableActionsInformerService } from '@mon3/sc';
 
 @Component({
-  selector: 'app-crm-service-list',
+  selector: 'app-crm-place-list',
   standalone: true,
   imports: [
     CommonModule, RouterModule, ReactiveFormsModule,
     MatButtonModule, MatCardModule, MatFormFieldModule, MatIconModule,
     MatProgressSpinnerModule, MatSelectModule, MatTooltipModule,
-    YcServiceListComponent,
+    YcPlaceListComponent,
   ],
   providers: [TableActionsInformerService],
-  templateUrl: './crm-service-list.component.html',
-  styleUrl: './crm-service-list.component.scss'
+  templateUrl: './crm-place-list.component.html',
+  styleUrl: './crm-place-list.component.scss'
 })
-export class CrmServiceListComponent implements OnInit {
+export class CrmPlaceListComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly notificationService = inject(NotificationService);

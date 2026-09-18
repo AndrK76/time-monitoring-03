@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { YClientsAgentConfigDto, YClientsDataResponseDto, YClientsOrganizationDto, YClientsServiceCategoryListDto, YClientsServiceDto, YClientsTokenRequestDto, YClientsTokenResponseDto } from '@mon3/sc';
+import { YClientsAgentConfigDto, YClientsDataResponseDto, YClientsOrganizationDto, YClientsPlaceDto, YClientsServiceCategoryDto, YClientsServiceDto, YClientsTokenRequestDto, YClientsTokenResponseDto } from '@mon3/sc';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -36,20 +36,20 @@ export class YclientsManageService {
     return this.http.put<YClientsOrganizationDto>(`${this.adminApiUrl}${this.YC_CONTROLLER}/agents/${id}/organization`, data);
   }
 
-  getServiceCategoriesForAgent(id: string): Observable<YClientsServiceCategoryListDto[]> {
-    return this.http.get<YClientsServiceCategoryListDto[]>(`${this.adminApiUrl}${this.YC_CONTROLLER}/agents/${id}/service-categories`);
+  getServiceCategoriesForAgent(id: string): Observable<YClientsServiceCategoryDto[]> {
+    return this.http.get<YClientsServiceCategoryDto[]>(`${this.adminApiUrl}${this.YC_CONTROLLER}/agents/${id}/service-categories`);
   }
 
-  updateServiceCategoriesForAgent(id: string, data: YClientsServiceCategoryListDto[]): Observable<YClientsServiceCategoryListDto[]> {
-    return this.http.put<YClientsServiceCategoryListDto[]>(`${this.adminApiUrl}${this.YC_CONTROLLER}/agents/${id}/service-categories`, data);
+  updateServiceCategoriesForAgent(id: string, data: YClientsServiceCategoryDto[]): Observable<YClientsServiceCategoryDto[]> {
+    return this.http.put<YClientsServiceCategoryDto[]>(`${this.adminApiUrl}${this.YC_CONTROLLER}/agents/${id}/service-categories`, data);
   }
 
   getAllowedOrganizationsForAgent(id: string): Observable<YClientsDataResponseDto<YClientsOrganizationDto[]>> {
     return this.http.get<YClientsDataResponseDto<YClientsOrganizationDto[]>>(`${this.adminApiUrl}${this.YC_CONTROLLER}/misc/agent/${id}/allowed-orgs`);
   }
 
-  getAllowedServiceCategories(id: string, orgId?: number): Observable<YClientsDataResponseDto<YClientsServiceCategoryListDto[]>> {
-    return this.http.get<YClientsDataResponseDto<YClientsServiceCategoryListDto[]>>(
+  getAllowedServiceCategories(id: string, orgId?: number): Observable<YClientsDataResponseDto<YClientsServiceCategoryDto[]>> {
+    return this.http.get<YClientsDataResponseDto<YClientsServiceCategoryDto[]>>(
       `${this.adminApiUrl}${this.YC_CONTROLLER}/misc/agent/${id}/org/${orgId}/service-categories`);
   }
 
@@ -76,6 +76,31 @@ export class YclientsManageService {
   getAllowedServices(id: string): Observable<YClientsDataResponseDto<YClientsServiceDto[]>> {
     return this.http.get<YClientsDataResponseDto<YClientsServiceDto[]>>(
       `${this.adminApiUrl}${this.YC_CONTROLLER}/misc/agent/${id}/services`);
+  }
+
+  getPlacesForAgent(id: string): Observable<YClientsPlaceDto[]> {
+    return this.http.get<YClientsPlaceDto[]>(
+      `${this.adminApiUrl}${this.YC_CONTROLLER}/agents/${id}/places`);
+  }
+
+  addPlaceForAgent(id: string, data: YClientsPlaceDto): Observable<YClientsPlaceDto> {
+    return this.http.post<YClientsPlaceDto>(
+      `${this.adminApiUrl}${this.YC_CONTROLLER}/agents/${id}/places`, data);
+  }
+
+  updatePlaceForAgent(id: string, placeId: string, data: YClientsPlaceDto): Observable<YClientsPlaceDto> {
+    return this.http.put<YClientsPlaceDto>(
+      `${this.adminApiUrl}${this.YC_CONTROLLER}/agents/${id}/places/${placeId}`, data);
+  }
+
+  deletePlaceForAgent(id: string, placeId: string): Observable<void> {
+    return this.http.delete<void>(
+      `${this.adminApiUrl}${this.YC_CONTROLLER}/agents/${id}/places/${placeId}`);
+  }
+
+  getAllowedPlaces(id: string): Observable<YClientsDataResponseDto<YClientsPlaceDto[]>> {
+    return this.http.get<YClientsDataResponseDto<YClientsPlaceDto[]>>(
+      `${this.adminApiUrl}${this.YC_CONTROLLER}/misc/agent/${id}/places`);
   }
 
 }

@@ -41,14 +41,14 @@ public class YClientsManageController {
     }
 
     @GetMapping("/agents/{id}/service-categories")
-    public List<YClientsServiceCategoryListDto> getServiceCategoriesForAgent(@PathVariable("id") String agentId) {
+    public List<YClientsServiceCategoryDto> getServiceCategoriesForAgent(@PathVariable("id") String agentId) {
         return service.getServiceCategoriesForAgent(agentId);
     }
 
     @PutMapping("/agents/{id}/service-categories")
-    public List<YClientsServiceCategoryListDto> updateServiceCategoriesForAgent(
+    public List<YClientsServiceCategoryDto> updateServiceCategoriesForAgent(
             @PathVariable("id") String agentId,
-            @Valid @RequestBody List<YClientsServiceCategoryListDto> request) {
+            @Valid @RequestBody List<YClientsServiceCategoryDto> request) {
         return service.updateServiceCategoriesForAgent(agentId, request);
     }
 
@@ -80,6 +80,35 @@ public class YClientsManageController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/agents/{id}/places")
+    public List<YClientsPlaceDto> getPlacesForAgent(@PathVariable("id") String agentId) {
+        return service.getPlacesForAgent(agentId);
+    }
+
+    @PostMapping("/agents/{id}/places")
+    public YClientsPlaceDto addPlacesForAgent(
+            @PathVariable("id") String agentId,
+            @Valid @RequestBody YClientsPlaceDto request) {
+        return service.addPlacesForAgent(agentId, request);
+    }
+
+    @PutMapping("/agents/{agent}/places/{id}")
+    public YClientsPlaceDto updatePlaceForAgent(
+            @PathVariable("agent") String agentId,
+            @PathVariable("id") String serviceId,
+            @Valid @RequestBody YClientsPlaceDto request) {
+        return service.updatePlaceForAgent(agentId, serviceId, request);
+    }
+
+    @DeleteMapping("/agents/{agent}/places/{id}")
+    public ResponseEntity<?> deletePlaceForAgent(
+            @PathVariable("agent") String agentId,
+            @PathVariable("id") String serviceId) {
+        service.deletePlaceForAgent(agentId, serviceId);
+        return ResponseEntity.noContent().build();
+    }
+
+
 
     @PostMapping("/misc/get-token")
     public YClientsTokenResponseDto getClientToken(@Valid @RequestBody YClientsTokenRequestDto request) {
@@ -95,7 +124,7 @@ public class YClientsManageController {
     }
 
     @GetMapping("/misc/agent/{id}/org/{org}/service-categories")
-    public YClientsDataResponse<List<YClientsServiceCategoryListDto>> getAllowedServiceCategories
+    public YClientsDataResponse<List<YClientsServiceCategoryDto>> getAllowedServiceCategories
             (@PathVariable(name = "id") String agentId, @PathVariable(name = "org") Long orgId) {
         return service.getAllowedServiceCategories(agentId, orgId);
     }
@@ -104,5 +133,11 @@ public class YClientsManageController {
     public YClientsDataResponse<List<YClientsServiceDto>> getAllowedServices
             (@PathVariable(name = "id") String agentId) {
         return service.getAllowedServices(agentId);
+    }
+
+    @GetMapping("/misc/agent/{id}/places")
+    public YClientsDataResponse<List<YClientsPlaceDto>> getAllowedPlaces
+            (@PathVariable(name = "id") String agentId) {
+        return service.getAllowedPlaces(agentId);
     }
 }

@@ -1,7 +1,5 @@
 package ru.igorit.monitoring.lib.persistence.entity.crm;
 
-import org.springframework.beans.factory.annotation.Value;
-
 public interface CrmAgentListProjection {
     String getId();
 

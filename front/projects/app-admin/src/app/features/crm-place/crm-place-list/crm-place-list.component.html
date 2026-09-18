@@ -1,7 +1,7 @@
 <div class="standard-table-container">
     <mat-card>
         <mat-card-header>
-            <mat-card-title>CRM: Услуги
+            <mat-card-title>CRM: Места
                 <span class="hide-on-small">{{ orgName() }}</span>
             </mat-card-title>
             <mat-card-subtitle class="hide-on-small">
@@ -15,7 +15,7 @@
                 }
             </mat-card-subtitle>
         </mat-card-header>
-        <mat-card-actions class="crm-service-actions full-row">
+        <mat-card-actions class="crm-place-actions full-row">
             <div class="action-button-group">
                 @if (showBackLink()) {
                 <a mat-button matTooltip="К списку организаций" class="table-action-btn back-button"
@@ -30,7 +30,7 @@
                         <mat-option *ngFor="let org of organizations()" [value]="org.id">
                             {{ org.shortName }}
                         </mat-option>
-                    </mat-select><!--[disabled]="isSelectingAgent()"-->
+                    </mat-select>
                 </mat-form-field>
                 }
             </div>
@@ -67,7 +67,7 @@
             </div>
             } @else {
             @if (agent()) {
-            <app-yc-service-list [actions]="actions"></app-yc-service-list>
+            <app-yc-place-list [actions]="actions"></app-yc-place-list>
             } @else if (orgId()) {
             <div class="empty-state">
                 <mat-icon>info</mat-icon>

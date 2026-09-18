@@ -65,8 +65,9 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewInit {
         {
           label: 'CRM', route: '/crm',
           children: [
-            { label: 'Агенты CRM', route: '/crm/agent-list' },
+            { label: 'Агенты', route: '/crm/agent-list' },
             { label: 'Услуги', route: '/crm/service-list' },
+            { label: 'Места', route: '/crm/place-list' },
           ]
         },
       ]

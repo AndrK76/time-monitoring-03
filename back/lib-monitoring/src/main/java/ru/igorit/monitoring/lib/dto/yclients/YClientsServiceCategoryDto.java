@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class YClientsServiceCategoryListDto {
+public class YClientsServiceCategoryDto {
     private Long id;
     private String name;
     private Long orgId;

@@ -23,11 +23,15 @@ public interface YClientsModelMapper {
     @Mapping(target = "id", source = "YClientsId")
     @Mapping(target = "name", source = "YClientsName")
     @Mapping(target = "orgId", source = "organization.yclientsId")
-    YClientsServiceCategoryListDto toDto(YClientsServiceCategory item);
+    YClientsServiceCategoryDto toDto(YClientsServiceCategory item);
 
     @Mapping(target = "categoryId", source = "serviceCategory.YClientsId")
     @Mapping(target = "ycId", source = "YClientsId")
     @Mapping(target = "ycName", source = "YClientsName")
     YClientsServiceDto toDto(YClientsService item);
+
+    @Mapping(target = "ycId", source = "yclientsId")
+    @Mapping(target = "ycName", source = "yclientsName")
+    YClientsPlaceDto toDto(YClientsPlace item);
 
 }

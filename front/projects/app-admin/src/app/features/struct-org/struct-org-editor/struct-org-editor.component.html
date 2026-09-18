@@ -87,8 +87,9 @@
 
         <!-- Ссылки на смежные разделы -->
         <div class="form-row">
-              <span class="label">Перейти</span>
-            <a mat-button class="editor-link" [routerLink]="['/']">
+            <span class="label">Перейти</span>
+            <a mat-button class="editor-link" [routerLink]="['/crm/place-list']"
+                [queryParams]="{org: organization().id}">
                 <span>{{isSmallScreen()?'Места':'К списку мест'}}</span>
             </a>
             <a mat-button class="editor-link" [routerLink]="['/crm/service-list']"

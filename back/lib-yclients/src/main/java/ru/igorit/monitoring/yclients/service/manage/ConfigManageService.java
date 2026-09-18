@@ -11,6 +11,8 @@ import ru.igorit.monitoring.yclients.api.dto.*;
 import ru.igorit.monitoring.yclients.api.service.YClientsApiClient;
 
 import java.time.ZoneOffset;
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -101,18 +103,11 @@ public class ConfigManageService {
                     .meta(response.getMeta())
                     .build();
         } else {
-            return YClientsDataResponse.<List<YClientsOrganizationDto>>builder()
-                    .statusCode(response.getStatus().value())
-                    .statusMessage(response.getStatus().toString())
-                    .success(false)
-                    .errorMessage(response.getMeta().get("message"))
-                    .meta(response.getMeta())
-                    .build();
+            return buildFailResponse(response);
         }
     }
 
-
-    public YClientsDataResponse<List<YClientsServiceCategoryListDto>> getOrganizationServiceCategories(long orgId, YClientCredentialsDto request) {
+    public YClientsDataResponse<List<YClientsServiceCategoryDto>> getOrganizationServiceCategories(long orgId, YClientCredentialsDto request) {
         var response = _getOrganizationServiceCategories(orgId, request);
         return parseOrganizationServiceCategoriesResponse(orgId, response);
     }
@@ -131,37 +126,33 @@ public class ConfigManageService {
         ).orElse(apiClient.emptyErrorResponse(metaType));
     }
 
-    private YClientsDataResponse<List<YClientsServiceCategoryListDto>> parseOrganizationServiceCategoriesResponse(
+    private YClientsDataResponse<List<YClientsServiceCategoryDto>> parseOrganizationServiceCategoriesResponse(
             Long orgId,
             YCResponse<List<YCServiceCategoryInfo>, Map<String, String>> response) {
         if (response.isSuccess()) {
-            return YClientsDataResponse.<List<YClientsServiceCategoryListDto>>builder()
+            return YClientsDataResponse.<List<YClientsServiceCategoryDto>>builder()
                     .statusCode(response.getStatus().value())
                     .statusMessage(response.getStatus().toString())
                     .success(true)
                     .data(response.getData().stream().map(v ->
-                            YClientsServiceCategoryListDto.builder()
-                                    .id((long) v.getId())
-                                    .name(v.getTitle())
-                                    .orgId(orgId)
-                                    .build()
-                    ).toList())
+                                    YClientsServiceCategoryDto.builder()
+                                            .id((long) v.getId())
+                                            .name(v.getTitle())
+                                            .orgId(orgId)
+                                            .build()
+                            )
+                            .sorted(Comparator.comparing(YClientsServiceCategoryDto::getName))
+                            .toList())
                     .meta(response.getMeta())
                     .build();
         } else {
-            return YClientsDataResponse.<List<YClientsServiceCategoryListDto>>builder()
-                    .statusCode(response.getStatus().value())
-                    .statusMessage(response.getStatus().toString())
-                    .success(false)
-                    .errorMessage(response.getMeta().get("message"))
-                    .meta(response.getMeta())
-                    .build();
+            return buildFailResponse(response);
         }
     }
 
     public YClientsDataResponse<List<YClientsServiceDto>> getServicesForOrganization(long orgId, List<Long> catIds, YClientCredentialsDto request) {
         var response = _getServicesForOrganization(orgId, request);
-        return parseServicesForOrganizationResponse(catIds,response);
+        return parseServicesForOrganizationResponse(catIds, response);
     }
 
     private YCResponse<List<YCServiceInfo>, Map<String, String>> _getServicesForOrganization(long orgId, YClientCredentialsDto request) {
@@ -187,13 +178,15 @@ public class ConfigManageService {
                     .statusMessage(response.getStatus().toString())
                     .success(true)
                     .data(response.getData().stream()
-                            .filter(f->f.getActive()==1 && catIds.contains((long)f.getCategory_id()))
+                            .filter(f -> f.getActive() == 1 && catIds.contains((long) f.getCategory_id()))
                             .map(v -> YClientsServiceDto.builder()
                                     .ycId(v.getId())
                                     .ycName(v.getTitle())
                                     .categoryId(v.getCategory_id())
                                     .build()
-                            ).toList())
+                            ).sorted(Comparator.comparing(YClientsServiceDto::getYcName)
+                                    .thenComparing(YClientsServiceDto::getYcId))
+                            .toList())
                     .meta(response.getMeta())
                     .build();
         } else {
@@ -205,6 +198,66 @@ public class ConfigManageService {
                     .meta(response.getMeta())
                     .build();
         }
+    }
+
+
+    public YClientsDataResponse<List<YClientsPlaceDto>> getPlacesForOrganization(long orgId, List<Long> catIds, YClientCredentialsDto request) {
+        var categories = _getOrganizationServiceCategories(orgId, request);
+        if (!categories.isSuccess()) {
+            return buildFailResponse(categories);
+        }
+        var staffs = _getOrganizationStaffs(orgId, request);
+        if (!categories.isSuccess()) {
+            return buildFailResponse(staffs);
+        }
+        var allowedStaffIds = categories.getData()
+                .stream().filter(f -> catIds.contains((long) f.getId()))
+                .map(YCServiceCategoryInfo::getStaff).flatMap(Collection::stream)
+                .toList();
+        var allowedStaffs = staffs.getData().stream().filter(f -> allowedStaffIds.contains(f.getId()))
+                .filter(f -> f.getFired() == 0 && f.getStatus() == 0)
+                .toList();
+        return YClientsDataResponse.<List<YClientsPlaceDto>>builder()
+                .statusCode(staffs.getStatus().value())
+                .statusMessage(staffs.getStatus().toString())
+                .success(true)
+                .data(allowedStaffs.stream()
+                        .map(v -> YClientsPlaceDto.builder()
+                                .ycId(v.getId())
+                                .ycName(v.getName())
+                                .available(true)
+                                .build()
+                        ).sorted(Comparator.comparing(YClientsPlaceDto::getYcName)
+                                .thenComparing(YClientsPlaceDto::getYcId))
+                        .toList())
+                .meta(staffs.getMeta())
+                .build();
+    }
+
+    private YCResponse<List<YCStaffInfo>, Map<String, String>> _getOrganizationStaffs(long orgId, YClientCredentialsDto request) {
+        return apiClient.exchange(
+                apiProperties.getApiUrl() + apiProperties.getCompanyApi() + "/" + orgId + apiProperties.getStaffsApi(),
+                HttpMethod.GET,
+                request.getPartnerToken(),
+                request.getUserToken(),
+                null,
+                null,
+                new TypeReference<List<YCStaffInfo>>() {
+                },
+                metaType
+        ).orElse(apiClient.emptyErrorResponse(metaType));
+    }
+
+    private <T, S> YClientsDataResponse<T> buildFailResponse(
+            YCResponse<S, Map<String, String>> response) {
+
+        return YClientsDataResponse.<T>builder()
+                .statusCode(response.getStatus().value())
+                .statusMessage(response.getStatus().toString())
+                .success(false)
+                .errorMessage(response.getMeta().get("message"))
+                .meta(response.getMeta())
+                .build();
     }
 
 

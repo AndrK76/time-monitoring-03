@@ -1,42 +1,42 @@
-import { Component, DestroyRef, inject, input, OnInit, output, signal } from '@angular/core';
+import { Component, DestroyRef, inject, input, OnInit, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { debounceTime, distinctUntilChanged, filter } from 'rxjs';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { YClientsServiceCategoryView, YClientsServiceView } from '../../yclients-view.models';
-import { isNewItem } from '@mon3/sc';
-import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { isNewItem } from '@mon3/sc';
+import { YClientsPlaceView } from '../../yclients-view.models';
 
 @Component({
-  selector: 'app-yc-service-inplace-editor',
+  selector: 'app-yc-place-inplace-editor',
   standalone: true,
   imports: [
     CommonModule, ReactiveFormsModule,
-    MatFormFieldModule, MatInputModule, MatIconModule, MatButtonModule
+    MatFormFieldModule, MatInputModule,
+    MatIconModule, MatButtonModule
   ],
-  templateUrl: './yc-service-inplace-editor.component.html',
-  styleUrl: './yc-service-inplace-editor.component.scss'
+  templateUrl: './yc-place-inplace-editor.component.html',
+  styleUrl: './yc-place-inplace-editor.component.scss'
 })
-export class YcServiceInplaceEditorComponent implements OnInit {
-  serviceData = input.required<YClientsServiceView>();
-  categories = input<YClientsServiceCategoryView[]>([]);
+export class YcPlaceInplaceEditorComponent implements OnInit {
+  placeData = input.required<YClientsPlaceView>();
 
-  change = output<YClientsServiceView>();
+  change = output<YClientsPlaceView>();
   delete = output<void>();
 
   private readonly fb = inject(FormBuilder);
   private readonly destroyRef = inject(DestroyRef);
 
   form!: FormGroup;
-  data!: YClientsServiceView;
+  data!: YClientsPlaceView;
 
   canDelete = (): boolean => isNewItem(this.data);
 
   ngOnInit(): void {
-    this.data = this.serviceData();
+    this.data = this.placeData();
     this.buildForm();
     this.listenToChanges();
   }
@@ -46,7 +46,7 @@ export class YcServiceInplaceEditorComponent implements OnInit {
       ycId: [{ value: this.data.ycId, disabled: true }],
       ycName: [{ value: this.data.ycName, disabled: true }],
       name: [{ value: this.data.name ?? '', disabled: false }],
-      categoryName: [{ value: this.data.categoryWithInfo?.name ?? '', disabled: true }],
+      available: [{ value: this.data.available ? 'Да' : 'Нет', disabled: true }],
     });
   }
 
@@ -60,7 +60,7 @@ export class YcServiceInplaceEditorComponent implements OnInit {
         takeUntilDestroyed(this.destroyRef)
       )
       .subscribe(values => {
-        const updated: YClientsServiceView = {
+        const updated: YClientsPlaceView = {
           ...this.data,
           name: values.name,
         };

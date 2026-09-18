@@ -19,6 +19,7 @@ import ru.igorit.monitoring.lib.enums.CrmAgentType;
 import ru.igorit.monitoring.lib.persistence.entity.common.Organization;
 import ru.igorit.monitoring.lib.persistence.entity.crm.CrmAgent;
 import ru.igorit.monitoring.lib.persistence.entity.crm.CrmAgentConfig;
+import ru.igorit.monitoring.lib.persistence.entity.crm.CrmAgentListProjection;
 import ru.igorit.monitoring.lib.persistence.entity.crm.CrmOrganization;
 import ru.igorit.monitoring.lib.persistence.entity.yclients.YClientsAgent;
 import ru.igorit.monitoring.lib.persistence.entity.yclients.YClientsAgentConfig;
@@ -30,10 +31,7 @@ import ru.igorit.monitoring.lib.persistence.repository.crm.CrmOrganizationReposi
 import ru.igorit.monitoring.rabbit.service.CommandSender;
 import ru.igorit.monitoring.security.util.SecurityAccessUtils;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 import static ru.igorit.monitoring.security.util.AuthInfoUtils.extractUserId;
 import static ru.igorit.monitoring.security.util.AuthInfoUtils.getCurrentAuth;
@@ -61,6 +59,9 @@ public class CrmManageService {
         return agentRepo.findAllProjectedBy().stream()
                 .map(crmModelMapper::toListDto)
                 .filter(f -> sa.isSuperUser() || sa.isAllowedOrganization(f.getOrganizationId()))
+                .sorted(Comparator.comparing(CrmAgentListDto::getName)
+                        .thenComparing(CrmAgentListDto::getDescription)
+                        .thenComparing(CrmAgentListDto::getId))
                 .toList();
     }
 
@@ -68,6 +69,9 @@ public class CrmManageService {
     @PreAuthorize("@securityAccessUtils.isAllowedOrganization(#organizationId)")
     public List<CrmAgentListDto> getAgentsByOrganization(String organizationId) {
         return agentRepo.findProjectedByOrganizationId(organizationId).stream()
+                .sorted(Comparator.comparing(CrmAgentListProjection::getName)
+                        .thenComparing(CrmAgentListProjection::getDescription)
+                        .thenComparing(CrmAgentListProjection::getId))
                 .map(crmModelMapper::toListDto).toList();
     }
 
@@ -76,6 +80,9 @@ public class CrmManageService {
     public List<CrmAgentListDto> getAgentsByOrganizationWithUnbounded(String organizationId) {
         return agentRepo.findAllProjectedBy().stream()
                 .filter(f -> f.getOrganization() == null || Objects.equals(f.getOrganization().getId(), organizationId))
+                .sorted(Comparator.comparing(CrmAgentListProjection::getName)
+                        .thenComparing(CrmAgentListProjection::getDescription)
+                        .thenComparing(CrmAgentListProjection::getId))
                 .map(crmModelMapper::toListDto).toList();
     }
 
@@ -169,7 +176,7 @@ public class CrmManageService {
     public void deleteAgent(String agentId) {
         var curr = agentRepo.findById(agentId).orElse(null);
         String orgId = curr == null ? null : curr.getCrmOrganization().getId();
-        if (curr!= null && curr.getOrganization() != null) {
+        if (curr != null && curr.getOrganization() != null) {
             _unbindAgent(agentId);
         }
         agentRepo.deleteById(agentId);

@@ -17,6 +17,7 @@ export const AUTH_CONSTANTS: Record<string, any> = {
     'crm/agent': { mode: 'or', groups: ['superuser', 'any_action_allow'] },
     'yclients/config': { mode: 'or', groups: ['superuser', 'any_action_allow'] },
     'crm/service-list': { mode: 'or', groups: ['superuser', 'any_action_allow'] },
+    'crm/place-list': { mode: 'or', groups: ['superuser', 'any_action_allow'] },
 
 }
 

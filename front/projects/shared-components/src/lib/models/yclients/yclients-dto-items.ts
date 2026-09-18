@@ -31,7 +31,7 @@ export interface YClientsOrganizationDto {
     timezone?: string;
 }
 
-export interface YClientsServiceCategoryListDto {
+export interface YClientsServiceCategoryDto {
     id: number;
     name: string;
     orgId: number;
@@ -52,5 +52,13 @@ export interface YClientsServiceDto {
     ycId: number;
     ycName: string;
     categoryId: number;
+}
+
+export interface YClientsPlaceDto {
+    id?: string;
+    name?: string;
+    ycId: number;
+    ycName: string;
+    available: boolean;
 }
 

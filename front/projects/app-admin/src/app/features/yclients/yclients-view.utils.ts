@@ -1,5 +1,5 @@
-import { YClientsAgentConfigDto, YClientsOrganizationDto, YClientsServiceCategoryListDto, YClientsServiceDto } from "@mon3/sc"
-import { YClientsAgentConfigView, YClientsOrganizationView, YClientsServiceCategoryListView, YClientsServiceView } from "./yclients-view.models"
+import { YClientsAgentConfigDto, YClientsOrganizationDto, YClientsPlaceDto, YClientsServiceCategoryDto, YClientsServiceDto } from "@mon3/sc"
+import { YClientsAgentConfigView, YClientsOrganizationView, YClientsPlaceView, YClientsServiceCategoryView, YClientsServiceView } from "./yclients-view.models"
 
 export const yClientsAgentConfigDtoToView = (dto: YClientsAgentConfigDto): YClientsAgentConfigView => {
     return {
@@ -55,8 +55,8 @@ export const yClientsOrganizationDtoPopulate = (dto: YClientsOrganizationDto, ne
     }
 }
 
-export const yClientsServiceCategoryDtoToListView = (dto: YClientsServiceCategoryListDto,
-    existsNow: boolean, existsCrm: boolean | undefined, selected: boolean): YClientsServiceCategoryListView => {
+export const yClientsServiceCategoryDtoToView = (dto: YClientsServiceCategoryDto,
+    existsNow: boolean, existsCrm: boolean | undefined, selected: boolean): YClientsServiceCategoryView => {
     return {
         id: dto.id,
         name: dto.name,
@@ -67,7 +67,7 @@ export const yClientsServiceCategoryDtoToListView = (dto: YClientsServiceCategor
     }
 }
 
-export const yClientsServiceCategoryListFromView = (item: YClientsServiceCategoryListView): YClientsServiceCategoryListDto => {
+export const yClientsServiceCategoryFromView = (item: YClientsServiceCategoryView): YClientsServiceCategoryDto => {
     return {
         id: item.id,
         name: item.name,
@@ -78,15 +78,15 @@ export const yClientsServiceCategoryListFromView = (item: YClientsServiceCategor
 
 export const yClientsServiceCategoryFromId = (
     categoryId: number | undefined,
-    allCategories: YClientsServiceCategoryListView[] | undefined
-): YClientsServiceCategoryListView | undefined => {
+    allCategories: YClientsServiceCategoryView[] | undefined
+): YClientsServiceCategoryView | undefined => {
     if (categoryId === undefined || !allCategories) return undefined;
     return allCategories.find(c => c.id === categoryId);
 };
 
 export const yClientsServiceDtoToView = (
     dto: YClientsServiceDto,
-    categories: YClientsServiceCategoryListView[] | undefined = undefined
+    categories: YClientsServiceCategoryView[] | undefined = undefined
 ): YClientsServiceView => {
     return {
         id: dto.id,
@@ -101,7 +101,7 @@ export const yClientsServiceDtoToView = (
 
 
 export const yClientsServiceCrmDtoToView = (dto: YClientsServiceDto,
-    categories: YClientsServiceCategoryListView[] | undefined = undefined
+    categories: YClientsServiceCategoryView[] | undefined = undefined
 ): YClientsServiceView => {
     return {
         //id: 'temp-' + Date.now(),
@@ -122,5 +122,38 @@ export const yClientsServiceViewToDto = (item: YClientsServiceView): YClientsSer
         ycId: item.ycId,
         ycName: item.ycName,
         categoryId: item.categoryId,
+    };
+};
+
+
+export const yClientsPlaceDtoToView = (dto: YClientsPlaceDto): YClientsPlaceView => {
+    return {
+        id: dto.id,
+        name: dto.name,
+        ycId: dto.ycId,
+        ycName: dto.ycName,
+        available: dto.available,
+        isNew: false,
+    } as YClientsPlaceView;
+};
+
+export const yClientsPlaceCrmDtoToView = (dto: YClientsPlaceDto): YClientsPlaceView => {
+    return {
+        id: undefined!,
+        name: dto.ycName,
+        ycId: dto.ycId,
+        ycName: dto.ycName,
+        available: dto.available,
+        isNew: true,
+    } as YClientsPlaceView;
+};
+
+export const yClientsPlaceViewToDto = (item: YClientsPlaceView): YClientsPlaceDto => {
+    return {
+        id: item.id,
+        name: item.name,
+        ycId: item.ycId,
+        ycName: item.ycName,
+        available: item.available,
     };
 };

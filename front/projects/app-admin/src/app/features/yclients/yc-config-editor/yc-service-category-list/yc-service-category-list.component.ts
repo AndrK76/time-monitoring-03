@@ -14,7 +14,7 @@ import {
   FilterRootComponent, TableFilterInfo, TableFilterListValue,
   TableFilterType, TableManageService
 } from '@mon3/sc';
-import { YClientsServiceCategoryListView } from '../../yclients-view.models';
+import { YClientsServiceCategoryView } from '../../yclients-view.models';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @Component({
@@ -30,9 +30,9 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
   styleUrl: './yc-service-category-list.component.scss'
 })
 export class YcServiceCategoryListComponent implements OnInit, AfterViewInit {
-  private tableManager = inject(TableManageService<YClientsServiceCategoryListView>);
+  private tableManager = inject(TableManageService<YClientsServiceCategoryView>);
 
-  categoriesData = input.required<YClientsServiceCategoryListView[]>();
+  categoriesData = input.required<YClientsServiceCategoryView[]>();
   currentOrgId = input<number | undefined>(undefined);
   selectedOrgId = input<number | undefined>(undefined);
   loadingCategories = input<boolean>(false);
@@ -45,13 +45,13 @@ export class YcServiceCategoryListComponent implements OnInit, AfterViewInit {
   showFilter = this.tableManager.showFilter;
   isSmallScreen = this.tableManager.isSmallScreen;
 
-  @ViewChild(MatTable) table!: MatTable<YClientsServiceCategoryListView>;
+  @ViewChild(MatTable) table!: MatTable<YClientsServiceCategoryView>;
   @ViewChild(MatSort) sort!: MatSort;
   @ViewChild('tableWrapper') tableWrapper!: ElementRef<HTMLDivElement>;
 
   displayedColumns = ['expand', 'name', 'id'];
-  trackById = (index: number, item: YClientsServiceCategoryListView) => item.id;
-  itemId = (item: YClientsServiceCategoryListView) => item.id;
+  trackById = (index: number, item: YClientsServiceCategoryView) => item.id;
+  itemId = (item: YClientsServiceCategoryView) => item.id;
 
   _filterConfig: Map<string, TableFilterInfo> = new Map([
     ['name', { key: 'name', type: TableFilterType.TEXT }],
@@ -64,6 +64,7 @@ export class YcServiceCategoryListComponent implements OnInit, AfterViewInit {
   });
 
   hasNoCategories = computed(() => this.categoriesData().length === 0);
+  
 
   constructor() {
     effect(() => {
@@ -96,7 +97,7 @@ export class YcServiceCategoryListComponent implements OnInit, AfterViewInit {
     this.loadFromCrm.emit();
   }
 
-  onSelectedChange(row: YClientsServiceCategoryListView, checked: boolean): void {
+  onSelectedChange(row: YClientsServiceCategoryView, checked: boolean): void {
     this.selectedChange.emit({ id: row.id, selected: checked });
   }
 }

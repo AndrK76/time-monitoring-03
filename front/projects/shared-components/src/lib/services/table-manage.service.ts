@@ -1,7 +1,7 @@
-import { Injectable, signal, WritableSignal, computed, ElementRef, inject, Signal } from '@angular/core';
+import { Injectable, signal, WritableSignal, computed, ElementRef, inject, Signal, Injector, DestroyRef } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 
-import { Observable } from 'rxjs';
+import { combineLatest, Observable } from 'rxjs';
 import { SaveDataResult, TableDataChanges } from '../models/table-data-items';
 import {
   actualizeDataSourceItem,
@@ -16,6 +16,8 @@ import { addNotApplyItemFlag } from '../utils/object-utils';
 import { handleError } from '@mon3/sa';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { SizeService } from './size.service';
+import { TableActionsCallbacks, TableActionsInformerService } from './table-actions-informer.service';
+import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 
 @Injectable() // Без providedIn, регистрируем в компоненте
 export class TableManageService<T extends Record<string, any>> {
@@ -31,6 +33,7 @@ export class TableManageService<T extends Record<string, any>> {
   // === Публичные сигналы ===
   readonly dataSource = new MatTableDataSource<T>([]);
   readonly dataState = signal<TableDataChanges>(newTableDataChanges());
+  readonly totalCount = signal(0);
   readonly selectedItem = signal<T | undefined>(undefined);
   readonly expandedItem = signal<T | undefined>(undefined);
   readonly filterConfig = signal<Map<string, TableFilterInfo>>(new Map());
@@ -67,6 +70,7 @@ export class TableManageService<T extends Record<string, any>> {
   // === Установка данных ===
   setData(data: T[]): void {
     this.dataSource.data = data;
+    this.totalCount.set(data.length);
     applyFilters(this.dataSource);
   }
 
@@ -182,13 +186,14 @@ export class TableManageService<T extends Record<string, any>> {
   }
 
   // === Добавление ===
-  doAddBase(newItem: T, renderFn: () => void, markAsDettach: boolean = false,
+  doAddBase(newItem: T, renderFn: (() => void) | undefined, markAsDettach: boolean = false,
     collapseOthers: boolean = false, onAddFn: (() => void) | undefined = undefined): void {
     this.selectedItem.set(undefined);
     this.expandedItem.set(undefined);
     const result = addDataSourceItem(this.dataSource.data, newItem, collapseOthers);
     if (result.added) {
       this.dataSource.data = result.data;
+      this.totalCount.set(this.dataSource.data.length);
       if (renderFn) renderFn();
       this.dataState.update(state => addNewChangeToState(state, this.itemIdFn(newItem)));
       if (markAsDettach) result.fullItem = addNotApplyItemFlag(result.fullItem);
@@ -199,12 +204,13 @@ export class TableManageService<T extends Record<string, any>> {
   }
 
   // === Обновление ===
-  doUpdateBase(item: T, renderFn: () => void, onUpdateFn: ((res: T) => void) | undefined = undefined): void {
+  doUpdateBase(item: T, renderFn: (() => void) | undefined, onUpdateFn: ((res: T) => void) | undefined = undefined): void {
     //console.log(item);
     const result = updateDataSourceItem(
       this.dataSource.data, item, this.itemIdFn, undefined, true);
     if (result.updated) {
       this.dataSource.data = result.data;
+      this.totalCount.set(this.dataSource.data.length);
       if (renderFn) renderFn();
       this.dataState.update(state => addModifyChangeToState(state, this.itemIdFn(item)));
       if (onUpdateFn) onUpdateFn(item);
@@ -212,10 +218,11 @@ export class TableManageService<T extends Record<string, any>> {
   }
 
   // === Удаление ===
-  doDeleteBase(item: T, renderFn: () => void, onDeleteFn: (() => void) | undefined = undefined): void {
+  doDeleteBase(item: T, renderFn: (() => void) | undefined, onDeleteFn: (() => void) | undefined = undefined): void {
     const result = deleteDataSourceItem(this.dataSource.data, item, this.itemIdFn);
     if (result.deleted) {
       this.dataSource.data = result.data;
+      this.totalCount.set(this.dataSource.data.length);
       if (renderFn) renderFn();
       this.dataState.update(state => addDeleteChangeToState(state, item, this.itemIdFn));
       this.selectedItem.set(undefined);
@@ -237,6 +244,7 @@ export class TableManageService<T extends Record<string, any>> {
         next: result => {
           isSaving.set(false);
           this.dataSource.data = result.data;
+          this.totalCount.set(this.dataSource.data.length);
           this.dataState.set(result.changes);
           applyFn(result);
         },
@@ -248,8 +256,69 @@ export class TableManageService<T extends Record<string, any>> {
       })
   }
 
+
+  // === Обработка ошибок observable ====
   handleError<T>(message: string, ret: T, target?: WritableSignal<string | null>): (source: Observable<T>) => Observable<T> {
     return handleError<T>(message, ret, target ?? this.error)
+  }
+
+  // === Работа с TableActionsInformer
+  private readonly injector = inject(Injector);
+  private readonly destroyRef = inject(DestroyRef);
+  private actionsInformer: TableActionsInformerService | null = null;
+
+
+  /**
+   * Подключает TableActionsInformerService.
+   * Сервис сам подписывается на 5 команд informer'а, синхронизирует в него
+   * hasChanges/canDelete/dataState и вызывает переданные callbacks.
+   * Все диалоги, уведомления, HTTP и состояния isLoading/isSaving/totalCount
+   * остаются в компоненте — TableManageService о них ничего не знает.
+   */
+  setActionsInformer(
+    informer: TableActionsInformerService,
+    callbacks: TableActionsCallbacks<T> = {}
+  ): void {
+    if (this.actionsInformer) return;
+    this.actionsInformer = informer;
+
+    // Синхронизация состояния таблицы в informer.
+    // hasChanges / canDelete / dataState — это свойства самой таблицы,
+    // поэтому их обновление входит в зону ответственности сервиса.
+    combineLatest([
+      toObservable(this.hasChanges, { injector: this.injector }),
+      toObservable(this.selectedItem, { injector: this.injector }),
+      toObservable(this.dataState, { injector: this.injector }),
+      toObservable(this.totalCount, { injector: this.injector }),
+    ])
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(([hasChanges, selected, dataState, total]) => {
+        informer.hasChanges.set(hasChanges);
+        informer.canDelete.set(!!selected);
+        informer.dataState.set(dataState);
+        informer.totalCount.set(total);
+      });
+
+    // Подписки на команды informer'а.
+    informer.add$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => callbacks.onTriggerAdd?.());
+
+    informer.delete$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => callbacks.onTriggerDelete?.());
+
+    informer.refresh$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => callbacks.onTriggerRefresh?.());
+
+    informer.save$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => callbacks.onTriggerSave?.());
+
+    informer.reload$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(id => callbacks.onTriggerReload?.(id));
   }
 
 }

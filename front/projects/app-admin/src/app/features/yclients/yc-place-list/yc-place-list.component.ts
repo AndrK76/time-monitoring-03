@@ -1,9 +1,8 @@
 import { CommonModule } from '@angular/common';
 import {
-  AfterViewInit, Component, computed, DestroyRef, ElementRef, inject, Injector,
-  input, OnInit, signal, ViewChild
+  AfterViewInit, Component, ElementRef, inject, Injector,
+  input, OnInit, ViewChild
 } from '@angular/core';
-import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
@@ -11,41 +10,37 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTable, MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { combineLatest, finalize, map, Observable, of, switchMap } from 'rxjs';
+import { finalize, map, Observable, of } from 'rxjs';
 import {
-  ConfirmDialogCancelResult,
   DialogService, FilterRootComponent, isExpanded, isNewItem, NotificationService,
   SaveDataResult, TableActionsInformerService, TableFilterInfo, TableFilterType, TableManageService,
-  YClientsServiceDto
+  YClientsPlaceDto
 } from '@mon3/sc';
 import { YclientsManageService } from '../../../services/yclients-manage.service';
-import { YClientsServiceCategoryView, YClientsServiceView } from '../yclients-view.models';
+import { YClientsPlaceView } from '../yclients-view.models';
 import {
-  yClientsServiceCategoryDtoToView, yClientsServiceCrmDtoToView, yClientsServiceDtoToView,
-  yClientsServiceViewToDto
+  yClientsPlaceCrmDtoToView, yClientsPlaceDtoToView, yClientsPlaceViewToDto
 } from '../yclients-view.utils';
-import { YcServiceInplaceEditorComponent } from './yc-service-inplace-editor/yc-service-inplace-editor.component';
+import { YcPlaceInplaceEditorComponent } from './yc-place-inplace-editor/yc-place-inplace-editor.component';
 import { processResponseError } from '@mon3/sa';
 
 @Component({
-  selector: 'app-yc-service-list',
+  selector: 'app-yc-place-list',
   standalone: true,
   imports: [
     CommonModule, MatTableModule, MatCardModule, MatButtonModule, MatProgressSpinnerModule,
     MatIconModule, MatTooltipModule, MatSortModule,
-    FilterRootComponent, YcServiceInplaceEditorComponent,
+    FilterRootComponent, YcPlaceInplaceEditorComponent,
   ],
   providers: [TableManageService],
-  templateUrl: './yc-service-list.component.html',
-  styleUrl: './yc-service-list.component.scss'
+  templateUrl: './yc-place-list.component.html',
+  styleUrl: './yc-place-list.component.scss'
 })
-export class YcServiceListComponent implements OnInit, AfterViewInit {
+export class YcPlaceListComponent implements OnInit, AfterViewInit {
   private readonly dataService = inject(YclientsManageService);
   private readonly dialogService = inject(DialogService);
   private readonly notificationService = inject(NotificationService);
-  private readonly tableManager = inject(TableManageService<YClientsServiceView>);
-  private readonly destroyRef = inject(DestroyRef);
-  private readonly injector = inject(Injector);
+  private readonly tableManager = inject(TableManageService<YClientsPlaceView>);
 
   actions = input.required<TableActionsInformerService>();
 
@@ -60,14 +55,14 @@ export class YcServiceListComponent implements OnInit, AfterViewInit {
   isSmallScreen = this.tableManager.isSmallScreen;
   totalCount = this.tableManager.totalCount;
 
-  @ViewChild(MatTable) table!: MatTable<YClientsServiceView>;
+  @ViewChild(MatTable) table!: MatTable<YClientsPlaceView>;
   @ViewChild(MatSort) sort!: MatSort;
   @ViewChild('tableWrapper') tableWrapper!: ElementRef<HTMLDivElement>;
 
-  displayedColumns = ['expand', 'isNew', 'name', 'categoryName', 'ycId', 'ycName'];
-  trackById = (index: number, item: YClientsServiceView) => item.id ?? `yc-${item.ycId}`;
-  itemId = (item: YClientsServiceView) => item.id ?? `yc-${item.ycId}`;
-  isNewRow = (row: YClientsServiceView): boolean => (row as any)._new === true;
+  displayedColumns = ['expand', 'isNew', 'available', 'name', 'ycName', 'ycId'];
+  trackById = (index: number, item: YClientsPlaceView) => item.id ?? `yc-${item.ycId}`;
+  itemId = (item: YClientsPlaceView) => item.id ?? `yc-${item.ycId}`;
+  isNewRow = (row: YClientsPlaceView): boolean => row.isNew === true;
 
   isExpanded = (index: number, item: any): boolean => isExpanded(item);
   isNewItem = () => {
@@ -75,19 +70,22 @@ export class YcServiceListComponent implements OnInit, AfterViewInit {
     return isNewItem(this.selectedItem()!);
   };
 
+
   get isLoading() { return this.actions().isLoading; }
   get isSaving() { return this.actions().isSaving; }
   get isLoadingFromCrm() { return this.actions().isLoadingOther1; }
 
   private currentAgentId = '';
-  categories: YClientsServiceCategoryView[] = [];
 
   _filterConfig: Map<string, TableFilterInfo> = new Map([
     ['name', { key: 'name', type: TableFilterType.TEXT }],
     ['ycName', { key: 'ycName', type: TableFilterType.TEXT }],
-    ['categoryId', { key: 'categoryId', type: TableFilterType.LIST, config: { dataSource: [] } }],
     ['isNew', {
       key: 'isNew', type: TableFilterType.LIST,
+      config: { dataSource: [{ id: true, text: 'Да' }, { id: false, text: 'Нет' }] }
+    }],
+    ['available', {
+      key: 'available', type: TableFilterType.LIST,
       config: { dataSource: [{ id: true, text: 'Да' }, { id: false, text: 'Нет' }] }
     }],
   ]);
@@ -114,6 +112,8 @@ export class YcServiceListComponent implements OnInit, AfterViewInit {
     this.tableManager.setTableWrapper(this.tableWrapper);
   }
 
+
+
   private initializeData(agentId: string): void {
     this.currentAgentId = agentId;
     this.tableManager.doRefreshBase(() => this.loadFullData(agentId));
@@ -122,28 +122,10 @@ export class YcServiceListComponent implements OnInit, AfterViewInit {
   private loadFullData(agentId: string): void {
     this.isLoading.set(true);
     this.error.set(null);
-    this.categories = [];
 
-    this.dataService.getServiceCategoriesForAgent(agentId)
+    this.dataService.getPlacesForAgent(agentId)
       .pipe(
-        map(list => list.map(dto =>
-          yClientsServiceCategoryDtoToView(dto, true, undefined, false))),
-        switchMap(categories => {
-          this.categories = categories;
-          this.filterConfig.update(map => {
-            const config = map.get('categoryId');
-            if (config) {
-              const dataSource = categories.map(p => ({ id: p.id, text: p.name }));
-              const newMap = new Map(map);
-              newMap.set('categoryId', { ...config, config: { ...config.config, dataSource } });
-              return newMap;
-            }
-            return map;
-          });
-          return this.dataService.getServicesForAgent(agentId).pipe(
-            map(list => list.map(dto => yClientsServiceDtoToView(dto, categories)))
-          );
-        }),
+        map(list => list.map(dto => yClientsPlaceDtoToView(dto))),
         finalize(() => this.isLoading.set(false))
       )
       .subscribe({
@@ -154,7 +136,7 @@ export class YcServiceListComponent implements OnInit, AfterViewInit {
         error: err => {
           const resError = processResponseError(err);
           this.notificationService.error(
-            `Ошибка загрузки списка услуг: ${resError.message}`);
+            `Ошибка загрузки списка мест: ${resError.message}`);
           this.tableManager.setData([]);
         },
       });
@@ -162,10 +144,10 @@ export class YcServiceListComponent implements OnInit, AfterViewInit {
 
   onFilterChange = (val: TableFilterInfo) => this.tableManager.onFilterChange(val);
   toggleFilter = (reset?: boolean) => this.tableManager.toggleFilter();
-
+  
   private render = (): void => this.table?.renderRows();
 
-  callSelect = (item: YClientsServiceView) => this.doSelect(item, true);
+  callSelect = (item: YClientsPlaceView) => this.doSelect(item, true);
 
   private callAdd(): void {
     this.dialogService.confirm('Добавить данные из CRM?').subscribe(confirmed => {
@@ -179,7 +161,7 @@ export class YcServiceListComponent implements OnInit, AfterViewInit {
     if (isNewItem(item)) {
       this.doDelete(item);
     } else {
-      this.dialogService.confirm(`Удалить услугу "${item.name ?? item.ycName}"?`)
+      this.dialogService.confirm(`Удалить место "${item.name ?? item.ycName}"?`)
         .subscribe(confirmed => { if (confirmed) this.doDelete(item); });
     }
   }
@@ -199,33 +181,33 @@ export class YcServiceListComponent implements OnInit, AfterViewInit {
 
 
 
-  private doSelect = (item: YClientsServiceView | undefined, newState: boolean,
+  private doSelect = (item: YClientsPlaceView | undefined, newState: boolean,
     updateUrl: boolean = true, scrollTo: boolean = false) => {
     this.tableManager.doSelectBaseWithCollapse(
       item, newState, () => this.table.renderRows(), updateUrl, scrollTo, true, undefined);
   };
 
-  private doDelete = (item: YClientsServiceView) => {
+  private doDelete = (item: YClientsPlaceView) => {
     this.tableManager.doDeleteBase(item, () => this.render());
   };
 
-  doUpdate = (item: YClientsServiceView) => {
-    this.tableManager.doUpdateBase(item, () => () => this.render());
+  doUpdate = (item: YClientsPlaceView) => {
+    this.tableManager.doUpdateBase(item, () => this.render());
   };
 
   private doAddFromCrm(): void {
-    this.isLoadingFromCrm.set(true);
+    this.isLoadingFromCrm.set(true); 
 
-    this.dataService.getAllowedServices(this.currentAgentId)
+    this.dataService.getAllowedPlaces(this.currentAgentId)
       .pipe(finalize(() => this.isLoadingFromCrm.set(false)))
       .subscribe({
         next: result => {
           if (!result.success) {
-            this.notificationService.error(result.errorMessage ?? 'Ошибка при запросе списка услуг из CRM');
+            this.notificationService.error(result.errorMessage ?? 'Ошибка при запросе списка мест из CRM');
             return;
           }
           if (!result.data?.length) {
-            this.notificationService.error(result.errorMessage ?? 'Получен пустой список услуг из CRM');
+            this.notificationService.error(result.errorMessage ?? 'Получен пустой список мест из CRM');
             return;
           }
           this.afterReceiveAddDataFromCrm(result.data);
@@ -237,86 +219,66 @@ export class YcServiceListComponent implements OnInit, AfterViewInit {
       });
   }
 
-  private afterReceiveAddDataFromCrm(crmServices: YClientsServiceDto[]): void {
-    const applyAddChanges = (
-      toAdd: YClientsServiceDto[],
-      toUpdate: { existing: YClientsServiceView; dto: YClientsServiceDto }[],
-      toDelete: YClientsServiceView[]): void => {
-
-      for (const dto of [...toAdd].reverse()) {
-        const view = yClientsServiceCrmDtoToView(dto, this.categories);
-        this.tableManager.doAddBase(view, undefined, false, false);
-      }
-      for (const { existing, dto } of toUpdate) {
-        this.tableManager.doUpdateBase({ ...existing, ycName: dto.ycName }, undefined);
-      }
-      for (const svc of toDelete) {
-        this.tableManager.doDeleteBase(svc, undefined);
-      }
-      this.render();
-
-      const firstNew = this.dataSource.data.find(s => this.isNewRow(s));
-      if (firstNew) this.callSelect(firstNew);
-    }
-
+  private afterReceiveAddDataFromCrm(crmPlaces: YClientsPlaceDto[]): void {
     const current = this.dataSource.data;
     const currentByYcId = new Map(current.map(s => [s.ycId, s]));
-    const crmByYcId = new Map(crmServices.map(s => [s.ycId, s]));
+    const crmByYcId = new Map(crmPlaces.map(s => [s.ycId, s]));
 
-    const toDelete: YClientsServiceView[] = [];
-    const toUpdate: { existing: YClientsServiceView; dto: YClientsServiceDto }[] = [];
-    const toAdd: YClientsServiceDto[] = [];
+    const toAdd: YClientsPlaceDto[] = [];
+    const toUpdate: { existing: YClientsPlaceView; changes: Partial<YClientsPlaceView> }[] = [];
 
-    for (const svc of current) {
-      const crm = crmByYcId.get(svc.ycId);
+    for (const place of current) {
+      const crm = crmByYcId.get(place.ycId);
       if (crm) {
-        if (svc.ycName !== crm.ycName) toUpdate.push({ existing: svc, dto: crm });
-      } else {
-        toDelete.push(svc);
+        const changes: Partial<YClientsPlaceView> = {};
+        if (place.ycName !== crm.ycName) changes.ycName = crm.ycName;
+        if (place.available !== crm.available) changes.available = crm.available;
+        if (Object.keys(changes).length > 0) {
+          toUpdate.push({ existing: place, changes });
+        }
+      } else if (place.available) {
+        toUpdate.push({ existing: place, changes: { available: false } });
       }
     }
-    for (const crm of crmServices) {
+
+    for (const crm of crmPlaces) {
       if (!currentByYcId.has(crm.ycId)) toAdd.push(crm);
     }
 
-    if (toDelete.length > 0) {
-      this.dialogService.confirmWithCancel(
-        `Найдено ${toDelete.length} услуг(и), отсутствующих в CRM. Удалить их?`,
-        'Отсутствующие услуги',
-        'Удалить', 'Оставить', 'Отмена'
-      ).subscribe((result: ConfirmDialogCancelResult) => {
-
-        if (result === 'cancel') return;
-        const shouldDelete = result === 'yes';
-        applyAddChanges(toAdd, toUpdate, shouldDelete ? toDelete : []);
-      });
-    } else {
-      applyAddChanges(toAdd, toUpdate, []);
+    for (const dto of [...toAdd].reverse()) {
+      const view = yClientsPlaceCrmDtoToView(dto);
+      this.tableManager.doAddBase(view, undefined, false, false);
     }
+    for (const { existing, changes } of toUpdate) {
+      this.tableManager.doUpdateBase({ ...existing, ...changes }, undefined);
+    }
+
+    this.render();
+
+    const firstNew = this.dataSource.data.find(s => this.isNewRow(s));
+    if (firstNew) this.callSelect(firstNew);
   }
 
 
 
-
-  private addItem = (item: YClientsServiceView): Observable<YClientsServiceView> => {
-    const req = yClientsServiceViewToDto(item);
-    return this.dataService.addServiceForAgent(this.currentAgentId, req)
-      .pipe(map(dto => yClientsServiceDtoToView(dto, this.categories)));
+  private addItem = (item: YClientsPlaceView): Observable<YClientsPlaceView> => {
+    const req = yClientsPlaceViewToDto(item);
+    return this.dataService.addPlaceForAgent(this.currentAgentId, req)
+      .pipe(map(dto => yClientsPlaceDtoToView(dto)));
   };
 
-  private updateItem = (item: YClientsServiceView): Observable<YClientsServiceView> => {
-    const req = yClientsServiceViewToDto(item);
-    return this.dataService.updateServiceForAgent(this.currentAgentId, item.id!, req)
-      .pipe(map(dto => yClientsServiceDtoToView(dto, this.categories)));;
+  private updateItem = (item: YClientsPlaceView): Observable<YClientsPlaceView> => {
+    const req = yClientsPlaceViewToDto(item);
+    return this.dataService.updatePlaceForAgent(this.currentAgentId, item.id!, req)
+      .pipe(map(dto => yClientsPlaceDtoToView(dto)));
   };
 
-  private deleteItem = (item: YClientsServiceView): Observable<void> => {
-    const req = yClientsServiceViewToDto(item);
-    return this.dataService.deleteServiceForAgent(this.currentAgentId, item.id!);
+  private deleteItem = (item: YClientsPlaceView): Observable<void> => {
+    return this.dataService.deletePlaceForAgent(this.currentAgentId, item.id!);
   };
 
   private doSave(): void {
-    const resApply = (result: SaveDataResult<YClientsServiceView>) => {
+    const resApply = (result: SaveDataResult<YClientsPlaceView>) => {
       if (result.success) {
         this.notificationService.success('Все изменения сохранены успешно');
       } else {

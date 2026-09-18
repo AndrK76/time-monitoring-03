@@ -32,6 +32,7 @@ export * from './lib/components/filter-text/filter-text.component';
 
 export * from './lib/services/table-manage.service';
 export * from './lib/services/size.service';
+export * from './lib/services/table-actions-informer.service';
 
 export * from './lib/components/change-password-dialog/change-password-dialog.model';
 export * from './lib/components/change-password-dialog/change-password-dialog.component';

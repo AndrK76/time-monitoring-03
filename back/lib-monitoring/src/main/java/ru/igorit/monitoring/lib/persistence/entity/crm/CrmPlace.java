@@ -44,4 +44,7 @@ public class CrmPlace {
 
     @Column(name = "updated_by")
     private String updatedBy;
+
+    @Column(name = "available", nullable = false)
+    private Boolean available;
 }

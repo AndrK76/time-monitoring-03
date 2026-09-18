@@ -4,7 +4,8 @@
     height: 100%;
 }
 
-.mat-mdc-table .mat-column-isNew {
+.mat-mdc-table .mat-column-isNew,
+.mat-mdc-table .mat-column-available {
     flex: 0 1 4rem !important;
     width: 6rem !important;
     min-width: 4rem !important;

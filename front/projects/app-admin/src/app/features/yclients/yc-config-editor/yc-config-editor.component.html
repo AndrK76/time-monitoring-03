@@ -158,6 +158,23 @@
                 (selectedChange)="onCategorySelectedChange($event)">
             </app-yc-service-category-list>
         </div>
+
+
+        <mat-divider class="section-divider"></mat-divider>
+
+        <div class="editor-container">
+            <div class="form-row">
+                <span class="label">Перейти</span>
+                <a mat-button class="editor-link" [routerLink]="['/crm/place-list']"
+                    [queryParams]="{org: agent()?.organizationId}">
+                    <span>{{isSmallScreen()?'Места':'К списку мест'}}</span>
+                </a>
+                <a mat-button class="editor-link" [routerLink]="['/crm/service-list']"
+                    [queryParams]="{org: agent()?.organizationId}">
+                    <span>{{isSmallScreen()?'Услуги':'К списку услуг'}}</span>
+                </a>
+            </div>
+        </div>
     </div>
     }
 </div>

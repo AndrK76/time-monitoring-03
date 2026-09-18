@@ -54,6 +54,12 @@ export const routes: Routes = [
     data: authConstant('crm/service-list')
   },
   {
+    path: 'crm/place-list',
+    loadComponent: () => import('./features/crm-place/crm-place-list/crm-place-list.component').then(m => m.CrmPlaceListComponent),
+    canActivate: [authGuard],
+    data: authConstant('crm/place-list')
+  },
+  {
     path: 'event/agent-list',
     loadComponent: () => import('./features/event-agent/event-agent-list/event-agent-list.component').then(m => m.EventAgentListComponent),
     canActivate: [authGuard],

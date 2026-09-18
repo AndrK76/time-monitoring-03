@@ -26,6 +26,8 @@
 |   |                           |       `-- CommandMessageType.java
 |   |                           |-- exception
 |   |                           |-- service
+|   |                           |-- util
+|   |                           |   `-- XorCipher.java
 |   |                           `-- AuthConstants.java
 |   `-- pom.xml
 |-- core-persistence
@@ -138,10 +140,16 @@
 |   |               `-- igorit
 |   |                   `-- monitoring
 |   |                       `-- web
-|   |                           `-- dto
-|   |                               |-- OrganizationListDto.java
-|   |                               |-- UserListItemDto.java
-|   |                               `-- UserResponseDto.java
+|   |                           |-- adviser
+|   |                           |   `-- GlobalExceptionHandler.java
+|   |                           |-- config
+|   |                           |   `-- DefaultObjectMapperConfig.java
+|   |                           |-- dto
+|   |                           |   |-- OrganizationListDto.java
+|   |                           |   |-- UserListItemDto.java
+|   |                           |   `-- UserResponseDto.java
+|   |                           `-- utils
+|   |                               `-- WebClientFactory.java
 |   `-- pom.xml
 |-- lib-monitoring
 |   |-- src
@@ -152,18 +160,89 @@
 |   |                   `-- monitoring
 |   |                       `-- lib
 |   |                           |-- dto
+|   |                           |   |-- crm
+|   |                           |   |   |-- CrmAgentConfigDto.java
+|   |                           |   |   |-- CrmAgentItemDto.java
+|   |                           |   |   |-- CrmAgentListDto.java
+|   |                           |   |   |-- CrmAgentTypeDto.java
+|   |                           |   |   |-- CrmOrganizationDto.java
+|   |                           |   |   `-- CrmServiceDto.java
+|   |                           |   |-- yclients
+|   |                           |   |   |-- YClientCredentialsDto.java
+|   |                           |   |   |-- YClientsAgentConfigDto.java
+|   |                           |   |   |-- YClientsDataResponse.java
+|   |                           |   |   |-- YClientsOrganizationDto.java
+|   |                           |   |   |-- YClientsPlaceDto.java
+|   |                           |   |   |-- YClientsServiceCategoryDto.java
+|   |                           |   |   |-- YClientsServiceDto.java
+|   |                           |   |   |-- YClientsTokenRequestDto.java
+|   |                           |   |   `-- YClientsTokenResponseDto.java
 |   |                           |   `-- OrgStructListDto.java
 |   |                           |-- enums
 |   |                           |   `-- CrmAgentType.java
 |   |                           `-- persistence
 |   |                               |-- entity
 |   |                               |   |-- admin
-|   |                               |   `-- common
-|   |                               |       `-- Organization.java
+|   |                               |   |-- common
+|   |                               |   |   `-- Organization.java
+|   |                               |   |-- crm
+|   |                               |   |   |-- CrmAgent.java
+|   |                               |   |   |-- CrmAgentConfig.java
+|   |                               |   |   |-- CrmAgentListProjection.java
+|   |                               |   |   |-- CrmOrganization.java
+|   |                               |   |   |-- CrmPlace.java
+|   |                               |   |   `-- CrmService.java
+|   |                               |   `-- yclients
+|   |                               |       |-- YClientCredentials.java
+|   |                               |       |-- YClientsAgent.java
+|   |                               |       |-- YClientsAgentConfig.java
+|   |                               |       |-- YClientsOrganization.java
+|   |                               |       |-- YClientsPlace.java
+|   |                               |       |-- YClientsService.java
+|   |                               |       `-- YClientsServiceCategory.java
 |   |                               `-- repository
 |   |                                   |-- admin
-|   |                                   `-- common
-|   |                                       `-- OrganizationRepository.java
+|   |                                   |-- common
+|   |                                   |   `-- OrganizationRepository.java
+|   |                                   |-- crm
+|   |                                   |   |-- CrmAgentConfigRepository.java
+|   |                                   |   |-- CrmAgentRepository.java
+|   |                                   |   |-- CrmOrganizationRepository.java
+|   |                                   |   |-- CrmPlaceRepository.java
+|   |                                   |   `-- CrmServiceRepository.java
+|   |                                   `-- yclients
+|   |                                       |-- YClientsAgentConfigRepository.java
+|   |                                       |-- YClientsAgentRepository.java
+|   |                                       |-- YClientsOrganizationRepository.java
+|   |                                       |-- YClientsPlaceRepository.java
+|   |                                       |-- YClientsServiceCategoryRepository.java
+|   |                                       `-- YClientsServiceRepository.java
+|   `-- pom.xml
+|-- lib-yclients
+|   |-- src
+|   |   `-- main
+|   |       `-- java
+|   |           `-- ru
+|   |               `-- igorit
+|   |                   `-- monitoring
+|   |                       `-- yclients
+|   |                           |-- api
+|   |                           |   |-- config
+|   |                           |   |   |-- YClientsApiProperties.java
+|   |                           |   |   `-- YClientsWebClientFactory.java
+|   |                           |   |-- dto
+|   |                           |   |   |-- YCAuthParams.java
+|   |                           |   |   |-- YCAuthResponse.java
+|   |                           |   |   |-- YCOrgInfo.java
+|   |                           |   |   |-- YCResponse.java
+|   |                           |   |   |-- YCServiceCategoryInfo.java
+|   |                           |   |   |-- YCServiceInfo.java
+|   |                           |   |   `-- YCStaffInfo.java
+|   |                           |   `-- service
+|   |                           |       `-- YClientsApiClient.java
+|   |                           `-- service
+|   |                               `-- manage
+|   |                                   `-- ConfigManageService.java
 |   `-- pom.xml
 |-- service-admin
 |   |-- src
@@ -178,8 +257,10 @@
 |   |       |                   |   `-- SecurityConfig.java
 |   |       |                   |-- controller
 |   |       |                   |   |-- AccessModelController.java
+|   |       |                   |   |-- CrmManageController.java
 |   |       |                   |   |-- MainDictController.java
-|   |       |                   |   `-- TestController.java
+|   |       |                   |   |-- TestController.java
+|   |       |                   |   `-- YClientsManageController.java
 |   |       |                   |-- dto
 |   |       |                   |   |-- OrganizationItemDto.java
 |   |       |                   |   `-- TestResponse.java
@@ -187,20 +268,30 @@
 |   |       |                   |   `-- RabbitCommandListener.java
 |   |       |                   |-- mapper
 |   |       |                   |   |-- AccessModelMapper.java
+|   |       |                   |   |-- CrmModelMapper.java
 |   |       |                   |   |-- EventCommandMapper.java
-|   |       |                   |   `-- StructModelMapper.java
+|   |       |                   |   |-- StructModelMapper.java
+|   |       |                   |   `-- YClientsModelMapper.java
 |   |       |                   |-- service
 |   |       |                   |   |-- AccessManageService.java
+|   |       |                   |   |-- CrmManageService.java
 |   |       |                   |   |-- StructManageService.java
 |   |       |                   |   |-- TestService.java
-|   |       |                   |   `-- UserEventsReceiveService.java
+|   |       |                   |   |-- UserEventsReceiveService.java
+|   |       |                   |   `-- YClientsManageService.java
 |   |       |                   `-- AdminApplication.java
 |   |       `-- resources
 |   |           |-- db
 |   |           |   `-- migration
 |   |           |       |-- V01.01__init_admin_schema.sql
 |   |           |       |-- V01.02__add_organizations.sql
-|   |           |       `-- V01.03__add_agent_cols_to_org.sql
+|   |           |       |-- V01.03__add_agent_cols_to_org.sql
+|   |           |       |-- V01.04__add_crm_entities.sql
+|   |           |       |-- V01.05__remove_not_nulls_in_yc_cfg.sql
+|   |           |       |-- V01.06__add_logging_fields.sql
+|   |           |       |-- V01.07__remove_yc_apiurl.sql
+|   |           |       |-- V01.08__add_tz_to_yc_org.sql
+|   |           |       `-- V01.09__add_aviable_org_flag.sql
 |   |           `-- application.yml
 |   |-- .properties
 |   `-- pom.xml
@@ -291,7 +382,8 @@
 |   |           |-- db
 |   |           |   `-- migration
 |   |           |       |-- V01.01__add_organizations.sql
-|   |           |       `-- V01.02__add_agent_cols_to_org.sql
+|   |           |       |-- V01.02__add_agent_cols_to_org.sql
+|   |           |       `-- V01.03__add_logging_cols_to_org.sql
 |   |           `-- application.yml
 |   |-- .properties
 |   `-- pom.xml
@@ -305,4 +397,4 @@
 |-- pom.xml
 `-- tree.txt
 
-149 directories, 156 files
+173 directories, 224 files

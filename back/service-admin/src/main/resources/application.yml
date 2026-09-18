@@ -111,6 +111,7 @@ yclients:
       company-api: "/company"
       service-categories-api: "/service_categories"
       services-api: "/services"
+      staffs-api: "/staff"
 
 server:
   port: 8082

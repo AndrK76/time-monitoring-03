@@ -67,18 +67,30 @@
 |   |   |   |   |   |       |-- camera-agent-list.component.scss
 |   |   |   |   |   |       `-- camera-agent-list.component.ts
 |   |   |   |   |   |-- crm-agent
-|   |   |   |   |   |   |-- crm-agent-editor
-|   |   |   |   |   |   |   |-- crm-agent-editor.component.html
-|   |   |   |   |   |   |   |-- crm-agent-editor.component.scss
-|   |   |   |   |   |   |   `-- crm-agent-editor.component.ts
-|   |   |   |   |   |   |-- crm-agent-editor-container
-|   |   |   |   |   |   |   |-- crm-agent-editor-container.component.html
-|   |   |   |   |   |   |   |-- crm-agent-editor-container.component.scss
-|   |   |   |   |   |   |   `-- crm-agent-editor-container.component.ts
-|   |   |   |   |   |   `-- crm-agent-list
-|   |   |   |   |   |       |-- crm-agent-list.component.html
-|   |   |   |   |   |       |-- crm-agent-list.component.scss
-|   |   |   |   |   |       `-- crm-agent-list.component.ts
+|   |   |   |   |   |   |-- crm-agent-bind-editor
+|   |   |   |   |   |   |   |-- crm-agent-bind-editor.component.html
+|   |   |   |   |   |   |   |-- crm-agent-bind-editor.component.scss
+|   |   |   |   |   |   |   `-- crm-agent-bind-editor.component.ts
+|   |   |   |   |   |   |-- crm-agent-config
+|   |   |   |   |   |   |   |-- crm-agent-config.component.html
+|   |   |   |   |   |   |   |-- crm-agent-config.component.scss
+|   |   |   |   |   |   |   `-- crm-agent-config.component.ts
+|   |   |   |   |   |   |-- crm-agent-list
+|   |   |   |   |   |   |   |-- crm-agent-list.component.html
+|   |   |   |   |   |   |   |-- crm-agent-list.component.scss
+|   |   |   |   |   |   |   `-- crm-agent-list.component.ts
+|   |   |   |   |   |   |-- crm-agent-view.models.ts
+|   |   |   |   |   |   `-- crm-agent-view.utils.ts
+|   |   |   |   |   |-- crm-place
+|   |   |   |   |   |   `-- crm-place-list
+|   |   |   |   |   |       |-- crm-place-list.component.html
+|   |   |   |   |   |       |-- crm-place-list.component.scss
+|   |   |   |   |   |       `-- crm-place-list.component.ts
+|   |   |   |   |   |-- crm-service
+|   |   |   |   |   |   `-- crm-service-list
+|   |   |   |   |   |       |-- crm-service-list.component.html
+|   |   |   |   |   |       |-- crm-service-list.component.scss
+|   |   |   |   |   |       `-- crm-service-list.component.ts
 |   |   |   |   |   |-- event-agent
 |   |   |   |   |   |   |-- event-agent-editor
 |   |   |   |   |   |   |   |-- event-agent-editor.component.html
@@ -137,31 +149,56 @@
 |   |   |   |   |   |   |   `-- struct-org-list.component.ts
 |   |   |   |   |   |   |-- struct-org-view.models.ts
 |   |   |   |   |   |   `-- struct-org-view.utils.ts
-|   |   |   |   |   |-- test
-|   |   |   |   |   |   |-- test.component.html
-|   |   |   |   |   |   |-- test.component.scss
-|   |   |   |   |   |   `-- test.component.ts
-|   |   |   |   |   `-- users
-|   |   |   |   |       |-- user-editor-inplace
-|   |   |   |   |       |   |-- user-editor-inplace.component.html
-|   |   |   |   |       |   |-- user-editor-inplace.component.scss
-|   |   |   |   |       |   `-- user-editor-inplace.component.ts
-|   |   |   |   |       |-- user-list-table
-|   |   |   |   |       |   |-- user-list-table.component.html
-|   |   |   |   |       |   |-- user-list-table.component.scss
-|   |   |   |   |       |   `-- user-list-table.component.ts
-|   |   |   |   |       |-- user-profile-dialog
-|   |   |   |   |       |   |-- user-profile-dialog.component.html
-|   |   |   |   |       |   |-- user-profile-dialog.component.scss
-|   |   |   |   |       |   `-- user-profile-dialog.component.ts
-|   |   |   |   |       |-- user-profile-edit-container
-|   |   |   |   |       |   |-- user-profile-edit-container.component.html
-|   |   |   |   |       |   |-- user-profile-edit-container.component.scss
-|   |   |   |   |       |   `-- user-profile-edit-container.component.ts
-|   |   |   |   |       |-- user-view.models.ts
-|   |   |   |   |       `-- user-view.utils.ts
+|   |   |   |   |   |-- users
+|   |   |   |   |   |   |-- user-editor-inplace
+|   |   |   |   |   |   |   |-- user-editor-inplace.component.html
+|   |   |   |   |   |   |   |-- user-editor-inplace.component.scss
+|   |   |   |   |   |   |   `-- user-editor-inplace.component.ts
+|   |   |   |   |   |   |-- user-list-table
+|   |   |   |   |   |   |   |-- user-list-table.component.html
+|   |   |   |   |   |   |   |-- user-list-table.component.scss
+|   |   |   |   |   |   |   `-- user-list-table.component.ts
+|   |   |   |   |   |   |-- user-profile-dialog
+|   |   |   |   |   |   |   |-- user-profile-dialog.component.html
+|   |   |   |   |   |   |   |-- user-profile-dialog.component.scss
+|   |   |   |   |   |   |   `-- user-profile-dialog.component.ts
+|   |   |   |   |   |   |-- user-profile-edit-container
+|   |   |   |   |   |   |   |-- user-profile-edit-container.component.html
+|   |   |   |   |   |   |   |-- user-profile-edit-container.component.scss
+|   |   |   |   |   |   |   `-- user-profile-edit-container.component.ts
+|   |   |   |   |   |   |-- user-view.models.ts
+|   |   |   |   |   |   `-- user-view.utils.ts
+|   |   |   |   |   `-- yclients
+|   |   |   |   |       |-- yc-config-editor
+|   |   |   |   |       |   |-- yc-service-category-list
+|   |   |   |   |       |   |   |-- yc-service-category-list.component.html
+|   |   |   |   |       |   |   |-- yc-service-category-list.component.scss
+|   |   |   |   |       |   |   `-- yc-service-category-list.component.ts
+|   |   |   |   |       |   |-- yc-config-editor.component.html
+|   |   |   |   |       |   |-- yc-config-editor.component.scss
+|   |   |   |   |       |   `-- yc-config-editor.component.ts
+|   |   |   |   |       |-- yc-place-list
+|   |   |   |   |       |   |-- yc-place-inplace-editor
+|   |   |   |   |       |   |   |-- yc-place-inplace-editor.component.html
+|   |   |   |   |       |   |   |-- yc-place-inplace-editor.component.scss
+|   |   |   |   |       |   |   `-- yc-place-inplace-editor.component.ts
+|   |   |   |   |       |   |-- yc-place-list.component.html
+|   |   |   |   |       |   |-- yc-place-list.component.scss
+|   |   |   |   |       |   `-- yc-place-list.component.ts
+|   |   |   |   |       |-- yc-service-list
+|   |   |   |   |       |   |-- yc-service-inplace-editor
+|   |   |   |   |       |   |   |-- yc-service-inplace-editor.component.html
+|   |   |   |   |       |   |   |-- yc-service-inplace-editor.component.scss
+|   |   |   |   |       |   |   `-- yc-service-inplace-editor.component.ts
+|   |   |   |   |       |   |-- yc-service-list.component.html
+|   |   |   |   |       |   |-- yc-service-list.component.scss
+|   |   |   |   |       |   `-- yc-service-list.component.ts
+|   |   |   |   |       |-- yclients-view.models.ts
+|   |   |   |   |       `-- yclients-view.utils.ts
 |   |   |   |   |-- services
-|   |   |   |   |   `-- main-struct-manage.service.ts
+|   |   |   |   |   |-- crm-struct-manage.service.ts
+|   |   |   |   |   |-- main-struct-manage.service.ts
+|   |   |   |   |   `-- yclients-manage.service.ts
 |   |   |   |   |-- app.component.html
 |   |   |   |   |-- app.component.scss
 |   |   |   |   |-- app.component.ts
@@ -304,6 +341,7 @@
 |   |   |   |   |   |-- permission.service.ts
 |   |   |   |   |   `-- user-manage.service.ts
 |   |   |   |   `-- utils
+|   |   |   |       |-- error.utils.ts
 |   |   |   |       `-- http.utils.ts
 |   |   |   `-- public-api.ts
 |   |   |-- README.md
@@ -348,6 +386,15 @@
 |   |   |   |   |   |   |-- login.component.html
 |   |   |   |   |   |   |-- login.component.scss
 |   |   |   |   |   |   `-- login.component.ts
+|   |   |   |   |   |-- login-dialog
+|   |   |   |   |   |   |-- login-dialog.component.html
+|   |   |   |   |   |   |-- login-dialog.component.scss
+|   |   |   |   |   |   |-- login-dialog.component.ts
+|   |   |   |   |   |   `-- login-dialog.model.ts
+|   |   |   |   |   |-- login-dialog-content
+|   |   |   |   |   |   |-- login-dialog-content.component.html
+|   |   |   |   |   |   |-- login-dialog-content.component.scss
+|   |   |   |   |   |   `-- login-dialog-content.component.ts
 |   |   |   |   |   |-- logout
 |   |   |   |   |   |   |-- logout.component.html
 |   |   |   |   |   |   |-- logout.component.scss
@@ -366,7 +413,10 @@
 |   |   |   |   |       `-- view-current-profile.component.ts
 |   |   |   |   |-- models
 |   |   |   |   |   |-- struct
+|   |   |   |   |   |   |-- crm-dto-items.ts
 |   |   |   |   |   |   `-- struct-dto-items.ts
+|   |   |   |   |   |-- yclients
+|   |   |   |   |   |   `-- yclients-dto-items.ts
 |   |   |   |   |   |-- menu-item.ts
 |   |   |   |   |   |-- table-data-items.ts
 |   |   |   |   |   `-- table-filter-items.ts
@@ -374,6 +424,8 @@
 |   |   |   |   |   |-- dialog.service.ts
 |   |   |   |   |   |-- navigation.service.ts
 |   |   |   |   |   |-- notification.service.ts
+|   |   |   |   |   |-- size.service.ts
+|   |   |   |   |   |-- table-actions-informer.service.ts
 |   |   |   |   |   `-- table-manage.service.ts
 |   |   |   |   |-- styles
 |   |   |   |   |   |-- _auth-common.scss
@@ -421,4 +473,4 @@
 |-- tsconfig.json
 `-- tsconfig.prod.json
 
-120 directories, 301 files
+133 directories, 340 files
