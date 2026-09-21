@@ -45,7 +45,8 @@ public class OrganizationInfoChangedEventCommandDto implements Serializable {
         ADD,
         UPDATE,
         UPDATE_NAME,
-        UPDATE_CRM_BIND
+        UPDATE_CRM_BIND,
+        UPDATE_EVT_BIND
     }
 
 

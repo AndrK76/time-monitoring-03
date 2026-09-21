@@ -16,7 +16,6 @@ import ru.igorit.monitoring.lib.persistence.entity.crm.CrmOrganization;
 import ru.igorit.monitoring.lib.persistence.entity.yclients.*;
 import ru.igorit.monitoring.lib.persistence.repository.crm.CrmAgentRepository;
 import ru.igorit.monitoring.lib.persistence.repository.crm.CrmOrganizationRepository;
-import ru.igorit.monitoring.lib.persistence.repository.crm.CrmServiceRepository;
 import ru.igorit.monitoring.lib.persistence.repository.yclients.*;
 import ru.igorit.monitoring.yclients.service.manage.ConfigManageService;
 

@@ -123,8 +123,8 @@ cookie:
 security:
   jwt:
     secret: ${JWT_SECRET:your-256-bit-secret-key-change-in-production}
-    expiration: 6000000
-    refresh-expiration: 12000000
+    expiration: 86400000
+    refresh-expiration: 604800000
   telegram:
     token-ttl: 300
 
