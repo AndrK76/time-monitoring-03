@@ -10,8 +10,6 @@ import { CrmStructManageService } from '../../../services/crm-struct-manage.serv
 import { MainStructManageService } from '../../../services/main-struct-manage.service';
 import { YClientCredentialsView, YClientsAgentConfigView, YClientsOrganizationView, YClientsServiceCategoryView } from '../yclients-view.models';
 import { yClientsAgentConfigDtoFromView, yClientsAgentConfigDtoToView, yClientsOrganizationDtoFromView, yClientsOrganizationDtoPopulate, yClientsOrganizationDtoToView, yClientsServiceCategoryDtoToView, yClientsServiceCategoryFromView } from '../yclients-view.utils';
-import { CrmAgentItemView, CrmAgentTypeView } from '../../crm-agent/crm-agent-view.models';
-import { crmAgentItemDtoToView, crmAgentTypeDtoToView } from '../../crm-agent/crm-agent-view.utils';
 import { OrgStructInfo } from '../../struct-org/struct-org-view.models';
 import { orgStructListDtoToView } from '../../struct-org/struct-org-view.utils';
 import { DialogService, hasChanges, LoginDialogResult, NotificationService, SizeService, YClientsTokenRequestDto } from '@mon3/sc';
@@ -24,6 +22,8 @@ import { MatCardModule } from '@angular/material/card';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatTableModule } from '@angular/material/table';
 import { YcServiceCategoryListComponent } from './yc-service-category-list/yc-service-category-list.component';
+import { CrmAgentItemView, CrmAgentTypeView } from '../../crm/crm-view.models';
+import { crmAgentItemDtoToView, crmAgentTypeDtoToView } from '../../crm/crm-view.utils';
 
 @Component({
   selector: 'app-yc-config-editor',

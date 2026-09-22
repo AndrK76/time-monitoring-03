@@ -61,45 +61,98 @@
 |   |   |   |   |       |-- main.component.scss
 |   |   |   |   |       `-- main.component.ts
 |   |   |   |   |-- features
+|   |   |   |   |   |-- access
+|   |   |   |   |   |   |-- organizations
+|   |   |   |   |   |   |   |-- organization-editor-inplace
+|   |   |   |   |   |   |   |   |-- organization-editor-inplace.component.html
+|   |   |   |   |   |   |   |   |-- organization-editor-inplace.component.scss
+|   |   |   |   |   |   |   |   `-- organization-editor-inplace.component.ts
+|   |   |   |   |   |   |   |-- organization-list-table
+|   |   |   |   |   |   |   |   |-- organization-list-table.component.html
+|   |   |   |   |   |   |   |   |-- organization-list-table.component.scss
+|   |   |   |   |   |   |   |   `-- organization-list-table.component.ts
+|   |   |   |   |   |   |   |-- organization-user-list
+|   |   |   |   |   |   |   |   |-- organization-user-list.component.html
+|   |   |   |   |   |   |   |   |-- organization-user-list.component.scss
+|   |   |   |   |   |   |   |   `-- organization-user-list.component.ts
+|   |   |   |   |   |   |   |-- organization-view.models.ts
+|   |   |   |   |   |   |   `-- organization-view.utils.ts
+|   |   |   |   |   |   |-- roles
+|   |   |   |   |   |   |   |-- role-editor-inplace
+|   |   |   |   |   |   |   |   |-- role-editor-inplace.component.html
+|   |   |   |   |   |   |   |   |-- role-editor-inplace.component.scss
+|   |   |   |   |   |   |   |   `-- role-editor-inplace.component.ts
+|   |   |   |   |   |   |   |-- role-list-table
+|   |   |   |   |   |   |   |   |-- role-list-table.component.html
+|   |   |   |   |   |   |   |   |-- role-list-table.component.scss
+|   |   |   |   |   |   |   |   `-- role-list-table.component.ts
+|   |   |   |   |   |   |   |-- role-view.models.ts
+|   |   |   |   |   |   |   `-- role-view.utils.ts
+|   |   |   |   |   |   `-- users
+|   |   |   |   |   |       |-- user-editor-inplace
+|   |   |   |   |   |       |   |-- user-editor-inplace.component.html
+|   |   |   |   |   |       |   |-- user-editor-inplace.component.scss
+|   |   |   |   |   |       |   `-- user-editor-inplace.component.ts
+|   |   |   |   |   |       |-- user-list-table
+|   |   |   |   |   |       |   |-- user-list-table.component.html
+|   |   |   |   |   |       |   |-- user-list-table.component.scss
+|   |   |   |   |   |       |   `-- user-list-table.component.ts
+|   |   |   |   |   |       |-- user-profile-dialog
+|   |   |   |   |   |       |   |-- user-profile-dialog.component.html
+|   |   |   |   |   |       |   |-- user-profile-dialog.component.scss
+|   |   |   |   |   |       |   `-- user-profile-dialog.component.ts
+|   |   |   |   |   |       |-- user-profile-edit-container
+|   |   |   |   |   |       |   |-- user-profile-edit-container.component.html
+|   |   |   |   |   |       |   |-- user-profile-edit-container.component.scss
+|   |   |   |   |   |       |   `-- user-profile-edit-container.component.ts
+|   |   |   |   |   |       |-- user-view.models.ts
+|   |   |   |   |   |       `-- user-view.utils.ts
 |   |   |   |   |   |-- camera-agent
 |   |   |   |   |   |   `-- camera-agent-list
 |   |   |   |   |   |       |-- camera-agent-list.component.html
 |   |   |   |   |   |       |-- camera-agent-list.component.scss
 |   |   |   |   |   |       `-- camera-agent-list.component.ts
-|   |   |   |   |   |-- crm-agent
-|   |   |   |   |   |   |-- crm-agent-bind-editor
-|   |   |   |   |   |   |   |-- crm-agent-bind-editor.component.html
-|   |   |   |   |   |   |   |-- crm-agent-bind-editor.component.scss
-|   |   |   |   |   |   |   `-- crm-agent-bind-editor.component.ts
-|   |   |   |   |   |   |-- crm-agent-config
-|   |   |   |   |   |   |   |-- crm-agent-config.component.html
-|   |   |   |   |   |   |   |-- crm-agent-config.component.scss
-|   |   |   |   |   |   |   `-- crm-agent-config.component.ts
-|   |   |   |   |   |   |-- crm-agent-list
-|   |   |   |   |   |   |   |-- crm-agent-list.component.html
-|   |   |   |   |   |   |   |-- crm-agent-list.component.scss
-|   |   |   |   |   |   |   `-- crm-agent-list.component.ts
-|   |   |   |   |   |   |-- crm-agent-view.models.ts
-|   |   |   |   |   |   `-- crm-agent-view.utils.ts
-|   |   |   |   |   |-- crm-place
-|   |   |   |   |   |   `-- crm-place-list
-|   |   |   |   |   |       |-- crm-place-list.component.html
-|   |   |   |   |   |       |-- crm-place-list.component.scss
-|   |   |   |   |   |       `-- crm-place-list.component.ts
-|   |   |   |   |   |-- crm-service
-|   |   |   |   |   |   `-- crm-service-list
-|   |   |   |   |   |       |-- crm-service-list.component.html
-|   |   |   |   |   |       |-- crm-service-list.component.scss
-|   |   |   |   |   |       `-- crm-service-list.component.ts
-|   |   |   |   |   |-- event-agent
-|   |   |   |   |   |   |-- event-agent-editor
-|   |   |   |   |   |   |   |-- event-agent-editor.component.html
-|   |   |   |   |   |   |   |-- event-agent-editor.component.scss
-|   |   |   |   |   |   |   `-- event-agent-editor.component.ts
-|   |   |   |   |   |   `-- event-agent-list
-|   |   |   |   |   |       |-- event-agent-list.component.html
-|   |   |   |   |   |       |-- event-agent-list.component.scss
-|   |   |   |   |   |       `-- event-agent-list.component.ts
+|   |   |   |   |   |-- crm
+|   |   |   |   |   |   |-- crm-agent
+|   |   |   |   |   |   |   |-- crm-agent-bind-editor
+|   |   |   |   |   |   |   |   |-- crm-agent-bind-editor.component.html
+|   |   |   |   |   |   |   |   |-- crm-agent-bind-editor.component.scss
+|   |   |   |   |   |   |   |   `-- crm-agent-bind-editor.component.ts
+|   |   |   |   |   |   |   |-- crm-agent-config
+|   |   |   |   |   |   |   |   |-- crm-agent-config.component.html
+|   |   |   |   |   |   |   |   |-- crm-agent-config.component.scss
+|   |   |   |   |   |   |   |   `-- crm-agent-config.component.ts
+|   |   |   |   |   |   |   `-- crm-agent-list
+|   |   |   |   |   |   |       |-- crm-agent-list.component.html
+|   |   |   |   |   |   |       |-- crm-agent-list.component.scss
+|   |   |   |   |   |   |       `-- crm-agent-list.component.ts
+|   |   |   |   |   |   |-- crm-place
+|   |   |   |   |   |   |   `-- crm-place-list
+|   |   |   |   |   |   |       |-- crm-place-list.component.html
+|   |   |   |   |   |   |       |-- crm-place-list.component.scss
+|   |   |   |   |   |   |       `-- crm-place-list.component.ts
+|   |   |   |   |   |   |-- crm-service
+|   |   |   |   |   |   |   `-- crm-service-list
+|   |   |   |   |   |   |       |-- crm-service-list.component.html
+|   |   |   |   |   |   |       |-- crm-service-list.component.scss
+|   |   |   |   |   |   |       `-- crm-service-list.component.ts
+|   |   |   |   |   |   |-- crm-view.models.ts
+|   |   |   |   |   |   `-- crm-view.utils.ts
+|   |   |   |   |   |-- evt
+|   |   |   |   |   |   |-- evt-agent-bind-editor
+|   |   |   |   |   |   |   |-- evt-agent-bind-editor.component.html
+|   |   |   |   |   |   |   |-- evt-agent-bind-editor.component.scss
+|   |   |   |   |   |   |   `-- evt-agent-bind-editor.component.ts
+|   |   |   |   |   |   |-- evt-agent-config
+|   |   |   |   |   |   |   |-- evt-agent-config.component.html
+|   |   |   |   |   |   |   |-- evt-agent-config.component.scss
+|   |   |   |   |   |   |   `-- evt-agent-config.component.ts
+|   |   |   |   |   |   |-- evt-agent-list
+|   |   |   |   |   |   |   |-- evt-agent-list.component.html
+|   |   |   |   |   |   |   |-- evt-agent-list.component.scss
+|   |   |   |   |   |   |   `-- evt-agent-list.component.ts
+|   |   |   |   |   |   |-- evt-view.models.ts
+|   |   |   |   |   |   `-- evt-view.utils.ts
 |   |   |   |   |   |-- index
 |   |   |   |   |   |   |-- index-auth
 |   |   |   |   |   |   |   |-- index-auth.component.html
@@ -112,32 +165,14 @@
 |   |   |   |   |   |   |-- index.component.html
 |   |   |   |   |   |   |-- index.component.scss
 |   |   |   |   |   |   `-- index.component.ts
-|   |   |   |   |   |-- organizations
-|   |   |   |   |   |   |-- organization-editor-inplace
-|   |   |   |   |   |   |   |-- organization-editor-inplace.component.html
-|   |   |   |   |   |   |   |-- organization-editor-inplace.component.scss
-|   |   |   |   |   |   |   `-- organization-editor-inplace.component.ts
-|   |   |   |   |   |   |-- organization-list-table
-|   |   |   |   |   |   |   |-- organization-list-table.component.html
-|   |   |   |   |   |   |   |-- organization-list-table.component.scss
-|   |   |   |   |   |   |   `-- organization-list-table.component.ts
-|   |   |   |   |   |   |-- organization-user-list
-|   |   |   |   |   |   |   |-- organization-user-list.component.html
-|   |   |   |   |   |   |   |-- organization-user-list.component.scss
-|   |   |   |   |   |   |   `-- organization-user-list.component.ts
-|   |   |   |   |   |   |-- organization-view.models.ts
-|   |   |   |   |   |   `-- organization-view.utils.ts
+|   |   |   |   |   |-- macroscop
+|   |   |   |   |   |   |-- macroscop-config-editor
+|   |   |   |   |   |   |   |-- macroscop-config-editor.component.html
+|   |   |   |   |   |   |   |-- macroscop-config-editor.component.scss
+|   |   |   |   |   |   |   `-- macroscop-config-editor.component.ts
+|   |   |   |   |   |   |-- macroscop-view.models.ts
+|   |   |   |   |   |   `-- macroscop-view.utils.ts
 |   |   |   |   |   |-- roles
-|   |   |   |   |   |   |-- role-editor-inplace
-|   |   |   |   |   |   |   |-- role-editor-inplace.component.html
-|   |   |   |   |   |   |   |-- role-editor-inplace.component.scss
-|   |   |   |   |   |   |   `-- role-editor-inplace.component.ts
-|   |   |   |   |   |   |-- role-list-table
-|   |   |   |   |   |   |   |-- role-list-table.component.html
-|   |   |   |   |   |   |   |-- role-list-table.component.scss
-|   |   |   |   |   |   |   `-- role-list-table.component.ts
-|   |   |   |   |   |   |-- role-view.models.ts
-|   |   |   |   |   |   `-- role-view.utils.ts
 |   |   |   |   |   |-- struct-org
 |   |   |   |   |   |   |-- struct-org-editor
 |   |   |   |   |   |   |   |-- struct-org-editor.component.html
@@ -149,25 +184,6 @@
 |   |   |   |   |   |   |   `-- struct-org-list.component.ts
 |   |   |   |   |   |   |-- struct-org-view.models.ts
 |   |   |   |   |   |   `-- struct-org-view.utils.ts
-|   |   |   |   |   |-- users
-|   |   |   |   |   |   |-- user-editor-inplace
-|   |   |   |   |   |   |   |-- user-editor-inplace.component.html
-|   |   |   |   |   |   |   |-- user-editor-inplace.component.scss
-|   |   |   |   |   |   |   `-- user-editor-inplace.component.ts
-|   |   |   |   |   |   |-- user-list-table
-|   |   |   |   |   |   |   |-- user-list-table.component.html
-|   |   |   |   |   |   |   |-- user-list-table.component.scss
-|   |   |   |   |   |   |   `-- user-list-table.component.ts
-|   |   |   |   |   |   |-- user-profile-dialog
-|   |   |   |   |   |   |   |-- user-profile-dialog.component.html
-|   |   |   |   |   |   |   |-- user-profile-dialog.component.scss
-|   |   |   |   |   |   |   `-- user-profile-dialog.component.ts
-|   |   |   |   |   |   |-- user-profile-edit-container
-|   |   |   |   |   |   |   |-- user-profile-edit-container.component.html
-|   |   |   |   |   |   |   |-- user-profile-edit-container.component.scss
-|   |   |   |   |   |   |   `-- user-profile-edit-container.component.ts
-|   |   |   |   |   |   |-- user-view.models.ts
-|   |   |   |   |   |   `-- user-view.utils.ts
 |   |   |   |   |   `-- yclients
 |   |   |   |   |       |-- yc-config-editor
 |   |   |   |   |       |   |-- yc-service-category-list
@@ -197,6 +213,8 @@
 |   |   |   |   |       `-- yclients-view.utils.ts
 |   |   |   |   |-- services
 |   |   |   |   |   |-- crm-struct-manage.service.ts
+|   |   |   |   |   |-- evt-struct-manage.service.ts
+|   |   |   |   |   |-- macroscop-manage.service.ts
 |   |   |   |   |   |-- main-struct-manage.service.ts
 |   |   |   |   |   `-- yclients-manage.service.ts
 |   |   |   |   |-- app.component.html
@@ -412,10 +430,11 @@
 |   |   |   |   |       |-- view-current-profile.component.scss
 |   |   |   |   |       `-- view-current-profile.component.ts
 |   |   |   |   |-- models
-|   |   |   |   |   |-- struct
+|   |   |   |   |   |-- content
 |   |   |   |   |   |   |-- crm-dto-items.ts
-|   |   |   |   |   |   `-- struct-dto-items.ts
-|   |   |   |   |   |-- yclients
+|   |   |   |   |   |   |-- evt-dto-items.ts
+|   |   |   |   |   |   |-- macroscop-dto-items.ts
+|   |   |   |   |   |   |-- struct-dto-items.ts
 |   |   |   |   |   |   `-- yclients-dto-items.ts
 |   |   |   |   |   |-- menu-item.ts
 |   |   |   |   |   |-- table-data-items.ts
@@ -473,4 +492,4 @@
 |-- tsconfig.json
 `-- tsconfig.prod.json
 
-133 directories, 340 files
+138 directories, 354 files

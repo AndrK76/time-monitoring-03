@@ -27,6 +27,7 @@
 |   |                           |-- exception
 |   |                           |-- service
 |   |                           |-- util
+|   |                           |   |-- Md5Hasher.java
 |   |                           |   `-- XorCipher.java
 |   |                           `-- AuthConstants.java
 |   `-- pom.xml
@@ -167,6 +168,16 @@
 |   |                           |   |   |-- CrmAgentTypeDto.java
 |   |                           |   |   |-- CrmOrganizationDto.java
 |   |                           |   |   `-- CrmServiceDto.java
+|   |                           |   |-- evt
+|   |                           |   |   |-- EvtAgentConfigDto.java
+|   |                           |   |   |-- EvtAgentItemDto.java
+|   |                           |   |   |-- EvtAgentListDto.java
+|   |                           |   |   |-- EvtAgentTypeDto.java
+|   |                           |   |   `-- EvtPlaceListDto.java
+|   |                           |   |-- macroscop
+|   |                           |   |   |-- MacroscopAgentConfigDto.java
+|   |                           |   |   |-- MacroscopCredentialsDto.java
+|   |                           |   |   `-- MacroscopEvtAgentConfigDto.java
 |   |                           |   |-- yclients
 |   |                           |   |   |-- YClientCredentialsDto.java
 |   |                           |   |   |-- YClientsAgentConfigDto.java
@@ -179,7 +190,9 @@
 |   |                           |   |   `-- YClientsTokenResponseDto.java
 |   |                           |   `-- OrgStructListDto.java
 |   |                           |-- enums
-|   |                           |   `-- CrmAgentType.java
+|   |                           |   |-- CrmAgentType.java
+|   |                           |   |-- EvtAgentType.java
+|   |                           |   `-- ImgAgentType.java
 |   |                           `-- persistence
 |   |                               |-- entity
 |   |                               |   |-- admin
@@ -191,7 +204,17 @@
 |   |                               |   |   |-- CrmAgentListProjection.java
 |   |                               |   |   |-- CrmOrganization.java
 |   |                               |   |   |-- CrmPlace.java
-|   |                               |   |   `-- CrmService.java
+|   |                               |   |   |-- CrmService.java
+|   |                               |   |   `-- EvtAgentListProjection.java
+|   |                               |   |-- evt
+|   |                               |   |   |-- EvtAgent.java
+|   |                               |   |   |-- EvtAgentConfig.java
+|   |                               |   |   `-- EvtPlace.java
+|   |                               |   |-- macroscop
+|   |                               |   |   |-- MacroscopAgentConfig.java
+|   |                               |   |   |-- MacroscopCredentials.java
+|   |                               |   |   |-- MacroscopEvtAgent.java
+|   |                               |   |   `-- MacroscopEvtAgentConfig.java
 |   |                               |   `-- yclients
 |   |                               |       |-- YClientCredentials.java
 |   |                               |       |-- YClientsAgent.java
@@ -210,6 +233,14 @@
 |   |                                   |   |-- CrmOrganizationRepository.java
 |   |                                   |   |-- CrmPlaceRepository.java
 |   |                                   |   `-- CrmServiceRepository.java
+|   |                                   |-- evt
+|   |                                   |   |-- EvtAgentConfigRepository.java
+|   |                                   |   |-- EvtAgentRepository.java
+|   |                                   |   `-- EvtPlaceRepository.java
+|   |                                   |-- macroscop
+|   |                                   |   |-- MacroscopAgentConfigRepository.java
+|   |                                   |   |-- MacroscopEvtAgentConfigRepository.java
+|   |                                   |   `-- MacroscopEvtAgentRepository.java
 |   |                                   `-- yclients
 |   |                                       |-- YClientsAgentConfigRepository.java
 |   |                                       |-- YClientsAgentRepository.java
@@ -258,6 +289,8 @@
 |   |       |                   |-- controller
 |   |       |                   |   |-- AccessModelController.java
 |   |       |                   |   |-- CrmManageController.java
+|   |       |                   |   |-- EvtManageController.java
+|   |       |                   |   |-- MacroscopManageController.java
 |   |       |                   |   |-- MainDictController.java
 |   |       |                   |   |-- TestController.java
 |   |       |                   |   `-- YClientsManageController.java
@@ -270,11 +303,15 @@
 |   |       |                   |   |-- AccessModelMapper.java
 |   |       |                   |   |-- CrmModelMapper.java
 |   |       |                   |   |-- EventCommandMapper.java
+|   |       |                   |   |-- EvtModelMapper.java
+|   |       |                   |   |-- MacroscopModelMapper.java
 |   |       |                   |   |-- StructModelMapper.java
 |   |       |                   |   `-- YClientsModelMapper.java
 |   |       |                   |-- service
 |   |       |                   |   |-- AccessManageService.java
 |   |       |                   |   |-- CrmManageService.java
+|   |       |                   |   |-- EvtManageService.java
+|   |       |                   |   |-- MacroscopManageService.java
 |   |       |                   |   |-- StructManageService.java
 |   |       |                   |   |-- TestService.java
 |   |       |                   |   |-- UserEventsReceiveService.java
@@ -291,7 +328,9 @@
 |   |           |       |-- V01.06__add_logging_fields.sql
 |   |           |       |-- V01.07__remove_yc_apiurl.sql
 |   |           |       |-- V01.08__add_tz_to_yc_org.sql
-|   |           |       `-- V01.09__add_aviable_org_flag.sql
+|   |           |       |-- V01.09__add_aviable_org_flag.sql
+|   |           |       |-- V01.10__add_evt_and_macroscop.sql
+|   |           |       `-- V01.11__macroscop_config_opt_in_evt.sql
 |   |           `-- application.yml
 |   |-- .properties
 |   `-- pom.xml
@@ -397,4 +436,4 @@
 |-- pom.xml
 `-- tree.txt
 
-173 directories, 224 files
+179 directories, 257 files

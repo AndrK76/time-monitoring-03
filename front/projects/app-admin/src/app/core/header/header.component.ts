@@ -10,10 +10,10 @@ import { AuthService, PermissionService } from '@mon3/sa';
 import { NgIf } from '@angular/common';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { MatDialog } from '@angular/material/dialog';
-import { UserProfileDialogComponent } from '../../features/users/user-profile-dialog/user-profile-dialog.component';
 import { MenuItem, NavigationService, TopMenuItemComponent } from '@mon3/sc';
 import { authConstant } from '../../auth-constants';
 import { filter, pairwise } from 'rxjs';
+import { UserProfileDialogComponent } from '../../features/access/users/user-profile-dialog/user-profile-dialog.component';
 
 @Component({
   selector: 'app-header',
@@ -68,9 +68,15 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewInit {
             { label: 'Агенты', route: '/crm/agent-list' },
             { label: 'Услуги', route: '/crm/service-list' },
             { label: 'Места', route: '/crm/place-list' },
-          ]
+          ],
         },
-      ]
+         {
+          label: 'События', route: '/evt',
+          children: [
+            { label: 'Агенты', route: '/evt/agent-list' },
+          ],
+        },
+      ],
     },
     {
       label: 'Доступ', route: '/access',

@@ -8,24 +8,24 @@ export const routes: Routes = [
   { path: 'register', loadComponent: () => import('@mon3/sc').then(m => m.RegisterComponent) },
   { path: 'logout', loadComponent: () => import('@mon3/sc').then(m => m.LogoutComponent), canActivate: [authGuard] },
   {
-    path: 'profile', loadComponent: () => import('./features/users/user-profile-edit-container/user-profile-edit-container.component')
+    path: 'profile', loadComponent: () => import('./features/access/users/user-profile-edit-container/user-profile-edit-container.component')
       .then(m => m.UserProfileEditContainerComponent), canActivate: [authGuard],
   },
   {
     path: 'access/users',
-    loadComponent: () => import('./features/users/user-list-table/user-list-table.component').then(m => m.UserListTableComponent),
+    loadComponent: () => import('./features/access/users/user-list-table/user-list-table.component').then(m => m.UserListTableComponent),
     canActivate: [authGuard],
     data: authConstant('access/users')
   },
   {
     path: 'access/organizations',
-    loadComponent: () => import('./features/organizations/organization-list-table/organization-list-table.component').then(m => m.OrganizationListTableComponent),
+    loadComponent: () => import('./features/access/organizations/organization-list-table/organization-list-table.component').then(m => m.OrganizationListTableComponent),
     canActivate: [authGuard],
     data: authConstant('access/organizations')
   },
   {
     path: 'access/roles',
-    loadComponent: () => import('./features/roles/role-list-table/role-list-table.component').then(m => m.RoleListTableComponent),
+    loadComponent: () => import('./features/access/roles/role-list-table/role-list-table.component').then(m => m.RoleListTableComponent),
     canActivate: [authGuard],
     data: authConstant('access/roles')
   },
@@ -37,33 +37,33 @@ export const routes: Routes = [
   },
   {
     path: 'crm/agent-list',
-    loadComponent: () => import('./features/crm-agent/crm-agent-list/crm-agent-list.component').then(m => m.CrmAgentListComponent),
+    loadComponent: () => import('./features/crm/crm-agent/crm-agent-list/crm-agent-list.component').then(m => m.CrmAgentListComponent),
     canActivate: [authGuard],
     data: authConstant('crm/agent-list')
   },
   {
     path: 'crm/agent',
-    loadComponent: () => import('./features/crm-agent/crm-agent-config/crm-agent-config.component').then(m => m.CrmAgentConfigComponent),
+    loadComponent: () => import('./features/crm/crm-agent/crm-agent-config/crm-agent-config.component').then(m => m.CrmAgentConfigComponent),
     canActivate: [authGuard],
     data: authConstant('crm/agent')
   },
   {
     path: 'crm/service-list',
-    loadComponent: () => import('./features/crm-service/crm-service-list/crm-service-list.component').then(m => m.CrmServiceListComponent),
+    loadComponent: () => import('./features/crm/crm-service/crm-service-list/crm-service-list.component').then(m => m.CrmServiceListComponent),
     canActivate: [authGuard],
     data: authConstant('crm/service-list')
   },
   {
     path: 'crm/place-list',
-    loadComponent: () => import('./features/crm-place/crm-place-list/crm-place-list.component').then(m => m.CrmPlaceListComponent),
+    loadComponent: () => import('./features/crm/crm-place/crm-place-list/crm-place-list.component').then(m => m.CrmPlaceListComponent),
     canActivate: [authGuard],
     data: authConstant('crm/place-list')
   },
   {
-    path: 'event/agent-list',
-    loadComponent: () => import('./features/event-agent/event-agent-list/event-agent-list.component').then(m => m.EventAgentListComponent),
+    path: 'evt/agent-list',
+    loadComponent: () => import('./features/evt/evt-agent-list/evt-agent-list.component').then(m => m.EvtAgentListComponent),
     canActivate: [authGuard],
-    data: authConstant('event/agent-lis')
+    data: authConstant('evt/agent-list')
   }, {
     path: 'camera/agent-list',
     loadComponent: () => import('./features/camera-agent/camera-agent-list/camera-agent-list.component').then(m => m.CameraAgentListComponent),
