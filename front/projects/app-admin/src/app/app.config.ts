@@ -11,6 +11,8 @@ import localeRu from '@angular/common/locales/ru';
 import { MainStructManageService } from './services/main-struct-manage.service';
 import { CrmStructManageService } from './services/crm-struct-manage.service';
 import { YclientsManageService } from './services/yclients-manage.service';
+import { EvtStructManageService } from './services/evt-struct-manage.service';
+import { MacroscopManageService } from './services/macroscop-manage.service';
 
 registerLocaleData(localeRu);
 
@@ -35,6 +37,8 @@ function initializeApp() {
   const mainStructManageService = inject(MainStructManageService);
   const crmStructManageService = inject(CrmStructManageService);
   const yclientsManageService = inject(YclientsManageService);
+  const evtStructManageService = inject(EvtStructManageService);
+  const macroscopManageService = inject(MacroscopManageService)
 
 
   return () => {
@@ -45,6 +49,8 @@ function initializeApp() {
     mainStructManageService.setAdminApiUrl(environment.adminApiUrl);
     crmStructManageService.setAdminApiUrl(environment.adminApiUrl);
     yclientsManageService.setAdminApiUrl(environment.adminApiUrl);
+    evtStructManageService.setAdminApiUrl(environment.adminApiUrl);
+    macroscopManageService.setAdminApiUrl(environment.adminApiUrl);
 
     return lastValueFrom(authService.checkAuth())
       .then((response) => {

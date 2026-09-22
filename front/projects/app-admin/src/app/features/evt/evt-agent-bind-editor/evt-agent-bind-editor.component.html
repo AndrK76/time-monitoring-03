@@ -1,1 +1,63 @@
-<p>evt-agent-bind-editor works!</p>
+<div class="editor-container">
+    <!-- Оверлей загрузки -->
+    @if (loading()) {
+    <div class="loading-overlay">
+        <mat-spinner diameter="40"></mat-spinner>
+        <p>Загрузка данных...</p>
+    </div>
+    }
+
+    <form [formGroup]="form" class="editor-form">
+        <div class="form-row">
+            <mat-form-field appearance="outline" class="full-width name-field">
+                <mat-label>Название</mat-label>
+                <input matInput formControlName="name" (change)="$event.stopPropagation()" />
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="type-field">
+                <mat-label>Тип</mat-label>
+                <mat-select formControlName="agentType">
+                    <mat-option *ngFor="let type of agentTypes()" [value]="type.value">
+                        {{ type.name }}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+            <div class="action-button-group">
+                <a mat-raised-button class="table-action-btn btn-gray" [routerLink]="['/evt/agent']"
+                    [queryParams]="{id: agentData().id}">
+                    <mat-icon>settings</mat-icon>
+                    <span class="hide-on-small">Настроить</span>
+                </a>
+                <button mat-raised-button color="primary" class="action-btn"
+                    *ngIf="canFullChange() && curOrg() && !orgIsCurrOrg()" (click)="callBind()">
+                    <mat-icon>link</mat-icon>
+                    <span class="hide-on-small">Выбрать</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Описание</mat-label>
+                <input matInput formControlName="description" (change)="$event.stopPropagation()" />
+            </mat-form-field>
+        </div>
+
+        <div class="form-row">
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Привязан к</mat-label>
+                <input matInput formControlName="organizationName" />
+            </mat-form-field>
+            <div class="action-button-group" *ngIf="canFullChange() && !!valueOrganizationId()">
+                <button mat-raised-button class="table-action-btn btn-danger-light" (click)="callUnBind()">
+                    <mat-icon>link</mat-icon>
+                    <span class="hide-on-small">Отвязать</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Настроен (флажок) -->
+        <div class="form-row">
+            <mat-checkbox formControlName="configured">Настроен</mat-checkbox>
+        </div>
+    </form>
+</div>

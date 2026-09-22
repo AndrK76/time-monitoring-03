@@ -64,7 +64,14 @@ export const routes: Routes = [
     loadComponent: () => import('./features/evt/evt-agent-list/evt-agent-list.component').then(m => m.EvtAgentListComponent),
     canActivate: [authGuard],
     data: authConstant('evt/agent-list')
-  }, {
+  },
+  {
+    path: 'evt/agent',
+    loadComponent: () => import('./features/evt/evt-agent-config/evt-agent-config.component').then(m => m.EvtAgentConfigComponent),
+    canActivate: [authGuard],
+    data: authConstant('crm/agent')
+  },
+  {
     path: 'camera/agent-list',
     loadComponent: () => import('./features/camera-agent/camera-agent-list/camera-agent-list.component').then(m => m.CameraAgentListComponent),
     canActivate: [authGuard],

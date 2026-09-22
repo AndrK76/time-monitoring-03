@@ -1,1 +1,14 @@
-<p>evt-agent-config works!</p>
+<div class="editor-container-wrapper">
+    @if (isLoading()) {
+    <div class="loading-spinner">
+        <mat-spinner diameter="40"></mat-spinner>
+        <p>Загрузка данных...</p>
+    </div>
+    } @else if (hasError()) {
+    <div class="error-message">
+        <mat-icon color="warn">error</mat-icon>
+        <span>Ошибка:</span>
+        <span>{{error().message}}</span>
+    </div>
+    }
+</div>
