@@ -7,9 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.igorit.monitoring.admin.service.MacroscopManageService;
-import ru.igorit.monitoring.lib.dto.macroscop.MacroscopAgentConfigDto;
-import ru.igorit.monitoring.lib.dto.macroscop.MacroscopAgentConfigListDto;
-import ru.igorit.monitoring.lib.dto.macroscop.MacroscopEvtAgentConfigDto;
+import ru.igorit.monitoring.lib.dto.macroscop.*;
 import ru.igorit.monitoring.lib.persistence.entity.macroscop.MacroscopAgentConfig;
 
 import java.util.List;
@@ -71,6 +69,11 @@ public class MacroscopManageController {
     public ResponseEntity<?> deleteConfig(@PathVariable("id") String configId) {
         service.deleteConfig(configId);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/misc/configs/{id}/server-info")
+    public MacroscopDataResponse<MacroscopServerInfo> getServerInfo(@PathVariable("id") String configId) {
+        return service.getServerInfo(configId);
     }
 
 

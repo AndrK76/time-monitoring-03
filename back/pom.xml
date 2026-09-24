@@ -26,6 +26,7 @@
         <module>core-rabbit</module>
         <module>lib-monitoring</module>
         <module>lib-yclients</module>
+        <module>lib-macroscop</module>
     </modules>
 
 </project>

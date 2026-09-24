@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-
 @Log4j2
 @RequiredArgsConstructor
 public class ConfigManageService {

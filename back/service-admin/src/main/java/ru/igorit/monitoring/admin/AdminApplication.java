@@ -19,6 +19,8 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
         "ru.igorit.monitoring.lib",
         "ru.igorit.monitoring.yclients.api",
         "ru.igorit.monitoring.yclients.service.manage",
+        "ru.igorit.monitoring.macroscop.api",
+        "ru.igorit.monitoring.macroscop.service.manage",
 })
 @EntityScan(basePackages = {
         "ru.igorit.monitoring.persistence.entity.admin",

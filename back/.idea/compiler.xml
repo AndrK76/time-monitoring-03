@@ -145,6 +145,7 @@
         <module name="lib-monitoring" />
         <module name="core-common" />
         <module name="lib-yclients" />
+        <module name="lib-macroscop" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
@@ -160,6 +161,7 @@
       <module name="core-security" options="-parameters -Amapstruct.defaultComponentModel=spring -Amapstruct.unmappedTargetPolicy=IGNORE" />
       <module name="core-telegram" options="-parameters -Amapstruct.defaultComponentModel=spring -Amapstruct.unmappedTargetPolicy=IGNORE" />
       <module name="core-web" options="-parameters -Amapstruct.defaultComponentModel=spring -Amapstruct.unmappedTargetPolicy=IGNORE" />
+      <module name="lib-macroscop" options="-parameters -Amapstruct.defaultComponentModel=spring -Amapstruct.unmappedTargetPolicy=IGNORE" />
       <module name="lib-monitoring" options="-parameters -Amapstruct.defaultComponentModel=spring -Amapstruct.unmappedTargetPolicy=IGNORE" />
       <module name="lib-yclients" options="-parameters -Amapstruct.defaultComponentModel=spring -Amapstruct.unmappedTargetPolicy=IGNORE" />
       <module name="service-admin" options="-parameters -Amapstruct.defaultComponentModel=spring -Amapstruct.unmappedTargetPolicy=IGNORE" />
