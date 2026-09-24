@@ -80,7 +80,6 @@ export class EvtAgentListComponent implements OnInit, AfterViewInit {
     const org = this.organizations().find(f => f.id === this.currentOrg());
     return org ? 'для ' + org.shortName : '';
   });
-  canAddAgent = signal(false);
   canBindAgent = signal(false);
 
   // === Фильтры ===
@@ -166,7 +165,6 @@ export class EvtAgentListComponent implements OnInit, AfterViewInit {
           if (orgParam) {
             this.currentOrg.set(orgParam);
             const idRec = result.find(f => f.organizationId === orgParam);
-            this.canAddAgent.set(!(idRec?.organizationId));
             idVal = idRec?.id;
 
             // Показываем фильтр и устанавливаем его на выбранную организацию
@@ -184,8 +182,6 @@ export class EvtAgentListComponent implements OnInit, AfterViewInit {
               queryParamsHandling: 'replace',
               replaceUrl: true
             });
-          } else {
-            this.canAddAgent.set(true);
           }
 
           this.tableManager.setData(result as EvtAgentItemView[]);
@@ -193,7 +189,6 @@ export class EvtAgentListComponent implements OnInit, AfterViewInit {
 
           if (this.selectedItem()) {
             const _item = this.selectedItem();
-            this.canAddAgent.set(!(_item?.organizationId));
             this.currentOrg.set(_item?.organizationId);
             this.selectedItem.set(undefined);
             this.tableManager.scrollToItemId(_item?.id);

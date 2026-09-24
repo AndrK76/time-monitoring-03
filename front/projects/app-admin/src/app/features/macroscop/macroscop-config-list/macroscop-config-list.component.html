@@ -1,9 +1,7 @@
 <div class="standard-table-container">
     <mat-card>
         <mat-card-header>
-            <mat-card-title>События: Агенты
-                <span class="hide-on-small">{{orgName()}}</span>
-            </mat-card-title>
+            <mat-card-title>Macroscop: Конфигурации <span *ngIf="!isSmallScreen()">серверов</span></mat-card-title>
             <mat-card-subtitle class="hide-on-small">
                 Всего: {{ dataSource.data.length }}
                 @if (hasChanges()) {
@@ -16,21 +14,14 @@
             </mat-card-subtitle>
         </mat-card-header>
 
-        <mat-card-actions class="full-row">
-            <div class="action-button-group">
-                <a mat-button matTooltip="К списку организаций" class="table-action-btn back-button"
-                    [routerLink]="['/struct/org']" [queryParams]="{id: currentOrg()}" *ngIf="currentOrg()">
-                    <mat-icon>arrow_back</mat-icon>
-                    <span class="hide-on-small">К списку организаций</span>
-                </a>
-            </div>
+        <mat-card-actions align="end">
             <div class="action-button-group">
                 <button mat-raised-button class="table-action-btn btn-success" (click)="callAdd()"
-                    [disabled]="isLoading() || isSaving()" *ngIf="canBindAgent()">
+                    [disabled]="isLoading() || isSaving()">
                     <mat-icon>add</mat-icon><span class="hide-on-small">Добавить</span>
                 </button>
                 <button mat-raised-button class="table-action-btn btn-danger" (click)="callDelete(selectedItem()!)"
-                    [disabled]="isLoading() || isSaving() || !selectedItem()" *ngIf="canBindAgent()">
+                    [disabled]="isLoading() || isSaving() || !selectedItem()">
                     <mat-icon>delete</mat-icon><span class="hide-on-small">Удалить</span>
                 </button>
                 <button mat-raised-button class="table-action-btn btn-light" (click)="callRefresh()"
@@ -46,7 +37,6 @@
         </mat-card-actions>
 
         <mat-card-content>
-            <!-- Оверлей загрузки -->
             @if (isLoading() || isSaving() || error()) {
             <div class="table-overlay">
                 @if (isLoading() || isSaving()) {
@@ -64,7 +54,6 @@
             </div>
             }
 
-            <!-- Таблица -->
             <div class="table-wrapper sticky-header-table sticky-firstcol-table nowrap-table inrow-editor-table filtered-table click-edit-table"
                 #tableWrapper>
                 <table mat-table [dataSource]="dataSource" [trackBy]="trackById" class="mat-elevation-z0"
@@ -79,8 +68,7 @@
                             <span class="changes-indicator" matTooltip="{{ changesSummary() }}">*</span>
                             }
                         </th>
-                        <td mat-cell *matCellDef="let row">
-                        </td>
+                        <td mat-cell *matCellDef="let row"></td>
                     </ng-container>
 
                     <ng-container matColumnDef="name">
@@ -92,40 +80,21 @@
                         <td mat-cell *matCellDef="let row"> {{ row.name }} </td>
                     </ng-container>
 
-                    <ng-container matColumnDef="configured">
+                    <ng-container matColumnDef="serverAddress">
                         <th mat-header-cell *matHeaderCellDef>
-                            <sc-filter-root key="configured" label="Настроен" [showFilter]="showFilter()" [sort]="true"
-                                [config]="filterConfig().get('configured')!"
+                            <sc-filter-root key="serverAddress" label="Адрес" [showFilter]="showFilter()" [sort]="true"
+                                [config]="filterConfig().get('serverAddress')!"
                                 (change)="onFilterChange($event)"></sc-filter-root>
                         </th>
-                        <td mat-cell *matCellDef="let row"> {{ row.configured ? 'Да' : 'Нет' }} </td>
-                    </ng-container>
-
-                    <ng-container matColumnDef="agentTypeWithInfo">
-                        <th mat-header-cell *matHeaderCellDef>
-                            <sc-filter-root key="agentType" label="Тип" [showFilter]="showFilter()" [sort]="true"
-                                [config]="filterConfig().get('agentType')!"
-                                (change)="onFilterChange($event)"></sc-filter-root>
-                        </th>
-                        <td mat-cell *matCellDef="let row"> {{ row.agentTypeWithInfo?.name }} </td>
-                    </ng-container>
-
-                    <ng-container matColumnDef="organization">
-                        <th mat-header-cell *matHeaderCellDef>
-                            <sc-filter-root key="organizationId" label="Организация" [showFilter]="showFilter()"
-                                [sort]="true" [config]="filterConfig().get('organizationId')!"
-                                (change)="onFilterChange($event)"></sc-filter-root>
-                        </th>
-                        <td mat-cell *matCellDef="let row"> {{ row.organization?.shortName }} </td>
+                        <td mat-cell *matCellDef="let row"> {{ row.serverAddress || '—' }} </td>
                     </ng-container>
 
                     <ng-container matColumnDef="editor">
                         <td mat-cell *matCellDef="let row" [attr.colspan]="displayedColumns.length">
                             <div class="editor-row" *ngIf="row._expanded">
-                                <app-evt-agent-bind-editor [agentData]="row" [loadItemFn]="loadItem"
-                                    [agentTypes]="agentTypes()" [organizations]="organizations()"
-                                    [curOrg]="currentOrg()" (loaded)="doLoadedItem($event)"
-                                    (change)="doUpdate($event)"></app-evt-agent-bind-editor>
+                                <app-macroscop-config-editor [config]="row" [loadItemFn]="loadItem"
+                                    (valueChange)="doUpdate($event)" (loaded)="doLoadedItem($event)">
+                                </app-macroscop-config-editor>
                             </div>
                         </td>
                     </ng-container>
@@ -140,7 +109,7 @@
                         <td class="mat-cell" [attr.colspan]="displayedColumns.length">
                             <div class="empty-state">
                                 <mat-icon>info</mat-icon>
-                                <p>Агенты не найдены</p>
+                                <p>Конфигурации не найдены</p>
                             </div>
                         </td>
                     </tr>

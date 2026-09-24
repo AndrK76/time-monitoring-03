@@ -3,7 +3,6 @@ import {
   AfterViewInit, Component, computed, DestroyRef, ElementRef, inject, Injector,
   input, OnInit, signal, ViewChild
 } from '@angular/core';
-import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
@@ -11,7 +10,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTable, MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { combineLatest, finalize, map, Observable, of, switchMap } from 'rxjs';
+import { finalize, map, Observable, switchMap } from 'rxjs';
 import {
   ConfirmDialogCancelResult,
   DialogService, FilterRootComponent, isExpanded, isNewItem, NotificationService,

@@ -132,6 +132,17 @@ export function removeOrigData<T extends Record<string, any>>(
     return source;
 }
 
+/**
+ * Проверяет наличие в объекте служебного поле `_orig`.
+ * @param source - объект, у которого нужно проверить `_orig`
+ * @returns наличие поля `_orig`
+ */
+export function hasOrigData<T extends Record<string, any>>(
+    source: T
+): boolean {
+    return (source && typeof source === 'object' && '_orig' in source);
+}
+
 
 /**
  * Добавляет к объекту служебное поле `_new`, показывающее что объект новый
@@ -268,7 +279,7 @@ export function removeNotFullLoadItemFlag<T extends Record<string, any>>(
  * @param idGetter - функция получения идентификатора из элемента (например, (item) => item.id)
  * @returns массив ключей объектов
  */
-export function getIdsArray<T,V>(arr: T[] | undefined | null, idGetter: (item: T) => V): (V)[] {
+export function getIdsArray<T, V>(arr: T[] | undefined | null, idGetter: (item: T) => V): (V)[] {
     return Array.from(new Set((arr || []).map(item => idGetter(item))));
 }
 

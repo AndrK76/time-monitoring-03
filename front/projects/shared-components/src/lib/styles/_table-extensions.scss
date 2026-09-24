@@ -589,6 +589,7 @@ mat-card-content {
             }
         }
 
+
         &.btn-success {
             background-color: var(--btn-success-bg);
             color: var(--btn-success-text);
@@ -600,6 +601,27 @@ mat-card-content {
             &:disabled {
                 background-color: var(--mat-raised-button-disabled-container-color, rgba(0, 0, 0, 0.12)) !important;
                 color: var(--mat-raised-button-disabled-label-text-color, rgba(0, 0, 0, 0.38)) !important;
+            }
+
+            &.mat-mdc-outlined-button {
+                background-color: transparent;
+                color: var(--btn-success-bg);
+                border-color: var(--btn-success-bg);
+
+                &:hover:not(:disabled),
+                &:focus:not(:disabled),
+                &:active:not(:disabled) {
+                    background-color: rgba(76, 175, 80, 0.08);
+                    color: var(--btn-success-hover);
+                    border-color: var(--btn-success-hover);
+                }
+
+                &:disabled,
+                &.mat-mdc-button-disabled {
+                    background-color: transparent;
+                    color: var(--mat-outlined-button-disabled-label-text-color, rgba(0, 0, 0, 0.38));
+                    border-color: var(--mat-outlined-button-disabled-outline-color, rgba(0, 0, 0, 0.12));
+                }
             }
         }
 

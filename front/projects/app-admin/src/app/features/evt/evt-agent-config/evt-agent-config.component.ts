@@ -79,11 +79,9 @@ export class EvtAgentConfigComponent implements OnInit {
     if (res?.id) this.config.set({ id: res.id, type: this.config()?.type });
     if (res?.agentType) this.config.set({ id: this.config()?.id, type: res.agentType });
 
-    // Маршрутизация по типу EVT-агента.
-    // Значение 'Macroscop' должно соответствовать EvtAgentType.MACROSCOP.name() на бэкенде.
     if (this.config()?.type === 'Macroscop') {
       if (this.config()?.id) {
-        this.router.navigate(['/', 'macroscop', 'config'], { queryParams: { id: this.config()?.id } });
+        this.router.navigate(['/', 'macroscop', 'evt', 'config'], { queryParams: { id: this.config()?.id } });
       } else {
         this.error.set({ message: 'Empty agent id' });
         this.hasError.set(true);

@@ -21,7 +21,7 @@
                 }
                 @if (canChangeAgents()) {
                 <div class="action-button-group">
-                    <button mat-raised-button class="table-action-btn btn-success" (click)="selectCrmAgent()">
+                    <button mat-stroked-button class="table-action-btn btn-success" (click)="selectCrmAgent()">
                         <mat-icon>search</mat-icon>
                         <span class="hide-on-small">Выбрать</span>
                     </button>
@@ -29,7 +29,7 @@
                     <a mat-stroked-button color="primary" [routerLink]="['/crm/agent']"
                         [queryParams]="{org: organization().id}">
                         <mat-icon>settings</mat-icon>
-                        <span class="hide-on-small">Настроить</span>
+                        <span class="hide-on-small">Настройка</span>
                     </a>
                     }
                 </div>
@@ -39,7 +39,7 @@
                     <a mat-stroked-button color="primary" [routerLink]="['/crm/agent']"
                         [queryParams]="{org: organization().id}">
                         <mat-icon>settings</mat-icon>
-                        <span class="hide-on-small">Настроить</span>
+                        <span class="hide-on-small">Настройка</span>
                     </a>
                 </div>
                 }
@@ -56,11 +56,19 @@
                 <button mat-stroked-button disabled>Не настроено</button>
                 } @else {
                 <div class="action-button-group">
+                    @if (organization().eventAgentsSet) {
                     <a mat-stroked-button color="primary" [routerLink]="['/evt/agent-list']"
                         [queryParams]="{org: organization().id}">
-                        <mat-icon>settings</mat-icon>
-                        <span class="hide-on-small">Настроить</span>
+                        <mat-icon>tune</mat-icon>
+                        <span class="hide-on-small">Настройки</span>
                     </a>
+                    } @else {
+                    <a mat-stroked-button class="table-action-btn btn-success" [routerLink]="['/evt/agent-list']"
+                        [queryParams]="{org: organization().id}">
+                        <mat-icon>tune</mat-icon>
+                        <span class="hide-on-small">Настройки</span>
+                    </a>
+                    }
                 </div>
                 }
             </div>
@@ -77,8 +85,8 @@
                 <div class="action-button-group">
                     <a mat-stroked-button color="primary" [routerLink]="['/camera/agent-list']"
                         [queryParams]="{org: organization().id}">
-                        <mat-icon>settings</mat-icon>
-                        <span class="hide-on-small">Настроить</span>
+                        <mat-icon>tune</mat-icon>
+                        <span class="hide-on-small">Настройки</span>
                     </a>
                 </div>
                 }

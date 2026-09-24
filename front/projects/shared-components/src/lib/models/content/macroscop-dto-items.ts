@@ -10,6 +10,12 @@ export interface MacroscopAgentConfigDto {
     credentials: MacroscopCredentialsDto;
 }
 
-export interface MacroscopEvtAgentConfigDto {
-    config: MacroscopAgentConfigDto;
+export interface MacroscopAgentConfigListDto {
+    id: string;
+    name: string;
 }
+
+export interface MacroscopEvtAgentConfigDto {
+    config?: MacroscopAgentConfigDto;
+}
+

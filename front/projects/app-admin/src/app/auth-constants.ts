@@ -20,7 +20,9 @@ export const AUTH_CONSTANTS: Record<string, any> = {
     'crm/place-list': { mode: 'or', groups: ['superuser', 'any_action_allow'] },
     'evt/agent': { mode: 'or', groups: ['superuser', 'any_action_allow'] },
     'evt/agent-list': { mode: 'or', groups: ['superuser', 'any_action_allow'] },
-    'macroscop/config': { mode: 'or', groups: ['superuser', 'any_action_allow'] },
+    'macroscop/evt/config': { mode: 'or', groups: ['superuser', 'any_action_allow'] },
+    'macroscop/config-list': ['superuser'],
+
 
 }
 

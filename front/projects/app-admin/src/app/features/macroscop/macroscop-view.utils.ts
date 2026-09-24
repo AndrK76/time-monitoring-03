@@ -1,9 +1,11 @@
 import {
     MacroscopAgentConfigDto,
+    MacroscopAgentConfigListDto,
     MacroscopCredentialsDto,
     MacroscopEvtAgentConfigDto,
 } from '@mon3/sc';
 import {
+    MacroscopAgentConfigListView,
     MacroscopAgentConfigView,
     MacroscopCredentialsView,
     MacroscopEvtAgentConfigView,
@@ -36,6 +38,34 @@ export const macroscopAgentConfigDtoToView = (
     );
 };
 
+export const macroscopAgentConfigListDtoToView = (
+    dto: MacroscopAgentConfigListDto
+): MacroscopAgentConfigListView => {
+    return new MacroscopAgentConfigListView(
+        dto.id,
+        dto.name,
+    );
+};
+
+export const macroscopAgentConfigListDtoToFullView = (
+    dto: MacroscopAgentConfigListDto
+): MacroscopAgentConfigView => {
+    return {
+        id: dto.id,
+        name: dto.name,
+        credentials: {}
+    } as MacroscopAgentConfigView
+};
+
+export const macroscopAgentConfigViewToListView = (
+    item: MacroscopAgentConfigView
+): MacroscopAgentConfigListDto => {
+    return new MacroscopAgentConfigListView(
+        item.id,
+        item.name,
+    );
+};
+
 export const macroscopAgentConfigViewToDto = (
     view: MacroscopAgentConfigView
 ): MacroscopAgentConfigDto => {
@@ -50,24 +80,28 @@ export const macroscopAgentConfigViewToDto = (
 export const macroscopEvtAgentConfigDtoToView = (
     dto: MacroscopEvtAgentConfigDto
 ): MacroscopEvtAgentConfigView => {
-    return new MacroscopEvtAgentConfigView(
-        macroscopAgentConfigDtoToView(dto.config),
-    );
+    return {
+        config: dto.config ? macroscopAgentConfigDtoToView(dto.config) : undefined,
+    } as MacroscopEvtAgentConfigView
 };
 
 export const macroscopEvtAgentConfigViewToDto = (
     view: MacroscopEvtAgentConfigView
 ): MacroscopEvtAgentConfigDto => {
     return {
-        config: macroscopAgentConfigViewToDto(view.config),
+        config: view.config ? macroscopAgentConfigViewToDto(view.config) : undefined,
     };
 };
 
 export const createEmptyMacroscopAgentConfigView = (): MacroscopAgentConfigView => {
-    return new MacroscopAgentConfigView(
-        '',
-        '',
-        undefined,
-        new MacroscopCredentialsView(),
-    );
+    return {
+        id: 'temp-' + Date.now(),
+        name: 'Новая конфигурация сервера',
+        serverAddress: 'http://localhost',
+        credentials: {
+            login: '',
+            password: ''
+        }
+    } as MacroscopAgentConfigView;
+
 };

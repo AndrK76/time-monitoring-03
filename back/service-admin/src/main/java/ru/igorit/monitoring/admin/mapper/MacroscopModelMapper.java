@@ -2,6 +2,7 @@ package ru.igorit.monitoring.admin.mapper;
 
 import org.mapstruct.Mapper;
 import ru.igorit.monitoring.lib.dto.macroscop.MacroscopAgentConfigDto;
+import ru.igorit.monitoring.lib.dto.macroscop.MacroscopAgentConfigListDto;
 import ru.igorit.monitoring.lib.dto.macroscop.MacroscopCredentialsDto;
 import ru.igorit.monitoring.lib.dto.macroscop.MacroscopEvtAgentConfigDto;
 import ru.igorit.monitoring.lib.persistence.entity.macroscop.MacroscopAgentConfig;
@@ -17,6 +18,8 @@ public interface MacroscopModelMapper {
     MacroscopAgentConfigDto toDto(MacroscopAgentConfig item);
 
     MacroscopEvtAgentConfigDto toDto (MacroscopEvtAgentConfig item);
+
+    MacroscopAgentConfigListDto toListDto(MacroscopAgentConfig item);
 
 
 }

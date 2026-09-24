@@ -64,7 +64,7 @@ export class YcServiceCategoryListComponent implements OnInit, AfterViewInit {
   });
 
   hasNoCategories = computed(() => this.categoriesData().length === 0);
-  
+
 
   constructor() {
     effect(() => {
@@ -73,7 +73,7 @@ export class YcServiceCategoryListComponent implements OnInit, AfterViewInit {
       if (this.table) {
         this.table.renderRows();
       }
-    });
+    }, { allowSignalWrites: true });
   }
 
   ngOnInit(): void {

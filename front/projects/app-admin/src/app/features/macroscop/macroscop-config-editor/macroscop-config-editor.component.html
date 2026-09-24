@@ -1,1 +1,53 @@
-<p>macroscop-config-editor works!</p>
+<div class="editor-scroll-wrapper" style="position: relative;">
+
+    @if (loading()) {
+    <div class="loading-overlay">
+        <mat-spinner diameter="40"></mat-spinner>
+        <p>Загрузка данных...</p>
+    </div>
+    }
+
+    <!-- Группа 1: Название -->
+    <div class="editor-container">
+        <form [formGroup]="formName" class="editor-form">
+            <div class="form-row"><span class="label">Наименование</span></div>
+            <div class="form-row">
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Название конфигурации</mat-label>
+                    <input matInput formControlName="name" placeholder="Например, Основной сервер Macroscop">
+                </mat-form-field>
+            </div>
+        </form>
+    </div>
+
+    <mat-divider class="section-divider"></mat-divider>
+
+    <!-- Группа 2: Адрес сервера и учётные данные -->
+    <div class="editor-container">
+        <form [formGroup]="formServer" class="editor-form">
+            <div class="form-row"><span class="label">Подключение</span></div>
+
+            <div class="form-row">
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Адрес сервера</mat-label>
+                    <input matInput formControlName="serverAddress" placeholder="https://macroscop.example.com">
+                </mat-form-field>
+            </div>
+
+            <div class="form-row">
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Логин</mat-label>
+                    <input matInput formControlName="login" autocomplete="off">
+                </mat-form-field>
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Пароль</mat-label>
+                    <input matInput formControlName="password" autocomplete="new-password">
+                </mat-form-field>
+            </div>
+        </form>
+    </div>
+
+    <mat-divider class="section-divider"></mat-divider>
+
+    <!-- Здесь появятся следующие группы -->
+</div>

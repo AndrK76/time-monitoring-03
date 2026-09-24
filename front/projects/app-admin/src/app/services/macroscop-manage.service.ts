@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import {
   MacroscopAgentConfigDto,
+  MacroscopAgentConfigListDto,
   MacroscopEvtAgentConfigDto,
 } from '@mon3/sc';
 import { Observable } from 'rxjs';
@@ -18,10 +19,6 @@ export class MacroscopManageService {
   setAdminApiUrl(url: string): void {
     this.adminApiUrl = url;
   }
-
-  // ============================================================
-  // Конфигурация Macroscop-Evt-агента (обёртка над общей конфигурацией)
-  // ============================================================
 
   getEvtConfig(agentId: string): Observable<MacroscopEvtAgentConfigDto> {
     return this.http.get<MacroscopEvtAgentConfigDto>(
@@ -47,9 +44,11 @@ export class MacroscopManageService {
       null);
   }
 
-  // ============================================================
-  // Общая конфигурация Macroscop
-  // ============================================================
+  getConfigs(): Observable<MacroscopAgentConfigListDto[]> {
+    return this.http.get<MacroscopAgentConfigListDto[]>(
+      `${this.adminApiUrl}${this.MACROSCOP_CONTROLLER}/configs`);
+  }
+
 
   getConfig(configId: string): Observable<MacroscopAgentConfigDto> {
     return this.http.get<MacroscopAgentConfigDto>(

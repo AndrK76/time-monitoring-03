@@ -8,8 +8,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.igorit.monitoring.admin.service.MacroscopManageService;
 import ru.igorit.monitoring.lib.dto.macroscop.MacroscopAgentConfigDto;
+import ru.igorit.monitoring.lib.dto.macroscop.MacroscopAgentConfigListDto;
 import ru.igorit.monitoring.lib.dto.macroscop.MacroscopEvtAgentConfigDto;
 import ru.igorit.monitoring.lib.persistence.entity.macroscop.MacroscopAgentConfig;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -25,21 +28,27 @@ public class MacroscopManageController {
 
     @PutMapping({"/evt-configs/{id}"})
     public MacroscopEvtAgentConfigDto updateEvtConfig(@PathVariable("id") String agentId,
-                                                      @Valid @RequestBody MacroscopEvtAgentConfigDto dto ) {
+                                                      @Valid @RequestBody MacroscopEvtAgentConfigDto dto) {
         return service.updateEvtConfig(agentId, dto);
     }
 
 
-    @PutMapping(value ="/evt-configs/{id}/bind", params = {"cfg"})
+    @PutMapping(value = "/evt-configs/{id}/bind", params = {"cfg"})
     public MacroscopEvtAgentConfigDto bindToConfig(@PathVariable("id") String agentId,
-                                                @RequestParam(name = "cfg") String configId) {
+                                                   @RequestParam(name = "cfg") String configId) {
         return service.bindEvtConfig(agentId, configId);
     }
 
-    @PutMapping(value ="/evt-configs/{id}/unbind")
+    @PutMapping(value = "/evt-configs/{id}/unbind")
     public MacroscopEvtAgentConfigDto unbindToConfig(@PathVariable("id") String agentId) {
         return service.unbindEvtConfig(agentId);
     }
+
+    @GetMapping({"/configs","/configs/"})
+    public List<MacroscopAgentConfigListDto> getConfigs() {
+        return service.getConfigs();
+    }
+
 
     @GetMapping({"/configs/{id}"})
     public MacroscopAgentConfigDto getConfig(@PathVariable("id") String configId) {

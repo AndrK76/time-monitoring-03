@@ -11,6 +11,7 @@ import org.springframework.web.server.ResponseStatusException;
 import ru.igorit.monitoring.admin.mapper.MacroscopModelMapper;
 import ru.igorit.monitoring.common.util.XorCipher;
 import ru.igorit.monitoring.lib.dto.macroscop.MacroscopAgentConfigDto;
+import ru.igorit.monitoring.lib.dto.macroscop.MacroscopAgentConfigListDto;
 import ru.igorit.monitoring.lib.dto.macroscop.MacroscopEvtAgentConfigDto;
 import ru.igorit.monitoring.lib.persistence.entity.macroscop.MacroscopAgentConfig;
 import ru.igorit.monitoring.lib.persistence.entity.macroscop.MacroscopCredentials;
@@ -20,6 +21,7 @@ import ru.igorit.monitoring.lib.persistence.repository.macroscop.MacroscopEvtAge
 import ru.igorit.monitoring.lib.persistence.repository.macroscop.MacroscopEvtAgentRepository;
 import ru.igorit.monitoring.security.util.SecurityAccessUtils;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -114,6 +116,12 @@ public class MacroscopManageService {
 
     @Transactional(readOnly = true)
     @PreAuthorize("@securityAccessUtils.isSuperUser()")
+    public List<MacroscopAgentConfigListDto> getConfigs() {
+        return configRepo.findAll().stream().map(mapper::toListDto).toList();
+    }
+
+    @Transactional(readOnly = true)
+    @PreAuthorize("@securityAccessUtils.isSuperUser()")
     public MacroscopAgentConfigDto getConfig(String configId) {
         return unmaskCreds(mapper.toDto(_getConfig(configId)));
     }
@@ -198,6 +206,6 @@ public class MacroscopManageService {
         }
         stored.setServerAddress(dto.getServerAddress());
         stored = configRepo.saveAndFlush(stored);
-        return unmaskCreds(mapper.toDto(stored));
+        return   unmaskCreds(mapper.toDto(stored));
     }
 }

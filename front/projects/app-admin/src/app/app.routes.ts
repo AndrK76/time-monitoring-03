@@ -83,6 +83,18 @@ export const routes: Routes = [
     canActivate: [authGuard],
     data: authConstant('yclients/config')
   },
+  {
+    path: 'macroscop/evt/config',
+    loadComponent: () => import('./features/macroscop/macroscop-evt-editor-container/macroscop-evt-editor-container.component').then(m => m.MacroscopEvtEditorContainerComponent),
+    canActivate: [authGuard],
+    data: authConstant('macroscop/evt/config')
+  },
+  {
+    path: 'macroscop/config-list',
+    loadComponent: () => import('./features/macroscop/macroscop-config-list/macroscop-config-list.component').then(m => m.MacroscopConfigListComponent),
+    canActivate: [authGuard],
+    data: authConstant('macroscop/config-list')
+  },
 
 
   { path: '**', redirectTo: '/' }

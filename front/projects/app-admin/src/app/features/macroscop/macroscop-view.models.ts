@@ -1,5 +1,6 @@
 import {
     MacroscopAgentConfigDto,
+    MacroscopAgentConfigListDto,
     MacroscopCredentialsDto,
     MacroscopEvtAgentConfigDto,
 } from '@mon3/sc';
@@ -25,8 +26,16 @@ export class MacroscopAgentConfigView implements MacroscopAgentConfigDto {
     ) { }
 }
 
-export class MacroscopEvtAgentConfigView implements MacroscopEvtAgentConfigDto {
+export class MacroscopAgentConfigListView implements MacroscopAgentConfigListDto {
     constructor(
-        public config: MacroscopAgentConfigView,
+        public id: string,
+        public name: string,
     ) { }
 }
+
+export class MacroscopEvtAgentConfigView implements MacroscopEvtAgentConfigDto {
+    constructor(
+        public config: MacroscopAgentConfigView | undefined,
+    ) { }
+}
+

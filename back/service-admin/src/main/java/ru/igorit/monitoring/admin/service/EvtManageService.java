@@ -221,12 +221,12 @@ public class EvtManageService {
         var newOrg = commonOrgRepo.findById(orgId).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Organization with id " + orgId + " not found"));
         if (!newOrg.isEventAgentsSet()) {
-            stored.setOrganization(newOrg);
             newOrg.setUpdatedBy(extractUserId(getCurrentAuth()));
             newOrg = commonOrgRepo.save(newOrg);
             sendOrgChangeEvent(newOrg);
-            stored.setUpdatedBy(extractUserId(getCurrentAuth()));
         }
+        stored.setOrganization(newOrg);
+        stored.setUpdatedBy(extractUserId(getCurrentAuth()));
         return agentRepo.save(stored);
     }
 

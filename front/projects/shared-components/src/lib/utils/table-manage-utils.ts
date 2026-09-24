@@ -3,6 +3,7 @@ import { SaveDataError, SaveDataResult, TableDataChanges } from '../models/table
 import { hasChanges, applyChanges, addOrigData, setExpanded, addNewItemFlag, isNotFullLoadedItem, addNotFullLoadItemFlag, removeNotFullLoadItemFlag } from './object-utils';
 import { TableFilterDateValue, TableFilterInfo, TableFilterListValue, TableFilterTextValue, TableFilterType } from '../models/table-filter-items';
 import { MatTableDataSource } from '@angular/material/table';
+import { processResponseError } from '@mon3/sa';
 
 export type SelectFn<T> = (item: T | undefined, newState: boolean, updateUrl?: boolean, scrollTo?: boolean) => void;
 export type ItemIdFn<T> = (item: T) => any;
@@ -345,7 +346,7 @@ export function doSaveData<T extends Record<string, any>>(
                 }),
                 catchError(err => {
                     // Добавляем ошибку
-                    errors.push({ id, message: err.message || 'Unknown error' });
+                    errors.push({ id, message: (processResponseError(err).message ?? err.message) || 'Unknown error' });
                     return of(undefined);
                 })
             );

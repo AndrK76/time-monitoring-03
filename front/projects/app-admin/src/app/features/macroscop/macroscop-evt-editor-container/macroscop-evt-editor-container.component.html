@@ -1,0 +1,86 @@
+<div class="editor-container-wrapper">
+
+    <!-- Заголовок -->
+    <div class="editor-header">
+        <div class="editor-title">
+            <span>Настройка </span><span *ngIf="!isSmallScreen()">агента Macroscop: </span><span>{{ agent()?.name ??
+                '' }}</span>
+        </div>
+    </div>
+
+    <!-- Строка действий: ссылка слева, кнопки справа -->
+    <div class="editor-header">
+        <div class="action-button-group">
+            <a mat-button class="table-action-btn back-button" matTooltip="К списку агентов" [routerLink]="backTarget()"
+                [queryParams]="backParams()?.queryParams">
+                <mat-icon>arrow_back</mat-icon>
+                <span class="hide-on-small">К списку агентов</span>
+            </a>
+        </div>
+        <div class="action-button-group">
+
+            <button mat-raised-button class="table-action-btn btn-success" (click)="callAdd()"
+                [disabled]="isLoading() || isSaving()" *ngIf="canManageAnyConfig()">
+                <mat-icon>add</mat-icon><span class="hide-on-small">Добавить</span>
+            </button>
+            <button mat-raised-button class="table-action-btn btn-danger"
+                [disabled]="isLoading() || isSaving() || !evtConfig()?.config" (click)="callUnBind()"
+                *ngIf="canManageAnyConfig()">
+                <mat-icon>delete</mat-icon><span class="hide-on-small">Отвязать</span>
+            </button>
+            <button mat-raised-button class="table-action-btn btn-light" (click)="callRefresh()"
+                [disabled]="isLoading() || isSaving()">
+                <mat-icon>refresh</mat-icon>
+                <span class="hide-on-small">{{ isLoading() ? 'Загрузка...' : 'Перечитать' }}</span>
+            </button>
+            <button mat-raised-button color="primary" (click)="callSave()"
+                [disabled]="isLoading() ||isSaving() || hasError() || !(hasCfgChanges() || hasEvtChanges())">
+                <mat-icon>save</mat-icon>
+                <span class="hide-on-small">Сохранить</span>
+            </button>
+        </div>
+    </div>
+
+    @if (isLoading()) {
+    <div class="loading-spinner">
+        <mat-spinner diameter="40"></mat-spinner>
+        <p>Загрузка данных...</p>
+    </div>
+    } @else if (hasError()) {
+    <div class="error-message">
+        <mat-icon color="warn">error</mat-icon>
+        <span>Ошибка:</span>
+        <span>{{ error().message }}</span>
+    </div>
+    } @else {
+    <div class="editor-scroll-wrapper">
+        <div class="editor-container">
+            <form [formGroup]="formGroup" class="editor-form">
+                <div class="form-row"><span class="label">Сервер Макроскоп:</span></div>
+                <div class="form-row">
+                    <mat-form-field appearance="outline" class="full-width" subscriptSizing="dynamic">
+                        <mat-label>Сервер</mat-label>
+                        <mat-select formControlName="config">
+                            <mat-option *ngFor="let c of configs()" [value]="c?.id">
+                                {{ c?.name }}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                    <mat-form-field appearance="outline" class="full-width">
+                        <mat-label>Организация</mat-label>
+                        <input matInput formControlName="organization" readonly>
+                    </mat-form-field>
+                </div>
+            </form>
+        </div>
+
+        <mat-divider class="section-divider"></mat-divider>
+
+        @if (evtConfig()?.config) {
+        <app-macroscop-config-editor [config]="evtConfig()!.config" (valueChange)="onConfigChange($event)">
+        </app-macroscop-config-editor>
+        }
+
+    </div>
+    }
+</div>
