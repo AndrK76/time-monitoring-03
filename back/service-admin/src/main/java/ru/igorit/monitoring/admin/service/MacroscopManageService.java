@@ -13,22 +13,22 @@ import ru.igorit.monitoring.common.util.Md5Hasher;
 import ru.igorit.monitoring.common.util.TimeUtils;
 import ru.igorit.monitoring.common.util.XorCipher;
 import ru.igorit.monitoring.lib.dto.macroscop.*;
+import ru.igorit.monitoring.lib.dto.yclients.YClientsServiceCategoryDto;
 import ru.igorit.monitoring.lib.persistence.entity.common.Organization;
 import ru.igorit.monitoring.lib.persistence.entity.evt.EvtAgent;
 import ru.igorit.monitoring.lib.persistence.entity.evt.EvtAgentConfig;
-import ru.igorit.monitoring.lib.persistence.entity.macroscop.MacroscopAgentConfig;
-import ru.igorit.monitoring.lib.persistence.entity.macroscop.MacroscopCredentials;
-import ru.igorit.monitoring.lib.persistence.entity.macroscop.MacroscopEvtAgentConfig;
-import ru.igorit.monitoring.lib.persistence.entity.macroscop.MacroscopServerInfo;
+import ru.igorit.monitoring.lib.persistence.entity.macroscop.*;
+import ru.igorit.monitoring.lib.persistence.entity.yclients.YClientsServiceCategory;
 import ru.igorit.monitoring.lib.persistence.repository.macroscop.MacroscopAgentConfigRepository;
+import ru.igorit.monitoring.lib.persistence.repository.macroscop.MacroscopChannelRepository;
 import ru.igorit.monitoring.lib.persistence.repository.macroscop.MacroscopEvtAgentConfigRepository;
 import ru.igorit.monitoring.lib.persistence.repository.macroscop.MacroscopEvtAgentRepository;
 import ru.igorit.monitoring.macroscop.service.manage.MSCPConfigManageService;
 import ru.igorit.monitoring.security.util.SecurityAccessUtils;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static ru.igorit.monitoring.security.util.AuthInfoUtils.extractUserId;
 import static ru.igorit.monitoring.security.util.AuthInfoUtils.getCurrentAuth;
@@ -40,9 +40,9 @@ public class MacroscopManageService {
     @Value("${security.store.xor}")
     private String xorSecret;
     private final MacroscopModelMapper mapper;
-    private final MacroscopEvtAgentRepository agentRepo;
     private final MacroscopEvtAgentConfigRepository evtConfigRepo;
     private final MacroscopAgentConfigRepository configRepo;
+    private final MacroscopChannelRepository channelRepo;
     private final EvtManageService evtService;
     private final SecurityAccessUtils sa;
     private final MSCPConfigManageService macroscopService;
@@ -157,17 +157,73 @@ public class MacroscopManageService {
         configRepo.deleteById(configId);
     }
 
+
+    @Transactional(readOnly = true)
+    @PreAuthorize("@securityAccessUtils.isAllowedAllActions()")
+    public List<MacroscopChannelDto> getChannelsForConfig(String configId) {
+        _checkAllowedConfigByOrg(configId);
+        return channelRepo.findByConfigId(configId).stream()
+                .map(mapper::toDto).toList();
+    }
+
+    @Transactional
+    @PreAuthorize("@securityAccessUtils.isAllowedAllActions()")
+    public List<MacroscopChannelDto> updateChannelsForConfig(
+            String configId, List<MacroscopChannelDto> dtoList) {
+        _checkAllowedConfigByOrg(configId);
+        var storedList = channelRepo.findByConfigId(configId);
+        var creatorId = extractUserId(getCurrentAuth());
+        var storedMap = storedList.stream()
+                .collect(Collectors.toMap(MacroscopChannel::getMacroscopId, e -> e, (a, b) -> a));
+        var dtoMap = dtoList.stream()
+                .collect(Collectors.toMap(MacroscopChannelDto::getMacroscopId, d -> d, (a, b) -> a));
+        var config = _getConfig(configId);
+
+        var updates = storedList.stream()
+                .map(stored -> {
+                    var dto = dtoMap.get(stored.getMacroscopId());
+                    if (dto == null) return null;
+                    if (!dto.isExists()) {
+                        if (!Boolean.TRUE.equals(stored.getExists())) return null;
+                        stored.setExists(false);
+                        stored.setUsed(false);
+                        stored.setUpdatedBy(creatorId);
+                        return stored;
+                    }
+                    fillChannelFromDto(stored, dto);
+                    stored.setUsed(dto.isUsed());
+                    stored.setExists(true);
+                    stored.setUpdatedBy(creatorId);
+                    return stored;
+                }).filter(Objects::nonNull);
+        var created = dtoList.stream().filter(d -> !storedMap.containsKey(d.getMacroscopId()))
+                .filter(MacroscopChannelDto::isExists)
+                .map(d -> {
+                    var entity = new MacroscopChannel();
+                    entity.setConfig(config);
+                    entity.setMacroscopId(d.getMacroscopId());
+                    fillChannelFromDto(entity, d);
+                    entity.setUsed(d.isUsed());
+                    entity.setExists(true);
+                    entity.setCreatedBy(creatorId);
+                    return entity;
+                });
+        var toSave = Stream.concat(updates, created).toList();
+        if (!toSave.isEmpty()) {
+            channelRepo.saveAll(toSave);
+            channelRepo.flush();
+        }
+        return channelRepo.findByConfigId(configId).stream()
+                .map(mapper::toDto)
+                .toList();
+    }
+
+
     @Transactional(readOnly = true)
     @PreAuthorize("@securityAccessUtils.isAllowedAllActions()")
     public MacroscopDataResponse<MacroscopServerInfoDto> getServerInfo(String configId) {
         _checkAllowedConfigByOrg(configId);
-        var creds = mapper.toServerCredentials(unmaskCreds(mapper.toDto(
-                configRepo.findById(configId).orElseThrow(() ->
-                        new ResponseStatusException(HttpStatus.NOT_FOUND, "Config not found")))));
-        if (creds == null || creds.address() == null || creds.address().isEmpty()
-                || creds.login() == null || creds.login().isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Invalid credentials in config");
-        }
+        var creds = _getCredsByConfigId(configId);
         return _getServerInfo(creds);
     }
 
@@ -175,6 +231,14 @@ public class MacroscopManageService {
             MacroscopServerCredentials creds) {
         var queryCreds = new MacroscopServerCredentials(creds.address(), creds.login(), Md5Hasher.md5HashUtf(creds.passwordHash()));
         return _getServerInfo(queryCreds);
+    }
+
+    @Transactional(readOnly = true)
+    @PreAuthorize("@securityAccessUtils.isAllowedAllActions()")
+    public MacroscopDataResponse<List<MacroscopChannelDto>> getAllowedChannels(String configId) {
+        _checkAllowedConfigByOrg(configId);
+        var creds = _getCredsByConfigId(configId);
+        return _getAllowedChannels(creds);
     }
 
 
@@ -263,8 +327,40 @@ public class MacroscopManageService {
         }
     }
 
-    public MacroscopDataResponse<MacroscopServerInfoDto> _getServerInfo(MacroscopServerCredentials creds) {
-        return macroscopService.getServerInfo(creds);
-
+    private MacroscopServerCredentials _getCredsByConfigId(String configId) {
+        var creds = mapper.toServerCredentials(unmaskCreds(mapper.toDto(
+                configRepo.findById(configId).orElseThrow(() ->
+                        new ResponseStatusException(HttpStatus.NOT_FOUND, "Config not found")))));
+        if (creds == null || creds.address() == null || creds.address().isEmpty()
+                || creds.login() == null || creds.login().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Invalid credentials in config");
+        }
+        return creds;
     }
+
+
+    private MacroscopDataResponse<MacroscopServerInfoDto> _getServerInfo(MacroscopServerCredentials creds) {
+        return macroscopService.getServerInfo(creds);
+    }
+
+    private MacroscopDataResponse<List<MacroscopChannelDto>> _getAllowedChannels(MacroscopServerCredentials creds) {
+        return macroscopService.getAllowedChannels(creds);
+    }
+
+    public void fillChannelFromDto(MacroscopChannel channel, MacroscopChannelDto dto) {
+        if (channel == null || dto == null) return;
+        if (channel.getMacroscopId() != null && !Objects.equals(channel.getMacroscopId(), dto.getMacroscopId())) return;
+        channel.setName(dto.getName());
+        channel.setDevice(dto.getDevice());
+        channel.setEnabled(dto.isEnabled());
+        channel.setUsed(dto.isUsed());
+        channel.setArchivingEnabled(dto.isArchivingEnabled());
+        channel.setArchiveAllowed(dto.isArchiveAllowed());
+        channel.setRealtimeAllowed(dto.isRealtimeAllowed());
+        channel.setSoundAllowed(dto.isSoundAllowed());
+        channel.setArchiveMode(MacroscopArchiveMode.byId(dto.getArchiveMode()));
+        channel.setTz(TimeUtils.zoneOffsetToString(dto.getTz()));
+    }
+
+
 }

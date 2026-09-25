@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.igorit.monitoring.admin.service.MacroscopManageService;
 import ru.igorit.monitoring.lib.dto.macroscop.*;
+import ru.igorit.monitoring.lib.dto.yclients.YClientsServiceCategoryDto;
 
 import java.util.List;
 
@@ -41,7 +42,7 @@ public class MacroscopManageController {
         return service.unbindEvtConfig(agentId);
     }
 
-    @GetMapping({"/configs","/configs/"})
+    @GetMapping({"/configs", "/configs/"})
     public List<MacroscopAgentConfigListDto> getConfigs() {
         return service.getConfigs();
     }
@@ -70,10 +71,28 @@ public class MacroscopManageController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/configs/{id}/channels")
+    public List<MacroscopChannelDto> getChannelsForConfig(@PathVariable("id") String configId) {
+        return service.getChannelsForConfig(configId);
+    }
+
+    @PutMapping("/configs/{id}/channels")
+    public List<MacroscopChannelDto> updateChannelsForConfig(
+            @PathVariable("id") String configId,
+            @RequestBody @Valid List<MacroscopChannelDto> dto) {
+        return service.updateChannelsForConfig(configId, dto);
+    }
+
     @GetMapping("/misc/configs/{id}/server-info")
     public MacroscopDataResponse<MacroscopServerInfoDto> getServerInfo(@PathVariable("id") String configId) {
         return service.getServerInfo(configId);
     }
+
+    @GetMapping("/misc/configs/{id}/channels")
+    public MacroscopDataResponse<List<MacroscopChannelDto>> getAllowedChannels(@PathVariable("id") String configId) {
+        return service.getAllowedChannels(configId);
+    }
+
     @PostMapping("/misc/server-info")
     public MacroscopDataResponse<MacroscopServerInfoDto> getServerInfoByCreds(
             @Valid @RequestBody MacroscopServerCredentials creds) {

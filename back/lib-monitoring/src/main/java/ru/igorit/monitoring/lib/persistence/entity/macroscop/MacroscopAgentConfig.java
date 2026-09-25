@@ -5,10 +5,13 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "macroscop_agent_configs")
@@ -48,6 +51,15 @@ public class MacroscopAgentConfig {
 
     @Embedded
     private MacroscopServerInfo serverInfo;
+
+    @BatchSize(size = 40)
+    @OneToMany(
+            mappedBy = "config",
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE},
+            orphanRemoval = true,
+            fetch = FetchType.LAZY
+    )
+    private List<MacroscopChannel> channels = new ArrayList<>();
 
 
     @PostLoad

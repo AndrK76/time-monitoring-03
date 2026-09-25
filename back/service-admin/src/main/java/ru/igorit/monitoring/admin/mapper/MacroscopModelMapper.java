@@ -7,10 +7,7 @@ import org.mapstruct.Named;
 import ru.igorit.monitoring.common.util.Md5Hasher;
 import ru.igorit.monitoring.common.util.TimeUtils;
 import ru.igorit.monitoring.lib.dto.macroscop.*;
-import ru.igorit.monitoring.lib.persistence.entity.macroscop.MacroscopAgentConfig;
-import ru.igorit.monitoring.lib.persistence.entity.macroscop.MacroscopCredentials;
-import ru.igorit.monitoring.lib.persistence.entity.macroscop.MacroscopEvtAgentConfig;
-import ru.igorit.monitoring.lib.persistence.entity.macroscop.MacroscopServerInfo;
+import ru.igorit.monitoring.lib.persistence.entity.macroscop.*;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -49,6 +46,10 @@ public interface MacroscopModelMapper {
     @Mapping(target = "tz", source = "tz", qualifiedByName = "zoneOffsetToString")
     MacroscopServerInfo fromDto(MacroscopServerInfoDto dto);
 
+    @Mapping(target = "archiveMode", source = "archiveMode", qualifiedByName = "archiveModeToString")
+    @Mapping(target = "tz", source = "tz", qualifiedByName = "stringToZoneOffset")
+    MacroscopChannelDto toDto(MacroscopChannel entity);
+
 
     @Named("hashPassword")
     default String hashPassword(String password) {
@@ -84,6 +85,13 @@ public interface MacroscopModelMapper {
     default String zoneOffsetToString(ZoneOffset z) {
         return TimeUtils.zoneOffsetToString(z);
     }
+
+    @Named("archiveModeToString")
+    default String archiveModeToString(MacroscopArchiveMode mode) {
+        return mode == null ? null : mode.name();
+    }
+
+
 
 
 }

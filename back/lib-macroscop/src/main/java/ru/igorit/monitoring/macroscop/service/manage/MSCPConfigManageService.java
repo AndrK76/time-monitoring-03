@@ -5,18 +5,21 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
+import ru.igorit.monitoring.lib.dto.macroscop.MacroscopChannelDto;
 import ru.igorit.monitoring.lib.dto.macroscop.MacroscopDataResponse;
 import ru.igorit.monitoring.lib.dto.macroscop.MacroscopServerCredentials;
 import ru.igorit.monitoring.lib.dto.macroscop.MacroscopServerInfoDto;
+import ru.igorit.monitoring.lib.persistence.entity.macroscop.MacroscopArchiveMode;
 import ru.igorit.monitoring.macroscop.api.config.MacroscopApiProperties;
+import ru.igorit.monitoring.macroscop.api.dto.MSCPChannel;
 import ru.igorit.monitoring.macroscop.api.dto.MSCPConfigResponse;
 import ru.igorit.monitoring.macroscop.api.service.MacroscopApiClient;
 
 import java.time.ZoneOffset;
+import java.util.List;
 import java.util.Map;
 
-import static ru.igorit.monitoring.macroscop.api.utils.MacroscopParseUtils.extractZoneOffset;
-import static ru.igorit.monitoring.macroscop.api.utils.MacroscopParseUtils.parseTimestamp;
+import static ru.igorit.monitoring.macroscop.api.utils.MacroscopParseUtils.*;
 
 @Service
 @Log4j2
@@ -56,6 +59,44 @@ public class MSCPConfigManageService {
                     .tz(zoneOffset)
                     .useTz(response.getData().getUseTimeZones())
                     .build());
+        } else if (response.isSuccess()) {
+            ret.setSuccess(false);
+            ret.setErrorMessage("Empty response data");
+        }
+        return ret;
+    }
+
+    public MacroscopDataResponse<List<MacroscopChannelDto>> getAllowedChannels(MacroscopServerCredentials creds) {
+        var response = _getServerInfo(creds);
+        return _parseChannelsResponse(response);
+    }
+
+    private MacroscopDataResponse<List<MacroscopChannelDto>> _parseChannelsResponse(MacroscopDataResponse<MSCPConfigResponse> response) {
+        var ret = new MacroscopDataResponse<List<MacroscopChannelDto>>(response);
+        if (response.isSuccess() && response.getData() != null && response.getData().getChannels() != null) {
+            ret.setData(
+                    response.getData().getChannels().stream()
+                            .map(r -> {
+                                var zoneOffset = hoursToZoneOffset(r.getTimeZoneOffset());
+                                return MacroscopChannelDto.builder()
+                                        .macroscopId(r.getId())
+                                        .name(r.getName())
+                                        .device(r.getDeviceInfo())
+                                        .enabled(!Boolean.TRUE.equals(r.getIsDisabled()))
+                                        .exists(true)
+                                        .used(true)
+                                        .archivingEnabled(Boolean.TRUE.equals(r.getIsArchivingEnabled()))
+                                        .archiveAllowed(Boolean.TRUE.equals(r.getAllowedArchive()))
+                                        .realtimeAllowed(Boolean.TRUE.equals(r.getAllowedRealtime()))
+                                        .soundAllowed(Boolean.TRUE.equals(r.getIsSoundOn()))
+                                        .archiveMode(MacroscopArchiveMode.idByMacroscopId(r.getArchiveMode()))
+                                        .tz(zoneOffset)
+                                        .build();
+                            }).toList()
+            );
+        } else if (response.isSuccess()) {
+            ret.setSuccess(false);
+            ret.setErrorMessage("Empty channel list");
         }
         return ret;
     }
