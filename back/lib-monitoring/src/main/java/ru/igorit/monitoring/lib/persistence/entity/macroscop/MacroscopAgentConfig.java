@@ -46,6 +46,9 @@ public class MacroscopAgentConfig {
     @Column(name = "updated_by")
     private String updatedBy;
 
+    @Embedded
+    private MacroscopServerInfo serverInfo;
+
 
     @PostLoad
     private void ensureCredentials() {

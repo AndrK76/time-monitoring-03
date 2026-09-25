@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import ru.igorit.monitoring.admin.mapper.MacroscopModelMapper;
+import ru.igorit.monitoring.common.util.Md5Hasher;
+import ru.igorit.monitoring.common.util.TimeUtils;
 import ru.igorit.monitoring.common.util.XorCipher;
 import ru.igorit.monitoring.lib.dto.macroscop.*;
 import ru.igorit.monitoring.lib.persistence.entity.common.Organization;
@@ -17,6 +19,7 @@ import ru.igorit.monitoring.lib.persistence.entity.evt.EvtAgentConfig;
 import ru.igorit.monitoring.lib.persistence.entity.macroscop.MacroscopAgentConfig;
 import ru.igorit.monitoring.lib.persistence.entity.macroscop.MacroscopCredentials;
 import ru.igorit.monitoring.lib.persistence.entity.macroscop.MacroscopEvtAgentConfig;
+import ru.igorit.monitoring.lib.persistence.entity.macroscop.MacroscopServerInfo;
 import ru.igorit.monitoring.lib.persistence.repository.macroscop.MacroscopAgentConfigRepository;
 import ru.igorit.monitoring.lib.persistence.repository.macroscop.MacroscopEvtAgentConfigRepository;
 import ru.igorit.monitoring.lib.persistence.repository.macroscop.MacroscopEvtAgentRepository;
@@ -156,15 +159,22 @@ public class MacroscopManageService {
 
     @Transactional(readOnly = true)
     @PreAuthorize("@securityAccessUtils.isAllowedAllActions()")
-    public MacroscopDataResponse<MacroscopServerInfo> getServerInfo(String configId) {
+    public MacroscopDataResponse<MacroscopServerInfoDto> getServerInfo(String configId) {
         _checkAllowedConfigByOrg(configId);
-        var creds = mapper.toServerCredentials(configRepo.findById(configId).orElseThrow(()->
-                new ResponseStatusException(HttpStatus.NOT_FOUND, "Config not found")));
+        var creds = mapper.toServerCredentials(unmaskCreds(mapper.toDto(
+                configRepo.findById(configId).orElseThrow(() ->
+                        new ResponseStatusException(HttpStatus.NOT_FOUND, "Config not found")))));
         if (creds == null || creds.address() == null || creds.address().isEmpty()
-                || creds.login() == null || creds.login().isEmpty()        ) {
+                || creds.login() == null || creds.login().isEmpty()) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Invalid credentials in config");
         }
         return _getServerInfo(creds);
+    }
+
+    public MacroscopDataResponse<MacroscopServerInfoDto> getServerInfoByCreds(
+            MacroscopServerCredentials creds) {
+        var queryCreds = new MacroscopServerCredentials(creds.address(), creds.login(), Md5Hasher.md5HashUtf(creds.passwordHash()));
+        return _getServerInfo(queryCreds);
     }
 
 
@@ -220,8 +230,20 @@ public class MacroscopManageService {
             stored.setName(dto.getName());
         }
         stored.setServerAddress(dto.getServerAddress());
+        if (dto.getServerInfo() != null) {
+            if (stored.getServerInfo() == null) {
+                stored.setServerInfo(new MacroscopServerInfo());
+            }
+            var dtoInfo = dto.getServerInfo();
+            var entityInfo = stored.getServerInfo();
+            entityInfo.setId(dtoInfo.getId());
+            entityInfo.setVersion(dtoInfo.getVersion());
+            entityInfo.setResponseDate(TimeUtils.zonedToOffset(dtoInfo.getResponseDate()));
+            entityInfo.setTz(TimeUtils.zoneOffsetToString(dtoInfo.getTz()));
+            entityInfo.setUseTz(dtoInfo.isUseTz());
+        }
         stored = configRepo.saveAndFlush(stored);
-        return   unmaskCreds(mapper.toDto(stored));
+        return unmaskCreds(mapper.toDto(stored));
     }
 
     private void _checkAllowedConfigByOrg(String configId) {
@@ -233,15 +255,15 @@ public class MacroscopManageService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Config not allowed");
         }
         var allow = evtConfigRepo.findByConfigId(configId).stream()
-                .map(EvtAgentConfig::getAgent)                .filter(Objects::nonNull)
-                .map(EvtAgent::getOrganization)                .filter(Objects::nonNull)
+                .map(EvtAgentConfig::getAgent).filter(Objects::nonNull)
+                .map(EvtAgent::getOrganization).filter(Objects::nonNull)
                 .map(Organization::getId).anyMatch(allowed::contains);
         if (!allow) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Config not allowed");
         }
     }
 
-    public MacroscopDataResponse<MacroscopServerInfo> _getServerInfo(MacroscopServerCredentials creds) {
+    public MacroscopDataResponse<MacroscopServerInfoDto> _getServerInfo(MacroscopServerCredentials creds) {
         return macroscopService.getServerInfo(creds);
 
     }

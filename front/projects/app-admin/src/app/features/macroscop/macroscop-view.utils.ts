@@ -35,6 +35,7 @@ export const macroscopAgentConfigDtoToView = (
         dto.name,
         dto.serverAddress,
         macroscopCredentialsDtoToView(dto.credentials),
+        dto.serverInfo,
     );
 };
 
@@ -74,6 +75,7 @@ export const macroscopAgentConfigViewToDto = (
         name: view.name,
         serverAddress: view.serverAddress,
         credentials: macroscopCredentialsViewToDto(view.credentials),
+        serverInfo: view.serverInfo,
     };
 };
 

@@ -8,7 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.igorit.monitoring.admin.service.MacroscopManageService;
 import ru.igorit.monitoring.lib.dto.macroscop.*;
-import ru.igorit.monitoring.lib.persistence.entity.macroscop.MacroscopAgentConfig;
 
 import java.util.List;
 
@@ -72,8 +71,13 @@ public class MacroscopManageController {
     }
 
     @GetMapping("/misc/configs/{id}/server-info")
-    public MacroscopDataResponse<MacroscopServerInfo> getServerInfo(@PathVariable("id") String configId) {
+    public MacroscopDataResponse<MacroscopServerInfoDto> getServerInfo(@PathVariable("id") String configId) {
         return service.getServerInfo(configId);
+    }
+    @PostMapping("/misc/server-info")
+    public MacroscopDataResponse<MacroscopServerInfoDto> getServerInfoByCreds(
+            @Valid @RequestBody MacroscopServerCredentials creds) {
+        return service.getServerInfoByCreds(creds);
     }
 
 

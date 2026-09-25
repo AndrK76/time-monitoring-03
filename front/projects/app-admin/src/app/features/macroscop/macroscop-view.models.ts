@@ -3,6 +3,7 @@ import {
     MacroscopAgentConfigListDto,
     MacroscopCredentialsDto,
     MacroscopEvtAgentConfigDto,
+    MacroscopServerInfoDto,
 } from '@mon3/sc';
 
 export class MacroscopCredentialsView implements MacroscopCredentialsDto {
@@ -23,6 +24,7 @@ export class MacroscopAgentConfigView implements MacroscopAgentConfigDto {
         public name: string,
         public serverAddress: string | undefined,
         public credentials: MacroscopCredentialsView,
+        public serverInfo?: MacroscopServerInfoDto,
     ) { }
 }
 

@@ -3,7 +3,10 @@ import { inject, Injectable } from '@angular/core';
 import {
   MacroscopAgentConfigDto,
   MacroscopAgentConfigListDto,
+  MacroscopDataResponse,
   MacroscopEvtAgentConfigDto,
+  MacroscopServerCredentials,
+  MacroscopServerInfoDto,
 } from '@mon3/sc';
 import { Observable } from 'rxjs';
 
@@ -70,4 +73,9 @@ export class MacroscopManageService {
     return this.http.delete<void>(
       `${this.adminApiUrl}${this.MACROSCOP_CONTROLLER}/configs/${configId}`);
   }
+  getServerInfoByCreds(creds: MacroscopServerCredentials): Observable<MacroscopDataResponse<MacroscopServerInfoDto>> {
+    return this.http.post<MacroscopDataResponse<MacroscopServerInfoDto>>(
+      `${this.adminApiUrl}${this.MACROSCOP_CONTROLLER}/misc/server-info`, creds);
+  }
+
 }

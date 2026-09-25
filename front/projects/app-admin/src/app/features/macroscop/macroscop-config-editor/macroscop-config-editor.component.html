@@ -23,27 +23,57 @@
     <mat-divider class="section-divider"></mat-divider>
 
     <!-- Группа 2: Адрес сервера и учётные данные -->
-    <div class="editor-container">
+    <div class="editor-container" style="position: relative;">
         <form [formGroup]="formServer" class="editor-form">
             <div class="form-row"><span class="label">Подключение</span></div>
-
             <div class="form-row">
-                <mat-form-field appearance="outline" class="full-width">
+                @if (inLoadServerInfo()) {
+                <div class="loading-overlay">
+                    <mat-spinner diameter="40"></mat-spinner>
+                    <p>Проверка учётных данных...</p>
+                </div>
+                }
+                <mat-form-field appearance="outline" class="full-width serverAddress">
                     <mat-label>Адрес сервера</mat-label>
                     <input matInput formControlName="serverAddress" placeholder="https://macroscop.example.com">
                 </mat-form-field>
-            </div>
-
-            <div class="form-row">
                 <mat-form-field appearance="outline" class="full-width">
                     <mat-label>Логин</mat-label>
-                    <input matInput formControlName="login" autocomplete="off">
+                    <input matInput formControlName="login">
                 </mat-form-field>
                 <mat-form-field appearance="outline" class="full-width">
                     <mat-label>Пароль</mat-label>
-                    <input matInput formControlName="password" autocomplete="new-password">
+                    <input matInput formControlName="password">
+                </mat-form-field>
+                <span class="spacer"></span>
+                <div class="action-button-group check-action">
+                    <button mat-stroked-button class="table-action-btn btn-success check-btn" type="button"
+                        (click)="callServerInfo()" [disabled]="isNew()">
+                        <mat-icon>cloud_done</mat-icon>
+                        <span>Проверить</span>
+                    </button>
+                </div>
+            </div>
+            @if (currentServerInfo()) {
+            <div class="form-row server-info-row">
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Версия</mat-label>
+                    <input matInput [value]="currentServerInfo()?.version ?? ''" readonly>
+                </mat-form-field>
+                <mat-form-field appearance="outline" class="full-width responseDate">
+                    <mat-label>Конфигурация от</mat-label>
+                    <input matInput [value]="currentServerInfo()?.responseDate | isoNoMs" readonly>
+                </mat-form-field>
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>TZ сервера</mat-label>
+                    <input matInput [value]="currentServerInfo()?.tz ?? ''" readonly>
+                </mat-form-field>
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Использовать TZ</mat-label>
+                    <input matInput [value]="currentServerInfo()?.useTz ? 'Да' : 'Нет'" readonly>
                 </mat-form-field>
             </div>
+            }
         </form>
     </div>
 

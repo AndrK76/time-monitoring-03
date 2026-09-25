@@ -9,3 +9,13 @@
 .section-divider {
     margin: 12px 0;
 }
+
+.mat-mdc-form-field {
+    &.serverAddress {
+        min-width: 15rem;
+    }
+
+    &.responseDate {
+        min-width: 20rem;
+    }
+}

@@ -18,4 +18,6 @@ public class MacroscopAgentConfigDto {
     private String serverAddress;
     @NotNull
     private MacroscopCredentialsDto credentials;
+
+    private MacroscopServerInfoDto serverInfo;
 }

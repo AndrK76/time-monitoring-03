@@ -45,3 +45,5 @@ export * from './lib/models/content/macroscop-dto-items';
 
 export * from './lib/components/login-dialog/login-dialog.model';
 
+export * from './lib/pipes/iso-no-ms.pipe';
+

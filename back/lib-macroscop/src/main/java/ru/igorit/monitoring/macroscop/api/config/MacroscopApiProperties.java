@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 @Component
 @ConfigurationProperties(prefix = "macroscop.config.api")
 public class MacroscopApiProperties {
-    private String apiUrl;
+    private String serverConfigApi = "/configex";
     private int connectTimeout = 15000;
     private int responseTimeout = 15000;
     private int maxMemorySizeMb = 1;

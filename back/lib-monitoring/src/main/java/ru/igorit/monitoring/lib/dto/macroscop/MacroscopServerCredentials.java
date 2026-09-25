@@ -1,6 +1,11 @@
 package ru.igorit.monitoring.lib.dto.macroscop;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.NotBlank;
+
 public record MacroscopServerCredentials(
-        String address, String login, String passwordHash
+        @NotBlank String address,
+        @NotBlank String login,
+        @NotBlank @JsonProperty("password") String passwordHash
 ) {
 }
