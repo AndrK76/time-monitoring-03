@@ -13,14 +13,16 @@
 |   |                           |-- config
 |   |                           |   `-- JacksonConfig.java
 |   |                           |-- dto
-|   |                           |   `-- command
-|   |                           |       |-- auth
-|   |                           |       |   |-- OrganizationInfoChangedEventCommandDto.java
-|   |                           |       |   |-- SecurityContextDto.java
-|   |                           |       |   |-- UserContextDto.java
-|   |                           |       |   |-- UserCreatedEventCommandDto.java
-|   |                           |       |   `-- UserInfoUpdatedEventCommandDto.java
-|   |                           |       `-- CommandMessageDto.java
+|   |                           |   |-- command
+|   |                           |   |   |-- auth
+|   |                           |   |   |   |-- OrganizationInfoChangedEventCommandDto.java
+|   |                           |   |   |   |-- SecurityContextDto.java
+|   |                           |   |   |   |-- UserContextDto.java
+|   |                           |   |   |   |-- UserCreatedEventCommandDto.java
+|   |                           |   |   |   `-- UserInfoUpdatedEventCommandDto.java
+|   |                           |   |   `-- CommandMessageDto.java
+|   |                           |   `-- common
+|   |                           |       `-- BinaryContent.java
 |   |                           |-- enums
 |   |                           |   `-- command
 |   |                           |       `-- CommandMessageType.java
@@ -28,6 +30,7 @@
 |   |                           |-- service
 |   |                           |-- util
 |   |                           |   |-- Md5Hasher.java
+|   |                           |   |-- TimeUtils.java
 |   |                           |   `-- XorCipher.java
 |   |                           `-- AuthConstants.java
 |   `-- pom.xml
@@ -152,6 +155,35 @@
 |   |                           `-- utils
 |   |                               `-- WebClientFactory.java
 |   `-- pom.xml
+|-- lib-macroscop
+|   |-- src
+|   |   `-- main
+|   |       `-- java
+|   |           `-- ru
+|   |               `-- igorit
+|   |                   `-- monitoring
+|   |                       `-- macroscop
+|   |                           |-- api
+|   |                           |   |-- config
+|   |                           |   |   |-- MacroscopApiConstants.java
+|   |                           |   |   |-- MacroscopApiProperties.java
+|   |                           |   |   `-- MacroscopWebClientFactory.java
+|   |                           |   |-- dto
+|   |                           |   |   |-- MSCPChannel.java
+|   |                           |   |   |-- MSCPConfigResponse.java
+|   |                           |   |   |-- MSCPMobileServerInfo.java
+|   |                           |   |   |-- MSCPResolution.java
+|   |                           |   |   |-- MSCPRtspServerInfo.java
+|   |                           |   |   |-- MSCPServer.java
+|   |                           |   |   `-- MSCPStream.java
+|   |                           |   |-- service
+|   |                           |   |   `-- MacroscopApiClient.java
+|   |                           |   `-- utils
+|   |                           |       `-- MacroscopParseUtils.java
+|   |                           `-- service
+|   |                               `-- manage
+|   |                                   `-- MSCPConfigManageService.java
+|   `-- pom.xml
 |-- lib-monitoring
 |   |-- src
 |   |   `-- main
@@ -176,8 +208,15 @@
 |   |                           |   |   `-- EvtPlaceListDto.java
 |   |                           |   |-- macroscop
 |   |                           |   |   |-- MacroscopAgentConfigDto.java
+|   |                           |   |   |-- MacroscopAgentConfigListDto.java
+|   |                           |   |   |-- MacroscopArchiveModeDto.java
+|   |                           |   |   |-- MacroscopChannelDto.java
+|   |                           |   |   |-- MacroscopChannelStreamDto.java
 |   |                           |   |   |-- MacroscopCredentialsDto.java
-|   |                           |   |   `-- MacroscopEvtAgentConfigDto.java
+|   |                           |   |   |-- MacroscopDataResponse.java
+|   |                           |   |   |-- MacroscopEvtAgentConfigDto.java
+|   |                           |   |   |-- MacroscopServerCredentials.java
+|   |                           |   |   `-- MacroscopServerInfoDto.java
 |   |                           |   |-- yclients
 |   |                           |   |   |-- YClientCredentialsDto.java
 |   |                           |   |   |-- YClientsAgentConfigDto.java
@@ -212,9 +251,13 @@
 |   |                               |   |   `-- EvtPlace.java
 |   |                               |   |-- macroscop
 |   |                               |   |   |-- MacroscopAgentConfig.java
+|   |                               |   |   |-- MacroscopArchiveMode.java
+|   |                               |   |   |-- MacroscopChannel.java
+|   |                               |   |   |-- MacroscopChannelStream.java
 |   |                               |   |   |-- MacroscopCredentials.java
 |   |                               |   |   |-- MacroscopEvtAgent.java
-|   |                               |   |   `-- MacroscopEvtAgentConfig.java
+|   |                               |   |   |-- MacroscopEvtAgentConfig.java
+|   |                               |   |   `-- MacroscopServerInfo.java
 |   |                               |   `-- yclients
 |   |                               |       |-- YClientCredentials.java
 |   |                               |       |-- YClientsAgent.java
@@ -239,6 +282,7 @@
 |   |                                   |   `-- EvtPlaceRepository.java
 |   |                                   |-- macroscop
 |   |                                   |   |-- MacroscopAgentConfigRepository.java
+|   |                                   |   |-- MacroscopChannelRepository.java
 |   |                                   |   |-- MacroscopEvtAgentConfigRepository.java
 |   |                                   |   `-- MacroscopEvtAgentRepository.java
 |   |                                   `-- yclients
@@ -330,7 +374,11 @@
 |   |           |       |-- V01.08__add_tz_to_yc_org.sql
 |   |           |       |-- V01.09__add_aviable_org_flag.sql
 |   |           |       |-- V01.10__add_evt_and_macroscop.sql
-|   |           |       `-- V01.11__macroscop_config_opt_in_evt.sql
+|   |           |       |-- V01.11__macroscop_config_opt_in_evt.sql
+|   |           |       |-- V01.12__macroscop_config_add_state.sql
+|   |           |       |-- V01.14__add_macroscop_channels.sql
+|   |           |       |-- V01.15__add_used_to_macroscop_channels.sql
+|   |           |       `-- V01.16__add_streams_to_macroscop_channels.sql
 |   |           `-- application.yml
 |   |-- .properties
 |   `-- pom.xml
@@ -436,4 +484,4 @@
 |-- pom.xml
 `-- tree.txt
 
-179 directories, 257 files
+195 directories, 289 files

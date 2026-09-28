@@ -7,7 +7,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTable, MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { finalize, map, Observable, switchMap, tap } from 'rxjs';
+import { finalize, forkJoin, map, Observable, of, switchMap, tap } from 'rxjs';
 
 import {
   addNewItemFlag, addNotFullLoadItemFlag,
@@ -17,12 +17,15 @@ import {
 
 import { MacroscopManageService } from '../../../services/macroscop-manage.service';
 import { MacroscopConfigEditorComponent } from '../macroscop-config-editor/macroscop-config-editor.component';
-import { MacroscopAgentConfigView } from '../macroscop-view.models';
+import { MacroscopAgentConfigView, MacroscopArchiveModeView, MacroscopChannelView } from '../macroscop-view.models';
 import {
   createEmptyMacroscopAgentConfigView,
   macroscopAgentConfigDtoToView,
   macroscopAgentConfigListDtoToFullView,
   macroscopAgentConfigViewToDto,
+  macroscopArchiveModeDtoToView,
+  macroscopChannelDtoToView,
+  macroscopChannelViewToDto,
 } from '../macroscop-view.utils';
 
 @Component({
@@ -54,6 +57,8 @@ export class MacroscopConfigListComponent implements OnInit, AfterViewInit {
   error = this.tableManager.error;
   isSmallScreen = this.tableManager.isSmallScreen;
 
+  archiveModes = signal<MacroscopArchiveModeView[]>([]);
+
   @ViewChild(MatTable) table!: MatTable<MacroscopAgentConfigView>;
   @ViewChild(MatSort) sort!: MatSort;
   @ViewChild('tableWrapper') tableWrapper!: ElementRef<HTMLDivElement>;
@@ -73,7 +78,7 @@ export class MacroscopConfigListComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     this.tableManager.breakpointsSubscribe();
     this.filterConfig.set(this._filterConfig);
-    this.loadData();
+    this.initData();
     this.tableManager.setItemIdFn(this.itemId);
     this.tableManager.setSelectFn(this.doSelect);
     this.showFilter.set(false);
@@ -84,6 +89,21 @@ export class MacroscopConfigListComponent implements OnInit, AfterViewInit {
     this.tableManager.initFilterPredicate();
     this.tableManager.setTableWrapper(this.tableWrapper);
   }
+
+  private initData = (): void => {
+    this.dataService.getArchiveModes()
+      .pipe(
+        map(list => list.map(dto => macroscopArchiveModeDtoToView(dto))),
+        this.tableManager.handleError<MacroscopArchiveModeView[]>(
+          'Ошибка загрузки режимов архивации', []),
+      )
+      .subscribe({
+        next: modes => {
+          this.archiveModes.set(modes as MacroscopArchiveModeView[]);
+          this.loadData();
+        },
+      });
+  };
 
   private loadData = (): void => {
     this.isLoading.set(true);
@@ -112,9 +132,21 @@ export class MacroscopConfigListComponent implements OnInit, AfterViewInit {
   };
 
   loadItem = (item: MacroscopAgentConfigView): Observable<MacroscopAgentConfigView | undefined> => {
+    const modes = this.archiveModes();
     this.tableManager.snackError.set(null);
-    return this.dataService.getConfig(item.id).pipe(
-      map(dto => macroscopAgentConfigDtoToView(dto)),
+    return forkJoin({
+      config: this.dataService.getConfig(item.id).pipe(
+        map(dto => macroscopAgentConfigDtoToView(dto))),
+      channels: this.dataService.getChannelsForConfig(item.id).pipe(
+        map(list => list.map(dto => macroscopChannelDtoToView(dto, modes))),
+        this.tableManager.handleError<MacroscopChannelView[]>(
+          'Ошибка загрузки каналов', []),
+      ),
+    }).pipe(
+      map(({ config, channels }) => {
+        config.channels = channels as MacroscopChannelView[];
+        return config;
+      }),
       this.tableManager.handleError<MacroscopAgentConfigView | undefined>(
         'Ошибка загрузки конфигурации', undefined, this.tableManager.snackError),
       tap(() => {
@@ -140,8 +172,25 @@ export class MacroscopConfigListComponent implements OnInit, AfterViewInit {
 
   updateItem = (item: MacroscopAgentConfigView): Observable<MacroscopAgentConfigView> => {
     const req = macroscopAgentConfigViewToDto(item);
-    return this.dataService.updateConfig(item.id, req)
-      .pipe(map(dto => macroscopAgentConfigDtoToView(dto)));
+    const hasChannels = (item.channels?.length ?? 0) > 0;
+
+    return this.dataService.updateConfig(item.id, req).pipe(
+      switchMap(updated => {
+        if (!hasChannels) {
+          return of(macroscopAgentConfigDtoToView(updated));
+        }
+        return this.dataService.updateChannelsForConfig(
+          item.id,
+          item.channels!.map(c => macroscopChannelViewToDto(c)),
+        ).pipe(
+          map(list => {
+            const view = macroscopAgentConfigDtoToView(updated);
+            view.channels = list.map(dto => macroscopChannelDtoToView(dto));
+            return view;
+          }),
+        );
+      }),
+    );
   };
 
   deleteItem = (item: MacroscopAgentConfigView): Observable<void> =>
@@ -186,9 +235,6 @@ export class MacroscopConfigListComponent implements OnInit, AfterViewInit {
   };
 
   doUpdate = (item: MacroscopAgentConfigView | undefined) => {
-    // Эмит `undefined` = пользователь вернул форму к исходному.
-    // Пока не поддерживаем откат — состояние modified останется,
-    // но при сохранении сервер получит актуальные значения.
     if (!item) return;
     this.tableManager.doUpdateBase(item, () => this.table.renderRows());
   };
@@ -220,4 +266,5 @@ export class MacroscopConfigListComponent implements OnInit, AfterViewInit {
       resApply,
     );
   }
+
 }

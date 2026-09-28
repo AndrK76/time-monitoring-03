@@ -12,10 +12,10 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { addNewItemFlag, addOrigData, applyChanges, DialogService, hasChanges, hasOrigData, isNewItem, NotificationService, removeOrigData, SizeService, TableActionsInformerService } from '@mon3/sc';
 import { MacroscopManageService } from '../../../services/macroscop-manage.service';
 import { ErrorResponseResult, PermissionService, processResponseError } from '@mon3/sa';
-import { MacroscopAgentConfigListView, MacroscopAgentConfigView, MacroscopEvtAgentConfigView } from '../macroscop-view.models';
+import { MacroscopAgentConfigListView, MacroscopAgentConfigView, MacroscopArchiveModeView, MacroscopChannelView, MacroscopEvtAgentConfigView } from '../macroscop-view.models';
 import { authConstant } from '../../../auth-constants';
 import { distinctUntilChanged, finalize, forkJoin, map, Observable, of, switchMap, tap } from 'rxjs';
-import { createEmptyMacroscopAgentConfigView, macroscopAgentConfigDtoToView, macroscopAgentConfigListDtoToView, macroscopAgentConfigViewToListView, macroscopEvtAgentConfigDtoToView, macroscopEvtAgentConfigViewToDto } from '../macroscop-view.utils';
+import { createEmptyMacroscopAgentConfigView, macroscopAgentConfigDtoToView, macroscopAgentConfigListDtoToView, macroscopAgentConfigViewToListView, macroscopArchiveModeDtoToView, macroscopChannelDtoToView, macroscopChannelViewToDto, macroscopEvtAgentConfigDtoToView, macroscopEvtAgentConfigViewToDto } from '../macroscop-view.utils';
 import { EvtStructManageService } from '../../../services/evt-struct-manage.service';
 import { EvtAgentItemView } from '../../evt/evt-view.models';
 import { evtAgentItemDtoToView } from '../../evt/evt-view.utils';
@@ -77,6 +77,7 @@ export class MacroscopEvtEditorContainerComponent implements OnInit {
   configs = signal<MacroscopAgentConfigListView[]>([]);
   configMap: Map<string, MacroscopAgentConfigView> = new Map();
   organizations = signal<OrgStructInfo[]>([]);
+  archiveModes = signal<MacroscopArchiveModeView[]>([]);
 
   isSmallScreen = this.sizeService.isSmallScreen;
 
@@ -139,15 +140,15 @@ export class MacroscopEvtEditorContainerComponent implements OnInit {
 
       switchMap(organizations => forkJoin({
         organizations: of(organizations),
-
+        archiveModes: this.macroscopManageService.getArchiveModes().pipe(
+          map(list => list.map(dto => macroscopArchiveModeDtoToView(dto))),
+        ),
         config: this.macroscopManageService.getEvtConfig(this.id()!).pipe(
           map(dto => macroscopEvtAgentConfigDtoToView(dto))
         ),
-
         agent: this.evtStructManageService.getAgentById(this.id()!).pipe(
           map(dto => evtAgentItemDtoToView(dto, undefined, organizations))
         ),
-
         configs: !canManage
           ? of([])
           : this.macroscopManageService.getConfigs().pipe(
@@ -156,13 +157,14 @@ export class MacroscopEvtEditorContainerComponent implements OnInit {
 
       finalize(() => this.isLoading.set(false))
     ).subscribe({
-      next: ({ organizations, config, agent, configs }) => {
+      next: ({ organizations, archiveModes, config, agent, configs }) => {
         const hasBoundConfig = !!config?.config;
         if (!hasBoundConfig && !canManage) {
           this.processError({ message: 'Не установлена конфигурация сервера Macroscop' }, true);
           return;
         }
         this.organizations.set(organizations);
+        this.archiveModes.set(archiveModes as MacroscopArchiveModeView[]);
         this.agent.set(agent);
         this.configs.set(canManage ? configs : [macroscopAgentConfigViewToListView(config!.config!)]);
         this.formGroup.patchValue({ organization: agent.organization?.shortName ?? '' }, { emitEvent: false });
@@ -187,15 +189,26 @@ export class MacroscopEvtEditorContainerComponent implements OnInit {
   }
 
   private loadData(): void {
+    const modes = this.archiveModes();
     this.isLoading.set(true);
-    forkJoin({
-      config: this.macroscopManageService.getEvtConfig(this.id()!).pipe(
-        map(dto => macroscopEvtAgentConfigDtoToView(dto))
-      ),
-    }).pipe(
-      finalize(() => this.isLoading.set(false))
+    this.macroscopManageService.getEvtConfig(this.id()!).pipe(
+      switchMap(dto => {
+        const view = macroscopEvtAgentConfigDtoToView(dto);
+        const cfgId = view.config?.id;
+        if (!cfgId) return of(view);
+        return this.macroscopManageService.getChannelsForConfig(cfgId).pipe(
+          map(list => {
+            if (view.config) {
+              view.config.channels = list.map(d => macroscopChannelDtoToView(d, modes));
+            }
+            return view;
+          }),
+        );
+      }),
+      finalize(() => this.isLoading.set(false)),
+      takeUntilDestroyed(this.destroyRef),
     ).subscribe({
-      next: ({ config }) => this.afterLoad(config),
+      next: config => this.afterLoad(config),
       error: err => this.processError(err, false),
     });
   }
@@ -220,17 +233,27 @@ export class MacroscopEvtEditorContainerComponent implements OnInit {
   }
 
   private loadConfig(configId: string): void {
+    const cached = this.configMap.get(configId);
+    const modes = this.archiveModes();
+    if (cached) { this.afterLoadConfig(cached); return; }
+
     this.isLoading.set(true);
-    (this.configMap.has(configId)
-      ? of(this.configMap.get(configId))
-      : this.macroscopManageService.getConfig(configId).pipe(
-        map(dto => macroscopAgentConfigDtoToView(dto)),
-        tap(v => this.configMap.set(configId, v))))
-      .pipe(finalize(() => this.isLoading.set(false)))
-      .subscribe({
-        next: cfg => this.afterLoadConfig(cfg),
-        error: err => this.processError(err, false),
-      });
+    forkJoin({
+      config: this.macroscopManageService.getConfig(configId).pipe(
+        map(dto => macroscopAgentConfigDtoToView(dto))),
+      channels: this.macroscopManageService.getChannelsForConfig(configId).pipe(
+        map(list => list.map(d => macroscopChannelDtoToView(d, modes)))),
+    }).pipe(
+      finalize(() => this.isLoading.set(false)),
+      takeUntilDestroyed(this.destroyRef),
+    ).subscribe({
+      next: ({ config, channels }) => {
+        config.channels = channels;
+        this.configMap.set(configId, config);
+        this.afterLoadConfig(config);
+      },
+      error: err => this.processError(err, false),
+    });
   }
 
 
@@ -314,6 +337,8 @@ export class MacroscopEvtEditorContainerComponent implements OnInit {
             cfg.name,
             cfg.serverAddress,
             cfg.credentials,
+            cfg.serverInfo,
+            cfg.channels ?? [],
           );
           return this.macroscopManageService.updateConfig(patched.id, patched);
         }),
@@ -341,8 +366,6 @@ export class MacroscopEvtEditorContainerComponent implements OnInit {
         .pipe(map(d => macroscopEvtAgentConfigDtoToView(d)));
     };
 
-
-
     const currEvtCfg = this.evtConfig();
     if (!currEvtCfg) return;
 
@@ -350,13 +373,12 @@ export class MacroscopEvtEditorContainerComponent implements OnInit {
     const isEvtChanged = this.hasEvtChanges();
     const isCfgChanged = this.hasCfgChanges();
     const isNewCfg = !!currCfg && isNewItem(currCfg);
-    const oldCfgId = currCfg?.id
+    const oldCfgId = currCfg?.id;
 
     if (!isEvtChanged && !isCfgChanged) {
       this.notificationService.info('Нет изменений для сохранения');
       return;
     }
-
 
     this.isSaving.set(true);
 
@@ -364,15 +386,26 @@ export class MacroscopEvtEditorContainerComponent implements OnInit {
       ? createAndSaveConfig(currCfg!)
       : of(currCfg);
 
-
     persistedCfg$.pipe(
       switchMap(cfg => {
-        const evt$: Observable<MacroscopEvtAgentConfigView | null> = isEvtChanged ? syncEvtBinding(cfg) : of(null);
+        const evt$: Observable<MacroscopEvtAgentConfigView | null> =
+          isEvtChanged ? syncEvtBinding(cfg) : of(null);
+
         const cfg$: Observable<MacroscopEvtAgentConfigView | null> =
           (!isNewCfg && isCfgChanged && cfg)
             ? updateEvtConfig(cfg)
             : of(null);
-        return forkJoin({ evt: evt$, cfg: cfg$ });
+
+        // Каналы сохраняем только для существующего конфига с непустым списком.
+        const channels$: Observable<MacroscopChannelView[] | null> =
+          (!isNewCfg && cfg?.id && (cfg.channels?.length ?? 0) > 0)
+            ? this.macroscopManageService.updateChannelsForConfig(
+              cfg.id,
+              cfg.channels!.map(c => macroscopChannelViewToDto(c)))
+              .pipe(map(list => list.map(d => macroscopChannelDtoToView(d))))
+            : of(null);
+
+        return forkJoin({ evt: evt$, cfg: cfg$, channels: channels$ });
       }),
       map(({ evt, cfg }) => evt ?? cfg ?? this.evtConfig() ?? undefined),
       finalize(() => this.isSaving.set(false)),
@@ -382,13 +415,13 @@ export class MacroscopEvtEditorContainerComponent implements OnInit {
         if (isNewCfg && result?.config && oldCfgId) {
           const realCfg = result.config;
           this.configs.update(list => list.map(c =>
-            c.id === oldCfgId ? macroscopAgentConfigViewToListView(realCfg) : c,));
+            c.id === oldCfgId ? macroscopAgentConfigViewToListView(realCfg) : c));
         }
         this.afterLoad(result);
-        this.notificationService.success("Изменения сохранены");
+        this.notificationService.success('Изменения сохранены');
       },
       error: err => this.processError(err, false),
-    })
+    });
   }
 
 }

@@ -9,20 +9,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import ru.igorit.monitoring.admin.mapper.MacroscopModelMapper;
+import ru.igorit.monitoring.common.dto.common.BinaryContent;
 import ru.igorit.monitoring.common.util.Md5Hasher;
 import ru.igorit.monitoring.common.util.TimeUtils;
 import ru.igorit.monitoring.common.util.XorCipher;
 import ru.igorit.monitoring.lib.dto.macroscop.*;
-import ru.igorit.monitoring.lib.dto.yclients.YClientsServiceCategoryDto;
 import ru.igorit.monitoring.lib.persistence.entity.common.Organization;
 import ru.igorit.monitoring.lib.persistence.entity.evt.EvtAgent;
 import ru.igorit.monitoring.lib.persistence.entity.evt.EvtAgentConfig;
 import ru.igorit.monitoring.lib.persistence.entity.macroscop.*;
-import ru.igorit.monitoring.lib.persistence.entity.yclients.YClientsServiceCategory;
 import ru.igorit.monitoring.lib.persistence.repository.macroscop.MacroscopAgentConfigRepository;
 import ru.igorit.monitoring.lib.persistence.repository.macroscop.MacroscopChannelRepository;
 import ru.igorit.monitoring.lib.persistence.repository.macroscop.MacroscopEvtAgentConfigRepository;
-import ru.igorit.monitoring.lib.persistence.repository.macroscop.MacroscopEvtAgentRepository;
 import ru.igorit.monitoring.macroscop.service.manage.MSCPConfigManageService;
 import ru.igorit.monitoring.security.util.SecurityAccessUtils;
 
@@ -30,6 +28,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static ru.igorit.monitoring.macroscop.api.config.MacroscopApiConstants.ALT_STREAM;
+import static ru.igorit.monitoring.macroscop.api.config.MacroscopApiConstants.MAIN_STREAM;
 import static ru.igorit.monitoring.security.util.AuthInfoUtils.extractUserId;
 import static ru.igorit.monitoring.security.util.AuthInfoUtils.getCurrentAuth;
 
@@ -74,7 +74,6 @@ public class MacroscopManageService {
                 } else {
                     cfg = _newConfig();
                 }
-                //ret = evtConfigRepo.findById(ret.getId()).orElseThrow();
                 ret.setConfig(cfg);
                 ret.setUpdatedBy(extractUserId(getCurrentAuth()));
                 ret = evtConfigRepo.saveAndFlush(ret);
@@ -163,7 +162,10 @@ public class MacroscopManageService {
     public List<MacroscopChannelDto> getChannelsForConfig(String configId) {
         _checkAllowedConfigByOrg(configId);
         return channelRepo.findByConfigId(configId).stream()
-                .map(mapper::toDto).toList();
+                .map(mapper::toDto)
+                .sorted(Comparator.comparing(MacroscopChannelDto::getName)
+                        .thenComparing(MacroscopChannelDto::getMacroscopId))
+                .toList();
     }
 
     @Transactional
@@ -215,7 +217,15 @@ public class MacroscopManageService {
         }
         return channelRepo.findByConfigId(configId).stream()
                 .map(mapper::toDto)
+                .sorted(Comparator.comparing(MacroscopChannelDto::getName)
+                        .thenComparing(MacroscopChannelDto::getMacroscopId))
                 .toList();
+    }
+
+
+    public List<MacroscopArchiveModeDto> getArchiveModes() {
+        return Arrays.stream(MacroscopArchiveMode.values()).map(MacroscopArchiveModeDto::new)
+                .sorted(Comparator.comparing(MacroscopArchiveModeDto::id)).collect(Collectors.toList());
     }
 
 
@@ -239,6 +249,35 @@ public class MacroscopManageService {
         _checkAllowedConfigByOrg(configId);
         var creds = _getCredsByConfigId(configId);
         return _getAllowedChannels(creds);
+    }
+
+    @Transactional(readOnly = true)
+    @PreAuthorize("@securityAccessUtils.isAllowedAllActions()")
+    public MacroscopDataResponse<BinaryContent> getCurrentScreenShotOnChannel(
+            String configId, String channelId
+    ) {
+        _checkAllowedConfigByOrg(configId);
+        var creds = _getCredsByConfigId(configId);
+        var channel = channelRepo.findByConfigIdAndMacroscopId(configId, channelId).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Channel not found"));
+
+        var mainRes = _getCurrentScreenShotOnChannel(creds, channel, MAIN_STREAM);
+        var altRes = _getCurrentScreenShotOnChannel(creds, channel, ALT_STREAM);
+
+        return _pickBestScreenshot(mainRes, altRes);
+    }
+
+    @Transactional(readOnly = true)
+    @PreAuthorize("@securityAccessUtils.isAllowedAllActions()")
+    public MacroscopDataResponse<BinaryContent> getLastArchiveScreenShotOnChannel(
+            String configId, String channelId
+    ) {
+        _checkAllowedConfigByOrg(configId);
+        var creds = _getCredsByConfigId(configId);
+        var channel = channelRepo.findByConfigIdAndMacroscopId(configId, channelId).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "Channel not found"));
+
+        return  _getLastArchiveScreenShotOnChannel(creds, channel);
     }
 
 
@@ -347,7 +386,7 @@ public class MacroscopManageService {
         return macroscopService.getAllowedChannels(creds);
     }
 
-    public void fillChannelFromDto(MacroscopChannel channel, MacroscopChannelDto dto) {
+    private void fillChannelFromDto(MacroscopChannel channel, MacroscopChannelDto dto) {
         if (channel == null || dto == null) return;
         if (channel.getMacroscopId() != null && !Objects.equals(channel.getMacroscopId(), dto.getMacroscopId())) return;
         channel.setName(dto.getName());
@@ -360,6 +399,74 @@ public class MacroscopManageService {
         channel.setSoundAllowed(dto.isSoundAllowed());
         channel.setArchiveMode(MacroscopArchiveMode.byId(dto.getArchiveMode()));
         channel.setTz(TimeUtils.zoneOffsetToString(dto.getTz()));
+
+        channel.getStreams().clear();
+        if (dto.getStreams() != null) {
+            dto.getStreams().stream()
+                    .filter(Objects::nonNull)
+                    .map(mapper::fromDto)
+                    .forEach(channel.getStreams()::add);
+        }
+    }
+
+    private MacroscopDataResponse<BinaryContent> _getCurrentScreenShotOnChannel(
+            MacroscopServerCredentials creds,
+            MacroscopChannel channel,
+            String expectStream
+    ) {
+        assert channel != null;
+
+        var channelId = channel.getMacroscopId();
+        var streams = channel.getStreams();
+
+        String streamType;
+        if (streams == null || streams.isEmpty()) {
+            streamType = expectStream;
+        } else if (streams.stream()
+                .anyMatch(s -> s != null && expectStream.equals(s.getType()))) {
+            streamType = expectStream;
+        } else {
+            streamType = streams.stream()
+                    .filter(s -> s != null && s.getType() != null)
+                    .map(MacroscopChannelStream::getType)
+                    .findFirst()
+                    .orElse(expectStream);
+        }
+
+        return macroscopService.getCurrentScreenShotOnChannel(creds, channelId, streamType);
+    }
+
+    private MacroscopDataResponse<BinaryContent> _getLastArchiveScreenShotOnChannel(
+            MacroscopServerCredentials creds,
+            MacroscopChannel channel) {
+        assert channel != null;
+
+        var channelId = channel.getMacroscopId();
+        return macroscopService.getLastArchiveScreenShotOnChannel(creds, channelId);
+    }
+
+
+    private MacroscopDataResponse<BinaryContent> _pickBestScreenshot(
+            MacroscopDataResponse<BinaryContent> mainRes,
+            MacroscopDataResponse<BinaryContent> altRes
+    ) {
+        boolean mainOk = _isValidContent(mainRes);
+        boolean altOk = _isValidContent(altRes);
+        if (!mainOk && !altOk) return mainRes;
+        if (mainOk && !altOk) return mainRes;
+        if (!mainOk) return altRes;
+
+        int mainSize = mainRes.getData().getData().length;
+        int altSize = altRes.getData().getData().length;
+        return altSize > mainSize ? altRes : mainRes;
+    }
+
+    private static boolean _isValidContent(MacroscopDataResponse<BinaryContent> res) {
+        return res != null
+                && res.isSuccess()
+                && res.getData() != null
+                && res.getData().getData() != null
+                && res.getData().getData().length > 0;
     }
 
 

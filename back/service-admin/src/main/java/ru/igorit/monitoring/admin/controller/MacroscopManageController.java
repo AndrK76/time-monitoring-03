@@ -4,11 +4,11 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.igorit.monitoring.admin.service.MacroscopManageService;
 import ru.igorit.monitoring.lib.dto.macroscop.*;
-import ru.igorit.monitoring.lib.dto.yclients.YClientsServiceCategoryDto;
 
 import java.util.List;
 
@@ -88,9 +88,9 @@ public class MacroscopManageController {
         return service.getServerInfo(configId);
     }
 
-    @GetMapping("/misc/configs/{id}/channels")
-    public MacroscopDataResponse<List<MacroscopChannelDto>> getAllowedChannels(@PathVariable("id") String configId) {
-        return service.getAllowedChannels(configId);
+    @GetMapping("/misc/archive-modes")
+    public List<MacroscopArchiveModeDto> getArchiveModes() {
+        return service.getArchiveModes();
     }
 
     @PostMapping("/misc/server-info")
@@ -98,6 +98,49 @@ public class MacroscopManageController {
             @Valid @RequestBody MacroscopServerCredentials creds) {
         return service.getServerInfoByCreds(creds);
     }
+
+
+    @GetMapping("/misc/configs/{id}/channels")
+    public MacroscopDataResponse<List<MacroscopChannelDto>> getAllowedChannels(@PathVariable("id") String configId) {
+        return service.getAllowedChannels(configId);
+    }
+
+    @GetMapping("/misc/configs/{id}/channels/{channelId}/current-screenshot")
+    public ResponseEntity<?> getCurrentScreenshot(
+            @PathVariable("id") String configId,
+            @PathVariable("channelId") String channelId
+    ) {
+        var result = service.getCurrentScreenShotOnChannel(configId, channelId);
+
+        if (!result.isSuccess() || result.getData() == null) {
+            return ResponseEntity.status(HttpStatus.valueOf(result.getStatusCode())).body(result);
+        }
+
+        var data = result.getData();
+        return ResponseEntity.status(HttpStatus.OK)
+                .contentType(MediaType.parseMediaType(data.getContentType()))
+                .contentLength(data.getData().length)
+                .body(data.getData());
+    }
+
+    @GetMapping("/misc/configs/{id}/channels/{channelId}/last-archive-screenshot")
+    public ResponseEntity<?> getlastArchiveScreenshot(
+            @PathVariable("id") String configId,
+            @PathVariable("channelId") String channelId
+    ) {
+        var result = service.getLastArchiveScreenShotOnChannel(configId, channelId);
+
+        if (!result.isSuccess() || result.getData() == null) {
+            return ResponseEntity.status(HttpStatus.valueOf(result.getStatusCode())).body(result);
+        }
+
+        var data = result.getData();
+        return ResponseEntity.status(HttpStatus.OK)
+                .contentType(MediaType.parseMediaType(data.getContentType()))
+                .contentLength(data.getData().length)
+                .body(data.getData());
+    }
+
 
 
 }

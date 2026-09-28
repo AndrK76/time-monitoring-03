@@ -79,5 +79,13 @@
 
     <mat-divider class="section-divider"></mat-divider>
 
-    <!-- Здесь появятся следующие группы -->
+    <div class="editor-container">
+        <div class="form-row">
+            <span class="label">Каналы</span>
+        </div>
+        <app-macroscop-channel-list [channelsData]="config()?.channels ?? []"
+            [loadingChannels]="isLoadingFromMacroscop()" (usedChange)="onChannelUsedChange($event)"
+            (loadFromMacroscop)="onLoadChannels()">
+        </app-macroscop-channel-list>
+    </div>
 </div>

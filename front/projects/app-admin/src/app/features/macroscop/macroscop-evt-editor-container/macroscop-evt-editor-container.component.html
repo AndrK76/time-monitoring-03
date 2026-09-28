@@ -77,7 +77,8 @@
         <mat-divider class="section-divider"></mat-divider>
 
         @if (evtConfig()?.config) {
-        <app-macroscop-config-editor [config]="evtConfig()!.config" (valueChange)="onConfigChange($event)">
+        <app-macroscop-config-editor [config]="evtConfig()!.config" [archiveModes]="archiveModes()"
+            (valueChange)="onConfigChange($event)">
         </app-macroscop-config-editor>
         }
 

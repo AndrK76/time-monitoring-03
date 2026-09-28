@@ -2,7 +2,6 @@ package ru.igorit.monitoring.lib.persistence.entity.macroscop;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import ru.igorit.monitoring.lib.enums.EvtAgentType;
 
 import java.util.Arrays;
 

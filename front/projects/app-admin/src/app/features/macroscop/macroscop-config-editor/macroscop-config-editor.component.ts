@@ -8,7 +8,7 @@ import { debounceTime, finalize, merge, Observable } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import {
-  MacroscopAgentConfigView, MacroscopCredentialsView,
+  MacroscopAgentConfigView, MacroscopArchiveModeView, MacroscopChannelView, MacroscopCredentialsView,
 } from '../macroscop-view.models';
 import { DialogService, isNewItem, isNotFullLoadedItem, IsoNoMsPipe, MacroscopServerCredentials, MacroscopServerInfoDto, NotificationService } from '@mon3/sc';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -16,6 +16,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MacroscopManageService } from '../../../services/macroscop-manage.service';
 import { processResponseError } from '@mon3/sa';
+import { MacroscopChannelListComponent } from './macroscop-channel-list/macroscop-channel-list.component';
+import { macroscopChannelDtoToView } from '../macroscop-view.utils';
 
 @Component({
   selector: 'app-macroscop-config-editor',
@@ -24,6 +26,7 @@ import { processResponseError } from '@mon3/sa';
     CommonModule, ReactiveFormsModule,
     MatDividerModule, MatFormFieldModule, MatInputModule, MatIconModule, MatProgressSpinnerModule, MatButtonModule,
     IsoNoMsPipe,
+    MacroscopChannelListComponent,
   ],
   templateUrl: './macroscop-config-editor.component.html',
   styleUrl: './macroscop-config-editor.component.scss',
@@ -34,11 +37,16 @@ export class MacroscopConfigEditorComponent implements OnInit {
 
   config = input<MacroscopAgentConfigView | undefined>(undefined);
   loadItemFn = input<(item: MacroscopAgentConfigView) => Observable<MacroscopAgentConfigView | undefined>>();
+  archiveModes = input<MacroscopArchiveModeView[]>([]);
+
 
   valueChange = output<MacroscopAgentConfigView | undefined>();
   loaded = output<MacroscopAgentConfigView>();
+
+
   loading = signal(false);
   inLoadServerInfo = signal(false);
+  isLoadingFromMacroscop = signal(false);
 
   currentServerInfo = signal<MacroscopServerInfoDto | undefined>(undefined);
   isNew = computed(() => { const cfg = this.config(); return !!cfg && isNewItem(cfg); });
@@ -191,5 +199,51 @@ export class MacroscopConfigEditorComponent implements OnInit {
       error: err => this.notificationService.error(processResponseError(err).message ?? 'Ошибка проверки соединения'),
     });
 
+  }
+
+
+  onChannelUsedChange(event: { macroscopId: string; used: boolean }): void {
+    const cfg = this.currentConfig;
+    if (!cfg) return;
+
+    const updatedChannels = (cfg.channels ?? []).map(c =>
+      c.macroscopId === event.macroscopId ? { ...c, used: event.used } : c);
+
+    const updated = new MacroscopAgentConfigView(
+      cfg.id, cfg.name, cfg.serverAddress, cfg.credentials, cfg.serverInfo,
+      updatedChannels,
+    );
+    this.currentConfig = updated;
+    this.valueChange.emit(updated);
+  }
+
+
+  onLoadChannels(): void {
+    const cfg = this.currentConfig;
+    if (!cfg) return;
+
+    this.isLoadingFromMacroscop.set(true);
+    this.macroscopManageService.getAllowedChannels(cfg.id).pipe(
+      finalize(() => this.isLoadingFromMacroscop.set(false)),
+      takeUntilDestroyed(this.destroyRef),
+    ).subscribe({
+      next: result => {
+        if (!result.success || !result.data) {
+          this.notificationService.error(
+            result.errorMessage ?? 'Ошибка загрузки каналов из Macroscop');
+          return;
+        }
+        const channels = result.data.map(dto => macroscopChannelDtoToView(dto, this.archiveModes()))
+        const updated = new MacroscopAgentConfigView(
+          cfg.id, cfg.name, cfg.serverAddress, cfg.credentials, cfg.serverInfo,
+          channels,
+        );
+        this.currentConfig = updated;
+        this.valueChange.emit(updated);
+        this.notificationService.success('Список каналов получен от Macroscop');
+      },
+      error: err => this.notificationService.error(
+        processResponseError(err).message ?? 'Ошибка загрузки каналов из Macroscop'),
+    });
   }
 }

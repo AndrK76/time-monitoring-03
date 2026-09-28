@@ -9,14 +9,11 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
-@Table(
-        name = "macroscop_agent_channels",
-        indexes = {
-                @Index(name = "ix_macroscop_channel_config", columnList = "config_id"),
-                @Index(name = "ix_macroscop_channel_uid", columnList = "config_id,macroscop_id", unique = true)
-        })
+@Table(name = "macroscop_agent_channels", indexes = {@Index(name = "ix_macroscop_channel_config", columnList = "config_id"), @Index(name = "ix_macroscop_channel_uid", columnList = "config_id,macroscop_id", unique = true)})
 @Getter
 @Setter
 @NoArgsConstructor
@@ -28,7 +25,7 @@ public class MacroscopChannel {
     @Column(length = 255)
     private String id;
 
-    @Column(length = 255, nullable = false, name="channel_id")
+    @Column(length = 255, nullable = false, name = "channel_id")
     private String macroscopId;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -49,6 +46,11 @@ public class MacroscopChannel {
 
     @Column(name = "use_channel", nullable = false)
     private Boolean used = true;
+
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "macroscop_channel_streams", joinColumns = @JoinColumn(name = "channel_id"))
+    @OrderColumn(name = "stream_order")
+    private List<MacroscopChannelStream> streams = new ArrayList<>();
 
     @Column(name = "archive_on", nullable = false)
     private Boolean archivingEnabled;

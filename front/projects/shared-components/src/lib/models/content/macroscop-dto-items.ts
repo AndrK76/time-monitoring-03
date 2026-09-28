@@ -41,3 +41,29 @@ export interface MacroscopServerInfoDto {
     useTz?: boolean;
 }
 
+export interface MacroscopChannelDto {
+    id?: string;
+    macroscopId: string;
+    name?: string;
+    device?: string;
+    enabled: boolean;
+    exists: boolean;
+    used: boolean;
+    archivingEnabled: boolean;
+    archiveAllowed: boolean;
+    realtimeAllowed: boolean;
+    soundAllowed: boolean;
+    archiveMode?: string;
+    tz?: string;
+    streams?: MacroscopChannelStreamDto[];
+}
+
+export interface MacroscopArchiveModeDto {
+    id: string;
+    name: string;
+}
+
+export interface MacroscopChannelStreamDto {
+    type?: string;
+    format?: string;
+}

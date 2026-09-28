@@ -207,10 +207,70 @@
         min-height: 0; // обязательно для flex-детей
     }
 
+    .inner-table-actions {
+        display: flex;
+        justify-content: flex-end;
+        padding: 4px 0 8px 0;
+        flex-shrink: 0;
+
+        .spacer {
+            flex: 1;
+        }
+    }
+
+    .details-row {
+        height: auto;
+
+        .mat-mdc-cell {
+            padding-top: 4px;
+            padding-bottom: 8px;
+            background-color: var(--table-row-hover-bg, rgba(0, 0, 0, 0.02));
+            border-bottom: none;
+            align-items: center;
+        }
+    }
+
+    .details-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 24px;
+    }
+
+    .detail-item {
+        display: flex;
+        gap: 8px;
+        align-items: baseline;
+        min-width: 12rem;
+        white-space: normal;
+
+        .detail-label {
+            color: #666;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .detail-value {
+            font-weight: 400;
+            white-space: normal;
+            min-width: 0;
+            overflow-wrap: anywhere;
+        }
+    }
+
+
     @media (max-width: 599.98px) {
         .mat-mdc-header-cell {
             padding-left: 4px;
             padding-right: 4px;
+        }
+
+        .details-container {
+            flex-direction: column;
+            gap: 6px;
+
+            .detail-item {
+                min-width: 0;
+            }
         }
     }
 
@@ -324,8 +384,9 @@
         cursor: pointer;
     }
 
-    .mat-column-expand {
-        width: 40x !important;
+    .mat-column-expand,
+    .mat-column-detail-expand {
+        width: 40px !important;
         min-width: 32px !important;
         max-width: 40px !important;
         padding: 0 0 !important;

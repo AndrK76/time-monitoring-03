@@ -1,12 +1,18 @@
 import {
     MacroscopAgentConfigDto,
     MacroscopAgentConfigListDto,
+    MacroscopArchiveModeDto,
+    MacroscopChannelDto,
+    MacroscopChannelStreamDto,
     MacroscopCredentialsDto,
     MacroscopEvtAgentConfigDto,
 } from '@mon3/sc';
 import {
     MacroscopAgentConfigListView,
     MacroscopAgentConfigView,
+    MacroscopArchiveModeView,
+    MacroscopChannelStreamView,
+    MacroscopChannelView,
     MacroscopCredentialsView,
     MacroscopEvtAgentConfigView,
 } from './macroscop-view.models';
@@ -27,8 +33,10 @@ export const macroscopCredentialsViewToDto = (
     };
 };
 
+
 export const macroscopAgentConfigDtoToView = (
-    dto: MacroscopAgentConfigDto
+    dto: MacroscopAgentConfigDto,
+    channels?: MacroscopChannelView[],
 ): MacroscopAgentConfigView => {
     return new MacroscopAgentConfigView(
         dto.id,
@@ -36,6 +44,7 @@ export const macroscopAgentConfigDtoToView = (
         dto.serverAddress,
         macroscopCredentialsDtoToView(dto.credentials),
         dto.serverInfo,
+        channels,
     );
 };
 
@@ -100,10 +109,91 @@ export const createEmptyMacroscopAgentConfigView = (): MacroscopAgentConfigView 
         id: 'temp-' + Date.now(),
         name: 'Новая конфигурация сервера',
         serverAddress: 'http://localhost',
-        credentials: {
-            login: '',
-            password: ''
-        }
+        credentials: { login: '', password: '' },
+        channels: [],
     } as MacroscopAgentConfigView;
+};
 
+export const macroscopChannelDtoToView = (
+    dto: MacroscopChannelDto,
+    modes: MacroscopArchiveModeView[] | undefined = undefined
+): MacroscopChannelView => {
+    return new MacroscopChannelView(
+        dto.macroscopId,
+        dto.enabled,
+        dto.exists,
+        dto.used,
+        dto.archivingEnabled,
+        dto.archiveAllowed,
+        dto.realtimeAllowed,
+        dto.soundAllowed,
+        dto.id,
+        dto.name,
+        dto.device,
+        dto.archiveMode,
+        macroscopArchiveModeFromId(dto.archiveMode, modes),
+        dto.tz,
+        (dto.streams ?? []).map(s => macroscopChannelStreamDtoToView(s)),
+    );
+};
+
+export const macroscopChannelViewToDto = (
+    view: MacroscopChannelView
+): MacroscopChannelDto => {
+    return {
+        id: view.id,
+        macroscopId: view.macroscopId,
+        name: view.name,
+        device: view.device,
+        enabled: view.enabled,
+        exists: view.exists,
+        used: view.used,
+        archivingEnabled: view.archivingEnabled,
+        archiveAllowed: view.archiveAllowed,
+        realtimeAllowed: view.realtimeAllowed,
+        soundAllowed: view.soundAllowed,
+        archiveMode: view.archiveMode,
+        tz: view.tz,
+        streams: (view.streams ?? []).map(s => macroscopChannelStreamViewToDto(s)),
+    };
+};
+
+export const macroscopArchiveModeFromId = (
+    id: string | undefined,
+    allModes: MacroscopArchiveModeView[] | undefined
+): MacroscopArchiveModeView | undefined => {
+    if (id === undefined || !allModes) return undefined;
+    return allModes.find(m => m.id === id);
+};
+
+export const macroscopChannelArraysEqual = (
+    a: MacroscopChannelView[] | undefined,
+    b: MacroscopChannelView[] | undefined,
+): boolean => {
+    const a1 = a ?? [];
+    const b1 = b ?? [];
+    if (a1.length !== b1.length) return false;
+    return a1.every((v, i) =>
+        v.macroscopId === b1[i].macroscopId && v.used === b1[i].used);
+};
+
+export const macroscopArchiveModeDtoToView = (
+    dto: MacroscopArchiveModeDto
+): MacroscopArchiveModeView => {
+    return new MacroscopArchiveModeView(dto.id, dto.name);
+};
+
+export const macroscopChannelStreamDtoToView = (
+    dto: MacroscopChannelStreamDto
+): MacroscopChannelStreamView => {
+    return new MacroscopChannelStreamView(dto.type, dto.format);
+};
+
+export const macroscopChannelStreamViewToDto = (
+    view: MacroscopChannelStreamView
+): MacroscopChannelStreamDto => {
+    return {
+        type: view.type,
+        format: view.format,
+    };
 };

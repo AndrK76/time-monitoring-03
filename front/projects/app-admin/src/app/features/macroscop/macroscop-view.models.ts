@@ -1,6 +1,9 @@
 import {
     MacroscopAgentConfigDto,
     MacroscopAgentConfigListDto,
+    MacroscopArchiveModeDto,
+    MacroscopChannelDto,
+    MacroscopChannelStreamDto,
     MacroscopCredentialsDto,
     MacroscopEvtAgentConfigDto,
     MacroscopServerInfoDto,
@@ -25,6 +28,7 @@ export class MacroscopAgentConfigView implements MacroscopAgentConfigDto {
         public serverAddress: string | undefined,
         public credentials: MacroscopCredentialsView,
         public serverInfo?: MacroscopServerInfoDto,
+        public channels?: MacroscopChannelView[],
     ) { }
 }
 
@@ -38,6 +42,40 @@ export class MacroscopAgentConfigListView implements MacroscopAgentConfigListDto
 export class MacroscopEvtAgentConfigView implements MacroscopEvtAgentConfigDto {
     constructor(
         public config: MacroscopAgentConfigView | undefined,
+    ) { }
+}
+
+export class MacroscopChannelView implements MacroscopChannelDto {
+    constructor(
+        public macroscopId: string,
+        public enabled: boolean,
+        public exists: boolean,
+        public used: boolean,
+        public archivingEnabled: boolean,
+        public archiveAllowed: boolean,
+        public realtimeAllowed: boolean,
+        public soundAllowed: boolean,
+        public id?: string,
+        public name?: string,
+        public device?: string,
+        public archiveMode?: string,
+        public archiveModeInfo?: MacroscopArchiveModeView,
+        public tz?: string,
+        public streams?: MacroscopChannelStreamView[],
+    ) { }
+}
+
+export class MacroscopArchiveModeView implements MacroscopArchiveModeDto {
+    constructor(
+        public id: string,
+        public name: string,
+    ) { }
+}
+
+export class MacroscopChannelStreamView implements MacroscopChannelStreamDto {
+    constructor(
+        public type?: string,
+        public format?: string,
     ) { }
 }
 

@@ -3,6 +3,8 @@ import { inject, Injectable } from '@angular/core';
 import {
   MacroscopAgentConfigDto,
   MacroscopAgentConfigListDto,
+  MacroscopArchiveModeDto,
+  MacroscopChannelDto,
   MacroscopDataResponse,
   MacroscopEvtAgentConfigDto,
   MacroscopServerCredentials,
@@ -76,6 +78,28 @@ export class MacroscopManageService {
   getServerInfoByCreds(creds: MacroscopServerCredentials): Observable<MacroscopDataResponse<MacroscopServerInfoDto>> {
     return this.http.post<MacroscopDataResponse<MacroscopServerInfoDto>>(
       `${this.adminApiUrl}${this.MACROSCOP_CONTROLLER}/misc/server-info`, creds);
+  }
+
+  getChannelsForConfig(configId: string): Observable<MacroscopChannelDto[]> {
+    return this.http.get<MacroscopChannelDto[]>(
+      `${this.adminApiUrl}${this.MACROSCOP_CONTROLLER}/configs/${configId}/channels`);
+  }
+
+  updateChannelsForConfig(configId: string, dto: MacroscopChannelDto[])
+    : Observable<MacroscopChannelDto[]> {
+    return this.http.put<MacroscopChannelDto[]>(
+      `${this.adminApiUrl}${this.MACROSCOP_CONTROLLER}/configs/${configId}/channels`, dto);
+  }
+
+  getAllowedChannels(configId: string)
+    : Observable<MacroscopDataResponse<MacroscopChannelDto[]>> {
+    return this.http.get<MacroscopDataResponse<MacroscopChannelDto[]>>(
+      `${this.adminApiUrl}${this.MACROSCOP_CONTROLLER}/misc/configs/${configId}/channels`);
+  }
+
+  getArchiveModes(): Observable<MacroscopArchiveModeDto[]> {
+    return this.http.get<MacroscopArchiveModeDto[]>(
+      `${this.adminApiUrl}${this.MACROSCOP_CONTROLLER}/misc/archive-modes`);
   }
 
 }

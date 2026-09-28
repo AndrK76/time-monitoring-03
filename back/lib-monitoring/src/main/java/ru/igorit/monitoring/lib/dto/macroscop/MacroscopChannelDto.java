@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.ZoneOffset;
+import java.util.List;
 
 @Data
 @Builder
@@ -25,4 +26,5 @@ public class MacroscopChannelDto {
     private boolean soundAllowed;
     private String archiveMode;
     private ZoneOffset tz;
+    private List<MacroscopChannelStreamDto> streams;
 }

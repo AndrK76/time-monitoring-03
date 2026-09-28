@@ -4,11 +4,11 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import ru.igorit.monitoring.lib.dto.macroscop.MacroscopChannelDto;
-import ru.igorit.monitoring.lib.dto.macroscop.MacroscopDataResponse;
-import ru.igorit.monitoring.lib.dto.macroscop.MacroscopServerCredentials;
-import ru.igorit.monitoring.lib.dto.macroscop.MacroscopServerInfoDto;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
+import ru.igorit.monitoring.common.dto.common.BinaryContent;
+import ru.igorit.monitoring.lib.dto.macroscop.*;
 import ru.igorit.monitoring.lib.persistence.entity.macroscop.MacroscopArchiveMode;
 import ru.igorit.monitoring.macroscop.api.config.MacroscopApiProperties;
 import ru.igorit.monitoring.macroscop.api.dto.MSCPChannel;
@@ -16,8 +16,10 @@ import ru.igorit.monitoring.macroscop.api.dto.MSCPConfigResponse;
 import ru.igorit.monitoring.macroscop.api.service.MacroscopApiClient;
 
 import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static ru.igorit.monitoring.macroscop.api.utils.MacroscopParseUtils.*;
 
@@ -78,6 +80,15 @@ public class MSCPConfigManageService {
                     response.getData().getChannels().stream()
                             .map(r -> {
                                 var zoneOffset = hoursToZoneOffset(r.getTimeZoneOffset());
+                                var streams = (r.getStreams() == null)
+                                        ? List.<MacroscopChannelStreamDto>of()
+                                        : r.getStreams().stream()
+                                        .filter(Objects::nonNull)
+                                        .map(s -> MacroscopChannelStreamDto.builder()
+                                                .type(s.getStreamType())
+                                                .format(s.getStreamFormat())
+                                                .build())
+                                        .toList();
                                 return MacroscopChannelDto.builder()
                                         .macroscopId(r.getId())
                                         .name(r.getName())
@@ -91,6 +102,7 @@ public class MSCPConfigManageService {
                                         .soundAllowed(Boolean.TRUE.equals(r.getIsSoundOn()))
                                         .archiveMode(MacroscopArchiveMode.idByMacroscopId(r.getArchiveMode()))
                                         .tz(zoneOffset)
+                                        .streams(streams)
                                         .build();
                             }).toList()
             );
@@ -101,5 +113,42 @@ public class MSCPConfigManageService {
         return ret;
     }
 
+    public MacroscopDataResponse<BinaryContent> getCurrentScreenShotOnChannel(
+            MacroscopServerCredentials creds,
+            String channelId,
+            String streamType
+    ) {
+        return apiClient.exchangeBinary(
+                MacroscopApiClient.Client.img,
+                creds.address() + apiProperties.getSiteOperationsApi(),
+                HttpMethod.GET,
+                Map.of(
+                        "login", creds.login(),
+                        "password", creds.passwordHash(),
+                        "channelId", channelId,
+                        "resolutionx", String.valueOf(apiProperties.getBigResolutionX()),
+                        "streamtype", streamType
+                )
+        ).orElse(apiClient.emptyErrorResponse());
+    }
+
+    public MacroscopDataResponse<BinaryContent> getLastArchiveScreenShotOnChannel(
+            MacroscopServerCredentials creds,
+            String channelId
+    ) {
+        return apiClient.exchangeBinary(
+                MacroscopApiClient.Client.img,
+                creds.address() + apiProperties.getSiteOperationsApi(),
+                HttpMethod.GET,
+                Map.of(
+                        "login", creds.login(),
+                        "password", creds.passwordHash(),
+                        "channelId", channelId,
+                        "resolutionx", String.valueOf(apiProperties.getBigResolutionX()),
+                        "mode", "archive",
+                        "starttime",toMacroscopTime(ZonedDateTime.now())
+                )
+        ).orElse(apiClient.emptyErrorResponse());
+    }
 
 }

@@ -167,12 +167,23 @@
 |   |   |   |   |   |   `-- index.component.ts
 |   |   |   |   |   |-- macroscop
 |   |   |   |   |   |   |-- macroscop-config-editor
+|   |   |   |   |   |   |   |-- macroscop-channel-list
+|   |   |   |   |   |   |   |   |-- macroscop-channel-list.component.html
+|   |   |   |   |   |   |   |   |-- macroscop-channel-list.component.scss
+|   |   |   |   |   |   |   |   `-- macroscop-channel-list.component.ts
 |   |   |   |   |   |   |   |-- macroscop-config-editor.component.html
 |   |   |   |   |   |   |   |-- macroscop-config-editor.component.scss
 |   |   |   |   |   |   |   `-- macroscop-config-editor.component.ts
+|   |   |   |   |   |   |-- macroscop-config-list
+|   |   |   |   |   |   |   |-- macroscop-config-list.component.html
+|   |   |   |   |   |   |   |-- macroscop-config-list.component.scss
+|   |   |   |   |   |   |   `-- macroscop-config-list.component.ts
+|   |   |   |   |   |   |-- macroscop-evt-editor-container
+|   |   |   |   |   |   |   |-- macroscop-evt-editor-container.component.html
+|   |   |   |   |   |   |   |-- macroscop-evt-editor-container.component.scss
+|   |   |   |   |   |   |   `-- macroscop-evt-editor-container.component.ts
 |   |   |   |   |   |   |-- macroscop-view.models.ts
 |   |   |   |   |   |   `-- macroscop-view.utils.ts
-|   |   |   |   |   |-- roles
 |   |   |   |   |   |-- struct-org
 |   |   |   |   |   |   |-- struct-org-editor
 |   |   |   |   |   |   |   |-- struct-org-editor.component.html
@@ -439,6 +450,8 @@
 |   |   |   |   |   |-- menu-item.ts
 |   |   |   |   |   |-- table-data-items.ts
 |   |   |   |   |   `-- table-filter-items.ts
+|   |   |   |   |-- pipes
+|   |   |   |   |   `-- iso-no-ms.pipe.ts
 |   |   |   |   |-- services
 |   |   |   |   |   |-- dialog.service.ts
 |   |   |   |   |   |-- navigation.service.ts
@@ -492,4 +505,4 @@
 |-- tsconfig.json
 `-- tsconfig.prod.json
 
-138 directories, 354 files
+141 directories, 364 files

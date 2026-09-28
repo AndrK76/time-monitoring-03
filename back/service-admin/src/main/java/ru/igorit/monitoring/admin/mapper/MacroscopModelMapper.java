@@ -50,6 +50,10 @@ public interface MacroscopModelMapper {
     @Mapping(target = "tz", source = "tz", qualifiedByName = "stringToZoneOffset")
     MacroscopChannelDto toDto(MacroscopChannel entity);
 
+    MacroscopChannelStreamDto toDto(MacroscopChannelStream item);
+
+    MacroscopChannelStream fromDto(MacroscopChannelStreamDto dto);
+
 
     @Named("hashPassword")
     default String hashPassword(String password) {

@@ -1,0 +1,135 @@
+<div class="standard-table-container">
+    <mat-card>
+        <mat-card-actions class="inner-table-actions">
+            <span class="spacer"></span>
+            <div class="action-button-group">
+                <button mat-stroked-button class="table-action-btn btn-success check-btn" [disabled]="loadingChannels()"
+                    (click)="onLoadFromMacroscop()">
+                    <mat-icon>cloud_download</mat-icon>
+                    <span>Считать из Macroscop</span>
+                </button>
+            </div>
+        </mat-card-actions>
+
+        <mat-card-content class="inner-table">
+            @if (loadingChannels()) {
+            <div class="table-overlay">
+                <div class="loading-spinner">
+                    <mat-spinner diameter="40"></mat-spinner>
+                    <p>Загрузка данных...</p>
+                </div>
+            </div>
+            }
+            @if (dataSource.data.length === 0) {
+            <div class="empty-state inner-table">
+                <mat-icon>info</mat-icon>
+                <p>Каналы не найдены</p>
+            </div>
+            }
+
+            <div class="table-wrapper sticky-header-table nowrap-table filtered-table click-edit-table" #tableWrapper
+                [style.display]="dataSource.data.length === 0 ? 'none' : ''">
+                <table mat-table [dataSource]="dataSource" [trackBy]="trackById" class="mat-elevation-z0"
+                    multiTemplateDataRows matSort>
+
+                    <ng-container matColumnDef="expand">
+                        <th mat-header-cell *matHeaderCellDef>
+                            <button mat-icon-button (click)="toggleFilter()" matTooltip="Фильтр">
+                                <mat-icon>filter_list</mat-icon>
+                            </button>
+                        </th>
+                        <td mat-cell *matCellDef="let row">
+                            <mat-checkbox [checked]="row.used" (change)="onUsedChange(row, $event.checked)"
+                                (click)="$event.stopPropagation()">
+                            </mat-checkbox>
+                        </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="name">
+                        <th mat-header-cell *matHeaderCellDef>
+                            <sc-filter-root key="name" label="Наименование" [showFilter]="showFilter()" [sort]="true"
+                                [config]="filterConfig().get('name')!"
+                                (change)="onFilterChange($event)"></sc-filter-root>
+                        </th>
+                        <td mat-cell *matCellDef="let row">{{ row.name }}</td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="enabled">
+                        <th mat-header-cell *matHeaderCellDef>
+                            <sc-filter-root key="enabled" label="Вкл" [showFilter]="showFilter()" [sort]="true"
+                                [config]="filterConfig().get('enabled')!"
+                                (change)="onFilterChange($event)"></sc-filter-root>
+                        </th>
+                        <td mat-cell *matCellDef="let row">{{ row.enabled ? 'Да' : 'Нет' }}</td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="exists">
+                        <th mat-header-cell *matHeaderCellDef>
+                            <sc-filter-root key="exists" label="Есть" [showFilter]="showFilter()" [sort]="true"
+                                [config]="filterConfig().get('exists')!"
+                                (change)="onFilterChange($event)"></sc-filter-root>
+                        </th>
+                        <td mat-cell *matCellDef="let row">{{ row.exists ? 'Да' : 'Нет' }}</td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="macroscopId">
+                        <th mat-header-cell *matHeaderCellDef>
+                            <sc-filter-root key="macroscopId" label="Id" [showFilter]="showFilter()" [sort]="true"
+                                [config]="filterConfig().get('macroscopId')!"
+                                (change)="onFilterChange($event)"></sc-filter-root>
+                        </th>
+                        <td mat-cell *matCellDef="let row">{{ row.macroscopId }}</td>
+                    </ng-container>
+
+
+                    <ng-container matColumnDef="detail-expand">
+                        <td mat-cell *matCellDef="let row"></td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="detail-info">
+                        <td mat-cell *matCellDef="let row" [attr.colspan]="displayedColumns.length - 1">
+                            <div class="details-container">
+                                <div class="detail-item">
+                                    <span class="detail-label">Потоки:</span>
+                                    <span class="detail-value">{{ streamTypes(row) }}</span>
+                                </div>
+                                <div class="detail-item detail-item-device">
+                                    <span class="detail-label">Устройство:</span>
+                                    <span class="detail-value">{{ row.device || '—' }}</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Архивация:</span>
+                                    <span class="detail-value">
+                                        {{ row.archiveModeInfo?.name ?? row.archiveMode ?? '—' }}
+                                    </span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">TZ:</span>
+                                    <span class="detail-value">{{ row.tz || '—' }}</span>
+                                </div>
+                            </div>
+                        </td>
+                    </ng-container>
+
+
+                    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+
+                    <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="simple-row"
+                        [attr.data-id]="row.macroscopId" (click)="callSelect(row)"></tr>
+
+                    <tr mat-row *matRowDef="let row; columns: detailsColumns; when: isExpanded;" class="details-row">
+                    </tr>
+
+                    <tr class="mat-row" *matNoDataRow>
+                        <td class="mat-cell" [attr.colspan]="displayedColumns.length">
+                            <div class="empty-state">
+                                <mat-icon>info</mat-icon>
+                                <p>Каналы не найдены</p>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </mat-card-content>
+    </mat-card>
+</div>

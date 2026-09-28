@@ -1,0 +1,52 @@
+:host {
+    display: block;
+    width: 100%;
+}
+
+.mat-column-name {
+    min-width: 15rem;
+}
+
+.mat-column-enabled,
+.mat-column-exists {
+    min-width: 6rem;
+    max-width: 8rem;
+}
+
+.mat-column-macroscopId {
+    min-width: 18rem;
+}
+
+.mat-column-detail-info {
+    white-space: normal !important;
+}
+
+.detail-item-device {
+    max-width: 28rem;
+
+    .detail-value {
+        word-break: break-word;
+        overflow-wrap: anywhere;
+    }
+}
+
+
+@media (max-width: 599.98px) {
+    .mat-column-name {
+        min-width: 10rem;
+    }
+
+    .mat-column-enabled,
+    .mat-column-exists {
+        min-width: 4rem;
+        max-width: 6rem;
+    }
+
+    .mat-column-macroscopId {
+        min-width: 12rem;
+    }
+
+    .detail-item-device {
+        max-width: 100%;
+    }
+}

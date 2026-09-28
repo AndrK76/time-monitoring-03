@@ -6,12 +6,18 @@ import ru.igorit.monitoring.macroscop.service.manage.MSCPConfigManageService;
 
 import java.time.Instant;
 import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Objects;
 
 @Log4j2
 public class MacroscopParseUtils {
+
+    private static final DateTimeFormatter MACROSCOP_QUERY_TIME_FORMAT =
+            DateTimeFormatter.ofPattern("dd.MM.yyyy+HH:mm:ss");
+
     public static ZoneOffset extractZoneOffset(List<MSCPChannel> channels) {
         if (channels == null || channels.isEmpty()) {
             return null;
@@ -53,4 +59,10 @@ public class MacroscopParseUtils {
                 .replace(". .", ".")
                 .trim();
     }
+
+    public static String toMacroscopTime(ZonedDateTime time) {
+        if (time == null) return null;
+        return MACROSCOP_QUERY_TIME_FORMAT.format(time.withZoneSameInstant(ZoneOffset.UTC));
+    }
+
 }

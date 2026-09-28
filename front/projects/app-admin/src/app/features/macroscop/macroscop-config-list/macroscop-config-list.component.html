@@ -93,7 +93,8 @@
                         <td mat-cell *matCellDef="let row" [attr.colspan]="displayedColumns.length">
                             <div class="editor-row" *ngIf="row._expanded">
                                 <app-macroscop-config-editor [config]="row" [loadItemFn]="loadItem"
-                                    (valueChange)="doUpdate($event)" (loaded)="doLoadedItem($event)">
+                                    [archiveModes]="archiveModes()" (valueChange)="doUpdate($event)"
+                                    (loaded)="doLoadedItem($event)">
                                 </app-macroscop-config-editor>
                             </div>
                         </td>
