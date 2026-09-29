@@ -232,3 +232,5 @@ temp/
 *.tar.gz
 *.rar
 *.7z
+# Go build output
+back-go/bin/
