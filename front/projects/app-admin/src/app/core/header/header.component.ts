@@ -77,6 +77,13 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewInit {
             { label: 'Конфигурации Macroscop', route: '/macroscop/config-list' },
           ],
         },
+        {
+          label: 'Камеры', route: '/img',
+          children: [
+            { label: 'Агенты', route: '/img/agent-list' },
+            { label: 'Конфигурации Macroscop', route: '/macroscop/config-list' },
+          ],
+        },
       ],
     },
     {

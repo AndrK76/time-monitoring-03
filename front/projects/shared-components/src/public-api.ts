@@ -40,6 +40,7 @@ export * from './lib/components/change-password-dialog/change-password-dialog.co
 export * from './lib/models/content/struct-dto-items';
 export * from './lib/models/content/crm-dto-items';
 export * from './lib/models/content/evt-dto-items';
+export * from './lib/models/content/img-dto-items';
 export * from './lib/models/content/yclients-dto-items';
 export * from './lib/models/content/macroscop-dto-items';
 

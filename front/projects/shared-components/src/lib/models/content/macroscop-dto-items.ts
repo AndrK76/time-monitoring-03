@@ -20,6 +20,10 @@ export interface MacroscopEvtAgentConfigDto {
     config?: MacroscopAgentConfigDto;
 }
 
+export interface MacroscopImgAgentConfigDto {
+    config?: MacroscopAgentConfigDto;
+}
+
 export interface MacroscopServerCredentials {
     address: string;
     login: string;

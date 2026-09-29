@@ -44,9 +44,15 @@ public class DictEventsReceiveService {
                 src.setUpdatedAt(event.getUpdatedAt());
                 src.setUpdatedBy(event.getUpdatedBy());
                 orgRepo.save(src);
-            }else if (event.getMode() == OrganizationInfoChangedEventCommandDto.Mode.UPDATE_EVT_BIND) {
+            } else if (event.getMode() == OrganizationInfoChangedEventCommandDto.Mode.UPDATE_EVT_BIND) {
                 var src = orgRepo.findById(event.getOrgId()).orElse(new Organization(event.getOrgId()));
                 src.setEventAgentsSet(event.isEventAgentsSet());
+                src.setUpdatedAt(event.getUpdatedAt());
+                src.setUpdatedBy(event.getUpdatedBy());
+                orgRepo.save(src);
+            } else if (event.getMode() == OrganizationInfoChangedEventCommandDto.Mode.UPDATE_IMG_BIND) {
+                var src = orgRepo.findById(event.getOrgId()).orElse(new Organization(event.getOrgId()));
+                src.setCameraAgentsSet(event.isEventAgentsSet());
                 src.setUpdatedAt(event.getUpdatedAt());
                 src.setUpdatedBy(event.getUpdatedBy());
                 orgRepo.save(src);

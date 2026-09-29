@@ -17,10 +17,6 @@ export class MainStructManageService {
   }
 
 
-  // ============================================================
-  // Организации
-  // ============================================================
-
   getOrganizations(): Observable<OrgStructListDto[]> {
     return this.http.get<OrgStructListDto[]>(`${this.adminApiUrl}${this.MAIN_DICT_CONTROLLER}/org`);
   }

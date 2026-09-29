@@ -7,6 +7,7 @@ import {
   MacroscopChannelDto,
   MacroscopDataResponse,
   MacroscopEvtAgentConfigDto,
+  MacroscopImgAgentConfigDto,
   MacroscopServerCredentials,
   MacroscopServerInfoDto,
   toFailMacroscopDataResponse,
@@ -47,6 +48,30 @@ export class MacroscopManageService {
   unbindEvtConfig(agentId: string): Observable<MacroscopEvtAgentConfigDto> {
     return this.http.put<MacroscopEvtAgentConfigDto>(
       `${this.adminApiUrl}${this.MACROSCOP_CONTROLLER}/evt-configs/${agentId}/unbind`,
+      null);
+  }
+
+  getImgConfig(agentId: string): Observable<MacroscopImgAgentConfigDto> {
+    return this.http.get<MacroscopImgAgentConfigDto>(
+      `${this.adminApiUrl}${this.MACROSCOP_CONTROLLER}/img-configs/${agentId}`);
+  }
+
+  updateImgConfig(agentId: string, dto: MacroscopImgAgentConfigDto)
+    : Observable<MacroscopImgAgentConfigDto> {
+    return this.http.put<MacroscopImgAgentConfigDto>(
+      `${this.adminApiUrl}${this.MACROSCOP_CONTROLLER}/img-configs/${agentId}`, dto);
+  }
+
+  bindImgConfig(agentId: string, configId: string)
+    : Observable<MacroscopImgAgentConfigDto> {
+    return this.http.put<MacroscopImgAgentConfigDto>(
+      `${this.adminApiUrl}${this.MACROSCOP_CONTROLLER}/img-configs/${agentId}/bind?cfg=${configId}`,
+      null);
+  }
+
+  unbindImgConfig(agentId: string): Observable<MacroscopImgAgentConfigDto> {
+    return this.http.put<MacroscopImgAgentConfigDto>(
+      `${this.adminApiUrl}${this.MACROSCOP_CONTROLLER}/img-configs/${agentId}/unbind`,
       null);
   }
 

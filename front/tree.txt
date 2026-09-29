@@ -107,11 +107,6 @@
 |   |   |   |   |   |       |   `-- user-profile-edit-container.component.ts
 |   |   |   |   |   |       |-- user-view.models.ts
 |   |   |   |   |   |       `-- user-view.utils.ts
-|   |   |   |   |   |-- camera-agent
-|   |   |   |   |   |   `-- camera-agent-list
-|   |   |   |   |   |       |-- camera-agent-list.component.html
-|   |   |   |   |   |       |-- camera-agent-list.component.scss
-|   |   |   |   |   |       `-- camera-agent-list.component.ts
 |   |   |   |   |   |-- crm
 |   |   |   |   |   |   |-- crm-agent
 |   |   |   |   |   |   |   |-- crm-agent-bind-editor
@@ -153,6 +148,21 @@
 |   |   |   |   |   |   |   `-- evt-agent-list.component.ts
 |   |   |   |   |   |   |-- evt-view.models.ts
 |   |   |   |   |   |   `-- evt-view.utils.ts
+|   |   |   |   |   |-- img
+|   |   |   |   |   |   |-- img-agent-bind-editor
+|   |   |   |   |   |   |   |-- img-agent-bind-editor.component.html
+|   |   |   |   |   |   |   |-- img-agent-bind-editor.component.scss
+|   |   |   |   |   |   |   `-- img-agent-bind-editor.component.ts
+|   |   |   |   |   |   |-- img-agent-config
+|   |   |   |   |   |   |   |-- img-agent-config.component.html
+|   |   |   |   |   |   |   |-- img-agent-config.component.scss
+|   |   |   |   |   |   |   `-- img-agent-config.component.ts
+|   |   |   |   |   |   |-- img-agent-list
+|   |   |   |   |   |   |   |-- img-agent-list.component.html
+|   |   |   |   |   |   |   |-- img-agent-list.component.scss
+|   |   |   |   |   |   |   `-- img-agent-list.component.ts
+|   |   |   |   |   |   |-- img-view.models.ts
+|   |   |   |   |   |   `-- img-view.utils.ts
 |   |   |   |   |   |-- index
 |   |   |   |   |   |   |-- index-auth
 |   |   |   |   |   |   |   |-- index-auth.component.html
@@ -182,6 +192,10 @@
 |   |   |   |   |   |   |   |-- macroscop-evt-editor-container.component.html
 |   |   |   |   |   |   |   |-- macroscop-evt-editor-container.component.scss
 |   |   |   |   |   |   |   `-- macroscop-evt-editor-container.component.ts
+|   |   |   |   |   |   |-- macroscop-img-editor-container
+|   |   |   |   |   |   |   |-- macroscop-img-editor-container.component.html
+|   |   |   |   |   |   |   |-- macroscop-img-editor-container.component.scss
+|   |   |   |   |   |   |   `-- macroscop-img-editor-container.component.ts
 |   |   |   |   |   |   |-- macroscop-view.models.ts
 |   |   |   |   |   |   `-- macroscop-view.utils.ts
 |   |   |   |   |   |-- struct-org
@@ -225,6 +239,7 @@
 |   |   |   |   |-- services
 |   |   |   |   |   |-- crm-struct-manage.service.ts
 |   |   |   |   |   |-- evt-struct-manage.service.ts
+|   |   |   |   |   |-- img-struct-manage.service.ts
 |   |   |   |   |   |-- macroscop-manage.service.ts
 |   |   |   |   |   |-- main-struct-manage.service.ts
 |   |   |   |   |   `-- yclients-manage.service.ts
@@ -448,6 +463,7 @@
 |   |   |   |   |   |-- content
 |   |   |   |   |   |   |-- crm-dto-items.ts
 |   |   |   |   |   |   |-- evt-dto-items.ts
+|   |   |   |   |   |   |-- img-dto-items.ts
 |   |   |   |   |   |   |-- macroscop-dto-items.ts
 |   |   |   |   |   |   |-- macroscop-dto-utils.ts
 |   |   |   |   |   |   |-- struct-dto-items.ts
@@ -510,4 +526,4 @@
 |-- tsconfig.json
 `-- tsconfig.prod.json
 
-142 directories, 368 files
+145 directories, 381 files

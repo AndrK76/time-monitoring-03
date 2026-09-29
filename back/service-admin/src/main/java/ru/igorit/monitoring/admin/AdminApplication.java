@@ -30,6 +30,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
         "ru.igorit.monitoring.lib.persistence.entity.yclients",
         "ru.igorit.monitoring.lib.persistence.entity.evt",
         "ru.igorit.monitoring.lib.persistence.entity.macroscop",
+        "ru.igorit.monitoring.lib.persistence.entity.img",
 })
 @EnableJpaRepositories({
         "ru.igorit.monitoring.persistence.repository.admin",
@@ -39,6 +40,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
         "ru.igorit.monitoring.lib.persistence.repository.yclients",
         "ru.igorit.monitoring.lib.persistence.repository.evt",
         "ru.igorit.monitoring.lib.persistence.repository.macroscop",
+        "ru.igorit.monitoring.lib.persistence.repository.img",
 })
 public class AdminApplication {
     public static void main(String[] args) {

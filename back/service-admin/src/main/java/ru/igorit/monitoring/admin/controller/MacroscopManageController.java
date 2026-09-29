@@ -33,14 +33,37 @@ public class MacroscopManageController {
 
 
     @PutMapping(value = "/evt-configs/{id}/bind", params = {"cfg"})
-    public MacroscopEvtAgentConfigDto bindToConfig(@PathVariable("id") String agentId,
-                                                   @RequestParam(name = "cfg") String configId) {
+    public MacroscopEvtAgentConfigDto bindEvtToConfig(@PathVariable("id") String agentId,
+                                                      @RequestParam(name = "cfg") String configId) {
         return service.bindEvtConfig(agentId, configId);
     }
 
     @PutMapping(value = "/evt-configs/{id}/unbind")
-    public MacroscopEvtAgentConfigDto unbindToConfig(@PathVariable("id") String agentId) {
+    public MacroscopEvtAgentConfigDto unbindEvtFromConfig(@PathVariable("id") String agentId) {
         return service.unbindEvtConfig(agentId);
+    }
+
+    @GetMapping({"/img-configs/{id}"})
+    public MacroscopImgAgentConfigDto getImgConfig(@PathVariable("id") String agentId) {
+        return service.getImgConfig(agentId);
+    }
+
+    @PutMapping({"/img-configs/{id}"})
+    public MacroscopImgAgentConfigDto updateImgConfig(@PathVariable("id") String agentId,
+                                                      @Valid @RequestBody MacroscopImgAgentConfigDto dto) {
+        return service.updateImgConfig(agentId, dto);
+    }
+
+
+    @PutMapping(value = "/img-configs/{id}/bind", params = {"cfg"})
+    public MacroscopImgAgentConfigDto bindImgToConfig(@PathVariable("id") String agentId,
+                                                      @RequestParam(name = "cfg") String configId) {
+        return service.bindImgConfig(agentId, configId);
+    }
+
+    @PutMapping(value = "/img-configs/{id}/unbind")
+    public MacroscopImgAgentConfigDto unbindImgFromConfig(@PathVariable("id") String agentId) {
+        return service.unbindImgConfig(agentId);
     }
 
     @GetMapping({"/configs", "/configs/"})
@@ -145,7 +168,6 @@ public class MacroscopManageController {
                 .contentLength(data.getData().length)
                 .body(data.getData());
     }
-
 
 
 }

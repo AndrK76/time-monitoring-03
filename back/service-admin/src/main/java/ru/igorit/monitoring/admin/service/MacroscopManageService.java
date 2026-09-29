@@ -21,6 +21,7 @@ import ru.igorit.monitoring.lib.persistence.entity.macroscop.*;
 import ru.igorit.monitoring.lib.persistence.repository.macroscop.MacroscopAgentConfigRepository;
 import ru.igorit.monitoring.lib.persistence.repository.macroscop.MacroscopChannelRepository;
 import ru.igorit.monitoring.lib.persistence.repository.macroscop.MacroscopEvtAgentConfigRepository;
+import ru.igorit.monitoring.lib.persistence.repository.macroscop.MacroscopImgAgentConfigRepository;
 import ru.igorit.monitoring.macroscop.service.manage.MSCPConfigManageService;
 import ru.igorit.monitoring.security.util.SecurityAccessUtils;
 
@@ -41,8 +42,10 @@ public class MacroscopManageService {
     private String xorSecret;
     private final MacroscopModelMapper mapper;
     private final MacroscopEvtAgentConfigRepository evtConfigRepo;
+    private final MacroscopImgAgentConfigRepository imgConfigRepo;
     private final MacroscopAgentConfigRepository configRepo;
     private final MacroscopChannelRepository channelRepo;
+    private final ImgManageService imgService;
     private final EvtManageService evtService;
     private final SecurityAccessUtils sa;
     private final MSCPConfigManageService macroscopService;
@@ -114,6 +117,76 @@ public class MacroscopManageService {
             ret.setConfig(null);
             ret.setUpdatedBy(extractUserId(getCurrentAuth()));
             return mapper.toDto(evtConfigRepo.save(ret));
+        }
+        return mapper.toDto(ret);
+    }
+
+    @Transactional(readOnly = true)
+    @PreAuthorize("@securityAccessUtils.isAllowedAllActions()")
+    public MacroscopImgAgentConfigDto getImgConfig(String agentId) {
+        var ret = mapper.toDto(_getImgConfig(agentId));
+        if (ret != null && ret.getConfig() != null) {
+            ret.setConfig(unmaskCreds(ret.getConfig()));
+        }
+        return ret;
+    }
+
+    @Transactional
+    @PreAuthorize("@securityAccessUtils.isAllowedAllActions()")
+    public MacroscopImgAgentConfigDto updateImgConfig(String agentId, MacroscopImgAgentConfigDto dto) {
+        if (dto == null) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Empty Macroscop config");
+        }
+        var ret = _getImgConfig(agentId);
+        assert ret != null;
+        if (ret.getConfig() == null) {
+            if (dto.getConfig() != null) {
+                MacroscopAgentConfig cfg;
+                if (dto.getConfig().getId() != null) {
+                    cfg = _getConfig(dto.getConfig().getId());
+                } else {
+                    cfg = _newConfig();
+                }
+                ret.setConfig(cfg);
+                ret.setUpdatedBy(extractUserId(getCurrentAuth()));
+                ret = imgConfigRepo.saveAndFlush(ret);
+                dto.setConfig(unmaskCreds(mapper.toDto(ret.getConfig())));
+            }
+        } else {
+            if (dto.getConfig() == null || !Objects.equals(ret.getConfig().getId(), dto.getConfig().getId())) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Incorrect Macroscop config");
+            }
+            dto.setConfig(_updateStoredConfig(dto.getConfig(), ret.getConfig()));
+        }
+        return dto;
+    }
+
+    @Transactional
+    @PreAuthorize("@securityAccessUtils.isSuperUser()")
+    public MacroscopImgAgentConfigDto bindImgConfig(String agentId, String configId) {
+        var ret = _getImgConfig(agentId);
+        assert ret != null;
+        if (ret.getConfig() != null) {
+            if (!Objects.equals(ret.getConfig().getId(), configId)) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Camera config for agent already bounded");
+            }
+            return mapper.toDto(ret);
+        }
+        var cfg = _getConfig(configId);
+        ret.setConfig(cfg);
+        ret.setUpdatedBy(extractUserId(getCurrentAuth()));
+        return mapper.toDto(imgConfigRepo.save(ret));
+    }
+
+    @Transactional
+    @PreAuthorize("@securityAccessUtils.isSuperUser()")
+    public MacroscopImgAgentConfigDto unbindImgConfig(String agentId) {
+        var ret = _getImgConfig(agentId);
+        assert ret != null;
+        if (ret.getConfig() != null) {
+            ret.setConfig(null);
+            ret.setUpdatedBy(extractUserId(getCurrentAuth()));
+            return mapper.toDto(imgConfigRepo.save(ret));
         }
         return mapper.toDto(ret);
     }
@@ -309,6 +382,12 @@ public class MacroscopManageService {
         var agent = evtService.getAgent(agentId);
         return evtConfigRepo.findById(agent.getId()).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Config for Macroscop event agent with id " + agentId + " not found"));
+    }
+
+    private MacroscopImgAgentConfig _getImgConfig(String agentId) {
+        var agent = imgService.getAgent(agentId);
+        return imgConfigRepo.findById(agent.getId()).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Config for Macroscop camera agent with id " + agentId + " not found"));
     }
 
     private MacroscopAgentConfig _getConfig(String configId) {

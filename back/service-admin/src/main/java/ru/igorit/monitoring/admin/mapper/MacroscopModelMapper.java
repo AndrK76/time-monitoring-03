@@ -23,6 +23,8 @@ public interface MacroscopModelMapper {
 
     MacroscopEvtAgentConfigDto toDto(MacroscopEvtAgentConfig item);
 
+    MacroscopImgAgentConfigDto toDto(MacroscopImgAgentConfig item);
+
     MacroscopAgentConfigListDto toListDto(MacroscopAgentConfig item);
 
     @Mapping(target = "address", source = "config.serverAddress")
@@ -94,8 +96,6 @@ public interface MacroscopModelMapper {
     default String archiveModeToString(MacroscopArchiveMode mode) {
         return mode == null ? null : mode.name();
     }
-
-
 
 
 }

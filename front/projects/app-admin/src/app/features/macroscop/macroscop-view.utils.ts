@@ -6,6 +6,7 @@ import {
     MacroscopChannelStreamDto,
     MacroscopCredentialsDto,
     MacroscopEvtAgentConfigDto,
+    MacroscopImgAgentConfigDto,
 } from '@mon3/sc';
 import {
     MacroscopAgentConfigListView,
@@ -15,6 +16,7 @@ import {
     MacroscopChannelView,
     MacroscopCredentialsView,
     MacroscopEvtAgentConfigView,
+    MacroscopImgAgentConfigView,
 } from './macroscop-view.models';
 
 export const macroscopCredentialsDtoToView = (
@@ -99,6 +101,22 @@ export const macroscopEvtAgentConfigDtoToView = (
 export const macroscopEvtAgentConfigViewToDto = (
     view: MacroscopEvtAgentConfigView
 ): MacroscopEvtAgentConfigDto => {
+    return {
+        config: view.config ? macroscopAgentConfigViewToDto(view.config) : undefined,
+    };
+};
+
+export const macroscopImgAgentConfigDtoToView = (
+    dto: MacroscopImgAgentConfigDto
+): MacroscopImgAgentConfigView => {
+    return {
+        config: dto.config ? macroscopAgentConfigDtoToView(dto.config) : undefined,
+    } as MacroscopImgAgentConfigView
+};
+
+export const macroscopImgAgentConfigViewToDto = (
+    view: MacroscopImgAgentConfigView
+): MacroscopImgAgentConfigDto => {
     return {
         config: view.config ? macroscopAgentConfigViewToDto(view.config) : undefined,
     };

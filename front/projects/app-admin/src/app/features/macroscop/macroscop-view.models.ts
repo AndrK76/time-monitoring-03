@@ -6,6 +6,7 @@ import {
     MacroscopChannelStreamDto,
     MacroscopCredentialsDto,
     MacroscopEvtAgentConfigDto,
+    MacroscopImgAgentConfigDto,
     MacroscopServerInfoDto,
 } from '@mon3/sc';
 
@@ -40,6 +41,12 @@ export class MacroscopAgentConfigListView implements MacroscopAgentConfigListDto
 }
 
 export class MacroscopEvtAgentConfigView implements MacroscopEvtAgentConfigDto {
+    constructor(
+        public config: MacroscopAgentConfigView | undefined,
+    ) { }
+}
+
+export class MacroscopImgAgentConfigView implements MacroscopImgAgentConfigDto {
     constructor(
         public config: MacroscopAgentConfigView | undefined,
     ) { }

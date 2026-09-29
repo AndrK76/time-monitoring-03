@@ -69,13 +69,19 @@ export const routes: Routes = [
     path: 'evt/agent',
     loadComponent: () => import('./features/evt/evt-agent-config/evt-agent-config.component').then(m => m.EvtAgentConfigComponent),
     canActivate: [authGuard],
-    data: authConstant('crm/agent')
+    data: authConstant('evt/agent')
   },
   {
-    path: 'camera/agent-list',
-    loadComponent: () => import('./features/camera-agent/camera-agent-list/camera-agent-list.component').then(m => m.CameraAgentListComponent),
+    path: 'img/agent-list',
+    loadComponent: () => import('./features/img/img-agent-list/img-agent-list.component').then(m => m.ImgAgentListComponent),
     canActivate: [authGuard],
-    data: authConstant('camera/agent-list')
+    data: authConstant('img/agent-list')
+  },
+  {
+    path: 'img/agent',
+    loadComponent: () => import('./features/img/img-agent-config/img-agent-config.component').then(m => m.ImgAgentConfigComponent),
+    canActivate: [authGuard],
+    data: authConstant('img/agent')
   },
   {
     path: 'yclients/config',
@@ -88,6 +94,12 @@ export const routes: Routes = [
     loadComponent: () => import('./features/macroscop/macroscop-evt-editor-container/macroscop-evt-editor-container.component').then(m => m.MacroscopEvtEditorContainerComponent),
     canActivate: [authGuard],
     data: authConstant('macroscop/evt/config')
+  },
+  {
+    path: 'macroscop/img/config',
+    loadComponent: () => import('./features/macroscop/macroscop-img-editor-container/macroscop-img-editor-container.component').then(m => m.MacroscopImgEditorContainerComponent),
+    canActivate: [authGuard],
+    data: authConstant('macroscop/img/config')
   },
   {
     path: 'macroscop/config-list',

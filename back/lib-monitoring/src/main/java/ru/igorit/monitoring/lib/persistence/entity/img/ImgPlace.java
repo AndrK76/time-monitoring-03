@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import ru.igorit.monitoring.lib.persistence.entity.evt.EvtAgent;
 
 import java.time.LocalDateTime;
 
@@ -30,7 +29,7 @@ public abstract class ImgPlace {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "agent_id", nullable = false)
-    private EvtAgent agent;
+    private ImgAgent agent;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)

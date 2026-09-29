@@ -84,7 +84,7 @@ public class ImgAgent {
 
     public void setOrganization(Organization organization) {
         if (organization != null) {
-            organization.setEventAgentsSet(true);
+            organization.setCameraAgentsSet(true);
         }
         this.organization = organization;
     }

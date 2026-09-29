@@ -13,6 +13,7 @@ import { CrmStructManageService } from './services/crm-struct-manage.service';
 import { YclientsManageService } from './services/yclients-manage.service';
 import { EvtStructManageService } from './services/evt-struct-manage.service';
 import { MacroscopManageService } from './services/macroscop-manage.service';
+import { ImgStructManageService } from './services/img-struct-manage.service';
 
 registerLocaleData(localeRu);
 
@@ -39,6 +40,7 @@ function initializeApp() {
   const yclientsManageService = inject(YclientsManageService);
   const evtStructManageService = inject(EvtStructManageService);
   const macroscopManageService = inject(MacroscopManageService)
+  const imgStructManageService = inject(ImgStructManageService);
 
 
   return () => {
@@ -50,6 +52,7 @@ function initializeApp() {
     crmStructManageService.setAdminApiUrl(environment.adminApiUrl);
     yclientsManageService.setAdminApiUrl(environment.adminApiUrl);
     evtStructManageService.setAdminApiUrl(environment.adminApiUrl);
+    imgStructManageService.setAdminApiUrl(environment.adminApiUrl);
     macroscopManageService.setAdminApiUrl(environment.adminApiUrl);
 
     return lastValueFrom(authService.checkAuth())
