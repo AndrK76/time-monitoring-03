@@ -1,13 +1,14 @@
 // shared-components/src/lib/services/dialog.service.ts
 import { Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { Observable } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 import { ConfirmDialogComponent } from '../components/confirm-dialog/confirm-dialog.component';
 import { ConfirmDialogCancelComponent, ConfirmDialogCancelData, ConfirmDialogCancelResult } from '../components/confirm-dialog-cancel/confirm-dialog-cancel.component';
 import { ChangePasswordDialogData, ChangePasswordDialogResult } from '../components/change-password-dialog/change-password-dialog.model';
 import { ChangePasswordDialogComponent } from '../components/change-password-dialog/change-password-dialog.component';
 import { LoginDialogData, LoginDialogResult } from '../components/login-dialog/login-dialog.model';
 import { LoginDialogComponent } from '../components/login-dialog/login-dialog.component';
+import { ShowImageDialogComponent } from '../components/show-image-dialog/show-image-dialog.component';
 
 @Injectable({ providedIn: 'root' })
 export class DialogService {
@@ -49,5 +50,19 @@ export class DialogService {
             autoFocus: false,
         });
         return dialogRef.afterClosed();
+    }
+
+
+    showImage(blob: Blob, title: string): Observable<void> {
+        const url = URL.createObjectURL(blob);
+        const dialogRef = this.dialog.open(ShowImageDialogComponent, {
+            data: { url, title },
+            maxWidth: '95vw',
+            maxHeight: '95vh',
+            autoFocus: false,
+        });
+        return dialogRef.afterClosed().pipe(
+            tap(() => URL.revokeObjectURL(url)),
+        );
     }
 }

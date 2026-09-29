@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpResponse } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import {
   MacroscopAgentConfigDto,
@@ -9,8 +9,9 @@ import {
   MacroscopEvtAgentConfigDto,
   MacroscopServerCredentials,
   MacroscopServerInfoDto,
+  toFailMacroscopDataResponse,
 } from '@mon3/sc';
-import { Observable } from 'rxjs';
+import { catchError, map, Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -100,6 +101,31 @@ export class MacroscopManageService {
   getArchiveModes(): Observable<MacroscopArchiveModeDto[]> {
     return this.http.get<MacroscopArchiveModeDto[]>(
       `${this.adminApiUrl}${this.MACROSCOP_CONTROLLER}/misc/archive-modes`);
+  }
+
+
+  getCurrentScreenshot(configId: string, channelId: string): Observable<MacroscopDataResponse<Blob>> {
+    return this.getScreenshot$(
+      `${this.adminApiUrl}${this.MACROSCOP_CONTROLLER}/misc/configs/${configId}/channels/${channelId}/current-screenshot`
+    );
+  }
+
+  getArchiveScreenshot(configId: string, channelId: string): Observable<MacroscopDataResponse<Blob>> {
+    return this.getScreenshot$(
+      `${this.adminApiUrl}${this.MACROSCOP_CONTROLLER}/misc/configs/${configId}/channels/${channelId}/last-archive-screenshot`
+    );
+  }
+
+
+  private getScreenshot$(url: string): Observable<MacroscopDataResponse<Blob>> {
+    return this.http.get(url, { responseType: 'blob', observe: 'response' }).pipe(
+      map((resp: HttpResponse<Blob>) => ({
+        statusCode: resp.status,
+        success: true,
+        data: resp.body ?? undefined,
+      } as MacroscopDataResponse<Blob>)),
+      catchError(err => toFailMacroscopDataResponse(err)),
+    );
   }
 
 }

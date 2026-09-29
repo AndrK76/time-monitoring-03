@@ -6,6 +6,12 @@
         <p>Загрузка данных...</p>
     </div>
     }
+    @if (isLoadingScreenshot()) {
+    <div class="loading-overlay">
+        <mat-spinner diameter="40"></mat-spinner>
+        <p>Получение скриншота...</p>
+    </div>
+    }
 
     <!-- Группа 1: Название -->
     <div class="editor-container">
@@ -47,7 +53,7 @@
                 </mat-form-field>
                 <span class="spacer"></span>
                 <div class="action-button-group check-action">
-                    <button mat-stroked-button class="table-action-btn btn-success check-btn" type="button"
+                    <button mat-stroked-button class="table-action-btn btn-success" type="button"
                         (click)="callServerInfo()" [disabled]="isNew()">
                         <mat-icon>cloud_done</mat-icon>
                         <span>Проверить</span>
@@ -85,7 +91,7 @@
         </div>
         <app-macroscop-channel-list [channelsData]="config()?.channels ?? []"
             [loadingChannels]="isLoadingFromMacroscop()" (usedChange)="onChannelUsedChange($event)"
-            (loadFromMacroscop)="onLoadChannels()">
+            (loadFromMacroscop)="onLoadChannels()" (getChannelScreenShot)="callGetChannelScreenShot($event)">
         </app-macroscop-channel-list>
     </div>
 </div>

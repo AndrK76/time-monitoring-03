@@ -944,6 +944,10 @@
 |   |   |   |   |   |   |   |-- register.component.html
 |   |   |   |   |   |   |   |-- register.component.scss
 |   |   |   |   |   |   |   `-- register.component.ts
+|   |   |   |   |   |   |-- show-image-dialog
+|   |   |   |   |   |   |   |-- show-image-dialog.component.html
+|   |   |   |   |   |   |   |-- show-image-dialog.component.scss
+|   |   |   |   |   |   |   `-- show-image-dialog.component.ts
 |   |   |   |   |   |   |-- top-menu-item
 |   |   |   |   |   |   |   |-- top-menu-item.component.html
 |   |   |   |   |   |   |   |-- top-menu-item.component.scss
@@ -957,6 +961,7 @@
 |   |   |   |   |   |   |   |-- crm-dto-items.ts
 |   |   |   |   |   |   |   |-- evt-dto-items.ts
 |   |   |   |   |   |   |   |-- macroscop-dto-items.ts
+|   |   |   |   |   |   |   |-- macroscop-dto-utils.ts
 |   |   |   |   |   |   |   |-- struct-dto-items.ts
 |   |   |   |   |   |   |   `-- yclients-dto-items.ts
 |   |   |   |   |   |   |-- menu-item.ts
@@ -1031,4 +1036,4 @@
 |-- README.md
 `-- tree.txt
 
-351 directories, 680 files
+352 directories, 684 files

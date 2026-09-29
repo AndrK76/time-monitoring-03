@@ -37,6 +37,8 @@ export class MacroscopChannelListComponent implements OnInit, AfterViewInit {
 
   loadFromMacroscop = output<void>();
   usedChange = output<{ macroscopId: string; used: boolean }>();
+  getChannelScreenShot = output<{ mode: string; channel: MacroscopChannelView }>()
+
 
   dataSource = this.tableManager.dataSource;
   filterConfig = this.tableManager.filterConfig;
@@ -97,7 +99,7 @@ export class MacroscopChannelListComponent implements OnInit, AfterViewInit {
   onFilterChange = (val: TableFilterInfo) => this.tableManager.onFilterChange(val);
   toggleFilter = (reset?: boolean) => this.tableManager.toggleFilter();
 
-  onLoadFromMacroscop(): void {
+  callLoadFromMacroscop(): void {
     this.loadFromMacroscop.emit();
   }
 
@@ -122,5 +124,15 @@ export class MacroscopChannelListComponent implements OnInit, AfterViewInit {
       .map(s => s.type)
       .filter((t): t is string => !!t);
     return types.length ? types.join(', ') : '—';
+  }
+
+  callGetCurrentScreenshot(row: MacroscopChannelView | undefined) {
+    if (!row) return;
+    this.getChannelScreenShot.emit({ mode: 'current', channel: row });
+  }
+
+  callGetArchiveScreenshot(row: MacroscopChannelView | undefined) {
+    if (!row) return;
+    this.getChannelScreenShot.emit({ mode: 'archive', channel: row });
   }
 }

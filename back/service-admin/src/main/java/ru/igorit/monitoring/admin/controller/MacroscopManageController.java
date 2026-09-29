@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import ru.igorit.monitoring.admin.service.MacroscopManageService;
 import ru.igorit.monitoring.lib.dto.macroscop.*;
 
@@ -113,7 +114,9 @@ public class MacroscopManageController {
         var result = service.getCurrentScreenShotOnChannel(configId, channelId);
 
         if (!result.isSuccess() || result.getData() == null) {
-            return ResponseEntity.status(HttpStatus.valueOf(result.getStatusCode())).body(result);
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_GATEWAY,
+                    result.getErrorMessage() != null ? result.getErrorMessage() : "Macroscop error");
         }
 
         var data = result.getData();
@@ -131,7 +134,9 @@ public class MacroscopManageController {
         var result = service.getLastArchiveScreenShotOnChannel(configId, channelId);
 
         if (!result.isSuccess() || result.getData() == null) {
-            return ResponseEntity.status(HttpStatus.valueOf(result.getStatusCode())).body(result);
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_GATEWAY,
+                    result.getErrorMessage() != null ? result.getErrorMessage() : "Macroscop error");
         }
 
         var data = result.getData();

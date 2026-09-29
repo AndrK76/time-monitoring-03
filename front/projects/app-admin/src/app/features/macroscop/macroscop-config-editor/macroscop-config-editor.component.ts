@@ -47,6 +47,7 @@ export class MacroscopConfigEditorComponent implements OnInit {
   loading = signal(false);
   inLoadServerInfo = signal(false);
   isLoadingFromMacroscop = signal(false);
+  isLoadingScreenshot = signal(false);
 
   currentServerInfo = signal<MacroscopServerInfoDto | undefined>(undefined);
   isNew = computed(() => { const cfg = this.config(); return !!cfg && isNewItem(cfg); });
@@ -244,6 +245,36 @@ export class MacroscopConfigEditorComponent implements OnInit {
       },
       error: err => this.notificationService.error(
         processResponseError(err).message ?? 'Ошибка загрузки каналов из Macroscop'),
+    });
+  }
+
+  callGetChannelScreenShot = (event: { mode: string; channel: MacroscopChannelView }): void => {
+    const cfg = this.currentConfig;
+    if (!cfg?.id) return;
+    if (isNewItem(cfg)) {
+      this.notificationService.error('Сначала сохраните конфигурацию');
+      return;
+    }
+
+    const loader$ = event.mode === 'archive'
+      ? this.macroscopManageService.getArchiveScreenshot(cfg.id, event.channel.macroscopId)
+      : this.macroscopManageService.getCurrentScreenshot(cfg.id, event.channel.macroscopId);
+
+    this.isLoadingScreenshot.set(true);
+    loader$.pipe(
+      takeUntilDestroyed(this.destroyRef),
+      finalize(() => this.isLoadingScreenshot.set(false)),
+    ).subscribe(result => {
+      if (result.success && result.data) {
+        this.dialogService.showImage(
+          result.data,
+          event.channel.name ?? event.channel.macroscopId,
+        );
+      } else {
+        this.notificationService.error(
+          result.errorMessage ?? 'Не удалось получить скриншот',
+        );
+      }
     });
   }
 }

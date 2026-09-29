@@ -3,10 +3,22 @@
         <mat-card-actions class="inner-table-actions">
             <span class="spacer"></span>
             <div class="action-button-group">
-                <button mat-stroked-button class="table-action-btn btn-success check-btn" [disabled]="loadingChannels()"
-                    (click)="onLoadFromMacroscop()">
+                <button mat-stroked-button class="table-action-btn btn-success" [disabled]="loadingChannels()"
+                    (click)="callLoadFromMacroscop()">
                     <mat-icon>cloud_download</mat-icon>
                     <span>Считать из Macroscop</span>
+                </button>
+                <button mat-stroked-button color="primary" class="table-action-btn" [disabled]="!selectedItem()"
+                    (click)="callGetCurrentScreenshot(selectedItem())"
+                    matTooltip="Получить текущее изображение с камеры">
+                    <mat-icon>photo_camera</mat-icon>
+                    <span class="hide-on-small">с камеры</span>
+                </button>
+                <button mat-stroked-button color="primary" class="table-action-btn" [disabled]="!selectedItem()"
+                    (click)="callGetArchiveScreenshot(selectedItem())"
+                    matTooltip="Получить текущее изображение из архива">
+                    <mat-icon>photo_library</mat-icon>
+                    <span class="hide-on-small">из архива</span>
                 </button>
             </div>
         </mat-card-actions>
