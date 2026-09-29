@@ -1,4 +1,4 @@
-package ru.igorit.monitoring.lib.persistence.entity.crm;
+package ru.igorit.monitoring.lib.persistence.entity.evt;
 
 public interface EvtAgentListProjection {
     String getId();

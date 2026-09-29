@@ -1,3 +1,5 @@
+
+
 <div class="editor-scroll-wrapper" style="position: relative;">
 
     @if (loading()) {
@@ -29,7 +31,7 @@
     <mat-divider class="section-divider"></mat-divider>
 
     <!-- Группа 2: Адрес сервера и учётные данные -->
-    <div class="editor-container" style="position: relative;">
+    <div class="editor-container" >
         <form [formGroup]="formServer" class="editor-form">
             <div class="form-row"><span class="label">Подключение</span></div>
             <div class="form-row">
@@ -90,8 +92,8 @@
             <span class="label">Каналы</span>
         </div>
         <app-macroscop-channel-list [channelsData]="config()?.channels ?? []"
-            [loadingChannels]="isLoadingFromMacroscop()" (usedChange)="onChannelUsedChange($event)"
-            (loadFromMacroscop)="onLoadChannels()" (getChannelScreenShot)="callGetChannelScreenShot($event)">
+            [loadingChannels]="inLoadChannels()" (usedChange)="onChannelUsedChange($event)"
+            (loadChannels)="callLoadChannels()" (getChannelScreenShot)="callGetChannelScreenShot($event)">
         </app-macroscop-channel-list>
     </div>
 </div>

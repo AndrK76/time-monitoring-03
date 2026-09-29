@@ -17,7 +17,7 @@ import ru.igorit.monitoring.lib.dto.evt.EvtAgentListDto;
 import ru.igorit.monitoring.lib.dto.evt.EvtAgentTypeDto;
 import ru.igorit.monitoring.lib.enums.EvtAgentType;
 import ru.igorit.monitoring.lib.persistence.entity.common.Organization;
-import ru.igorit.monitoring.lib.persistence.entity.crm.EvtAgentListProjection;
+import ru.igorit.monitoring.lib.persistence.entity.evt.EvtAgentListProjection;
 import ru.igorit.monitoring.lib.persistence.entity.evt.EvtAgent;
 import ru.igorit.monitoring.lib.persistence.entity.macroscop.MacroscopEvtAgent;
 import ru.igorit.monitoring.lib.persistence.entity.macroscop.MacroscopEvtAgentConfig;

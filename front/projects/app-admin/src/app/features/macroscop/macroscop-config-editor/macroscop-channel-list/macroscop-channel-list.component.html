@@ -119,6 +119,18 @@
                                     <span class="detail-label">TZ:</span>
                                     <span class="detail-value">{{ row.tz || '—' }}</span>
                                 </div>
+                                <div class="detail-item detail-actions">
+                                    <a class="screenshot-link"
+                                        (click)="callGetCurrentScreenshot(row); $event.stopPropagation()"
+                                        matTooltip="Получить текущее изображение с камеры">
+                                        <mat-icon>photo_camera</mat-icon>
+                                    </a>
+                                    <a class="screenshot-link"
+                                        (click)="callGetArchiveScreenshot(row); $event.stopPropagation()"
+                                        matTooltip="Получить текущее изображение из архива">
+                                        <mat-icon>photo_library</mat-icon>
+                                    </a>
+                                </div>
                             </div>
                         </td>
                     </ng-container>

@@ -46,7 +46,7 @@ export class MacroscopConfigEditorComponent implements OnInit {
 
   loading = signal(false);
   inLoadServerInfo = signal(false);
-  isLoadingFromMacroscop = signal(false);
+  inLoadChannels = signal(false);
   isLoadingScreenshot = signal(false);
 
   currentServerInfo = signal<MacroscopServerInfoDto | undefined>(undefined);
@@ -143,6 +143,7 @@ export class MacroscopConfigEditorComponent implements OnInit {
       serverAddress || undefined,
       credentials,
       serverInfo ?? this.currentServerInfo(),
+      base.channels,
     );
   }
 
@@ -219,13 +220,13 @@ export class MacroscopConfigEditorComponent implements OnInit {
   }
 
 
-  onLoadChannels(): void {
+  callLoadChannels(): void {
     const cfg = this.currentConfig;
     if (!cfg) return;
 
-    this.isLoadingFromMacroscop.set(true);
+    this.inLoadChannels.set(true);
     this.macroscopManageService.getAllowedChannels(cfg.id).pipe(
-      finalize(() => this.isLoadingFromMacroscop.set(false)),
+      finalize(() => this.inLoadChannels.set(false)),
       takeUntilDestroyed(this.destroyRef),
     ).subscribe({
       next: result => {
@@ -234,10 +235,12 @@ export class MacroscopConfigEditorComponent implements OnInit {
             result.errorMessage ?? 'Ошибка загрузки каналов из Macroscop');
           return;
         }
-        const channels = result.data.map(dto => macroscopChannelDtoToView(dto, this.archiveModes()))
+        const rcvChannels = result.data.map(dto => macroscopChannelDtoToView(dto, this.archiveModes()));
+        const curChannels = cfg.channels ?? [];
+        const mergedChannels = this.mergeChannels(curChannels, rcvChannels)
         const updated = new MacroscopAgentConfigView(
           cfg.id, cfg.name, cfg.serverAddress, cfg.credentials, cfg.serverInfo,
-          channels,
+          mergedChannels,
         );
         this.currentConfig = updated;
         this.valueChange.emit(updated);
@@ -246,6 +249,55 @@ export class MacroscopConfigEditorComponent implements OnInit {
       error: err => this.notificationService.error(
         processResponseError(err).message ?? 'Ошибка загрузки каналов из Macroscop'),
     });
+  }
+
+  private mergeChannels(curChannels: MacroscopChannelView[], rcvChannels: MacroscopChannelView[],): MacroscopChannelView[] {
+    const rcvMap = new Map<string, MacroscopChannelView>();
+    for (const r of rcvChannels) rcvMap.set(r.macroscopId, r);
+
+    const curIds = new Set<string>();
+    const merged: MacroscopChannelView[] = [];
+
+    for (const cur of curChannels) {
+      curIds.add(cur.macroscopId);
+      const rcv = rcvMap.get(cur.macroscopId);
+
+      if (rcv) {
+        // Найдена на сервере — берём «серверные» поля из rcv,
+        // а пользовательские (id, used) — из cur.
+        merged.push(new MacroscopChannelView(
+          cur.macroscopId, rcv.enabled, rcv.exists, cur.used, rcv.archivingEnabled, rcv.archiveAllowed,
+          rcv.realtimeAllowed, rcv.soundAllowed, cur.id, rcv.name, rcv.device,
+          rcv.archiveMode, rcv.archiveModeInfo, rcv.tz, rcv.streams,
+        ));
+      } else {
+        // Пропала с сервера — exists = false, used = false.
+        merged.push(new MacroscopChannelView(
+          cur.macroscopId, cur.enabled, false, false,
+          cur.archivingEnabled, cur.archiveAllowed, cur.realtimeAllowed,
+          cur.soundAllowed, cur.id, cur.name,
+          cur.device, cur.archiveMode, cur.archiveModeInfo,
+          cur.tz, cur.streams,
+        ));
+      }
+    }
+
+    // Новые каналы, которых не было в curChannels.
+    for (const rcv of rcvChannels) {
+      if (!curIds.has(rcv.macroscopId)) {
+        merged.push(rcv);
+      }
+    }
+
+    // Сортировка по name, затем по macroscopId.
+    merged.sort((a, b) => {
+      const an = a.name ?? '';
+      const bn = b.name ?? '';
+      if (an !== bn) return an.localeCompare(bn);
+      return a.macroscopId.localeCompare(b.macroscopId);
+    });
+
+    return merged;
   }
 
   callGetChannelScreenShot = (event: { mode: string; channel: MacroscopChannelView }): void => {

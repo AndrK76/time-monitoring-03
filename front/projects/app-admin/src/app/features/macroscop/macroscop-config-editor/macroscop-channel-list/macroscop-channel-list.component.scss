@@ -3,6 +3,7 @@
     width: 100%;
 }
 
+
 .mat-column-name {
     min-width: 15rem;
 }
@@ -48,5 +49,47 @@
 
     .detail-item-device {
         max-width: 100%;
+    }
+}
+
+.detail-actions {
+    gap: 12px;
+    margin-left: auto; // прижать к правому краю строки деталей
+    align-items: center;
+
+    .screenshot-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        color: var(--primary-color, #3f51b5);
+        text-decoration: none;
+        border-radius: 50%;
+        transition: background-color 0.2s, color 0.2s;
+        padding: 4px;
+
+        &:hover {
+            background-color: rgba(63, 81, 181, 0.08);
+        }
+
+        .mat-icon {
+            font-size: 22px;
+            width: 22px;
+            height: 22px;
+            line-height: 22px;
+        }
+    }
+}
+
+@media (max-width: 599.98px) {
+    .detail-actions {
+        margin-left: 0;
+
+        .screenshot-link .mat-icon {
+            font-size: 20px;
+            width: 20px;
+            height: 20px;
+            line-height: 20px;
+        }
     }
 }

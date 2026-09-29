@@ -35,7 +35,7 @@ export class MacroscopChannelListComponent implements OnInit, AfterViewInit {
   channelsData = input.required<MacroscopChannelView[]>();
   loadingChannels = input<boolean>(false);
 
-  loadFromMacroscop = output<void>();
+  loadChannels = output<void>();
   usedChange = output<{ macroscopId: string; used: boolean }>();
   getChannelScreenShot = output<{ mode: string; channel: MacroscopChannelView }>()
 
@@ -100,7 +100,7 @@ export class MacroscopChannelListComponent implements OnInit, AfterViewInit {
   toggleFilter = (reset?: boolean) => this.tableManager.toggleFilter();
 
   callLoadFromMacroscop(): void {
-    this.loadFromMacroscop.emit();
+    this.loadChannels.emit();
   }
 
   onUsedChange(row: MacroscopChannelView, checked: boolean): void {

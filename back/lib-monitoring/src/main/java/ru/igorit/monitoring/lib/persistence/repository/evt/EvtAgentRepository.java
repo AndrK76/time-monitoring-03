@@ -1,7 +1,7 @@
 package ru.igorit.monitoring.lib.persistence.repository.evt;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import ru.igorit.monitoring.lib.persistence.entity.crm.EvtAgentListProjection;
+import ru.igorit.monitoring.lib.persistence.entity.evt.EvtAgentListProjection;
 import ru.igorit.monitoring.lib.persistence.entity.evt.EvtAgent;
 
 import java.util.List;

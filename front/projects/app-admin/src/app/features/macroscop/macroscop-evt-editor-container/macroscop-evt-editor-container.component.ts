@@ -407,7 +407,11 @@ export class MacroscopEvtEditorContainerComponent implements OnInit {
 
         return forkJoin({ evt: evt$, cfg: cfg$, channels: channels$ });
       }),
-      map(({ evt, cfg }) => evt ?? cfg ?? this.evtConfig() ?? undefined),
+      map(({ evt, cfg, channels }) => {
+        var res = evt ?? cfg ?? this.evtConfig() ?? undefined;
+        if (channels && res?.config) res!.config!.channels = channels;
+        return res;
+    }),
       finalize(() => this.isSaving.set(false)),
       takeUntilDestroyed(this.destroyRef),
     ).subscribe({

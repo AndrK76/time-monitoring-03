@@ -95,14 +95,14 @@
 
         <!-- Ссылки на смежные разделы -->
         <div class="form-row">
-            <span class="label">Перейти</span>
+            <span class="label">Перейти <span>{{isSmallScreen()?'(CRM)':''}}</span></span>
             <a mat-button class="editor-link" [routerLink]="['/crm/place-list']"
                 [queryParams]="{org: organization().id}">
-                <span>{{isSmallScreen()?'Места':'К списку мест'}}</span>
+                <span>{{isSmallScreen()?'Места':'К списку мест CRM'}}</span>
             </a>
             <a mat-button class="editor-link" [routerLink]="['/crm/service-list']"
                 [queryParams]="{org: organization().id}">
-                <span>{{isSmallScreen()?'Услуги':'К списку услуг'}}</span>
+                <span>{{isSmallScreen()?'Услуги':'К списку услуг CRM'}}</span>
             </a>
         </div>
     </form>
