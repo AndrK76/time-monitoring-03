@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import ru.igorit.monitoring.lib.enums.ImgAgentType;
 
 import java.time.LocalDateTime;
 
@@ -31,6 +32,15 @@ public abstract class ImgPlace {
     @JoinColumn(name = "agent_id", nullable = false)
     private ImgAgent agent;
 
+    @Column(name = "used", nullable = false)
+    private Boolean used;
+
+    @Column(name = "present", nullable = false)
+    private Boolean present = true;
+
+    @Column(name = "deleted", nullable = false)
+    private Boolean deleted = false;
+
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
@@ -45,6 +55,15 @@ public abstract class ImgPlace {
     @Column(name = "updated_by")
     private String updatedBy;
 
-    @Column(name = "available", nullable = false)
-    private Boolean available;
+    @Transient
+    public ImgAgentType getType() {
+        DiscriminatorValue dv = getClass().getAnnotation(DiscriminatorValue.class);
+        return dv == null ? null : ImgAgentType.byDiscriminator(dv.value());
+    }
+
+    public boolean isActual(){
+        return Boolean.TRUE.equals(this.present) && !Boolean.TRUE.equals(this.deleted);
+    }
+
+    public abstract String getInternalName();
 }

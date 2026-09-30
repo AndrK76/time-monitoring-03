@@ -84,7 +84,7 @@ public class ImgManageService {
     @Transactional(readOnly = true)
     @PreAuthorize("@securityAccessUtils.isAllowedAllActions()")
     public ImgAgentItemDto getAgent(String agentId) {
-        var stored = agentRepo.findById(agentId).orElseThrow(
+        var stored = agentRepo.findByIdWithPlaces(agentId).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Camera Agent with id " + agentId + " not found"));
         var ret = imgModelMapper.toDto(stored);
         if (!(sa.isAllowedAllOrganizations() || sa.isAllowedOrganization(ret.getOrganizationId()))) {

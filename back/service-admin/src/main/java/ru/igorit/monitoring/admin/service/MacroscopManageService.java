@@ -18,10 +18,7 @@ import ru.igorit.monitoring.lib.persistence.entity.common.Organization;
 import ru.igorit.monitoring.lib.persistence.entity.evt.EvtAgent;
 import ru.igorit.monitoring.lib.persistence.entity.evt.EvtAgentConfig;
 import ru.igorit.monitoring.lib.persistence.entity.macroscop.*;
-import ru.igorit.monitoring.lib.persistence.repository.macroscop.MacroscopAgentConfigRepository;
-import ru.igorit.monitoring.lib.persistence.repository.macroscop.MacroscopChannelRepository;
-import ru.igorit.monitoring.lib.persistence.repository.macroscop.MacroscopEvtAgentConfigRepository;
-import ru.igorit.monitoring.lib.persistence.repository.macroscop.MacroscopImgAgentConfigRepository;
+import ru.igorit.monitoring.lib.persistence.repository.macroscop.*;
 import ru.igorit.monitoring.macroscop.service.manage.MSCPConfigManageService;
 import ru.igorit.monitoring.security.util.SecurityAccessUtils;
 
@@ -43,6 +40,8 @@ public class MacroscopManageService {
     private final MacroscopModelMapper mapper;
     private final MacroscopEvtAgentConfigRepository evtConfigRepo;
     private final MacroscopImgAgentConfigRepository imgConfigRepo;
+    private final MacroscopImgPlaceRepository imgPlaceRepo;
+    private final MacroscopImgAgentRepository imgAgentRepo;
     private final MacroscopAgentConfigRepository configRepo;
     private final MacroscopChannelRepository channelRepo;
     private final ImgManageService imgService;
@@ -188,6 +187,68 @@ public class MacroscopManageService {
             ret.setUpdatedBy(extractUserId(getCurrentAuth()));
             return mapper.toDto(imgConfigRepo.save(ret));
         }
+        return mapper.toDto(ret);
+    }
+
+
+    @Transactional(readOnly = true)
+    @PreAuthorize("@securityAccessUtils.isAllowedAllActions()")
+    public List<MacroscopImgPlaceListDto> getImgPlacesForAgent(String agentId) {
+        var agent = imgService.getAgent(agentId);
+        return imgPlaceRepo.findByAgentId(agentId).stream()
+                .map(mapper::toListDto).toList();
+    }
+
+    @Transactional
+    @PreAuthorize("@securityAccessUtils.isAllowedAllActions()")
+    public MacroscopImgPlaceDto addImgPlaceByAgent(String agentId, MacroscopImgPlaceDto dto) {
+        imgService.getAgent(agentId);
+        var agent = imgAgentRepo.findById(agentId).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Agent not found"));
+        var cfg = _getImgConfig(agentId);
+        assert cfg != null;
+        if (cfg.getConfig() == null) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Macroscop config for agent not bounded");
+        }
+        if (imgPlaceRepo.findByAgentId(agentId).stream()
+                .anyMatch(f -> Objects.equals(dto.getMacroscopId(), f.getOrigChannelId()))) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Place for channel =" + dto.getMacroscopId() + " already exists");
+        }
+        var channel = channelRepo.findByConfigIdAndMacroscopId(cfg.getConfig().getId(), dto.getMacroscopId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Channel not found"));
+        var ret = new MacroscopImgPlace();
+        ret.setName(dto.getName() == null ? channel.getName() : dto.getName());
+        ret.setAgent(agent);
+        ret.setPresent(channel.getExists() && channel.getEnabled());
+        ret.setDeleted(false);
+        ret.setUsed(channel.getUsed());
+        ret.setChannel(channel);
+        ret.setOrigChannelId(channel.getMacroscopId());
+        ret.setCreatedBy(extractUserId(getCurrentAuth()));
+        ret = imgPlaceRepo.saveAndFlush(ret);
+        return mapper.toDto(ret);
+    }
+
+
+    @Transactional(readOnly = true)
+    @PreAuthorize("@securityAccessUtils.isAllowedAllActions()")
+    public MacroscopImgPlaceDto getImgPlace(String id) {
+        var ret = imgPlaceRepo.findById(id).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "place not found"));
+        imgService.getAgent(ret.getAgent().getId());
+        return mapper.toDto(ret);
+    }
+
+    @Transactional
+    @PreAuthorize("@securityAccessUtils.isAllowedAllActions()")
+    public MacroscopImgPlaceDto updateImgPlace(String id, MacroscopImgPlaceDto dto) {
+        var ret = imgPlaceRepo.findById(id).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "place not found"));
+        imgService.getAgent(ret.getAgent().getId());
+        ret.setName(dto.getName());
+        ret.setUsed(dto.isUsed());
+        ret.setUpdatedBy(extractUserId(getCurrentAuth()));
+        ret = imgPlaceRepo.saveAndFlush(ret);
         return mapper.toDto(ret);
     }
 
@@ -350,7 +411,7 @@ public class MacroscopManageService {
         var channel = channelRepo.findByConfigIdAndMacroscopId(configId, channelId).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "Channel not found"));
 
-        return  _getLastArchiveScreenShotOnChannel(creds, channel);
+        return _getLastArchiveScreenShotOnChannel(creds, channel);
     }
 
 

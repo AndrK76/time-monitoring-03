@@ -66,11 +66,35 @@ public class MacroscopManageController {
         return service.unbindImgConfig(agentId);
     }
 
+    @GetMapping(value = {"/img-agents/{id}/places"})
+    public List<MacroscopImgPlaceListDto> getImgPlacesForAgent(
+            @PathVariable(name = "id") String agentId) {
+        return service.getImgPlacesForAgent(agentId);
+    }
+
+    @PostMapping("/img-agents/{id}/places")
+    MacroscopImgPlaceDto addImgPlaceByAgent(
+            @PathVariable(name = "id") String agentId,
+            @Valid @RequestBody MacroscopImgPlaceDto dto) {
+        return service.addImgPlaceByAgent(agentId, dto);
+    }
+
+    @GetMapping("/img-places/{id}")
+    public MacroscopImgPlaceDto getImgPlace(@PathVariable(name = "id") String id) {
+        return service.getImgPlace(id);
+    }
+
+    @PutMapping("/img-places/{id}")
+    public MacroscopImgPlaceDto updateImgPlace(
+            @PathVariable(name = "id") String id,
+            @Valid @RequestBody MacroscopImgPlaceDto dto) {
+        return service.updateImgPlace(id, dto);
+    }
+
     @GetMapping({"/configs", "/configs/"})
     public List<MacroscopAgentConfigListDto> getConfigs() {
         return service.getConfigs();
     }
-
 
     @GetMapping({"/configs/{id}"})
     public MacroscopAgentConfigDto getConfig(@PathVariable("id") String configId) {

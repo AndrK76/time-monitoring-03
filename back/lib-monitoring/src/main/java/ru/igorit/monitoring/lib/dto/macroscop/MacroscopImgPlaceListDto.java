@@ -1,4 +1,4 @@
-package ru.igorit.monitoring.lib.dto.img;
+package ru.igorit.monitoring.lib.dto.macroscop;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ImgPlaceListDto {
+public class MacroscopImgPlaceListDto {
     private String id;
     private String name;
     private String internalName;

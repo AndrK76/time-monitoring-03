@@ -1,0 +1,1 @@
+ALTER TABLE img_places RENAME COLUMN available TO used;

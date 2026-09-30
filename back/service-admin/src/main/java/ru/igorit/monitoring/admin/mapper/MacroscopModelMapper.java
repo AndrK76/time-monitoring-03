@@ -56,6 +56,12 @@ public interface MacroscopModelMapper {
 
     MacroscopChannelStream fromDto(MacroscopChannelStreamDto dto);
 
+    MacroscopImgPlaceListDto toListDto(MacroscopImgPlace item);
+
+    @Mapping(target = "macroscopId", source = "origChannelId")
+    @Mapping(target = "channelId",   source = "channel.id")
+    MacroscopImgPlaceDto toDto(MacroscopImgPlace item);
+
 
     @Named("hashPassword")
     default String hashPassword(String password) {

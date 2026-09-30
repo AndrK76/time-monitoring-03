@@ -9,8 +9,14 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ImgPlaceListDto {
+public class ImgPlaceDto {
     private String id;
+    private String type;
     private String name;
     private String internalName;
+    private boolean used;
+    private boolean actual;
+    private boolean present;
+    private boolean deleted;
+
 }
