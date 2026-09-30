@@ -143,27 +143,6 @@ type UserInfoUpdatedEvent struct {
 	Roles       []string       `json:"roles"`
 }
 
-// OrganizationInfoChangedEvent mirrors OrganizationInfoChangedEventCommandDto.
-type OrganizationInfoChangedEvent struct {
-	OrgID           string         `json:"orgId"`
-	Mode            OrgChangeMode  `json:"mode"`
-	ShortName       string         `json:"shortName"`
-	FullName        string         `json:"fullName"`
-	UpdatedAt       *LocalDateTime `json:"updatedAt"`
-	UpdatedBy       string         `json:"updatedBy"`
-	Users           []string       `json:"users"`
-	CRMAgentSet     bool           `json:"crmAgentSet"`
-	EventAgentsSet  bool           `json:"eventAgentsSet"`
-	CameraAgentsSet bool           `json:"cameraAgentsSet"`
-}
-
-// NewDeleteOrgEvent mirrors OrganizationInfoChangedEventCommandDto#newDeleteEvent:
-// only orgId and mode are populated.
-func NewDeleteOrgEvent(orgID string) *OrganizationInfoChangedEvent {
-	mode := ModeDelete
-	return &OrganizationInfoChangedEvent{OrgID: orgID, Mode: mode}
-}
-
 // DecodePayload rehydrates a command payload into a concrete struct, mirroring
 // CommandReceiver#getPayload. The Java version raises on conversion failure;
 // here the error is returned so the listener can log and skip it.

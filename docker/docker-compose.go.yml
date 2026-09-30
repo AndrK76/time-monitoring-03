@@ -1,0 +1,90 @@
+# docker-compose.go.yml — runs the three Go backend services beside mon3-pg and
+# mon3-rabbit from docker-compose.yml:
+#
+#   cd docker
+#   docker compose -f docker-compose.yml -f docker-compose.go.yml up -d --build
+#
+# JWT_SECRET and STORE_XOR must be added to docker/.env (they are deliberately
+# absent from .env.example, and this file fails fast if they are missing). They
+# must be byte-identical across the three services; STORE_XOR must additionally
+# match the value the Java services used, or previously stored credentials are
+# unreadable. RABBIT_PASSWORD/PG_* come from the same docker/.env.
+services:
+  service-auth:
+    build:
+      context: ..
+      dockerfile: docker/go/Dockerfile
+      args: { CMD: service-auth }
+    image: mon3-auth:latest
+    container_name: mon3-auth
+    ports: ["8083:8083"]
+    environment:
+      POSTGRES_URL: postgres://${PG_AUTH_USER}:${PG_AUTH_PASSWORD}@mon3-pg:5432/${PG_DB}?sslmode=disable
+      PG_USER: ${PG_AUTH_USER}
+      PG_PASSWORD: ${PG_AUTH_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET in docker/.env}
+      STORE_XOR: ${STORE_XOR:?set STORE_XOR in docker/.env}
+      RABBIT_HOST: mon3-rabbit
+      RABBIT_PORT: "5672"
+      RABBIT_USER: ${RABBIT_USER}
+      RABBIT_PASSWORD: ${RABBIT_PASSWORD}
+      BOOTSTRAP_ADMIN_PASSWORD: ${BOOTSTRAP_ADMIN_PASSWORD:-}
+    depends_on:
+      mon3-pg: { condition: service_healthy }
+      mon3-rabbit: { condition: service_healthy }
+    networks: [mon3-net]
+    restart: unless-stopped
+
+  service-admin:
+    build:
+      context: ..
+      dockerfile: docker/go/Dockerfile
+      args: { CMD: service-admin }
+    image: mon3-admin:latest
+    container_name: mon3-admin
+    ports: ["8082:8082"]
+    environment:
+      POSTGRES_URL: postgres://${PG_ADMIN_USER}:${PG_ADMIN_PASSWORD}@mon3-pg:5432/${PG_DB}?sslmode=disable
+      PG_USER: ${PG_ADMIN_USER}
+      PG_PASSWORD: ${PG_ADMIN_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET in docker/.env}
+      STORE_XOR: ${STORE_XOR:?set STORE_XOR in docker/.env}
+      RABBIT_HOST: mon3-rabbit
+      RABBIT_PORT: "5672"
+      RABBIT_USER: ${RABBIT_USER}
+      RABBIT_PASSWORD: ${RABBIT_PASSWORD}
+      YCLIENTS_API_URL: ${YCLIENTS_API_URL:-}
+    depends_on:
+      mon3-pg: { condition: service_healthy }
+      mon3-rabbit: { condition: service_healthy }
+    networks: [mon3-net]
+    restart: unless-stopped
+
+  service-monitoring:
+    build:
+      context: ..
+      dockerfile: docker/go/Dockerfile
+      args: { CMD: service-monitoring }
+    image: mon3-monitoring:latest
+    container_name: mon3-monitoring
+    # No public port: the Java service exposed 8081 only to the gateway and
+    # actuator; the Go binary listens on 8081 inside the network for parity.
+    expose: ["8081"]
+    environment:
+      POSTGRES_URL: postgres://${PG_MONITORING_USER}:${PG_MONITORING_PASSWORD}@mon3-pg:5432/${PG_DB}?sslmode=disable
+      PG_USER: ${PG_MONITORING_USER}
+      PG_PASSWORD: ${PG_MONITORING_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET in docker/.env}
+      STORE_XOR: ${STORE_XOR:?set STORE_XOR in docker/.env}
+      RABBIT_HOST: mon3-rabbit
+      RABBIT_PORT: "5672"
+      RABBIT_USER: ${RABBIT_USER}
+      RABBIT_PASSWORD: ${RABBIT_PASSWORD}
+    depends_on:
+      mon3-pg: { condition: service_healthy }
+      mon3-rabbit: { condition: service_healthy }
+    networks: [mon3-net]
+    restart: unless-stopped
+
+# The mon3-net network and the mon3-pg/mon3-rabbit services come from
+# docker-compose.yml; this file only adds the backend services to them.

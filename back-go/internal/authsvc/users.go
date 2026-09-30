@@ -7,7 +7,6 @@ import (
 
 	"golang.org/x/crypto/bcrypt"
 
-	"github.com/nightweb/time-monitoring-03/back-go/internal/common"
 	"github.com/nightweb/time-monitoring-03/back-go/internal/db"
 	"github.com/nightweb/time-monitoring-03/back-go/internal/httpx"
 	"github.com/nightweb/time-monitoring-03/back-go/internal/security"
@@ -361,11 +360,3 @@ func slicesContains(list []string, v string) bool {
 	}
 	return false
 }
-
-// orgEvent publishes an organization change to service-admin and the
-// monitoring service, which mirrors the auth schema.
-func (s *Service) orgEvent(ctx context.Context, event *common.OrganizationInfoChangedEvent) {
-	s.publish(ctx, rabbitRouteAdmin, common.CmdOrganizationInfoChanged, event)
-}
-
-const rabbitRouteAdmin = "mon3.admin"

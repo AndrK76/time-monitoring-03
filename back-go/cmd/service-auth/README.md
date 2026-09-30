@@ -4,9 +4,12 @@ Authentication, users, roles, permissions, organizations. Owns the `auth`
 PostgreSQL schema, listens on **8083**.
 
 Publishes `USER_CREATED`, `USER_INFO_UPDATED` and `ORGANIZATION_INFO_CHANGED` to
-`mon3.admin`. Declares `mon3-auth-queue` but attaches no consumer: the
-organization dictionary is owned by `service-admin` and mirrored into the `mon`
-schema, so there is nothing for this service to apply.
+`mon3.admin`. Consumes `ORGANIZATION_INFO_CHANGED` on its own
+`mon3-auth-queue`: service-admin owns the organization dictionary, and this
+service keeps the read-side copy in `auth.organizations` plus the
+`user_organizations` membership every login checks. The ADDs, renames and
+deletes published by the admin service are exactly what keeps that copy in
+step.
 
 ```bash
 POSTGRES_URL='postgres://mon3:secret@localhost:5432/mon3?sslmode=disable' \

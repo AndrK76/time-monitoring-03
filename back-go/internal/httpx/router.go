@@ -97,6 +97,32 @@ func (rt *Route) raw(method, pattern string, fn http.HandlerFunc) {
 	rt.mux.Handle(method+" "+rt.join(pattern), fn)
 }
 
+// ExactGet and its siblings register a trailing-slash alias.
+//
+// The Java controllers wrote mappings like @GetMapping({"/types", "/types/"}), so
+// both the bare path and the same path with a trailing slash were collection
+// endpoints and nothing else. Go's ServeMux has no trailing-slash matching: a
+// pattern ending in "/" matches the whole subtree, so a bare registration would
+// also answer "/types/anything". These register the subtree and then reject
+// anything that is not the exact trailing-slash form, reproducing the Java
+// behaviour without losing the more specific exact pattern.
+func (rt *Route) ExactGet(pattern string, fn HandlerFunc)  { rt.exact(http.MethodGet, pattern, fn) }
+func (rt *Route) ExactPost(pattern string, fn HandlerFunc) { rt.exact(http.MethodPost, pattern, fn) }
+func (rt *Route) ExactPut(pattern string, fn HandlerFunc)  { rt.exact(http.MethodPut, pattern, fn) }
+func (rt *Route) ExactDelete(pattern string, fn HandlerFunc) {
+	rt.exact(http.MethodDelete, pattern, fn)
+}
+
+func (rt *Route) exact(method, pattern string, fn HandlerFunc) {
+	full := rt.join(pattern)
+	rt.mux.Handle(method+" "+full+"/", Wrap(func(w http.ResponseWriter, r *http.Request) error {
+		if r.URL.Path != full+"/" {
+			return NotFound("No endpoint " + method + " " + r.URL.Path)
+		}
+		return fn(w, r)
+	}))
+}
+
 // PathVar reads a path variable captured by the Go 1.22 ServeMux pattern
 // syntax, the replacement for Spring's @PathVariable.
 func PathVar(r *http.Request, name string) string {

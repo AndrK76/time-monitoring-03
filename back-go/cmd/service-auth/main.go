@@ -51,6 +51,16 @@ func main() {
 
 	authhttp.Register(a, svc)
 
+	// The queue's routing key mon3.auth carries the ORGANIZATION_INFO_CHANGED
+	// events service-admin publishes. This service mirrors them: auth.organizations
+	// is the read-side copy of the dictionary and user_organizations feeds login
+	// membership, so both must track the admin service's edits.
+	if a.Rabbit != nil {
+		a.Rabbit.Consume(ctx, svc.HandleCommand, true)
+	} else {
+		a.Log.Warn("organization events not consumed, no rabbitmq connection; the organization mirror will stay empty")
+	}
+
 	// The migrations seed superadmin without a password and the only endpoint
 	// that could set one needs a superuser token, so a fresh database has no
 	// way in until an operator supplies BOOTSTRAP_ADMIN_PASSWORD. The Java

@@ -168,3 +168,17 @@ func DecodeJSON(w http.ResponseWriter, r *http.Request, target any) error {
 	}
 	return nil
 }
+
+// ErrorMessage extracts the human-readable detail from an error, returning the
+// empty string for one that carries none. It is used where an error has to be
+// folded into a domain envelope - the YClients response, for instance - that
+// does not have the problem+json shape to render.
+func ErrorMessage(err error) string {
+	if err == nil {
+		return ""
+	}
+	if apiErr := AsAPIError(err); apiErr != nil {
+		return apiErr.Detail
+	}
+	return err.Error()
+}

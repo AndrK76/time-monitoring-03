@@ -235,6 +235,30 @@ calling it. The endpoints exist here, and the store and TTL were already in the
 schema. Note the issued token is not *redeemable*: there is no Telegram bot in
 this port to consume it. It is issued and rotatable, not a working login path.
 
+**`USER_INFO_UPDATED` partial events no longer blank the mirror.** The auth
+service publishes a partial event when only some profile fields change; the Java
+mapper copied the absent fields as null, so the admin mirror lost the previous
+values. Partial events now skip absent fields (`COALESCE` on the upsert).
+
+**Agent and delegate lists sort missing descriptions last.** `Comparator.comparing(...)`
+on a null description threw an NPE and the whole list failed to render; the Go
+comparator orders nulls after present values.
+
+**`POST /yc/agents/{id}/service-categories` keeps the staff lists.** Java
+re-checked `categories.isSuccess()` where it meant `staffs.isSuccess()` (copy
+paste), so a failing staffs fetch was reported as a failing categories fetch and
+places silently lost their staff filters.
+
+**The YClients organization row records `yc_id`.** The Java
+`CrmManageService.updateOrganization` never assigned `yc_id` after creating the
+external-organization row, so a renamed company kept the id of the previous one.
+The Go upsert writes it.
+
+**DELETE of an unknown agent, config or organization returns 404.** Java called
+`deleteById(...)` unconditionally; an unknown id surfaced as a 500 (through
+`EmptyResultDataAccessException` or an NPE). The Go paths report a 404 with the
+same message shape the corresponding GET uses.
+
 ### Robustness
 
 **The logout blacklist is trimmed.** Java kept an unbounded map, so memory grew
@@ -243,6 +267,62 @@ be rejected anyway.
 
 **The blacklist records the token's expiry**, so the trim above can be exact
 rather than guessing a maximum lifetime.
+
+## service-admin wire deviations
+
+These are deliberate differences from the Java service on this branch. The Java
+wire format was reconstructed from the controllers and the front-end, and where
+a Java detail was clearly accidental it was not reproduced when the front-end
+could not depend on it.
+
+**`bindEvtConfig` and `bindImgConfig` return unmasked credentials.** The Java
+methods returned the stored XOR-masked credentials back to a client that had
+just sent them; anything that reads the response as the server's own state would
+have had to unmask again. The Go methods return the plain values. The bind-and-
+read flow (`GET` after `PUT`) is unaffected: reads are unmasked in both.
+
+**Organization events are published after the transaction commits.** Java
+published inside the transaction, from `_bindAgent`/`_unbindAgent` and the
+create/update/delete methods, so a rollback left consumers with an event the
+writer never durably stored. Go collects the events and publishes once the
+transaction has committed (see "Binding an agent publishes the event after the
+flag is written" above for the flag-ordering half of the same fix).
+
+**Events carry the real agent-set flags.** The Java command mapper declared all
+three agent flags `@Mapping(ignore = true)`, so every published event carried
+`false` and each consumer's copy of the flags was reset to false on every
+update. The Go `OrgChangeEvent` carries the organization's current flags, which
+is the only value the consumers can converge on.
+
+## service-monitoring
+
+The monitoring service in Go is the same shape as the Java one, trimmed to what
+the Java service actually did:
+
+- **No routes.** The Java application had a security chain and actuator but no
+  controllers, so every path answered 404 (or actuator's own JSON). The Go
+  binary registers no routes and answers the shared JSON 404 on 8081.
+- **Bus only.** It consumes `ORGANIZATION_INFO_CHANGED` on `mon3.mon` and keeps
+  the `mon.organizations` mirror. Everything it stores is a projection of what
+  service-admin publishes; there is no other writer.
+- **Faithful mode handling.** The `ADD`/`UPDATE`/`UPDATE_NAME` branch writes
+  names and the created or updated group exactly as the Java handler did;
+  `DELETE` drops the row (a missing row is not an error, matching Spring Data's
+  `deleteById`); each bind mode writes one flag plus the updated group.
+- **Errors are logged, not thrown.** The Java handler swallowed every exception
+  and the listener acknowledged every message, so a poison message was consumed
+  and discarded; the Go consumer does the same (`swallowErrors=true`).
+
+Fixed in the port (see "Fixed defects", "Correctness"):
+
+- **`UPDATE_IMG_BIND` reads the camera flag.** Java wrote
+  `eventAgentsSet` into the camera column, so the camera flag followed the
+  *event* flag's value whenever the two diverged.
+- **A bind event for an unknown organization recreates the row.** Java inserted
+  a row whose names were null, hit the NOT NULL constraint, caught the error,
+  and dropped the event, so a bind that arrived before its ADD (a service that
+  was down on the ADD) was lost forever. The events carry the names, so the Go
+  upsert uses them.
 
 ## Known limitations, inherited
 
@@ -286,7 +366,8 @@ back-go/
 ```
 
 `service-admin` and `service-monitoring` follow the same split: domain packages
-(`adminsvc`, `monitorsvc`) plus route packages (`adminhttp`, `monitorhttp`).
+(`adminsvc`, `monsvc`) plus a route package (`adminhttp`) where routes exist —
+the monitoring service has no routes, only a command consumer.
 
 ## Tests
 
@@ -296,6 +377,17 @@ go test ./...
 
 Coverage is concentrated where a mistake would be silent and expensive: the JWT
 algorithm negotiation and the access-token/refresh-token separation, the
-credential masking round trip against rows written by Java, and the
-`LocalDateTime` wire format, whose difference from `time.RFC3339` is invisible
-until a client parses a timestamp.
+credential masking round trip against rows written by Java, the command
+envelope round trip between the three services, and the `LocalDateTime` wire
+format, whose difference from `time.RFC3339` is invisible until a client parses
+a timestamp.
+
+The end-to-end smoke scripts drive a live stack and are the fastest way to
+verify a behaviour claim that the unit tests do not cover:
+
+```bash
+# needs mon3-pg on :55432 and mon3-rabbit, plus the three binaries running
+./scripts/smoke-auth.sh http://localhost:8083/api/v1
+./scripts/smoke-admin.sh http://localhost:8082/api/v1 <superadmin-token>
+./scripts/smoke-monitoring.sh http://localhost:8082/api/v1 <superadmin-token>
+```

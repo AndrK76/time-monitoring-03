@@ -52,29 +52,17 @@ func scanUser(row pgx.Row) (*User, error) {
 	return &u, nil
 }
 
-// nullTime and nullString convert a nullable column into the wire types.
-//
-// They take pgtype values rather than pointers. pgx will happily scan a NULL
-// into a pointer-to-pointer, but a bare *string or *time.Time destination is
-// treated as a non-nullable target and the scan fails with "cannot scan NULL
-// into ...". Going through pgtype makes the nullable case explicit, which is
-// what the schema needs: every one of these columns is genuinely NULL for a row
-// the migrations seeded.
-func nullTime(t pgtype.Timestamp) *common.LocalDateTime {
-	if !t.Valid {
-		return nil
-	}
-	v := common.NewLocalDateTime(t.Time)
-	return &v
-}
+// nullTime and nullString convert a nullable column into the wire types. They
+// take pgtype values rather than pointers: pgx will happily scan a NULL into a
+// pointer-to-pointer, but a bare *string or *time.Time destination is treated
+// as a non-nullable target and the scan fails with "cannot scan NULL into ...".
+// Going through pgtype makes the nullable case explicit, which is what the
+// schema needs, since every one of these columns is genuinely NULL for a row
+// the migrations seeded. The implementations are shared with service-admin, so
+// a change to nullable handling cannot diverge between the two services.
+func nullTime(t pgtype.Timestamp) *common.LocalDateTime { return db.NullTime(t) }
 
-func nullString(s pgtype.Text) *string {
-	if !s.Valid {
-		return nil
-	}
-	v := s.String
-	return &v
-}
+func nullString(s pgtype.Text) *string { return db.NullString(s) }
 
 // newID generates a primary key for a row whose id has no database default.
 // The Java entities used UUID.randomUUID(), rendered by Postgres as text.
@@ -455,6 +443,40 @@ func (s *Store) UserIDsForOrganization(ctx context.Context, q db.Querier, orgID 
 		out = append(out, id)
 	}
 	return out, rows.Err()
+}
+
+// ExistingUserIDs returns the given ids that exist in app_users, in the input
+// order. The Java consumer resolved the event's membership through
+// getUsersByIds before granting, so an id that is not a real user is silently
+// dropped here too.
+func (s *Store) ExistingUserIDs(ctx context.Context, q db.Querier, ids []string) ([]string, error) {
+	if len(ids) == 0 {
+		return nil, nil
+	}
+	rows, err := q.Query(ctx, `SELECT id FROM users WHERE id = ANY($1)`, ids)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	present := map[string]bool{}
+	for rows.Next() {
+		var id string
+		if err := rows.Scan(&id); err != nil {
+			return nil, err
+		}
+		present[id] = true
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	out := []string{}
+	for _, id := range ids {
+		if present[id] {
+			out = append(out, id)
+		}
+	}
+	return out, nil
 }
 
 // ListOrganizations returns every organization, unfiltered, ordered by
