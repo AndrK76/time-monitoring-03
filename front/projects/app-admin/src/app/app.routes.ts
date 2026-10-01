@@ -73,15 +73,21 @@ export const routes: Routes = [
   },
   {
     path: 'img/agent-list',
-    loadComponent: () => import('./features/img/img-agent-list/img-agent-list.component').then(m => m.ImgAgentListComponent),
+    loadComponent: () => import('./features/img/img-agent/img-agent-list/img-agent-list.component').then(m => m.ImgAgentListComponent),
     canActivate: [authGuard],
     data: authConstant('img/agent-list')
   },
   {
     path: 'img/agent',
-    loadComponent: () => import('./features/img/img-agent-config/img-agent-config.component').then(m => m.ImgAgentConfigComponent),
+    loadComponent: () => import('./features/img/img-agent/img-agent-config/img-agent-config.component').then(m => m.ImgAgentConfigComponent),
     canActivate: [authGuard],
     data: authConstant('img/agent')
+  },
+  {
+    path: 'img/place-list',
+    loadComponent: () => import('./features/img/img-place/img-place-list-header/img-place-list-header.component').then(m => m.ImgPlaceListHeaderComponent),
+    canActivate: [authGuard],
+    data: authConstant('crm/place-list')
   },
   {
     path: 'yclients/config',

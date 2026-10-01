@@ -206,15 +206,26 @@
 |   |                           |   |   |-- EvtAgentListDto.java
 |   |                           |   |   |-- EvtAgentTypeDto.java
 |   |                           |   |   `-- EvtPlaceListDto.java
+|   |                           |   |-- img
+|   |                           |   |   |-- ImgAgentConfigDto.java
+|   |                           |   |   |-- ImgAgentItemDto.java
+|   |                           |   |   |-- ImgAgentListDto.java
+|   |                           |   |   |-- ImgAgentTypeDto.java
+|   |                           |   |   |-- ImgPlaceDto.java
+|   |                           |   |   `-- ImgPlaceListDto.java
 |   |                           |   |-- macroscop
 |   |                           |   |   |-- MacroscopAgentConfigDto.java
 |   |                           |   |   |-- MacroscopAgentConfigListDto.java
 |   |                           |   |   |-- MacroscopArchiveModeDto.java
 |   |                           |   |   |-- MacroscopChannelDto.java
+|   |                           |   |   |-- MacroscopChannelListDto.java
 |   |                           |   |   |-- MacroscopChannelStreamDto.java
 |   |                           |   |   |-- MacroscopCredentialsDto.java
 |   |                           |   |   |-- MacroscopDataResponse.java
 |   |                           |   |   |-- MacroscopEvtAgentConfigDto.java
+|   |                           |   |   |-- MacroscopImgAgentConfigDto.java
+|   |                           |   |   |-- MacroscopImgPlaceDto.java
+|   |                           |   |   |-- MacroscopImgPlaceListDto.java
 |   |                           |   |   |-- MacroscopServerCredentials.java
 |   |                           |   |   `-- MacroscopServerInfoDto.java
 |   |                           |   |-- yclients
@@ -243,12 +254,17 @@
 |   |                               |   |   |-- CrmAgentListProjection.java
 |   |                               |   |   |-- CrmOrganization.java
 |   |                               |   |   |-- CrmPlace.java
-|   |                               |   |   |-- CrmService.java
-|   |                               |   |   `-- EvtAgentListProjection.java
+|   |                               |   |   `-- CrmService.java
 |   |                               |   |-- evt
 |   |                               |   |   |-- EvtAgent.java
 |   |                               |   |   |-- EvtAgentConfig.java
+|   |                               |   |   |-- EvtAgentListProjection.java
 |   |                               |   |   `-- EvtPlace.java
+|   |                               |   |-- img
+|   |                               |   |   |-- ImgAgent.java
+|   |                               |   |   |-- ImgAgentConfig.java
+|   |                               |   |   |-- ImgAgentListProjection.java
+|   |                               |   |   `-- ImgPlace.java
 |   |                               |   |-- macroscop
 |   |                               |   |   |-- MacroscopAgentConfig.java
 |   |                               |   |   |-- MacroscopArchiveMode.java
@@ -257,6 +273,9 @@
 |   |                               |   |   |-- MacroscopCredentials.java
 |   |                               |   |   |-- MacroscopEvtAgent.java
 |   |                               |   |   |-- MacroscopEvtAgentConfig.java
+|   |                               |   |   |-- MacroscopImgAgent.java
+|   |                               |   |   |-- MacroscopImgAgentConfig.java
+|   |                               |   |   |-- MacroscopImgPlace.java
 |   |                               |   |   `-- MacroscopServerInfo.java
 |   |                               |   `-- yclients
 |   |                               |       |-- YClientCredentials.java
@@ -280,11 +299,18 @@
 |   |                                   |   |-- EvtAgentConfigRepository.java
 |   |                                   |   |-- EvtAgentRepository.java
 |   |                                   |   `-- EvtPlaceRepository.java
+|   |                                   |-- img
+|   |                                   |   |-- ImgAgentConfigRepository.java
+|   |                                   |   |-- ImgAgentRepository.java
+|   |                                   |   `-- ImgPlaceRepository.java
 |   |                                   |-- macroscop
 |   |                                   |   |-- MacroscopAgentConfigRepository.java
 |   |                                   |   |-- MacroscopChannelRepository.java
 |   |                                   |   |-- MacroscopEvtAgentConfigRepository.java
-|   |                                   |   `-- MacroscopEvtAgentRepository.java
+|   |                                   |   |-- MacroscopEvtAgentRepository.java
+|   |                                   |   |-- MacroscopImgAgentConfigRepository.java
+|   |                                   |   |-- MacroscopImgAgentRepository.java
+|   |                                   |   `-- MacroscopImgPlaceRepository.java
 |   |                                   `-- yclients
 |   |                                       |-- YClientsAgentConfigRepository.java
 |   |                                       |-- YClientsAgentRepository.java
@@ -334,6 +360,7 @@
 |   |       |                   |   |-- AccessModelController.java
 |   |       |                   |   |-- CrmManageController.java
 |   |       |                   |   |-- EvtManageController.java
+|   |       |                   |   |-- ImgManageController.java
 |   |       |                   |   |-- MacroscopManageController.java
 |   |       |                   |   |-- MainDictController.java
 |   |       |                   |   |-- TestController.java
@@ -348,6 +375,7 @@
 |   |       |                   |   |-- CrmModelMapper.java
 |   |       |                   |   |-- EventCommandMapper.java
 |   |       |                   |   |-- EvtModelMapper.java
+|   |       |                   |   |-- ImgModelMapper.java
 |   |       |                   |   |-- MacroscopModelMapper.java
 |   |       |                   |   |-- StructModelMapper.java
 |   |       |                   |   `-- YClientsModelMapper.java
@@ -355,6 +383,7 @@
 |   |       |                   |   |-- AccessManageService.java
 |   |       |                   |   |-- CrmManageService.java
 |   |       |                   |   |-- EvtManageService.java
+|   |       |                   |   |-- ImgManageService.java
 |   |       |                   |   |-- MacroscopManageService.java
 |   |       |                   |   |-- StructManageService.java
 |   |       |                   |   |-- TestService.java
@@ -378,7 +407,13 @@
 |   |           |       |-- V01.12__macroscop_config_add_state.sql
 |   |           |       |-- V01.14__add_macroscop_channels.sql
 |   |           |       |-- V01.15__add_used_to_macroscop_channels.sql
-|   |           |       `-- V01.16__add_streams_to_macroscop_channels.sql
+|   |           |       |-- V01.16__add_streams_to_macroscop_channels.sql
+|   |           |       |-- V01.17__add_img_agents_and_places.sql
+|   |           |       |-- V01.18__add_macroscop_img_agent_configs.sql
+|   |           |       |-- V01.19__fix_img_agent_configs.sql
+|   |           |       |-- V01.20__drop_discriminator_from_img_agent_configs.sql
+|   |           |       |-- V01.21__extend_img_places.sql
+|   |           |       `-- V01.22__rename_img_places_available_to_used.sql
 |   |           `-- application.yml
 |   |-- .properties
 |   `-- pom.xml
@@ -484,4 +519,4 @@
 |-- pom.xml
 `-- tree.txt
 
-195 directories, 289 files
+198 directories, 321 files

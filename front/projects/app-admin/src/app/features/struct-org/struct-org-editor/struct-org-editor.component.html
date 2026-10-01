@@ -95,7 +95,7 @@
 
         <!-- Ссылки на смежные разделы -->
         <div class="form-row">
-            <span class="label">Перейти <span>{{isSmallScreen()?'(CRM)':''}}</span></span>
+            <span class="label"><span>{{isSmallScreen()?'CRM:':'Перейти'}}</span></span>
             <a mat-button class="editor-link" [routerLink]="['/crm/place-list']"
                 [queryParams]="{org: organization().id}">
                 <span>{{isSmallScreen()?'Места':'К списку мест CRM'}}</span>
@@ -104,6 +104,21 @@
                 [queryParams]="{org: organization().id}">
                 <span>{{isSmallScreen()?'Услуги':'К списку услуг CRM'}}</span>
             </a>
+            @if (!isSmallScreen()) {
+            <a mat-button class="editor-link" [routerLink]="['/img/place-list']"
+                [queryParams]="{org: organization().id}">
+                <span>К списку мест камер</span>
+            </a>
+            }
         </div>
+        @if (isSmallScreen()) {
+        <div class="form-row">
+            <span class="label">Камеры:</span>
+            <a mat-button class="editor-link" [routerLink]="['/img/place-list']"
+                [queryParams]="{org: organization().id}">
+                <span>Места</span>
+            </a>
+        </div>
+        }
     </form>
 </div>

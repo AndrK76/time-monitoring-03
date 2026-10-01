@@ -29,4 +29,9 @@ public class MacroscopImgPlace extends ImgPlace {
     public String getInternalName() {
         return channel == null ? null : channel.getName();
     }
+
+    @Override
+    public String getInternalId() {
+        return channel == null ? null : channel.getMacroscopId();
+    }
 }

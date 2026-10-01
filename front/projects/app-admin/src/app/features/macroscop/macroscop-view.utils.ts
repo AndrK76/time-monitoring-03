@@ -7,6 +7,8 @@ import {
     MacroscopCredentialsDto,
     MacroscopEvtAgentConfigDto,
     MacroscopImgAgentConfigDto,
+    MacroscopImgPlaceDto,
+    MacroscopImgPlaceListDto,
 } from '@mon3/sc';
 import {
     MacroscopAgentConfigListView,
@@ -17,6 +19,8 @@ import {
     MacroscopCredentialsView,
     MacroscopEvtAgentConfigView,
     MacroscopImgAgentConfigView,
+    MacroscopImgPlaceListView,
+    MacroscopImgPlaceView,
 } from './macroscop-view.models';
 
 export const macroscopCredentialsDtoToView = (
@@ -120,6 +124,71 @@ export const macroscopImgAgentConfigViewToDto = (
     return {
         config: view.config ? macroscopAgentConfigViewToDto(view.config) : undefined,
     };
+};
+
+export const macroscopImgPlaceListDtoToView = (
+    dto: MacroscopImgPlaceListDto
+): MacroscopImgPlaceView => {
+    return {
+        id: dto.id,
+        type: 'Macroscop',
+        name: dto.name,
+        internalName: dto.internalName,
+        used: dto.used,
+        actual: false,
+        present: dto.present,
+        deleted: dto.deleted,
+        macroscopId: dto.internalId,
+        channelId: '',
+    } as MacroscopImgPlaceView;
+};
+
+export const macroscopImgPlaceDtoToView = (dto: MacroscopImgPlaceDto): MacroscopImgPlaceView => {
+    return new MacroscopImgPlaceView(
+        dto.id,
+        dto.type,
+        dto.name,
+        dto.internalName,
+        dto.used,
+        dto.actual,
+        dto.present,
+        dto.deleted,
+        dto.macroscopId,
+        dto.channelId,
+    );
+};
+
+
+export const macroscopImgPlaceViewToDto = (
+    view: MacroscopImgPlaceView
+): MacroscopImgPlaceDto => {
+    return {
+        id: view.id,
+        type: view.type,
+        name: view.name,
+        internalName: view.internalName,
+        used: view.used,
+        actual: view.actual,
+        present: view.present,
+        deleted: view.deleted,
+        macroscopId: view.macroscopId,
+        channelId: view.channelId,
+    };
+};
+
+export const createNewMacroscopPlace = (): MacroscopImgPlaceView => {
+    return {
+        id: 'temp-' + Date.now(),
+        type: 'Macroscop',
+        name: '',
+        internalName: '',
+        used: true,
+        actual: false,
+        present: false,
+        deleted: false,
+        macroscopId: '',
+        channelId: '',
+    } as MacroscopImgPlaceView;
 };
 
 export const createEmptyMacroscopAgentConfigView = (): MacroscopAgentConfigView => {

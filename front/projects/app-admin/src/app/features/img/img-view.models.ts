@@ -1,4 +1,4 @@
-import { ImgAgentConfigDto, ImgAgentItemDto, ImgAgentTypeDto, ImgPlaceListDto } from '@mon3/sc';
+import { ImgAgentConfigDto, ImgAgentItemDto, ImgAgentTypeDto, ImgPlaceDto, ImgPlaceListDto } from '@mon3/sc';
 import { OrgStructInfo } from '../struct-org/struct-org-view.models';
 
 export class ImgAgentTypeView implements ImgAgentTypeDto {
@@ -16,13 +16,6 @@ export class ImgAgentConfigView implements ImgAgentConfigDto {
     ) { }
 }
 
-export class ImgPlaceView implements ImgPlaceListDto {
-    constructor(
-        public id: string,
-        public name: string,
-    ) { }
-}
-
 export class ImgAgentItemView implements ImgAgentItemDto {
     constructor(
         public id: string,
@@ -35,5 +28,27 @@ export class ImgAgentItemView implements ImgAgentItemDto {
         public configured: boolean | undefined,
         public config: ImgAgentConfigView | undefined,
         public places: ImgPlaceView[],
+    ) { }
+}
+
+export class ImgPlaceView implements ImgPlaceListDto {
+    constructor(
+        public id: string,
+        public name: string,
+        public internalName: string,
+        public type: string,
+    ) { }
+}
+
+export class ImgPlaceItemView implements ImgPlaceDto {
+    constructor(
+        public id: string,
+        public type: string,
+        public name: string,
+        public internalName: string,
+        public used: boolean,
+        public actual: boolean,
+        public present: boolean,
+        public deleted: boolean,
     ) { }
 }

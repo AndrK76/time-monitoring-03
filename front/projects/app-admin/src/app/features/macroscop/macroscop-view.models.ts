@@ -7,6 +7,8 @@ import {
     MacroscopCredentialsDto,
     MacroscopEvtAgentConfigDto,
     MacroscopImgAgentConfigDto,
+    MacroscopImgPlaceDto,
+    MacroscopImgPlaceListDto,
     MacroscopServerInfoDto,
 } from '@mon3/sc';
 
@@ -50,6 +52,34 @@ export class MacroscopImgAgentConfigView implements MacroscopImgAgentConfigDto {
     constructor(
         public config: MacroscopAgentConfigView | undefined,
     ) { }
+}
+
+export class MacroscopImgPlaceListView implements MacroscopImgPlaceListDto {
+    constructor(
+        public id: string,
+        public name: string,
+        public internalName: string,
+        public internalId: string,
+        public used: boolean,
+        public present: boolean,
+        public deleted: boolean,
+    ) { }
+}
+
+export class MacroscopImgPlaceView implements MacroscopImgPlaceDto {
+    constructor(
+        public id: string,
+        public type: string,
+        public name: string,
+        public internalName: string,
+        public used: boolean,
+        public actual: boolean,
+        public present: boolean,
+        public deleted: boolean,
+        public macroscopId: string,
+        public channelId: string,
+    ) { }
+    undeleted?: boolean;
 }
 
 export class MacroscopChannelView implements MacroscopChannelDto {

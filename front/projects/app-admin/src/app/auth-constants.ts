@@ -22,6 +22,8 @@ export const AUTH_CONSTANTS: Record<string, any> = {
     'evt/agent-list': { mode: 'or', groups: ['superuser', 'any_action_allow'] },
     'img/agent': { mode: 'or', groups: ['superuser', 'any_action_allow'] },
     'img/agent-list': { mode: 'or', groups: ['superuser', 'any_action_allow'] },
+    'img/place-list': { mode: 'or', groups: ['superuser', 'any_action_allow'] },
+    'imgPlaceAllActions': { mode: 'or', groups: ['superuser'] },
     'macroscop/evt/config': { mode: 'or', groups: ['superuser', 'any_action_allow'] },
     'macroscop/img/config': { mode: 'or', groups: ['superuser', 'any_action_allow'] },
     'macroscop/config-list': ['superuser'],

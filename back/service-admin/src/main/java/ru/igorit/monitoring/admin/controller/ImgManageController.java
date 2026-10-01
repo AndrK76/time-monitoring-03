@@ -6,10 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.igorit.monitoring.admin.service.ImgManageService;
-import ru.igorit.monitoring.lib.dto.img.ImgAgentConfigDto;
-import ru.igorit.monitoring.lib.dto.img.ImgAgentItemDto;
-import ru.igorit.monitoring.lib.dto.img.ImgAgentListDto;
-import ru.igorit.monitoring.lib.dto.img.ImgAgentTypeDto;
+import ru.igorit.monitoring.lib.dto.img.*;
 
 import java.util.List;
 
@@ -73,6 +70,11 @@ public class ImgManageController {
             @PathVariable("id") String agentId,
             @RequestParam(name = "org") String orgId) {
         return service.bindAgent(agentId, orgId);
+    }
+
+    @GetMapping("/agents/{id}/places")
+    public List<ImgPlaceListDto>  getPlacesForAgent(@PathVariable(name = "id") String agentId) {
+        return service.getPlacesForAgent(agentId);
     }
 
     @GetMapping({"/configs/{id}"})

@@ -5,9 +5,12 @@ import {
   MacroscopAgentConfigListDto,
   MacroscopArchiveModeDto,
   MacroscopChannelDto,
+  MacroscopChannelListDto,
   MacroscopDataResponse,
   MacroscopEvtAgentConfigDto,
   MacroscopImgAgentConfigDto,
+  MacroscopImgPlaceDto,
+  MacroscopImgPlaceListDto,
   MacroscopServerCredentials,
   MacroscopServerInfoDto,
   toFailMacroscopDataResponse,
@@ -73,6 +76,43 @@ export class MacroscopManageService {
     return this.http.put<MacroscopImgAgentConfigDto>(
       `${this.adminApiUrl}${this.MACROSCOP_CONTROLLER}/img-configs/${agentId}/unbind`,
       null);
+  }
+
+
+  getImgPlacesForAgent(agentId: string, showDeleted = false): Observable<MacroscopImgPlaceListDto[]> {
+    return this.http.get<MacroscopImgPlaceListDto[]>(
+      `${this.adminApiUrl}${this.MACROSCOP_CONTROLLER}/img-agents/${agentId}/places`,
+      { params: { 'show-deleted': showDeleted } });
+  }
+
+  addImgPlaceByAgent(agentId: string, dto: MacroscopImgPlaceDto): Observable<MacroscopImgPlaceDto> {
+    return this.http.post<MacroscopImgPlaceDto>(
+      `${this.adminApiUrl}${this.MACROSCOP_CONTROLLER}/img-agents/${agentId}/places`, dto);
+  }
+
+  getActualChannelsForAgent(agentId: string): Observable<MacroscopChannelListDto[]> {
+    return this.http.get<MacroscopChannelListDto[]>(
+      `${this.adminApiUrl}${this.MACROSCOP_CONTROLLER}/img-agents/${agentId}/actual-channels`);
+  }
+
+  getImgPlace(id: string): Observable<MacroscopImgPlaceDto> {
+    return this.http.get<MacroscopImgPlaceDto>(
+      `${this.adminApiUrl}${this.MACROSCOP_CONTROLLER}/img-places/${id}`);
+  }
+
+  updateImgPlace(id: string, dto: MacroscopImgPlaceDto): Observable<MacroscopImgPlaceDto> {
+    return this.http.put<MacroscopImgPlaceDto>(
+      `${this.adminApiUrl}${this.MACROSCOP_CONTROLLER}/img-places/${id}`, dto);
+  }
+
+  deleteImgPlace(id: string): Observable<void> {
+    return this.http.delete<void>(
+      `${this.adminApiUrl}${this.MACROSCOP_CONTROLLER}/img-places/${id}`);
+  }
+
+  restoreImgPlace(id: string): Observable<MacroscopImgPlaceDto> {
+    return this.http.put<MacroscopImgPlaceDto>(
+      `${this.adminApiUrl}${this.MACROSCOP_CONTROLLER}/img-places/${id}/restore-deleted`, null);
   }
 
   getConfigs(): Observable<MacroscopAgentConfigListDto[]> {

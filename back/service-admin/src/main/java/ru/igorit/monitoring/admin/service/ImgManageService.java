@@ -11,10 +11,7 @@ import ru.igorit.monitoring.admin.mapper.EventCommandMapper;
 import ru.igorit.monitoring.admin.mapper.ImgModelMapper;
 import ru.igorit.monitoring.common.dto.command.auth.OrganizationInfoChangedEventCommandDto;
 import ru.igorit.monitoring.common.enums.command.CommandMessageType;
-import ru.igorit.monitoring.lib.dto.img.ImgAgentConfigDto;
-import ru.igorit.monitoring.lib.dto.img.ImgAgentItemDto;
-import ru.igorit.monitoring.lib.dto.img.ImgAgentListDto;
-import ru.igorit.monitoring.lib.dto.img.ImgAgentTypeDto;
+import ru.igorit.monitoring.lib.dto.img.*;
 import ru.igorit.monitoring.lib.enums.ImgAgentType;
 import ru.igorit.monitoring.lib.persistence.entity.common.Organization;
 import ru.igorit.monitoring.lib.persistence.entity.img.ImgAgent;
@@ -24,6 +21,7 @@ import ru.igorit.monitoring.lib.persistence.entity.macroscop.MacroscopImgAgentCo
 import ru.igorit.monitoring.lib.persistence.repository.common.OrganizationRepository;
 import ru.igorit.monitoring.lib.persistence.repository.img.ImgAgentConfigRepository;
 import ru.igorit.monitoring.lib.persistence.repository.img.ImgAgentRepository;
+import ru.igorit.monitoring.lib.persistence.repository.img.ImgPlaceRepository;
 import ru.igorit.monitoring.rabbit.service.CommandSender;
 import ru.igorit.monitoring.security.util.SecurityAccessUtils;
 
@@ -39,6 +37,7 @@ public class ImgManageService {
     private final ImgModelMapper imgModelMapper;
     private final ImgAgentRepository agentRepo;
     private final ImgAgentConfigRepository cfgRepo;
+    private final ImgPlaceRepository placeRepo;
     private final OrganizationRepository commonOrgRepo;
     private final SecurityAccessUtils sa;
     private final CommandSender commandSender;
@@ -175,6 +174,17 @@ public class ImgManageService {
     @PreAuthorize("@securityAccessUtils.isSuperUser()")
     public ImgAgentItemDto bindAgent(String agentId, String orgId) {
         return imgModelMapper.toDto(_bindAgent(agentId, orgId));
+    }
+
+    @Transactional(readOnly = true)
+    @PreAuthorize("@securityAccessUtils.isAllowedAllActions()")
+    public List<ImgPlaceListDto> getPlacesForAgent(String agentId) {
+        getAgent(agentId);
+        return placeRepo.findByAgentId(agentId).stream()
+                .filter(f->!Boolean.TRUE.equals(f.getDeleted()))
+                .map(imgModelMapper::toListDto)
+                .sorted(Comparator.comparing(ImgPlaceListDto::getName).thenComparing(ImgPlaceListDto::getId))
+                .toList();
     }
 
     @Transactional

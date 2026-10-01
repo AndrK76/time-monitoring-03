@@ -1,0 +1,56 @@
+:host {
+    display: block;
+    width: 100%;
+}
+
+.place-id-field {
+    min-width: 20rem;
+    max-width: 22rem;
+}
+
+.missing-hint {
+    color: #c62828;
+    font-size: 0.9rem;
+    font-style: italic;
+    white-space: nowrap;
+    align-self: center;
+}
+
+.full-width {
+    &.second-info {
+        display: flex;
+    }
+}
+
+
+.screenshot-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--primary-color, #3f51b5);
+    text-decoration: none;
+    border-radius: 50%;
+    transition: background-color 0.2s, color 0.2s;
+    padding: 4px;
+
+    &:hover {
+        background-color: rgba(63, 81, 181, 0.08);
+    }
+
+    .mat-icon {
+        font-size: 22px;
+        width: 22px;
+        height: 22px;
+        line-height: 22px;
+    }
+}
+
+@media (max-width: 599.98px) {
+    .screenshot-link .mat-icon {
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+        line-height: 20px;
+    }
+}

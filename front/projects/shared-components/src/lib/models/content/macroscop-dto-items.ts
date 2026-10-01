@@ -62,6 +62,16 @@ export interface MacroscopChannelDto {
     streams?: MacroscopChannelStreamDto[];
 }
 
+export interface MacroscopChannelListDto {
+    id: string;
+    macroscopId: string;
+    name?: string;
+    device?: string;
+    enabled: boolean;
+    exists: boolean;
+    used: boolean;
+}
+
 export interface MacroscopArchiveModeDto {
     id: string;
     name: string;
@@ -70,4 +80,27 @@ export interface MacroscopArchiveModeDto {
 export interface MacroscopChannelStreamDto {
     type?: string;
     format?: string;
+}
+
+export interface MacroscopImgPlaceListDto {
+    id: string;
+    name: string;
+    internalName: string;
+    internalId: string;
+    used: boolean;
+    present: boolean;
+    deleted: boolean;
+}
+
+export interface MacroscopImgPlaceDto {
+    id: string;
+    type: string;
+    name: string;
+    internalName: string;
+    used: boolean;
+    actual: boolean;
+    present: boolean;
+    deleted: boolean;
+    macroscopId: string;
+    channelId: string;
 }

@@ -6,6 +6,7 @@ import { SaveDataResult, TableDataChanges } from '../models/table-data-items';
 import {
   actualizeDataSourceItem,
   addDataSourceItem, addDeleteChangeToState, addModifyChangeToState, addNewChangeToState, applyFilters,
+  CanDeleteFn,
   clearFilterValues, deleteDataSourceItem, doSaveData, formatTableChanges, hasTableChanges,
   initFilterPredicate, ItemIdFn, newTableDataChanges, selectDataSourceItem,
   SelectFn, updateDataSourceItem
@@ -58,6 +59,10 @@ export class TableManageService<T extends Record<string, any>> {
   setSelectFn(fn: SelectFn<T>): void {
     this.doSelectFn = fn;
   }
+
+  // === Функция дополнительной проверки доступности удаления ===
+  private canDeleteFn: CanDeleteFn<T> | undefined;
+  setCanDeleteFn = (fn: CanDeleteFn<T>) => this.canDeleteFn = fn;
 
   // === Ссылка на DOM-контейнер таблицы (для прокрутки) ===
   private tableWrapperRef: ElementRef<HTMLDivElement> | null = null;
@@ -293,8 +298,9 @@ export class TableManageService<T extends Record<string, any>> {
     ])
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(([hasChanges, selected, dataState, total]) => {
+        const canDelete = this.canDeleteFn ? this.canDeleteFn(selected) : !!selected;
         informer.hasChanges.set(hasChanges);
-        informer.canDelete.set(!!selected);
+        informer.canDelete.set(canDelete);
         informer.dataState.set(dataState);
         informer.totalCount.set(total);
       });

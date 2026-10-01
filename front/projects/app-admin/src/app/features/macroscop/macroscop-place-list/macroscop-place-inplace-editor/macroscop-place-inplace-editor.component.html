@@ -1,0 +1,69 @@
+<div class="editor-container">
+    <form [formGroup]="form" class="editor-form">
+        <div class="form-row">
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Наименование</mat-label>
+                <input matInput formControlName="name" [readonly]="deleted" (change)="$event.stopPropagation()">
+            </mat-form-field>
+            @if (showChannelSelect) {
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Канал Macroscop</mat-label>
+                <mat-select formControlName="macroscopId">
+                    @for (c of freeChannels(); track c.macroscopId) {
+                    <mat-option [value]="c.macroscopId">{{ c.name ?? c.macroscopId }}</mat-option>
+                    }
+                </mat-select>
+            </mat-form-field>
+            } @else {
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Канал Macroscop</mat-label>
+                <input matInput formControlName="internalName" readonly>
+            </mat-form-field>
+            }
+        </div>
+
+        <div class="form-row">
+            <div class='full-width second-info'>
+                <mat-checkbox formControlName="used">Используется</mat-checkbox>
+
+                @if (deleted || !present || placeData().macroscopId) {
+                <span class="spacer"></span>
+                }
+
+                @if (placeData().macroscopId) {
+                <div class="action-button-group">
+                    <button mat-icon-button type="button" matTooltip="Текущий скриншот"
+                        (click)="callGetCurrentScreenshot()" class="screenshot-link">
+                        <mat-icon>photo_camera</mat-icon>
+                    </button>
+                    <button mat-icon-button type="button" matTooltip="Последний из архива"
+                        (click)="callGetArchiveScreenshot()" class="screenshot-link">
+                        <mat-icon>photo_library</mat-icon>
+                    </button>
+                </div>
+                }
+
+                @if (deleted) {
+                <div class="action-button-group">
+                    <button mat-stroked-button class="table-action-btn btn-success" type="button"
+                        (click)="callRestore()">
+                        <mat-icon>restore</mat-icon>
+                        <span class="hide-on-small">Восстановить</span>
+                    </button>
+                </div>
+                }
+
+                @if (!present) {
+                <span class="missing-hint">Отсутствует на сервере</span>
+                }
+
+            </div>
+
+
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Id места</mat-label>
+                <input matInput formControlName="placeId">
+            </mat-form-field>
+        </div>
+    </form>
+</div>

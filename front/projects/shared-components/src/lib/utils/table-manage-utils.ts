@@ -7,6 +7,7 @@ import { processResponseError } from '@mon3/sa';
 
 export type SelectFn<T> = (item: T | undefined, newState: boolean, updateUrl?: boolean, scrollTo?: boolean) => void;
 export type ItemIdFn<T> = (item: T) => any;
+export type CanDeleteFn<T> = (item: T | undefined) => boolean;
 
 /**
  * Обновляет элемент в массиве данных.

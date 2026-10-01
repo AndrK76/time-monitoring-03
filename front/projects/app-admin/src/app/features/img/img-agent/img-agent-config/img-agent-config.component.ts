@@ -7,8 +7,8 @@ import { Observable, map, finalize } from 'rxjs';
 
 import { ErrorResponseResult, processResponseError } from '@mon3/sa';
 import { ImgAgentConfigDto, ImgAgentListDto } from '@mon3/sc';
+import { ImgStructManageService } from '../../../../services/img-struct-manage.service';
 
-import { ImgStructManageService } from '../../../services/img-struct-manage.service';
 
 @Component({
   selector: 'app-img-agent-config',

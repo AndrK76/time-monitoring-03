@@ -13,6 +13,7 @@ import ru.igorit.monitoring.common.dto.common.BinaryContent;
 import ru.igorit.monitoring.common.util.Md5Hasher;
 import ru.igorit.monitoring.common.util.TimeUtils;
 import ru.igorit.monitoring.common.util.XorCipher;
+import ru.igorit.monitoring.lib.dto.img.ImgPlaceListDto;
 import ru.igorit.monitoring.lib.dto.macroscop.*;
 import ru.igorit.monitoring.lib.persistence.entity.common.Organization;
 import ru.igorit.monitoring.lib.persistence.entity.evt.EvtAgent;
@@ -193,10 +194,16 @@ public class MacroscopManageService {
 
     @Transactional(readOnly = true)
     @PreAuthorize("@securityAccessUtils.isAllowedAllActions()")
-    public List<MacroscopImgPlaceListDto> getImgPlacesForAgent(String agentId) {
-        var agent = imgService.getAgent(agentId);
+    public List<MacroscopImgPlaceListDto> getImgPlacesForAgent(String agentId, boolean showDeleted) {
+        if (!sa.isSuperUser() && showDeleted) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "This action not allowed");
+        }
+        imgService.getAgent(agentId);
         return imgPlaceRepo.findByAgentId(agentId).stream()
-                .map(mapper::toListDto).toList();
+                .filter(f -> showDeleted || !Boolean.TRUE.equals(f.getDeleted()))
+                .map(mapper::toListDto)
+                .sorted(Comparator.comparing(MacroscopImgPlaceListDto::getName).thenComparing(MacroscopImgPlaceListDto::getId))
+                .toList();
     }
 
     @Transactional
@@ -229,6 +236,23 @@ public class MacroscopManageService {
         return mapper.toDto(ret);
     }
 
+    @Transactional(readOnly = true)
+    @PreAuthorize("@securityAccessUtils.isAllowedAllActions()")
+    public List<MacroscopChannelListDto> getActualChannelsForAgent(String agentId) {
+        var cfg = _getImgConfig(agentId);
+        if (cfg.getConfig() == null) {
+            return List.of();
+        }
+        return channelRepo.findByConfigId(cfg.getConfig().getId()).stream()
+                .map(mapper::toListDto)
+                .filter((MacroscopChannelListDto::isExists))
+                .filter((MacroscopChannelListDto::isUsed))
+                .filter((MacroscopChannelListDto::isEnabled))
+                .sorted(Comparator.comparing(MacroscopChannelListDto::getName)
+                        .thenComparing(MacroscopChannelListDto::getId))
+                .toList();
+    }
+
 
     @Transactional(readOnly = true)
     @PreAuthorize("@securityAccessUtils.isAllowedAllActions()")
@@ -245,11 +269,37 @@ public class MacroscopManageService {
         var ret = imgPlaceRepo.findById(id).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "place not found"));
         imgService.getAgent(ret.getAgent().getId());
+        if (Boolean.TRUE.equals(ret.getDeleted())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Place deleted");
+        }
         ret.setName(dto.getName());
         ret.setUsed(dto.isUsed());
         ret.setUpdatedBy(extractUserId(getCurrentAuth()));
         ret = imgPlaceRepo.saveAndFlush(ret);
         return mapper.toDto(ret);
+    }
+
+    @Transactional
+    @PreAuthorize("@securityAccessUtils.isSuperUser()")
+    public void markPlaceAsDeleted(String id) {
+        imgPlaceRepo.findById(id).ifPresent(place -> {
+            place.setDeleted(true);
+            place.setUpdatedBy(extractUserId(getCurrentAuth()));
+            imgPlaceRepo.saveAndFlush(place);
+        });
+    }
+
+    @Transactional
+    @PreAuthorize("@securityAccessUtils.isSuperUser()")
+    public MacroscopImgPlaceDto restoreDeletedPlace(String id) {
+        var place = imgPlaceRepo.findById(id).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "place not found"));
+        if (Boolean.TRUE.equals(place.getDeleted())) {
+            place.setDeleted(false);
+            place.setUpdatedBy(extractUserId(getCurrentAuth()));
+            place = imgPlaceRepo.saveAndFlush(place);
+        }
+        return mapper.toDto(place);
     }
 
 
@@ -348,6 +398,7 @@ public class MacroscopManageService {
         if (!toSave.isEmpty()) {
             channelRepo.saveAll(toSave);
             channelRepo.flush();
+            _syncPlacesFromChannels(toSave, creatorId);
         }
         return channelRepo.findByConfigId(configId).stream()
                 .map(mapper::toDto)
@@ -609,5 +660,43 @@ public class MacroscopManageService {
                 && res.getData().getData().length > 0;
     }
 
+    private void _syncPlacesFromChannels(List<MacroscopChannel> channels, String userId) {
+        var ids = channels.stream()
+                .map(MacroscopChannel::getId)
+                .filter(Objects::nonNull)
+                .toList();
+        if (ids.isEmpty()) return;
 
+        var places = imgPlaceRepo.findByChannelIdIn(ids);
+        if (places.isEmpty()) return;
+
+        var changed = new ArrayList<MacroscopImgPlace>();
+        for (var place : places) {
+            var ch = place.getChannel();
+            if (ch == null) continue;
+
+            boolean dirty = false;
+
+            // present = exists && enabled — та же формула, что в addImgPlaceByAgent
+            boolean newPresent = Boolean.TRUE.equals(ch.getExists())
+                    && Boolean.TRUE.equals(ch.getEnabled());
+            if (!Objects.equals(place.getPresent(), newPresent)) {
+                place.setPresent(newPresent);
+                dirty = true;
+            }
+            if (Boolean.FALSE.equals(ch.getUsed())
+                    && Boolean.TRUE.equals(place.getUsed())) {
+                place.setUsed(false);
+                dirty = true;
+            }
+            if (dirty) {
+                place.setUpdatedBy(userId);
+                changed.add(place);
+            }
+        }
+        if (!changed.isEmpty()) {
+            imgPlaceRepo.saveAll(changed);
+            imgPlaceRepo.flush();
+        }
+    }
 }

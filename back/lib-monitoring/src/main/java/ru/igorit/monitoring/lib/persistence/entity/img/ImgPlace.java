@@ -66,4 +66,5 @@ public abstract class ImgPlace {
     }
 
     public abstract String getInternalName();
+    public abstract String getInternalId();
 }

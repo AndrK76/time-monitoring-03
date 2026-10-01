@@ -5,6 +5,7 @@ import {
   ImgAgentItemDto,
   ImgAgentListDto,
   ImgAgentTypeDto,
+  ImgPlaceListDto,
 } from '@mon3/sc';
 import { Observable } from 'rxjs';
 
@@ -74,5 +75,10 @@ export class ImgStructManageService {
   getAgentConfig(id: string): Observable<ImgAgentConfigDto> {
     return this.http.get<ImgAgentConfigDto>(
       `${this.adminApiUrl}${this.IMG_CONTROLLER}/configs/${id}`);
+  }
+
+  getPlacesForAgent(agentId: string): Observable<ImgPlaceListDto[]> {
+    return this.http.get<ImgPlaceListDto[]>(
+      `${this.adminApiUrl}${this.IMG_CONTROLLER}/agents/${agentId}/places`);
   }
 }

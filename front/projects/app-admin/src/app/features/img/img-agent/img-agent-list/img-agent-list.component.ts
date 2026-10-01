@@ -16,17 +16,17 @@ import {
 } from '@mon3/sc';
 import { PermissionService } from '@mon3/sa';
 
-import { ImgStructManageService } from '../../../services/img-struct-manage.service';
-import { MainStructManageService } from '../../../services/main-struct-manage.service';
-import { authConstant } from '../../../auth-constants';
-import { OrgStructInfo } from '../../struct-org/struct-org-view.models';
-import { orgStructListDtoToView } from '../../struct-org/struct-org-view.utils';
-import { ImgAgentItemView, ImgAgentTypeView } from '../img-view.models';
+import { ImgStructManageService } from '../../../../services/img-struct-manage.service';
+import { MainStructManageService } from '../../../../services/main-struct-manage.service';
+import { authConstant } from '../../../../auth-constants';
+import { OrgStructInfo } from '../../../struct-org/struct-org-view.models';
+import { orgStructListDtoToView } from '../../../struct-org/struct-org-view.utils';
+import { ImgAgentItemView, ImgAgentTypeView } from '../../img-view.models';
 import { ImgAgentBindEditorComponent } from '../img-agent-bind-editor/img-agent-bind-editor.component';
 import {
   createNewImgAgent, imgAgentItemDtoToView, imgAgentListDtoToView,
   imgAgentTypeDtoToView, imgAgentViewToItemDto, imgAgentViewToListDto
-} from '../img-view.utils';
+} from '../../img-view.utils';
 
 @Component({
   selector: 'app-img-agent-list',

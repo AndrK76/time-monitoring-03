@@ -5,16 +5,19 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.ZoneOffset;
+import java.util.List;
+
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class MacroscopImgPlaceListDto {
+public class MacroscopChannelListDto {
     private String id;
+    private String macroscopId;
     private String name;
-    private String internalName;
-    private String internalId;
+    private String device;
+    private boolean enabled;
+    private boolean exists;
     private boolean used;
-    private boolean present;
-    private boolean deleted;
 }

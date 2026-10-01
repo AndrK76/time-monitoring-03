@@ -149,18 +149,24 @@
 |   |   |   |   |   |   |-- evt-view.models.ts
 |   |   |   |   |   |   `-- evt-view.utils.ts
 |   |   |   |   |   |-- img
-|   |   |   |   |   |   |-- img-agent-bind-editor
-|   |   |   |   |   |   |   |-- img-agent-bind-editor.component.html
-|   |   |   |   |   |   |   |-- img-agent-bind-editor.component.scss
-|   |   |   |   |   |   |   `-- img-agent-bind-editor.component.ts
-|   |   |   |   |   |   |-- img-agent-config
-|   |   |   |   |   |   |   |-- img-agent-config.component.html
-|   |   |   |   |   |   |   |-- img-agent-config.component.scss
-|   |   |   |   |   |   |   `-- img-agent-config.component.ts
-|   |   |   |   |   |   |-- img-agent-list
-|   |   |   |   |   |   |   |-- img-agent-list.component.html
-|   |   |   |   |   |   |   |-- img-agent-list.component.scss
-|   |   |   |   |   |   |   `-- img-agent-list.component.ts
+|   |   |   |   |   |   |-- img-agent
+|   |   |   |   |   |   |   |-- img-agent-bind-editor
+|   |   |   |   |   |   |   |   |-- img-agent-bind-editor.component.html
+|   |   |   |   |   |   |   |   |-- img-agent-bind-editor.component.scss
+|   |   |   |   |   |   |   |   `-- img-agent-bind-editor.component.ts
+|   |   |   |   |   |   |   |-- img-agent-config
+|   |   |   |   |   |   |   |   |-- img-agent-config.component.html
+|   |   |   |   |   |   |   |   |-- img-agent-config.component.scss
+|   |   |   |   |   |   |   |   `-- img-agent-config.component.ts
+|   |   |   |   |   |   |   `-- img-agent-list
+|   |   |   |   |   |   |       |-- img-agent-list.component.html
+|   |   |   |   |   |   |       |-- img-agent-list.component.scss
+|   |   |   |   |   |   |       `-- img-agent-list.component.ts
+|   |   |   |   |   |   |-- img-place
+|   |   |   |   |   |   |   `-- img-place-list-header
+|   |   |   |   |   |   |       |-- img-place-list-header.component.html
+|   |   |   |   |   |   |       |-- img-place-list-header.component.scss
+|   |   |   |   |   |   |       `-- img-place-list-header.component.ts
 |   |   |   |   |   |   |-- img-view.models.ts
 |   |   |   |   |   |   `-- img-view.utils.ts
 |   |   |   |   |   |-- index
@@ -196,6 +202,14 @@
 |   |   |   |   |   |   |   |-- macroscop-img-editor-container.component.html
 |   |   |   |   |   |   |   |-- macroscop-img-editor-container.component.scss
 |   |   |   |   |   |   |   `-- macroscop-img-editor-container.component.ts
+|   |   |   |   |   |   |-- macroscop-place-list
+|   |   |   |   |   |   |   |-- macroscop-place-inplace-editor
+|   |   |   |   |   |   |   |   |-- macroscop-place-inplace-editor.component.html
+|   |   |   |   |   |   |   |   |-- macroscop-place-inplace-editor.component.scss
+|   |   |   |   |   |   |   |   `-- macroscop-place-inplace-editor.component.ts
+|   |   |   |   |   |   |   |-- macroscop-place-list.component.html
+|   |   |   |   |   |   |   |-- macroscop-place-list.component.scss
+|   |   |   |   |   |   |   `-- macroscop-place-list.component.ts
 |   |   |   |   |   |   |-- macroscop-view.models.ts
 |   |   |   |   |   |   `-- macroscop-view.utils.ts
 |   |   |   |   |   |-- struct-org
@@ -526,4 +540,4 @@
 |-- tsconfig.json
 `-- tsconfig.prod.json
 
-145 directories, 381 files
+150 directories, 390 files

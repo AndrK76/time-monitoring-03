@@ -29,7 +29,7 @@ public interface ImgModelMapper {
     @Mapping(target = "agentType", source = "item.agent", qualifiedByName = "agentTypeToString")
     ImgAgentConfigDto toDto(ImgAgentConfig item);
 
-    ImgPlaceListDto toDto(ImgPlace item);
+    ImgPlaceListDto toListDto(ImgPlace item);
 
 
     @Named("agentTypeToString")

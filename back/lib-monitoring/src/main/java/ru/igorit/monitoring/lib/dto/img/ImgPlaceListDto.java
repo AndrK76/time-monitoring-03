@@ -13,4 +13,5 @@ public class ImgPlaceListDto {
     private String id;
     private String name;
     private String internalName;
+    private String type;
 }

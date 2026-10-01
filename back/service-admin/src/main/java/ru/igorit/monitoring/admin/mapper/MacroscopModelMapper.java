@@ -52,6 +52,9 @@ public interface MacroscopModelMapper {
     @Mapping(target = "tz", source = "tz", qualifiedByName = "stringToZoneOffset")
     MacroscopChannelDto toDto(MacroscopChannel entity);
 
+    MacroscopChannelListDto toListDto(MacroscopChannel entity);
+
+
     MacroscopChannelStreamDto toDto(MacroscopChannelStream item);
 
     MacroscopChannelStream fromDto(MacroscopChannelStreamDto dto);

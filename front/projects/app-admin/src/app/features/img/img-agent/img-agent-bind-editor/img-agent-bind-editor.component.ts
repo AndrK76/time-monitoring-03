@@ -14,11 +14,11 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { DialogService, isNewItem, isNotFullLoadedItem } from '@mon3/sc';
 import { PermissionService } from '@mon3/sa';
+import { ImgAgentItemView, ImgAgentTypeView } from '../../img-view.models';
+import { OrgStructInfo } from '../../../struct-org/struct-org-view.models';
+import { authConstant } from '../../../../auth-constants';
+import { imgAgentTypeFromId, imgOrgStructFromId } from '../../img-view.utils';
 
-import { authConstant } from '../../../auth-constants';
-import { OrgStructInfo } from '../../struct-org/struct-org-view.models';
-import { ImgAgentItemView, ImgAgentTypeView } from '../img-view.models';
-import { imgAgentTypeFromId, imgOrgStructFromId } from '../img-view.utils';
 
 @Component({
   selector: 'app-img-agent-bind-editor',

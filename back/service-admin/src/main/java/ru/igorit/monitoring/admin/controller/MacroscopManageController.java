@@ -68,20 +68,37 @@ public class MacroscopManageController {
 
     @GetMapping(value = {"/img-agents/{id}/places"})
     public List<MacroscopImgPlaceListDto> getImgPlacesForAgent(
-            @PathVariable(name = "id") String agentId) {
-        return service.getImgPlacesForAgent(agentId);
+            @PathVariable(name = "id") String agentId,
+            @RequestParam(name = "show-deleted", required = false, defaultValue = "false") boolean showDeleted) {
+        return service.getImgPlacesForAgent(agentId, showDeleted);
     }
 
     @PostMapping("/img-agents/{id}/places")
-    MacroscopImgPlaceDto addImgPlaceByAgent(
+    public MacroscopImgPlaceDto addImgPlaceByAgent(
             @PathVariable(name = "id") String agentId,
             @Valid @RequestBody MacroscopImgPlaceDto dto) {
         return service.addImgPlaceByAgent(agentId, dto);
     }
 
+    @GetMapping("/img-agents/{id}/actual-channels")
+    public List<MacroscopChannelListDto> getActualChannelsForAgent(@PathVariable(name = "id") String agentId) {
+        return service.getActualChannelsForAgent(agentId);
+    }
+
     @GetMapping("/img-places/{id}")
     public MacroscopImgPlaceDto getImgPlace(@PathVariable(name = "id") String id) {
         return service.getImgPlace(id);
+    }
+
+    @DeleteMapping("/img-places/{id}")
+    public ResponseEntity<?> deleteImgPlace(@PathVariable(name = "id") String id) {
+        service.markPlaceAsDeleted(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/img-places/{id}/restore-deleted")
+    public MacroscopImgPlaceDto restoreImgPlace(@PathVariable(name = "id") String id) {
+        return service.restoreDeletedPlace(id);
     }
 
     @PutMapping("/img-places/{id}")

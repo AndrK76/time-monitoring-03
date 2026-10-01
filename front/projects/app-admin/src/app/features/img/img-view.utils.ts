@@ -1,5 +1,5 @@
-import { ImgAgentItemDto, ImgAgentListDto, ImgAgentTypeDto, ImgPlaceListDto } from '@mon3/sc';
-import { ImgAgentItemView, ImgAgentTypeView, ImgPlaceView } from './img-view.models';
+import { ImgAgentItemDto, ImgAgentListDto, ImgAgentTypeDto, ImgPlaceDto, ImgPlaceListDto } from '@mon3/sc';
+import { ImgAgentItemView, ImgAgentTypeView, ImgPlaceItemView, ImgPlaceView } from './img-view.models';
 import { OrgStructInfo } from '../struct-org/struct-org-view.models';
 
 export const imgAgentTypeDtoToView = (dto: ImgAgentTypeDto): ImgAgentTypeView => {
@@ -24,13 +24,6 @@ export const imgOrgStructFromId = (
 ): OrgStructInfo | undefined => {
     if (!dtoOrg || !allOrgs) return undefined;
     return allOrgs.find(f => f.id === dtoOrg);
-};
-
-export const imgPlaceListDtoToView = (dto: ImgPlaceListDto): ImgPlaceView => {
-    return {
-        id: dto.id,
-        name: dto.name,
-    } as ImgPlaceView;
 };
 
 export const imgAgentListDtoToView = (
@@ -113,4 +106,27 @@ export const createNewImgAgent = (
         config: undefined,
         places: [],
     } as ImgAgentItemView;
+};
+
+
+export const imgPlaceListDtoToView = (dto: ImgPlaceListDto): ImgPlaceView => {
+    return {
+        id: dto.id,
+        name: dto.name,
+        internalName: dto.internalName,
+        type: dto.type,
+    } as ImgPlaceView;
+};
+
+export const imgPlaceDtoToView = (dto: ImgPlaceDto): ImgPlaceItemView => {
+    return {
+        id: dto.id,
+        type: dto.type,
+        name: dto.name,
+        internalName: dto.internalName,
+        used: dto.used,
+        actual: dto.actual,
+        present: dto.present,
+        deleted: dto.deleted,
+    } as ImgPlaceItemView;
 };

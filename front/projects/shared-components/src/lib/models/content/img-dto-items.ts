@@ -32,4 +32,17 @@ export interface ImgAgentItemDto {
 export interface ImgPlaceListDto {
     id: string;
     name: string;
+    internalName: string;
+    type: string;
+}
+
+export interface ImgPlaceDto {
+    id: string;
+    type: string;
+    name: string;
+    internalName: string;
+    used: boolean;
+    actual: boolean;
+    present: boolean;
+    deleted: boolean;
 }

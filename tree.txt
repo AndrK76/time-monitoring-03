@@ -207,15 +207,26 @@
 |   |   |                           |   |   |-- EvtAgentListDto.java
 |   |   |                           |   |   |-- EvtAgentTypeDto.java
 |   |   |                           |   |   `-- EvtPlaceListDto.java
+|   |   |                           |   |-- img
+|   |   |                           |   |   |-- ImgAgentConfigDto.java
+|   |   |                           |   |   |-- ImgAgentItemDto.java
+|   |   |                           |   |   |-- ImgAgentListDto.java
+|   |   |                           |   |   |-- ImgAgentTypeDto.java
+|   |   |                           |   |   |-- ImgPlaceDto.java
+|   |   |                           |   |   `-- ImgPlaceListDto.java
 |   |   |                           |   |-- macroscop
 |   |   |                           |   |   |-- MacroscopAgentConfigDto.java
 |   |   |                           |   |   |-- MacroscopAgentConfigListDto.java
 |   |   |                           |   |   |-- MacroscopArchiveModeDto.java
 |   |   |                           |   |   |-- MacroscopChannelDto.java
+|   |   |                           |   |   |-- MacroscopChannelListDto.java
 |   |   |                           |   |   |-- MacroscopChannelStreamDto.java
 |   |   |                           |   |   |-- MacroscopCredentialsDto.java
 |   |   |                           |   |   |-- MacroscopDataResponse.java
 |   |   |                           |   |   |-- MacroscopEvtAgentConfigDto.java
+|   |   |                           |   |   |-- MacroscopImgAgentConfigDto.java
+|   |   |                           |   |   |-- MacroscopImgPlaceDto.java
+|   |   |                           |   |   |-- MacroscopImgPlaceListDto.java
 |   |   |                           |   |   |-- MacroscopServerCredentials.java
 |   |   |                           |   |   `-- MacroscopServerInfoDto.java
 |   |   |                           |   |-- yclients
@@ -244,12 +255,17 @@
 |   |   |                               |   |   |-- CrmAgentListProjection.java
 |   |   |                               |   |   |-- CrmOrganization.java
 |   |   |                               |   |   |-- CrmPlace.java
-|   |   |                               |   |   |-- CrmService.java
-|   |   |                               |   |   `-- EvtAgentListProjection.java
+|   |   |                               |   |   `-- CrmService.java
 |   |   |                               |   |-- evt
 |   |   |                               |   |   |-- EvtAgent.java
 |   |   |                               |   |   |-- EvtAgentConfig.java
+|   |   |                               |   |   |-- EvtAgentListProjection.java
 |   |   |                               |   |   `-- EvtPlace.java
+|   |   |                               |   |-- img
+|   |   |                               |   |   |-- ImgAgent.java
+|   |   |                               |   |   |-- ImgAgentConfig.java
+|   |   |                               |   |   |-- ImgAgentListProjection.java
+|   |   |                               |   |   `-- ImgPlace.java
 |   |   |                               |   |-- macroscop
 |   |   |                               |   |   |-- MacroscopAgentConfig.java
 |   |   |                               |   |   |-- MacroscopArchiveMode.java
@@ -258,6 +274,9 @@
 |   |   |                               |   |   |-- MacroscopCredentials.java
 |   |   |                               |   |   |-- MacroscopEvtAgent.java
 |   |   |                               |   |   |-- MacroscopEvtAgentConfig.java
+|   |   |                               |   |   |-- MacroscopImgAgent.java
+|   |   |                               |   |   |-- MacroscopImgAgentConfig.java
+|   |   |                               |   |   |-- MacroscopImgPlace.java
 |   |   |                               |   |   `-- MacroscopServerInfo.java
 |   |   |                               |   `-- yclients
 |   |   |                               |       |-- YClientCredentials.java
@@ -281,11 +300,18 @@
 |   |   |                                   |   |-- EvtAgentConfigRepository.java
 |   |   |                                   |   |-- EvtAgentRepository.java
 |   |   |                                   |   `-- EvtPlaceRepository.java
+|   |   |                                   |-- img
+|   |   |                                   |   |-- ImgAgentConfigRepository.java
+|   |   |                                   |   |-- ImgAgentRepository.java
+|   |   |                                   |   `-- ImgPlaceRepository.java
 |   |   |                                   |-- macroscop
 |   |   |                                   |   |-- MacroscopAgentConfigRepository.java
 |   |   |                                   |   |-- MacroscopChannelRepository.java
 |   |   |                                   |   |-- MacroscopEvtAgentConfigRepository.java
-|   |   |                                   |   `-- MacroscopEvtAgentRepository.java
+|   |   |                                   |   |-- MacroscopEvtAgentRepository.java
+|   |   |                                   |   |-- MacroscopImgAgentConfigRepository.java
+|   |   |                                   |   |-- MacroscopImgAgentRepository.java
+|   |   |                                   |   `-- MacroscopImgPlaceRepository.java
 |   |   |                                   `-- yclients
 |   |   |                                       |-- YClientsAgentConfigRepository.java
 |   |   |                                       |-- YClientsAgentRepository.java
@@ -335,6 +361,7 @@
 |   |   |       |                   |   |-- AccessModelController.java
 |   |   |       |                   |   |-- CrmManageController.java
 |   |   |       |                   |   |-- EvtManageController.java
+|   |   |       |                   |   |-- ImgManageController.java
 |   |   |       |                   |   |-- MacroscopManageController.java
 |   |   |       |                   |   |-- MainDictController.java
 |   |   |       |                   |   |-- TestController.java
@@ -349,6 +376,7 @@
 |   |   |       |                   |   |-- CrmModelMapper.java
 |   |   |       |                   |   |-- EventCommandMapper.java
 |   |   |       |                   |   |-- EvtModelMapper.java
+|   |   |       |                   |   |-- ImgModelMapper.java
 |   |   |       |                   |   |-- MacroscopModelMapper.java
 |   |   |       |                   |   |-- StructModelMapper.java
 |   |   |       |                   |   `-- YClientsModelMapper.java
@@ -356,6 +384,7 @@
 |   |   |       |                   |   |-- AccessManageService.java
 |   |   |       |                   |   |-- CrmManageService.java
 |   |   |       |                   |   |-- EvtManageService.java
+|   |   |       |                   |   |-- ImgManageService.java
 |   |   |       |                   |   |-- MacroscopManageService.java
 |   |   |       |                   |   |-- StructManageService.java
 |   |   |       |                   |   |-- TestService.java
@@ -379,7 +408,13 @@
 |   |   |           |       |-- V01.12__macroscop_config_add_state.sql
 |   |   |           |       |-- V01.14__add_macroscop_channels.sql
 |   |   |           |       |-- V01.15__add_used_to_macroscop_channels.sql
-|   |   |           |       `-- V01.16__add_streams_to_macroscop_channels.sql
+|   |   |           |       |-- V01.16__add_streams_to_macroscop_channels.sql
+|   |   |           |       |-- V01.17__add_img_agents_and_places.sql
+|   |   |           |       |-- V01.18__add_macroscop_img_agent_configs.sql
+|   |   |           |       |-- V01.19__fix_img_agent_configs.sql
+|   |   |           |       |-- V01.20__drop_discriminator_from_img_agent_configs.sql
+|   |   |           |       |-- V01.21__extend_img_places.sql
+|   |   |           |       `-- V01.22__rename_img_places_available_to_used.sql
 |   |   |           `-- application.yml
 |   |   |-- .properties
 |   |   `-- pom.xml
@@ -619,11 +654,6 @@
 |   |   |   |   |   |   |       |   `-- user-profile-edit-container.component.ts
 |   |   |   |   |   |   |       |-- user-view.models.ts
 |   |   |   |   |   |   |       `-- user-view.utils.ts
-|   |   |   |   |   |   |-- camera-agent
-|   |   |   |   |   |   |   `-- camera-agent-list
-|   |   |   |   |   |   |       |-- camera-agent-list.component.html
-|   |   |   |   |   |   |       |-- camera-agent-list.component.scss
-|   |   |   |   |   |   |       `-- camera-agent-list.component.ts
 |   |   |   |   |   |   |-- crm
 |   |   |   |   |   |   |   |-- crm-agent
 |   |   |   |   |   |   |   |   |-- crm-agent-bind-editor
@@ -665,6 +695,27 @@
 |   |   |   |   |   |   |   |   `-- evt-agent-list.component.ts
 |   |   |   |   |   |   |   |-- evt-view.models.ts
 |   |   |   |   |   |   |   `-- evt-view.utils.ts
+|   |   |   |   |   |   |-- img
+|   |   |   |   |   |   |   |-- img-agent
+|   |   |   |   |   |   |   |   |-- img-agent-bind-editor
+|   |   |   |   |   |   |   |   |   |-- img-agent-bind-editor.component.html
+|   |   |   |   |   |   |   |   |   |-- img-agent-bind-editor.component.scss
+|   |   |   |   |   |   |   |   |   `-- img-agent-bind-editor.component.ts
+|   |   |   |   |   |   |   |   |-- img-agent-config
+|   |   |   |   |   |   |   |   |   |-- img-agent-config.component.html
+|   |   |   |   |   |   |   |   |   |-- img-agent-config.component.scss
+|   |   |   |   |   |   |   |   |   `-- img-agent-config.component.ts
+|   |   |   |   |   |   |   |   `-- img-agent-list
+|   |   |   |   |   |   |   |       |-- img-agent-list.component.html
+|   |   |   |   |   |   |   |       |-- img-agent-list.component.scss
+|   |   |   |   |   |   |   |       `-- img-agent-list.component.ts
+|   |   |   |   |   |   |   |-- img-place
+|   |   |   |   |   |   |   |   `-- img-place-list-header
+|   |   |   |   |   |   |   |       |-- img-place-list-header.component.html
+|   |   |   |   |   |   |   |       |-- img-place-list-header.component.scss
+|   |   |   |   |   |   |   |       `-- img-place-list-header.component.ts
+|   |   |   |   |   |   |   |-- img-view.models.ts
+|   |   |   |   |   |   |   `-- img-view.utils.ts
 |   |   |   |   |   |   |-- index
 |   |   |   |   |   |   |   |-- index-auth
 |   |   |   |   |   |   |   |   |-- index-auth.component.html
@@ -694,6 +745,18 @@
 |   |   |   |   |   |   |   |   |-- macroscop-evt-editor-container.component.html
 |   |   |   |   |   |   |   |   |-- macroscop-evt-editor-container.component.scss
 |   |   |   |   |   |   |   |   `-- macroscop-evt-editor-container.component.ts
+|   |   |   |   |   |   |   |-- macroscop-img-editor-container
+|   |   |   |   |   |   |   |   |-- macroscop-img-editor-container.component.html
+|   |   |   |   |   |   |   |   |-- macroscop-img-editor-container.component.scss
+|   |   |   |   |   |   |   |   `-- macroscop-img-editor-container.component.ts
+|   |   |   |   |   |   |   |-- macroscop-place-list
+|   |   |   |   |   |   |   |   |-- macroscop-place-inplace-editor
+|   |   |   |   |   |   |   |   |   |-- macroscop-place-inplace-editor.component.html
+|   |   |   |   |   |   |   |   |   |-- macroscop-place-inplace-editor.component.scss
+|   |   |   |   |   |   |   |   |   `-- macroscop-place-inplace-editor.component.ts
+|   |   |   |   |   |   |   |   |-- macroscop-place-list.component.html
+|   |   |   |   |   |   |   |   |-- macroscop-place-list.component.scss
+|   |   |   |   |   |   |   |   `-- macroscop-place-list.component.ts
 |   |   |   |   |   |   |   |-- macroscop-view.models.ts
 |   |   |   |   |   |   |   `-- macroscop-view.utils.ts
 |   |   |   |   |   |   |-- struct-org
@@ -737,6 +800,7 @@
 |   |   |   |   |   |-- services
 |   |   |   |   |   |   |-- crm-struct-manage.service.ts
 |   |   |   |   |   |   |-- evt-struct-manage.service.ts
+|   |   |   |   |   |   |-- img-struct-manage.service.ts
 |   |   |   |   |   |   |-- macroscop-manage.service.ts
 |   |   |   |   |   |   |-- main-struct-manage.service.ts
 |   |   |   |   |   |   `-- yclients-manage.service.ts
@@ -960,6 +1024,7 @@
 |   |   |   |   |   |   |-- content
 |   |   |   |   |   |   |   |-- crm-dto-items.ts
 |   |   |   |   |   |   |   |-- evt-dto-items.ts
+|   |   |   |   |   |   |   |-- img-dto-items.ts
 |   |   |   |   |   |   |   |-- macroscop-dto-items.ts
 |   |   |   |   |   |   |   |-- macroscop-dto-utils.ts
 |   |   |   |   |   |   |   |-- struct-dto-items.ts
@@ -1036,4 +1101,4 @@
 |-- README.md
 `-- tree.txt
 
-352 directories, 684 files
+363 directories, 738 files

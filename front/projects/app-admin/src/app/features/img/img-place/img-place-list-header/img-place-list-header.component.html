@@ -1,0 +1,130 @@
+<div class="standard-table-container">
+    <mat-card>
+        <mat-card-header>
+            <mat-card-title>Камеры: Места
+                <span class="hide-on-small">{{ orgName() }}</span>
+                @if (selectedAgent(); as ag) {
+                <span class="hide-on-small"> / {{ ag.name }}</span>
+                }
+            </mat-card-title>
+            <mat-card-subtitle class="hide-on-small">
+                Всего: {{ actions.totalCount() }}
+                @if (actions.hasChanges()) {
+                <span class="changes-summary">
+                    | Добавлено: {{ actions.dataState().added.length }},
+                    Изменено: {{ actions.dataState().modified.length }},
+                    Удалено: {{ actions.dataState().deleted.length }}
+                </span>
+                }
+            </mat-card-subtitle>
+        </mat-card-header>
+
+        <mat-card-actions class="img-place-actions full-row">
+            <div class="action-button-group">
+                @if (showBackLink()) {
+                <a mat-button matTooltip="К списку организаций" class="table-action-btn back-button"
+                    [routerLink]="['/struct/org']" [queryParams]="{id: orgId()}">
+                    <mat-icon>arrow_back</mat-icon>
+                    <span class="hide-on-small">К списку организаций</span>
+                </a>
+                } @else {
+                <mat-form-field appearance="outline" class="org-select" subscriptSizing="dynamic">
+                    <mat-label>Организация</mat-label>
+                    <mat-select [formControl]="orgSelect" (selectionChange)="onSelectOrganization($event.value)">
+                        <mat-option *ngFor="let org of organizations()" [value]="org.id">
+                            {{ org.shortName }}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+                }
+
+                @if (orgId() && agents().length > 0) {
+                <mat-form-field appearance="outline" class="agent-select" subscriptSizing="dynamic">
+                    <mat-label>Агент</mat-label>
+                    <mat-select [formControl]="agentSelect" (selectionChange)="onSelectAgent($event.value)">
+                        <mat-option *ngFor="let agent of agents()" [value]="agent.id">
+                            {{ agent.name }}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+                }
+
+                @if (canFullActions() && selectedAgent() && !isSmallScreen()) {
+                <mat-checkbox class="show-deleted-checkbox" [checked]="showDeleted()"
+                    (change)="onShowDeletedChange($event.checked)" matTooltip="Показывать удалённые места">
+                    <span>+удалённые</span>
+                </mat-checkbox>
+                }
+            </div>
+
+            @if (selectedAgent()) {
+            <div class="action-button-group">
+                <button mat-raised-button class="table-action-btn btn-success" (click)="actions.triggerAdd()"
+                    [disabled]="actions.isLoading() || actions.isSaving()">
+                    <mat-icon>add</mat-icon><span class="hide-on-small">Добавить</span>
+                </button>
+                <button mat-raised-button class="table-action-btn btn-danger" (click)="actions.triggerDelete()"
+                    [disabled]="actions.isLoading() || actions.isSaving() || !actions.canDelete()">
+                    <mat-icon>delete</mat-icon><span class="hide-on-small">Удалить</span>
+                </button>
+                <button mat-raised-button class="table-action-btn btn-light" (click)="actions.triggerRefresh()"
+                    [disabled]="actions.isLoading() || actions.isSaving()">
+                    <mat-icon>refresh</mat-icon>
+                    <span class="hide-on-small">{{ actions.isLoading() ? 'Загрузка...' : 'Перечитать' }}</span>
+                </button>
+                <button mat-raised-button color="primary" (click)="actions.triggerSave()"
+                    [disabled]="!actions.hasChanges() || actions.isLoading() || actions.isSaving()">
+                    <mat-icon>save</mat-icon><span class="hide-on-small">Сохранить</span>
+                </button>
+                @if (canFullActions() && isSmallScreen()) {
+                <mat-checkbox class="show-deleted-checkbox" [checked]="showDeleted()"
+                    (change)="onShowDeletedChange($event.checked)" matTooltip="Показывать удалённые места">
+                    <span>+удаленные</span>
+                </mat-checkbox>
+                }
+            </div>
+            }
+        </mat-card-actions>
+        <mat-card-content>
+            @if (hasError()) {
+            <div class="error-message">
+                <mat-icon color="warn">error</mat-icon>
+                <span>Ошибка:</span>
+                <span>{{ error().message }}</span>
+            </div>
+            } @else if (isLoading()) {
+            <div class="table-overlay">
+                <div class="loading-spinner">
+                    <mat-spinner diameter="40"></mat-spinner>
+                    <p>Загрузка данных...</p>
+                </div>
+            </div>
+            } @else if (selectedAgent()) {
+            @if (selectedAgent()!.agentType === 'Macroscop') {
+            <app-macroscop-place-list [agentId]="selectedAgent()!.id" [actions]="actions" [showDeleted]="showDeleted()"
+                [canFullActions]="canFullActions()"></app-macroscop-place-list>
+            } @else {
+            <div class="empty-state">
+                <mat-icon>info</mat-icon>
+                <p>Неизвестный тип агента: {{ selectedAgent()!.agentType }}</p>
+            </div>
+            }
+            } @else if (!orgId()) {
+            <div class="empty-state">
+                <mat-icon>info</mat-icon>
+                <p>Выберите организацию</p>
+            </div>
+            } @else if (agents().length === 0) {
+            <div class="empty-state">
+                <mat-icon>info</mat-icon>
+                <p>Для организации нет агентов камер</p>
+            </div>
+            } @else {
+            <div class="empty-state">
+                <mat-icon>info</mat-icon>
+                <p>Выберите агента</p>
+            </div>
+            }
+        </mat-card-content>
+    </mat-card>
+</div>
