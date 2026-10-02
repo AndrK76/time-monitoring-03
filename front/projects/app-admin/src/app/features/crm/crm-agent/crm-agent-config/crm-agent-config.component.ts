@@ -79,7 +79,7 @@ export class CrmAgentConfigComponent implements OnInit {
       if (res?.agentType) this.config.set({ id: this.config()?.id, type: res?.agentType });
       if (this.config()?.type === 'YClients') {
         if (this.config()?.id) {
-          this.router.navigate(['/', 'yclients', 'config'], { queryParams: { id: this.config()?.id } });
+          this.router.navigate(['/', 'yclients', 'crm', 'config'], { queryParams: { id: this.config()?.id } });
         } else {
           this.error.set({ message: `Empty agent id` });
           this.hasError.set(true);

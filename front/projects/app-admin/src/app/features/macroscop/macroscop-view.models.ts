@@ -1,10 +1,12 @@
 import {
+    MacroscopActivityEventTypeDto,
     MacroscopAgentConfigDto,
     MacroscopAgentConfigListDto,
     MacroscopArchiveModeDto,
     MacroscopChannelDto,
     MacroscopChannelStreamDto,
     MacroscopCredentialsDto,
+    MacroscopEventTypeDto,
     MacroscopEvtAgentConfigDto,
     MacroscopImgAgentConfigDto,
     MacroscopImgPlaceDto,
@@ -116,3 +118,18 @@ export class MacroscopChannelStreamView implements MacroscopChannelStreamDto {
     ) { }
 }
 
+export class MacroscopActivityEventTypeView implements MacroscopActivityEventTypeDto {
+    constructor(
+        public id: string,
+        public description: string,
+    ) { }
+}
+
+export class MacroscopEventTypeView implements MacroscopEventTypeDto {
+    constructor(
+        public id: string,
+        public name: string | undefined,
+        public activityTypeId: string | undefined,
+        public activityType: MacroscopActivityEventTypeView | undefined,
+    ) { }
+}

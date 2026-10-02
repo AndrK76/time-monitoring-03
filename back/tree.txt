@@ -171,6 +171,7 @@
 |   |                           |   |-- dto
 |   |                           |   |   |-- MSCPChannel.java
 |   |                           |   |   |-- MSCPConfigResponse.java
+|   |                           |   |   |-- MSCPEventType.java
 |   |                           |   |   |-- MSCPMobileServerInfo.java
 |   |                           |   |   |-- MSCPResolution.java
 |   |                           |   |   |-- MSCPRtspServerInfo.java
@@ -214,6 +215,7 @@
 |   |                           |   |   |-- ImgPlaceDto.java
 |   |                           |   |   `-- ImgPlaceListDto.java
 |   |                           |   |-- macroscop
+|   |                           |   |   |-- MacroscopActivityEventTypeDto.java
 |   |                           |   |   |-- MacroscopAgentConfigDto.java
 |   |                           |   |   |-- MacroscopAgentConfigListDto.java
 |   |                           |   |   |-- MacroscopArchiveModeDto.java
@@ -222,6 +224,7 @@
 |   |                           |   |   |-- MacroscopChannelStreamDto.java
 |   |                           |   |   |-- MacroscopCredentialsDto.java
 |   |                           |   |   |-- MacroscopDataResponse.java
+|   |                           |   |   |-- MacroscopEventTypeDto.java
 |   |                           |   |   |-- MacroscopEvtAgentConfigDto.java
 |   |                           |   |   |-- MacroscopImgAgentConfigDto.java
 |   |                           |   |   |-- MacroscopImgPlaceDto.java
@@ -266,11 +269,13 @@
 |   |                               |   |   |-- ImgAgentListProjection.java
 |   |                               |   |   `-- ImgPlace.java
 |   |                               |   |-- macroscop
+|   |                               |   |   |-- MacroscopActivityEventType.java
 |   |                               |   |   |-- MacroscopAgentConfig.java
 |   |                               |   |   |-- MacroscopArchiveMode.java
 |   |                               |   |   |-- MacroscopChannel.java
 |   |                               |   |   |-- MacroscopChannelStream.java
 |   |                               |   |   |-- MacroscopCredentials.java
+|   |                               |   |   |-- MacroscopEventType.java
 |   |                               |   |   |-- MacroscopEvtAgent.java
 |   |                               |   |   |-- MacroscopEvtAgentConfig.java
 |   |                               |   |   |-- MacroscopImgAgent.java
@@ -306,6 +311,7 @@
 |   |                                   |-- macroscop
 |   |                                   |   |-- MacroscopAgentConfigRepository.java
 |   |                                   |   |-- MacroscopChannelRepository.java
+|   |                                   |   |-- MacroscopEventTypeRepository.java
 |   |                                   |   |-- MacroscopEvtAgentConfigRepository.java
 |   |                                   |   |-- MacroscopEvtAgentRepository.java
 |   |                                   |   |-- MacroscopImgAgentConfigRepository.java
@@ -413,7 +419,9 @@
 |   |           |       |-- V01.19__fix_img_agent_configs.sql
 |   |           |       |-- V01.20__drop_discriminator_from_img_agent_configs.sql
 |   |           |       |-- V01.21__extend_img_places.sql
-|   |           |       `-- V01.22__rename_img_places_available_to_used.sql
+|   |           |       |-- V01.22__rename_img_places_available_to_used.sql
+|   |           |       |-- V01.23__add_unique_index_to_macroscop_event_types.sql
+|   |           |       `-- V01.24__add_audit_to_macroscop_event_types.sql
 |   |           `-- application.yml
 |   |-- .properties
 |   `-- pom.xml
@@ -519,4 +527,4 @@
 |-- pom.xml
 `-- tree.txt
 
-198 directories, 321 files
+198 directories, 329 files

@@ -50,4 +50,5 @@ export * from './lib/pipes/iso-no-ms.pipe';
 export * from './lib/models/content/macroscop-dto-utils';
 
 export * from './lib/components/show-image-dialog/show-image-dialog.component';
+export * from './lib/components/select-value-dialog/select-value-dialog.component';
 

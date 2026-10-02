@@ -198,6 +198,14 @@
 |   |   |   |   |   |   |   |-- macroscop-evt-editor-container.component.html
 |   |   |   |   |   |   |   |-- macroscop-evt-editor-container.component.scss
 |   |   |   |   |   |   |   `-- macroscop-evt-editor-container.component.ts
+|   |   |   |   |   |   |-- macroscop-evttype-list
+|   |   |   |   |   |   |   |-- macroscop-evttype-inplace-editor
+|   |   |   |   |   |   |   |   |-- macroscop-evttype-inplace-editor.component.html
+|   |   |   |   |   |   |   |   |-- macroscop-evttype-inplace-editor.component.scss
+|   |   |   |   |   |   |   |   `-- macroscop-evttype-inplace-editor.component.ts
+|   |   |   |   |   |   |   |-- macroscop-evttype-list.component.html
+|   |   |   |   |   |   |   |-- macroscop-evttype-list.component.scss
+|   |   |   |   |   |   |   `-- macroscop-evttype-list.component.ts
 |   |   |   |   |   |   |-- macroscop-img-editor-container
 |   |   |   |   |   |   |   |-- macroscop-img-editor-container.component.html
 |   |   |   |   |   |   |   |-- macroscop-img-editor-container.component.scss
@@ -232,6 +240,10 @@
 |   |   |   |   |       |   |-- yc-config-editor.component.html
 |   |   |   |   |       |   |-- yc-config-editor.component.scss
 |   |   |   |   |       |   `-- yc-config-editor.component.ts
+|   |   |   |   |       |-- yc-config-list
+|   |   |   |   |       |   |-- yc-config-list.component.html
+|   |   |   |   |       |   |-- yc-config-list.component.scss
+|   |   |   |   |       |   `-- yc-config-list.component.ts
 |   |   |   |   |       |-- yc-place-list
 |   |   |   |   |       |   |-- yc-place-inplace-editor
 |   |   |   |   |       |   |   |-- yc-place-inplace-editor.component.html
@@ -461,6 +473,10 @@
 |   |   |   |   |   |   |-- register.component.html
 |   |   |   |   |   |   |-- register.component.scss
 |   |   |   |   |   |   `-- register.component.ts
+|   |   |   |   |   |-- select-value-dialog
+|   |   |   |   |   |   |-- select-value-dialog.component.html
+|   |   |   |   |   |   |-- select-value-dialog.component.scss
+|   |   |   |   |   |   `-- select-value-dialog.component.ts
 |   |   |   |   |   |-- show-image-dialog
 |   |   |   |   |   |   |-- show-image-dialog.component.html
 |   |   |   |   |   |   |-- show-image-dialog.component.scss
@@ -540,4 +556,4 @@
 |-- tsconfig.json
 `-- tsconfig.prod.json
 
-150 directories, 390 files
+154 directories, 402 files

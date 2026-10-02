@@ -1,0 +1,15 @@
+<h2 mat-dialog-title>{{ data.title }}</h2>
+<mat-dialog-content>
+    <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Значение</mat-label>
+        <mat-select [(ngModel)]="selectedId">
+            <mat-option *ngFor="let item of data.data" [value]="item.id">
+                {{ item.name }}
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+    <button mat-raised-button color="primary" (click)="onSelect()">{{ data.selectLabel }}</button>
+    <button mat-button (click)="onCancel()">{{ data.cancelLabel }}</button>
+</mat-dialog-actions>

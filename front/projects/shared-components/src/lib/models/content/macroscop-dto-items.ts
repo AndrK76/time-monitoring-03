@@ -104,3 +104,14 @@ export interface MacroscopImgPlaceDto {
     macroscopId: string;
     channelId: string;
 }
+
+export interface MacroscopActivityEventTypeDto {
+    id: string;
+    description: string;
+}
+
+export interface MacroscopEventTypeDto {
+    id: string;
+    name?: string;
+    activityTypeId?: string;
+}

@@ -172,6 +172,7 @@
 |   |   |                           |   |-- dto
 |   |   |                           |   |   |-- MSCPChannel.java
 |   |   |                           |   |   |-- MSCPConfigResponse.java
+|   |   |                           |   |   |-- MSCPEventType.java
 |   |   |                           |   |   |-- MSCPMobileServerInfo.java
 |   |   |                           |   |   |-- MSCPResolution.java
 |   |   |                           |   |   |-- MSCPRtspServerInfo.java
@@ -215,6 +216,7 @@
 |   |   |                           |   |   |-- ImgPlaceDto.java
 |   |   |                           |   |   `-- ImgPlaceListDto.java
 |   |   |                           |   |-- macroscop
+|   |   |                           |   |   |-- MacroscopActivityEventTypeDto.java
 |   |   |                           |   |   |-- MacroscopAgentConfigDto.java
 |   |   |                           |   |   |-- MacroscopAgentConfigListDto.java
 |   |   |                           |   |   |-- MacroscopArchiveModeDto.java
@@ -223,6 +225,7 @@
 |   |   |                           |   |   |-- MacroscopChannelStreamDto.java
 |   |   |                           |   |   |-- MacroscopCredentialsDto.java
 |   |   |                           |   |   |-- MacroscopDataResponse.java
+|   |   |                           |   |   |-- MacroscopEventTypeDto.java
 |   |   |                           |   |   |-- MacroscopEvtAgentConfigDto.java
 |   |   |                           |   |   |-- MacroscopImgAgentConfigDto.java
 |   |   |                           |   |   |-- MacroscopImgPlaceDto.java
@@ -267,11 +270,13 @@
 |   |   |                               |   |   |-- ImgAgentListProjection.java
 |   |   |                               |   |   `-- ImgPlace.java
 |   |   |                               |   |-- macroscop
+|   |   |                               |   |   |-- MacroscopActivityEventType.java
 |   |   |                               |   |   |-- MacroscopAgentConfig.java
 |   |   |                               |   |   |-- MacroscopArchiveMode.java
 |   |   |                               |   |   |-- MacroscopChannel.java
 |   |   |                               |   |   |-- MacroscopChannelStream.java
 |   |   |                               |   |   |-- MacroscopCredentials.java
+|   |   |                               |   |   |-- MacroscopEventType.java
 |   |   |                               |   |   |-- MacroscopEvtAgent.java
 |   |   |                               |   |   |-- MacroscopEvtAgentConfig.java
 |   |   |                               |   |   |-- MacroscopImgAgent.java
@@ -307,6 +312,7 @@
 |   |   |                                   |-- macroscop
 |   |   |                                   |   |-- MacroscopAgentConfigRepository.java
 |   |   |                                   |   |-- MacroscopChannelRepository.java
+|   |   |                                   |   |-- MacroscopEventTypeRepository.java
 |   |   |                                   |   |-- MacroscopEvtAgentConfigRepository.java
 |   |   |                                   |   |-- MacroscopEvtAgentRepository.java
 |   |   |                                   |   |-- MacroscopImgAgentConfigRepository.java
@@ -414,7 +420,9 @@
 |   |   |           |       |-- V01.19__fix_img_agent_configs.sql
 |   |   |           |       |-- V01.20__drop_discriminator_from_img_agent_configs.sql
 |   |   |           |       |-- V01.21__extend_img_places.sql
-|   |   |           |       `-- V01.22__rename_img_places_available_to_used.sql
+|   |   |           |       |-- V01.22__rename_img_places_available_to_used.sql
+|   |   |           |       |-- V01.23__add_unique_index_to_macroscop_event_types.sql
+|   |   |           |       `-- V01.24__add_audit_to_macroscop_event_types.sql
 |   |   |           `-- application.yml
 |   |   |-- .properties
 |   |   `-- pom.xml
@@ -745,6 +753,14 @@
 |   |   |   |   |   |   |   |   |-- macroscop-evt-editor-container.component.html
 |   |   |   |   |   |   |   |   |-- macroscop-evt-editor-container.component.scss
 |   |   |   |   |   |   |   |   `-- macroscop-evt-editor-container.component.ts
+|   |   |   |   |   |   |   |-- macroscop-evttype-list
+|   |   |   |   |   |   |   |   |-- macroscop-evttype-inplace-editor
+|   |   |   |   |   |   |   |   |   |-- macroscop-evttype-inplace-editor.component.html
+|   |   |   |   |   |   |   |   |   |-- macroscop-evttype-inplace-editor.component.scss
+|   |   |   |   |   |   |   |   |   `-- macroscop-evttype-inplace-editor.component.ts
+|   |   |   |   |   |   |   |   |-- macroscop-evttype-list.component.html
+|   |   |   |   |   |   |   |   |-- macroscop-evttype-list.component.scss
+|   |   |   |   |   |   |   |   `-- macroscop-evttype-list.component.ts
 |   |   |   |   |   |   |   |-- macroscop-img-editor-container
 |   |   |   |   |   |   |   |   |-- macroscop-img-editor-container.component.html
 |   |   |   |   |   |   |   |   |-- macroscop-img-editor-container.component.scss
@@ -779,6 +795,10 @@
 |   |   |   |   |   |       |   |-- yc-config-editor.component.html
 |   |   |   |   |   |       |   |-- yc-config-editor.component.scss
 |   |   |   |   |   |       |   `-- yc-config-editor.component.ts
+|   |   |   |   |   |       |-- yc-config-list
+|   |   |   |   |   |       |   |-- yc-config-list.component.html
+|   |   |   |   |   |       |   |-- yc-config-list.component.scss
+|   |   |   |   |   |       |   `-- yc-config-list.component.ts
 |   |   |   |   |   |       |-- yc-place-list
 |   |   |   |   |   |       |   |-- yc-place-inplace-editor
 |   |   |   |   |   |       |   |   |-- yc-place-inplace-editor.component.html
@@ -1008,6 +1028,10 @@
 |   |   |   |   |   |   |   |-- register.component.html
 |   |   |   |   |   |   |   |-- register.component.scss
 |   |   |   |   |   |   |   `-- register.component.ts
+|   |   |   |   |   |   |-- select-value-dialog
+|   |   |   |   |   |   |   |-- select-value-dialog.component.html
+|   |   |   |   |   |   |   |-- select-value-dialog.component.scss
+|   |   |   |   |   |   |   `-- select-value-dialog.component.ts
 |   |   |   |   |   |   |-- show-image-dialog
 |   |   |   |   |   |   |   |-- show-image-dialog.component.html
 |   |   |   |   |   |   |   |-- show-image-dialog.component.scss
@@ -1101,4 +1125,4 @@
 |-- README.md
 `-- tree.txt
 
-363 directories, 738 files
+367 directories, 758 files

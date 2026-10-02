@@ -9,6 +9,7 @@ import { ChangePasswordDialogComponent } from '../components/change-password-dia
 import { LoginDialogData, LoginDialogResult } from '../components/login-dialog/login-dialog.model';
 import { LoginDialogComponent } from '../components/login-dialog/login-dialog.component';
 import { ShowImageDialogComponent } from '../components/show-image-dialog/show-image-dialog.component';
+import { SelectValueDialogComponent, SelectValueDialogData, SelectValueDialogResult } from '../components/select-value-dialog/select-value-dialog.component';
 
 @Injectable({ providedIn: 'root' })
 export class DialogService {
@@ -64,5 +65,14 @@ export class DialogService {
         return dialogRef.afterClosed().pipe(
             tap(() => URL.revokeObjectURL(url)),
         );
+    }
+
+    selectValue(data: SelectValueDialogData): Observable<SelectValueDialogResult> {
+        const dialogRef = this.dialog.open(SelectValueDialogComponent, {
+            data,
+            width: '450px',
+            autoFocus: false,
+        });
+        return dialogRef.afterClosed();
     }
 }

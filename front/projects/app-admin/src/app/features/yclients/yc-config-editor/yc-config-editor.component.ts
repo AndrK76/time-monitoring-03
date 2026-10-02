@@ -1,4 +1,4 @@
-import { Component, computed, DestroyRef, inject, OnInit, Signal, signal, WritableSignal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, input, OnInit, Signal, signal, WritableSignal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
@@ -48,6 +48,8 @@ export class YcConfigEditorComponent implements OnInit {
   private readonly notificationService = inject(NotificationService);
   private readonly sizeService = inject(SizeService);
   private readonly dialogService = inject(DialogService);
+
+  agentId = input<string | undefined>(undefined);
 
   isLoading = signal<boolean>(false);
   isSaving = signal<boolean>(false);
@@ -146,7 +148,8 @@ export class YcConfigEditorComponent implements OnInit {
   private initializeData(): void {
     this._beforeLoad();
 
-    this.configId = this.route.snapshot.queryParamMap.get('id') ?? undefined;
+    //this.configId = this.route.snapshot.queryParamMap.get('id') ?? undefined;
+    this.configId = this.agentId() ?? this.route.snapshot.queryParamMap.get('id') ?? undefined;
     if (!this.configId) {
       this.processError({ message: 'Empty config id in URL' });
       return;
@@ -191,6 +194,7 @@ export class YcConfigEditorComponent implements OnInit {
     this.hasError.set(true);
     this.error.set(resError);
     this.isLoading.set(false);
+    if (this.agentId()) return;
     setTimeout(() => {
       this.router.navigate(this.agentPage, { queryParams: this.agentIdParams() });
     }, 1000);

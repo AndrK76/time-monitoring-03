@@ -1,12 +1,14 @@
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import {
+  MacroscopActivityEventTypeDto,
   MacroscopAgentConfigDto,
   MacroscopAgentConfigListDto,
   MacroscopArchiveModeDto,
   MacroscopChannelDto,
   MacroscopChannelListDto,
   MacroscopDataResponse,
+  MacroscopEventTypeDto,
   MacroscopEvtAgentConfigDto,
   MacroscopImgAgentConfigDto,
   MacroscopImgPlaceDto,
@@ -141,6 +143,24 @@ export class MacroscopManageService {
     return this.http.delete<void>(
       `${this.adminApiUrl}${this.MACROSCOP_CONTROLLER}/configs/${configId}`);
   }
+
+
+  getEventTypes(): Observable<MacroscopEventTypeDto[]> {
+    return this.http.get<MacroscopEventTypeDto[]>(
+      `${this.adminApiUrl}${this.MACROSCOP_CONTROLLER}/event-types`);
+  }
+
+  updateEventTypes(dtos: MacroscopEventTypeDto[]): Observable<MacroscopEventTypeDto[]> {
+    return this.http.put<MacroscopEventTypeDto[]>(
+      `${this.adminApiUrl}${this.MACROSCOP_CONTROLLER}/event-types`, dtos);
+  }
+
+  getActivityEventTypes(): Observable<MacroscopActivityEventTypeDto[]> {
+    return this.http.get<MacroscopActivityEventTypeDto[]>(
+      `${this.adminApiUrl}${this.MACROSCOP_CONTROLLER}/misc/activity-event-types`);
+  }
+
+
   getServerInfoByCreds(creds: MacroscopServerCredentials): Observable<MacroscopDataResponse<MacroscopServerInfoDto>> {
     return this.http.post<MacroscopDataResponse<MacroscopServerInfoDto>>(
       `${this.adminApiUrl}${this.MACROSCOP_CONTROLLER}/misc/server-info`, creds);
@@ -180,6 +200,12 @@ export class MacroscopManageService {
       `${this.adminApiUrl}${this.MACROSCOP_CONTROLLER}/misc/configs/${configId}/channels/${channelId}/last-archive-screenshot`
     );
   }
+
+  getMacroscopEventTypes(configId: string): Observable<MacroscopDataResponse<MacroscopEventTypeDto[]>> {
+    return this.http.get<MacroscopDataResponse<MacroscopEventTypeDto[]>>(
+      `${this.adminApiUrl}${this.MACROSCOP_CONTROLLER}/misc/configs/${configId}/event-types`);
+  }
+
 
 
   private getScreenshot$(url: string): Observable<MacroscopDataResponse<Blob>> {

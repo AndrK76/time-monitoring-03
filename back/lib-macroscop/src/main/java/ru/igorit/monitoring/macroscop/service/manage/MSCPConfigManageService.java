@@ -13,6 +13,7 @@ import ru.igorit.monitoring.lib.persistence.entity.macroscop.MacroscopArchiveMod
 import ru.igorit.monitoring.macroscop.api.config.MacroscopApiProperties;
 import ru.igorit.monitoring.macroscop.api.dto.MSCPChannel;
 import ru.igorit.monitoring.macroscop.api.dto.MSCPConfigResponse;
+import ru.igorit.monitoring.macroscop.api.dto.MSCPEventType;
 import ru.igorit.monitoring.macroscop.api.service.MacroscopApiClient;
 
 import java.time.ZoneOffset;
@@ -112,6 +113,41 @@ public class MSCPConfigManageService {
         }
         return ret;
     }
+
+    public MacroscopDataResponse<List<MacroscopEventTypeDto>> getEventTypes(MacroscopServerCredentials creds) {
+        var response = _getEventTypes(creds);
+        return _parseEventTypes(response);
+    }
+
+    private MacroscopDataResponse<List<MSCPEventType>> _getEventTypes(MacroscopServerCredentials creds) {
+        return apiClient.exchange(
+                MacroscopApiClient.Client.main,
+                creds.address() + apiProperties.getEventTypesApi(),
+                HttpMethod.GET,
+                Map.of("login", creds.login(), "password", creds.passwordHash(), "responsetype", "json"),
+                null,
+                new TypeReference<List<MSCPEventType>>() {
+                }
+        ).orElse(apiClient.emptyErrorResponse());
+    }
+
+    private MacroscopDataResponse<List<MacroscopEventTypeDto>> _parseEventTypes(MacroscopDataResponse<List<MSCPEventType>> response) {
+        var ret = new MacroscopDataResponse<List<MacroscopEventTypeDto>>(response);
+        if (response.isSuccess() && response.getData() != null ) {
+            ret.setData(
+                    response.getData().stream()
+                            .map(r -> MacroscopEventTypeDto.builder()
+                                    .id(r.getId())
+                                    .name(r.getName())
+                                    .build()).toList()
+            );
+        } else if (response.isSuccess()) {
+            ret.setSuccess(false);
+            ret.setErrorMessage("Empty event types list");
+        }
+        return ret;
+    }
+
 
     public MacroscopDataResponse<BinaryContent> getCurrentScreenShotOnChannel(
             MacroscopServerCredentials creds,

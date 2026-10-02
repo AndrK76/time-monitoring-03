@@ -90,10 +90,22 @@ export const routes: Routes = [
     data: authConstant('crm/place-list')
   },
   {
-    path: 'yclients/config',
+    path: 'yclients/config-list',
+    loadComponent: () => import('./features/yclients/yc-config-list/yc-config-list.component').then(m => m.YcConfigListComponent),
+    canActivate: [authGuard],
+    data: authConstant('yclients/config-list')
+  },
+  {
+    path: 'yclients/crm/config',
     loadComponent: () => import('./features/yclients/yc-config-editor/yc-config-editor.component').then(m => m.YcConfigEditorComponent),
     canActivate: [authGuard],
     data: authConstant('yclients/config')
+  },
+  {
+    path: 'macroscop/config-list',
+    loadComponent: () => import('./features/macroscop/macroscop-config-list/macroscop-config-list.component').then(m => m.MacroscopConfigListComponent),
+    canActivate: [authGuard],
+    data: authConstant('macroscop/config-list')
   },
   {
     path: 'macroscop/evt/config',
@@ -102,16 +114,16 @@ export const routes: Routes = [
     data: authConstant('macroscop/evt/config')
   },
   {
+    path: 'macroscop/evt/type-list',
+    loadComponent: () => import('./features/macroscop/macroscop-evttype-list/macroscop-evttype-list.component').then(m => m.MacroscopEvttypeListComponent),
+    canActivate: [authGuard],
+    data: authConstant('macroscop/evt/type-list')
+  },
+  {
     path: 'macroscop/img/config',
     loadComponent: () => import('./features/macroscop/macroscop-img-editor-container/macroscop-img-editor-container.component').then(m => m.MacroscopImgEditorContainerComponent),
     canActivate: [authGuard],
     data: authConstant('macroscop/img/config')
-  },
-  {
-    path: 'macroscop/config-list',
-    loadComponent: () => import('./features/macroscop/macroscop-config-list/macroscop-config-list.component').then(m => m.MacroscopConfigListComponent),
-    canActivate: [authGuard],
-    data: authConstant('macroscop/config-list')
   },
 
 

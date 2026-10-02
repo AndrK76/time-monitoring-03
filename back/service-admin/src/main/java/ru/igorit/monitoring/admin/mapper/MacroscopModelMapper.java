@@ -65,6 +65,10 @@ public interface MacroscopModelMapper {
     @Mapping(target = "channelId",   source = "channel.id")
     MacroscopImgPlaceDto toDto(MacroscopImgPlace item);
 
+    @Mapping(target = "activityTypeId", source = "type", qualifiedByName = "activityEventTypeToString")
+    MacroscopEventTypeDto toDto(MacroscopEventType item);
+
+
 
     @Named("hashPassword")
     default String hashPassword(String password) {
@@ -104,6 +108,11 @@ public interface MacroscopModelMapper {
     @Named("archiveModeToString")
     default String archiveModeToString(MacroscopArchiveMode mode) {
         return mode == null ? null : mode.name();
+    }
+
+    @Named("activityEventTypeToString")
+    default String activityEventTypeToString(MacroscopActivityEventType type) {
+        return type == null ? null : type.name();
     }
 
 

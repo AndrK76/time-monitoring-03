@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import ru.igorit.monitoring.admin.service.MacroscopManageService;
+import ru.igorit.monitoring.common.dto.common.BinaryContent;
 import ru.igorit.monitoring.lib.dto.macroscop.*;
 
 import java.util.List;
@@ -148,9 +149,26 @@ public class MacroscopManageController {
         return service.updateChannelsForConfig(configId, dto);
     }
 
+    @GetMapping({"/event-types", "/event-types/"})
+    public List<MacroscopEventTypeDto> getEventTypes() {
+        return service.getEventTypes();
+    }
+
+    @PutMapping({"/event-types", "/event-types/"})
+    List<MacroscopEventTypeDto> updateEventTypes(
+            @Valid @RequestBody List<MacroscopEventTypeDto> dto) {
+        return service.updateEventTypes(dto);
+    }
+
+
     @GetMapping("/misc/configs/{id}/server-info")
     public MacroscopDataResponse<MacroscopServerInfoDto> getServerInfo(@PathVariable("id") String configId) {
         return service.getServerInfo(configId);
+    }
+
+    @GetMapping("/misc/activity-event-types")
+    public List<MacroscopActivityEventTypeDto> getActivityEventTypes() {
+        return service.getActivityEventTypes();
     }
 
     @GetMapping("/misc/archive-modes")
@@ -176,18 +194,7 @@ public class MacroscopManageController {
             @PathVariable("channelId") String channelId
     ) {
         var result = service.getCurrentScreenShotOnChannel(configId, channelId);
-
-        if (!result.isSuccess() || result.getData() == null) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_GATEWAY,
-                    result.getErrorMessage() != null ? result.getErrorMessage() : "Macroscop error");
-        }
-
-        var data = result.getData();
-        return ResponseEntity.status(HttpStatus.OK)
-                .contentType(MediaType.parseMediaType(data.getContentType()))
-                .contentLength(data.getData().length)
-                .body(data.getData());
+        return macroscopResultToResponseEntity(result);
     }
 
     @GetMapping("/misc/configs/{id}/channels/{channelId}/last-archive-screenshot")
@@ -196,7 +203,16 @@ public class MacroscopManageController {
             @PathVariable("channelId") String channelId
     ) {
         var result = service.getLastArchiveScreenShotOnChannel(configId, channelId);
+        return macroscopResultToResponseEntity(result);
+    }
 
+    @GetMapping("/misc/configs/{id}/event-types")
+    public MacroscopDataResponse<List<MacroscopEventTypeDto>> getMacroscopEventTypes(@PathVariable("id") String configId) {
+        return service.getMacroscopEventTypes(configId);
+    }
+
+
+    private ResponseEntity<?> macroscopResultToResponseEntity(MacroscopDataResponse<BinaryContent> result) {
         if (!result.isSuccess() || result.getData() == null) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_GATEWAY,

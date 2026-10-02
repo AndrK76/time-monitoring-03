@@ -57,7 +57,6 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewInit {
 
   // Структура меню (можно вынести в сервис позже)
   menuItems: MenuItem[] = [
-    //{ label: 'Главная', route: '/', exact: true, hideOnSmall: true },
     {
       label: 'Структура', route: '/struct',
       children: [
@@ -68,13 +67,25 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewInit {
             { label: 'Агенты', route: '/crm/agent-list' },
             { label: 'Услуги', route: '/crm/service-list' },
             { label: 'Места', route: '/crm/place-list' },
+            {
+              label: 'YClients', route: '/yclients',
+              children: [
+                { label: 'Конфигурации', route: '/yclients/config-list' },
+              ],
+            },
           ],
         },
         {
           label: 'События', route: '/evt',
           children: [
             { label: 'Агенты', route: '/evt/agent-list' },
-            { label: 'Конфигурации Macroscop', route: '/macroscop/config-list' },
+            {
+              label: 'Macroscop', route: '/macroscop',
+              children: [
+                { label: 'Конфигурации', route: '/macroscop/config-list' },
+                { label: 'Типы событий', route: '/macroscop/evt/type-list' },
+              ],
+            },
           ],
         },
         {
@@ -82,7 +93,12 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewInit {
           children: [
             { label: 'Агенты', route: '/img/agent-list' },
             { label: 'Места', route: '/img/place-list' },
-            { label: 'Конфигурации Macroscop', route: '/macroscop/config-list' },
+            {
+              label: 'Macroscop', route: '/macroscop',
+              children: [
+                { label: 'Конфигурации Macroscop', route: '/macroscop/config-list' },
+              ],
+            },
           ],
         },
       ],

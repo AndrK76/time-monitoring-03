@@ -60,6 +60,15 @@ public class MacroscopParseUtils {
                 .trim();
     }
 
+    public static String sanitizeResponse(String src) {
+        if (src == null) {
+            return null;
+        }
+        return src
+                .replace("\uFEFF", "")         // BOM
+                .trim();
+    }
+
     public static String toMacroscopTime(ZonedDateTime time) {
         if (time == null) return null;
         return MACROSCOP_QUERY_TIME_FORMAT.format(time.withZoneSameInstant(ZoneOffset.UTC));

@@ -1,0 +1,33 @@
+<div class="editor-container">
+    <form [formGroup]="form" class="editor-form">
+        <div class="form-row">
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>ID</mat-label>
+                <input matInput formControlName="id" readonly>
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Название</mat-label>
+                <input matInput formControlName="name" readonly>
+            </mat-form-field>
+        </div>
+
+        <div class="form-row">
+            @if (canEdit()) {
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Тип активности</mat-label>
+                <mat-select formControlName="activityTypeId">
+                    <mat-option [value]="''">— не выбрано —</mat-option>
+                    <mat-option *ngFor="let a of activityTypes()" [value]="a.id">
+                        {{ a.description }}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+            } @else {
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Тип активности</mat-label>
+                <input matInput [value]="currentActivityDescription()" readonly>
+            </mat-form-field>
+            }
+        </div>
+    </form>
+</div>

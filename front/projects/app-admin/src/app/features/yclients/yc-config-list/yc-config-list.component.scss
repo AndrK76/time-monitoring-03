@@ -1,0 +1,17 @@
+:host {
+    display: block;
+    height: 100%;
+}
+
+.mat-column-name {
+    min-width: 15rem;
+}
+
+.mat-column-organization {
+    min-width: 12rem;
+}
+
+.mat-column-configured {
+    min-width: 6rem;
+    max-width: 8rem;
+}

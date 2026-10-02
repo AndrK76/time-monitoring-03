@@ -1,5 +1,6 @@
 package ru.igorit.monitoring.macroscop.api.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.log4j.Log4j2;
@@ -19,6 +20,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static ru.igorit.monitoring.macroscop.api.utils.MacroscopParseUtils.sanitizeMessage;
+import static ru.igorit.monitoring.macroscop.api.utils.MacroscopParseUtils.sanitizeResponse;
 
 @Component
 @Log4j2
@@ -175,12 +177,22 @@ public class MacroscopApiClient {
         }
         if (dataType != null) {
             try {
-                TData data = objectMapper.readValue(rawBody, dataType);
+                TData data;
+                try {
+                    data = objectMapper.readValue(rawBody, dataType);
+                } catch (JsonProcessingException e) {
+                    data = objectMapper.readValue(sanitizeResponse(rawBody), dataType);
+                }
                 result.setData(data);
             } catch (Exception e) {
                 log.warn("Failed to convert data to expected type. data={}", rawBody);
                 result.setSuccess(false);
-                result.setErrorMessage(sanitizeMessage(rawBody));
+                result.setErrorMessage(
+                        (e.getMessage() != null ? e.getMessage() + " " : "") +
+                                sanitizeMessage(rawBody));
+                if (result.getErrorMessage() != null && result.getErrorMessage().length() > 1000) {
+                    result.setErrorMessage(result.getErrorMessage().substring(0, 1000));
+                }
                 result.setData(null);
                 return result;
             }

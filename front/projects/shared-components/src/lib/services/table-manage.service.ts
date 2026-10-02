@@ -182,9 +182,9 @@ export class TableManageService<T extends Record<string, any>> {
 
 
   //Выпонение обновления данных
-  doRefreshBase(loadEventsFn: () => void): void {
+  doRefreshBase(loadEventsFn?: () => void): void {
     this.updateUrlParams();
-    loadEventsFn();
+    loadEventsFn?.();
     this.dataState.set(newTableDataChanges());
     this.selectedItem.set(undefined);
     this.expandedItem.set(undefined);

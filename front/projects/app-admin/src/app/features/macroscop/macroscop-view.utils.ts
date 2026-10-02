@@ -1,22 +1,26 @@
 import {
+    MacroscopActivityEventTypeDto,
     MacroscopAgentConfigDto,
     MacroscopAgentConfigListDto,
     MacroscopArchiveModeDto,
     MacroscopChannelDto,
     MacroscopChannelStreamDto,
     MacroscopCredentialsDto,
+    MacroscopEventTypeDto,
     MacroscopEvtAgentConfigDto,
     MacroscopImgAgentConfigDto,
     MacroscopImgPlaceDto,
     MacroscopImgPlaceListDto,
 } from '@mon3/sc';
 import {
+    MacroscopActivityEventTypeView,
     MacroscopAgentConfigListView,
     MacroscopAgentConfigView,
     MacroscopArchiveModeView,
     MacroscopChannelStreamView,
     MacroscopChannelView,
     MacroscopCredentialsView,
+    MacroscopEventTypeView,
     MacroscopEvtAgentConfigView,
     MacroscopImgAgentConfigView,
     MacroscopImgPlaceListView,
@@ -282,5 +286,33 @@ export const macroscopChannelStreamViewToDto = (
     return {
         type: view.type,
         format: view.format,
+    };
+};
+
+export const macroscopActivityEventTypeDtoToView = (dto: MacroscopActivityEventTypeDto): MacroscopActivityEventTypeView => {
+    return new MacroscopActivityEventTypeView(dto.id, dto.description);
+};
+
+export const macroscopActivityEventTypeFromId = (
+    id: string | undefined, all: MacroscopActivityEventTypeView[] | undefined,): MacroscopActivityEventTypeView | undefined => {
+    if (!id || !all) return undefined;
+    return all.find(a => a.id === id);
+};
+
+export const macroscopEventTypeDtoToView = (dto: MacroscopEventTypeDto, types: MacroscopActivityEventTypeView[] | undefined = undefined,
+): MacroscopEventTypeView => {
+    return new MacroscopEventTypeView(
+        dto.id,
+        dto.name,
+        dto.activityTypeId,
+        macroscopActivityEventTypeFromId(dto.activityTypeId, types),
+    );
+};
+
+export const macroscopEventTypeViewToDto = (view: MacroscopEventTypeView): MacroscopEventTypeDto => {
+    return {
+        id: view.id,
+        name: view.name,
+        activityTypeId: view.activityTypeId,
     };
 };

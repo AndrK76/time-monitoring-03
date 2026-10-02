@@ -13,7 +13,6 @@ import ru.igorit.monitoring.common.dto.common.BinaryContent;
 import ru.igorit.monitoring.common.util.Md5Hasher;
 import ru.igorit.monitoring.common.util.TimeUtils;
 import ru.igorit.monitoring.common.util.XorCipher;
-import ru.igorit.monitoring.lib.dto.img.ImgPlaceListDto;
 import ru.igorit.monitoring.lib.dto.macroscop.*;
 import ru.igorit.monitoring.lib.persistence.entity.common.Organization;
 import ru.igorit.monitoring.lib.persistence.entity.evt.EvtAgent;
@@ -45,6 +44,7 @@ public class MacroscopManageService {
     private final MacroscopImgAgentRepository imgAgentRepo;
     private final MacroscopAgentConfigRepository configRepo;
     private final MacroscopChannelRepository channelRepo;
+    private final MacroscopEventTypeRepository eventTypeRepo;
     private final ImgManageService imgService;
     private final EvtManageService evtService;
     private final SecurityAccessUtils sa;
@@ -408,9 +408,93 @@ public class MacroscopManageService {
     }
 
 
+    @Transactional(readOnly = true)
+    public List<MacroscopEventTypeDto> getEventTypes() {
+        return eventTypeRepo.findAll().stream().map(mapper::toDto).toList();
+    }
+
+    @Transactional
+    @PreAuthorize("@securityAccessUtils.isSuperUser()")
+    public List<MacroscopEventTypeDto> updateEventTypes(List<MacroscopEventTypeDto> newVals) {
+        if (newVals == null) newVals = List.of();
+
+        var seenActivityTypes = new HashSet<String>();
+        var seenIds = new HashSet<String>();
+        for (var dto : newVals) {
+            if (dto.getId() == null || dto.getId().isBlank()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Empty id in event type");
+            }
+            if (!seenIds.add(dto.getId())) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        "Duplicate id in request: " + dto.getId());
+            }
+            var actId = dto.getActivityTypeId();
+            if (actId != null) {
+                if (MacroscopActivityEventType.byId(actId) == null) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                            "Unknown activityTypeId: " + actId);
+                }
+                if (!seenActivityTypes.add(actId)) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                            "Duplicate activityTypeId in request: " + actId);
+                }
+            }
+        }
+
+        // 2. Что удаляем: есть в БД, но нет в запросе
+        var existing = eventTypeRepo.findAll();
+        var existingById = existing.stream()
+                .collect(Collectors.toMap(MacroscopEventType::getId, e -> e));
+        var incomingIds = newVals.stream()
+                .map(MacroscopEventTypeDto::getId)
+                .collect(Collectors.toSet());
+
+        var toDelete = existing.stream()
+                .filter(e -> !incomingIds.contains(e.getId()))
+                .toList();
+        if (!toDelete.isEmpty()) {
+            eventTypeRepo.deleteAll(toDelete);
+            eventTypeRepo.flush();
+        }
+
+        // 3. Обновляем существующие и добавляем новые
+        var userId = extractUserId(getCurrentAuth());
+        var toSave = new ArrayList<MacroscopEventType>();
+        for (var dto : newVals) {
+            var entity = existingById.get(dto.getId());
+            if (entity == null) {
+                entity = new MacroscopEventType();
+                entity.setId(dto.getId());
+                entity.setCreatedBy(userId);
+            } else {
+                entity.setUpdatedBy(userId);
+            }
+            entity.setName(dto.getName());
+            entity.setType(MacroscopActivityEventType.byId(dto.getActivityTypeId()));
+            toSave.add(entity);
+        }
+        if (!toSave.isEmpty()) {
+            eventTypeRepo.saveAll(toSave);
+            eventTypeRepo.flush();
+        }
+
+        return eventTypeRepo.findAll().stream()
+                .map(mapper::toDto)
+                .sorted(Comparator.comparing(MacroscopEventTypeDto::getName,
+                                Comparator.nullsLast(String::compareTo))
+                        .thenComparing(MacroscopEventTypeDto::getId))
+                .toList();
+    }
+
     public List<MacroscopArchiveModeDto> getArchiveModes() {
         return Arrays.stream(MacroscopArchiveMode.values()).map(MacroscopArchiveModeDto::new)
                 .sorted(Comparator.comparing(MacroscopArchiveModeDto::id)).collect(Collectors.toList());
+    }
+
+
+    public List<MacroscopActivityEventTypeDto> getActivityEventTypes() {
+        return Arrays.stream(MacroscopActivityEventType.values()).map(MacroscopActivityEventTypeDto::new)
+                .sorted(Comparator.comparing(MacroscopActivityEventTypeDto::id)).collect(Collectors.toList());
     }
 
 
@@ -435,6 +519,7 @@ public class MacroscopManageService {
         var creds = _getCredsByConfigId(configId);
         return _getAllowedChannels(creds);
     }
+
 
     @Transactional(readOnly = true)
     @PreAuthorize("@securityAccessUtils.isAllowedAllActions()")
@@ -463,6 +548,12 @@ public class MacroscopManageService {
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "Channel not found"));
 
         return _getLastArchiveScreenShotOnChannel(creds, channel);
+    }
+
+    public MacroscopDataResponse<List<MacroscopEventTypeDto>> getMacroscopEventTypes(String configId) {
+        _checkAllowedConfigByOrg(configId);
+        var creds = _getCredsByConfigId(configId);
+        return _getMacroscopEventTypes(creds);
     }
 
 
@@ -575,6 +666,10 @@ public class MacroscopManageService {
 
     private MacroscopDataResponse<List<MacroscopChannelDto>> _getAllowedChannels(MacroscopServerCredentials creds) {
         return macroscopService.getAllowedChannels(creds);
+    }
+
+    private MacroscopDataResponse<List<MacroscopEventTypeDto>> _getMacroscopEventTypes(MacroscopServerCredentials creds) {
+        return macroscopService.getEventTypes(creds);
     }
 
     private void fillChannelFromDto(MacroscopChannel channel, MacroscopChannelDto dto) {
