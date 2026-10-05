@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.io.buffer.DataBufferLimitException;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
@@ -44,25 +45,13 @@ public class MacroscopApiClient {
             String url,
             HttpMethod method,
             Map<String, String> params,
+            AuthData basicAuth,
             Object body,
             TypeReference<TData> dataType
     ) {
-        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(url);
-        if (params != null && !params.isEmpty()) {
-            params.forEach(uriBuilder::queryParam);
-        }
-        URI uri = uriBuilder.build().encode().toUri();
-
-        WebClient.RequestBodySpec spec = (client == Client.img ? imgClient : mainClient).method(method)
-                .uri(uri)
-                .accept(MediaType.APPLICATION_JSON)
-                .contentType(MediaType.APPLICATION_JSON);
-        WebClient.RequestHeadersSpec<?> readySpec;
-        if (body != null) {
-            readySpec = spec.bodyValue(body);
-        } else {
-            readySpec = spec;
-        }
+        URI uri = buildUri(url, params);
+        WebClient.RequestHeadersSpec<?> readySpec = prepareSpec(
+                client, uri, method, MediaType.APPLICATION_JSON, MediaType.APPLICATION_JSON, basicAuth, body);
 
         return readySpec
                 .exchangeToMono(response -> response.bodyToMono(String.class)
@@ -81,18 +70,15 @@ public class MacroscopApiClient {
             Client client,
             String url,
             HttpMethod method,
-            Map<String, String> params
+            Map<String, String> params,
+            AuthData basicAuth,
+            Object body
     ) {
-        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(url);
-        if (params != null && !params.isEmpty()) {
-            params.forEach(uriBuilder::queryParam);
-        }
-        URI uri = uriBuilder.build().encode().toUri();
+        URI uri = buildUri(url, params);
+        WebClient.RequestHeadersSpec<?> readySpec = prepareSpec(
+                client, uri, method, MediaType.ALL, null, basicAuth, body);
 
-        return (client == Client.img ? imgClient : mainClient)
-                .method(method)
-                .uri(uri)
-                .accept(MediaType.ALL)
+        return readySpec
                 .exchangeToMono(response -> {
                     HttpStatusCode status = response.statusCode();
                     MediaType ct = response.headers().contentType().orElse(null);
@@ -100,9 +86,8 @@ public class MacroscopApiClient {
                     if (!status.is2xxSuccessful()) {
                         return response.bodyToMono(String.class)
                                 .defaultIfEmpty("")
-                                .map(body -> binaryError(
-                                        status.value(),
-                                        "Macroscop returned " + status.value() + ": " + sanitizeMessage(body)));
+                                .map(b -> binaryError(status.value(),
+                                        "Macroscop returned " + status.value() + ": " + sanitizeMessage(b)));
                     }
 
                     if (isBinary(ct)) {
@@ -123,8 +108,8 @@ public class MacroscopApiClient {
                     // 2xx + не бинарный тип = ошибка в теле
                     return response.bodyToMono(String.class)
                             .defaultIfEmpty("")
-                            .map(body -> {
-                                String msg = sanitizeMessage(body);
+                            .map(b -> {
+                                String msg = sanitizeMessage(b);
                                 log.warn("Macroscop returned 2xx with non-binary content-type {} and body: {}",
                                         ct, msg);
                                 return binaryError(status.value(),
@@ -132,7 +117,7 @@ public class MacroscopApiClient {
                             });
                 })
                 .onErrorResume(ex -> {
-                    if (ex instanceof org.springframework.core.io.buffer.DataBufferLimitException) {
+                    if (ex instanceof DataBufferLimitException) {
                         log.error("Macroscop binary response too large for maxInMemorySize", ex);
                         return Mono.just(binaryError(502, "Ответ Macroscop превышает допустимый размер"));
                     }
@@ -141,7 +126,6 @@ public class MacroscopApiClient {
                 })
                 .blockOptional();
     }
-
 
     public <TData> MacroscopDataResponse<TData> emptyErrorResponse() {
         MacroscopDataResponse<TData> result = new MacroscopDataResponse<>();
@@ -200,6 +184,39 @@ public class MacroscopApiClient {
         return result;
     }
 
+    private static URI buildUri(String url, Map<String, String> params) {
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(url);
+        if (params != null && !params.isEmpty()) {
+            params.forEach(uriBuilder::queryParam);
+        }
+        return uriBuilder.build().encode().toUri();
+    }
+
+    private WebClient.RequestHeadersSpec<?> prepareSpec(
+            Client client,
+            URI uri,
+            HttpMethod method,
+            MediaType accept,
+            MediaType contentType,
+            AuthData basicAuth,
+            Object body
+    ) {
+        WebClient.RequestBodySpec spec = (client == Client.img ? imgClient : mainClient)
+                .method(method)
+                .uri(uri)
+                .accept(accept);
+
+        if (contentType != null) {
+            spec = spec.contentType(contentType);
+        }
+        if (basicAuth != null) {
+            spec.headers(h -> h.setBasicAuth(
+                    basicAuth.login(), basicAuth.password() == null ? "" : basicAuth.password()));
+        }
+
+        return body != null ? spec.bodyValue(body) : spec;
+    }
+
 
     private MacroscopDataResponse<BinaryContent> binaryError(
             int statusCode, String message
@@ -222,5 +239,8 @@ public class MacroscopApiClient {
 
     public enum Client {
         main, img
+    }
+
+    public record AuthData(String login, String password) {
     }
 }

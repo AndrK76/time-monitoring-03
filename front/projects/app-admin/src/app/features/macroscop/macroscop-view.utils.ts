@@ -8,6 +8,7 @@ import {
     MacroscopCredentialsDto,
     MacroscopEventTypeDto,
     MacroscopEvtAgentConfigDto,
+    MacroscopEvtAgentModeDto,
     MacroscopImgAgentConfigDto,
     MacroscopImgPlaceDto,
     MacroscopImgPlaceListDto,
@@ -22,6 +23,7 @@ import {
     MacroscopCredentialsView,
     MacroscopEventTypeView,
     MacroscopEvtAgentConfigView,
+    MacroscopEvtAgentModeView,
     MacroscopImgAgentConfigView,
     MacroscopImgPlaceListView,
     MacroscopImgPlaceView,
@@ -98,11 +100,14 @@ export const macroscopAgentConfigViewToDto = (
     };
 };
 
+
 export const macroscopEvtAgentConfigDtoToView = (
-    dto: MacroscopEvtAgentConfigDto
+    dto: MacroscopEvtAgentConfigDto, allModes: MacroscopEvtAgentModeView[] | undefined = undefined
 ): MacroscopEvtAgentConfigView => {
     return {
         config: dto.config ? macroscopAgentConfigDtoToView(dto.config) : undefined,
+        mode: dto.mode,
+        modeWithInfo: macroscopEvtAgentModeFromId(dto.mode, allModes),
     } as MacroscopEvtAgentConfigView
 };
 
@@ -111,7 +116,22 @@ export const macroscopEvtAgentConfigViewToDto = (
 ): MacroscopEvtAgentConfigDto => {
     return {
         config: view.config ? macroscopAgentConfigViewToDto(view.config) : undefined,
+        mode: view.mode,
     };
+};
+
+export const macroscopEvtAgentModeFromId = (
+    id: string | undefined,
+    allModes: MacroscopEvtAgentModeView[] | undefined
+): MacroscopEvtAgentModeView | undefined => {
+    if (id === undefined || !allModes) return undefined;
+    return allModes.find(m => m.id === id);
+};
+
+export const macroscopEvtAgentModeDtoToView = (
+    dto: MacroscopEvtAgentModeDto
+): MacroscopEvtAgentModeView => {
+    return new MacroscopEvtAgentModeView(dto.id, dto.set, dto.name, dto.description);
 };
 
 export const macroscopImgAgentConfigDtoToView = (

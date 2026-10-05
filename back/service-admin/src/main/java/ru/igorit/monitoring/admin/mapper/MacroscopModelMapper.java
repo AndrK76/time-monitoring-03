@@ -37,14 +37,18 @@ public interface MacroscopModelMapper {
 
         return MacroscopServerInfoDto.builder()
                 .id(entity.getId())
+                .product(entity.getProduct())
                 .version(entity.getVersion())
                 .responseDate(TimeUtils.offsetToZonedWithTz(entity.getResponseDate(), entity.getTz()))
                 .tz(TimeUtils.stringToZoneOffset(entity.getTz()))
                 .useTz(Boolean.TRUE.equals(entity.getUseTz()))
+                .licenseEnd(TimeUtils.offsetToZonedWithTz(entity.getLicenseEnd(), entity.getTz()))
+                .pcAnalyticInfo(entity.getPcAnalyticInfo())
                 .build();
     }
 
     @Mapping(target = "responseDate", source = "responseDate", qualifiedByName = "zonedToOffsetDateTime")
+    @Mapping(target = "licenseEnd", source = "licenseEnd", qualifiedByName = "zonedToOffsetDateTime")
     @Mapping(target = "tz", source = "tz", qualifiedByName = "zoneOffsetToString")
     MacroscopServerInfo fromDto(MacroscopServerInfoDto dto);
 

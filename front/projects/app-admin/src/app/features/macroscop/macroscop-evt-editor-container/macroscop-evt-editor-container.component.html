@@ -34,7 +34,7 @@
                 <span class="hide-on-small">{{ isLoading() ? 'Загрузка...' : 'Перечитать' }}</span>
             </button>
             <button mat-raised-button color="primary" (click)="callSave()"
-                [disabled]="isLoading() ||isSaving() || hasError() || !(hasCfgChanges() || hasEvtChanges())">
+                [disabled]="isLoading() ||isSaving() || hasError() || !(hasCfgChanges() || hasEvtChanges() || hasModeChanges())">
                 <mat-icon>save</mat-icon>
                 <span class="hide-on-small">Сохранить</span>
             </button>
@@ -66,6 +66,19 @@
                             </mat-option>
                         </mat-select>
                     </mat-form-field>
+
+                    <mat-form-field appearance="outline" class="full-width" subscriptSizing="dynamic">
+                        <mat-label>Режим событий</mat-label>
+                        <mat-select formControlName="mode">
+                            <mat-option *ngFor="let m of availableModes()" [value]="m.id">
+                                {{ m.name }}
+                            </mat-option>
+                        </mat-select>
+                        @if (formGroup.get('mode')?.hasError('required')) {
+                        <mat-error>Выберите режим</mat-error>
+                        }
+                    </mat-form-field>
+
                     <mat-form-field appearance="outline" class="full-width">
                         <mat-label>Организация</mat-label>
                         <input matInput formControlName="organization" readonly>

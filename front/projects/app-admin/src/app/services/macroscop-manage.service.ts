@@ -10,6 +10,7 @@ import {
   MacroscopDataResponse,
   MacroscopEventTypeDto,
   MacroscopEvtAgentConfigDto,
+  MacroscopEvtAgentModeDto,
   MacroscopImgAgentConfigDto,
   MacroscopImgPlaceDto,
   MacroscopImgPlaceListDto,
@@ -188,6 +189,10 @@ export class MacroscopManageService {
       `${this.adminApiUrl}${this.MACROSCOP_CONTROLLER}/misc/archive-modes`);
   }
 
+  getEvtAgentModes(): Observable<MacroscopEvtAgentModeDto[]> {
+    return this.http.get<MacroscopEvtAgentModeDto[]>(
+      `${this.adminApiUrl}${this.MACROSCOP_CONTROLLER}/misc/evt-agent-modes`);
+  }
 
   getCurrentScreenshot(configId: string, channelId: string): Observable<MacroscopDataResponse<Blob>> {
     return this.getScreenshot$(

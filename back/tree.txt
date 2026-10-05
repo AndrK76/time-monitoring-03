@@ -172,6 +172,8 @@
 |   |                           |   |   |-- MSCPChannel.java
 |   |                           |   |   |-- MSCPConfigResponse.java
 |   |                           |   |   |-- MSCPEventType.java
+|   |                           |   |   |-- MSCPLicenseInfo.java
+|   |                           |   |   |-- MSCPLicenseInfoChannelStat.java
 |   |                           |   |   |-- MSCPMobileServerInfo.java
 |   |                           |   |   |-- MSCPResolution.java
 |   |                           |   |   |-- MSCPRtspServerInfo.java
@@ -226,6 +228,7 @@
 |   |                           |   |   |-- MacroscopDataResponse.java
 |   |                           |   |   |-- MacroscopEventTypeDto.java
 |   |                           |   |   |-- MacroscopEvtAgentConfigDto.java
+|   |                           |   |   |-- MacroscopEvtAgentModeDto.java
 |   |                           |   |   |-- MacroscopImgAgentConfigDto.java
 |   |                           |   |   |-- MacroscopImgPlaceDto.java
 |   |                           |   |   |-- MacroscopImgPlaceListDto.java
@@ -278,6 +281,7 @@
 |   |                               |   |   |-- MacroscopEventType.java
 |   |                               |   |   |-- MacroscopEvtAgent.java
 |   |                               |   |   |-- MacroscopEvtAgentConfig.java
+|   |                               |   |   |-- MacroscopEvtAgentMode.java
 |   |                               |   |   |-- MacroscopImgAgent.java
 |   |                               |   |   |-- MacroscopImgAgentConfig.java
 |   |                               |   |   |-- MacroscopImgPlace.java
@@ -421,7 +425,9 @@
 |   |           |       |-- V01.21__extend_img_places.sql
 |   |           |       |-- V01.22__rename_img_places_available_to_used.sql
 |   |           |       |-- V01.23__add_unique_index_to_macroscop_event_types.sql
-|   |           |       `-- V01.24__add_audit_to_macroscop_event_types.sql
+|   |           |       |-- V01.24__add_audit_to_macroscop_event_types.sql
+|   |           |       |-- V01.25__add_license_and_product_to_macroscop_configs.sql
+|   |           |       `-- V01.26__add_event_mode_to_macroscop_evt_agent_configs.sql
 |   |           `-- application.yml
 |   |-- .properties
 |   `-- pom.xml
@@ -527,4 +533,4 @@
 |-- pom.xml
 `-- tree.txt
 
-198 directories, 329 files
+198 directories, 335 files

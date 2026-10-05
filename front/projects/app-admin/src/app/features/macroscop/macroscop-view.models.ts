@@ -8,6 +8,7 @@ import {
     MacroscopCredentialsDto,
     MacroscopEventTypeDto,
     MacroscopEvtAgentConfigDto,
+    MacroscopEvtAgentModeDto,
     MacroscopImgAgentConfigDto,
     MacroscopImgPlaceDto,
     MacroscopImgPlaceListDto,
@@ -47,6 +48,17 @@ export class MacroscopAgentConfigListView implements MacroscopAgentConfigListDto
 export class MacroscopEvtAgentConfigView implements MacroscopEvtAgentConfigDto {
     constructor(
         public config: MacroscopAgentConfigView | undefined,
+        public mode: string,
+        public modeWithInfo?: MacroscopEvtAgentModeView,
+    ) { }
+}
+
+export class MacroscopEvtAgentModeView implements MacroscopEvtAgentModeDto {
+    constructor(
+        public id: string,
+        public set: boolean,
+        public name: string,
+        public description: string,
     ) { }
 }
 

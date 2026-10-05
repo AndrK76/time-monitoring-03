@@ -3,6 +3,8 @@ import { Pipe, PipeTransform } from '@angular/core';
 /**
  * Убирает миллисекунды из ISO-строки, сохраняя TZ-offset.
  * Пример: 2026-09-24T09:40:41.585677+03:00 → 2026-09-24 09:40:41 +03:00
+ * Если hideSeconds=true — секунды тоже скрываются:
+ *         2026-09-24T09:40:41.585677+03:00 → 2026-09-24 09:40 +03:00
  * Если вход не ISO или пуст — возвращает как есть.
  */
 @Pipe({
@@ -10,7 +12,7 @@ import { Pipe, PipeTransform } from '@angular/core';
   standalone: true,
 })
 export class IsoNoMsPipe implements PipeTransform {
-  transform(value: string | null | undefined): string {
+  transform(value: string | null | undefined, hideSeconds: boolean = false): string {
     if (!value) return '';
 
     // YYYY-MM-DDTHH:MM:SS(.fraction)?(Z|±HH:MM)?
@@ -20,8 +22,10 @@ export class IsoNoMsPipe implements PipeTransform {
     if (!m) return value;
 
     const [, date, time, tz] = m;
+    const shownTime = hideSeconds ? time.substring(0, 5) : time;
+
     return tz
-      ? `${date} ${time} ${tz}`
-      : `${date} ${time}`;
+      ? `${date} ${shownTime} ${tz}`
+      : `${date} ${shownTime}`;
   }
 }

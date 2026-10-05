@@ -1,5 +1,6 @@
 package ru.igorit.monitoring.lib.dto.macroscop;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,4 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class MacroscopEvtAgentConfigDto {
     private MacroscopAgentConfigDto config;
+
+    @NotBlank
+    private String mode;
 }

@@ -4,16 +4,14 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 import ru.igorit.monitoring.common.dto.common.BinaryContent;
 import ru.igorit.monitoring.lib.dto.macroscop.*;
 import ru.igorit.monitoring.lib.persistence.entity.macroscop.MacroscopArchiveMode;
 import ru.igorit.monitoring.macroscop.api.config.MacroscopApiProperties;
-import ru.igorit.monitoring.macroscop.api.dto.MSCPChannel;
 import ru.igorit.monitoring.macroscop.api.dto.MSCPConfigResponse;
 import ru.igorit.monitoring.macroscop.api.dto.MSCPEventType;
+import ru.igorit.monitoring.macroscop.api.dto.MSCPLicenseInfo;
 import ru.igorit.monitoring.macroscop.api.service.MacroscopApiClient;
 
 import java.time.ZoneOffset;
@@ -33,7 +31,8 @@ public class MSCPConfigManageService {
 
     public MacroscopDataResponse<MacroscopServerInfoDto> getServerInfo(MacroscopServerCredentials creds) {
         var response = _getServerInfo(creds);
-        return _parseServerInfoResponse(response);
+        var licResponse = _getLicenseInfo(creds);
+        return _parseServerInfoResponse(response, licResponse);
     }
 
     private MacroscopDataResponse<MSCPConfigResponse> _getServerInfo(MacroscopServerCredentials creds) {
@@ -43,12 +42,28 @@ public class MSCPConfigManageService {
                 HttpMethod.GET,
                 Map.of("login", creds.login(), "password", creds.passwordHash(), "responsetype", "json"),
                 null,
+                null,
                 new TypeReference<MSCPConfigResponse>() {
                 }
         ).orElse(apiClient.emptyErrorResponse());
     }
 
-    private MacroscopDataResponse<MacroscopServerInfoDto> _parseServerInfoResponse(MacroscopDataResponse<MSCPConfigResponse> response) {
+    private MacroscopDataResponse<MSCPLicenseInfo> _getLicenseInfo(MacroscopServerCredentials creds) {
+        return apiClient.exchange(
+                MacroscopApiClient.Client.main,
+                creds.address() + apiProperties.getWebApi() + apiProperties.getLicenseApi(),
+                HttpMethod.GET,
+                null,
+                new MacroscopApiClient.AuthData(creds.login(), creds.passwordHash()),
+                null,
+                new TypeReference<MSCPLicenseInfo>() {
+                }
+        ).orElse(apiClient.emptyErrorResponse());
+    }
+
+    private MacroscopDataResponse<MacroscopServerInfoDto> _parseServerInfoResponse(
+            MacroscopDataResponse<MSCPConfigResponse> response,
+            MacroscopDataResponse<MSCPLicenseInfo> licResponse) {
         var ret = new MacroscopDataResponse<MacroscopServerInfoDto>(response);
         if (response.isSuccess() && response.getData() != null) {
             var zoneOffset = extractZoneOffset(response.getData().getChannels());
@@ -62,6 +77,18 @@ public class MSCPConfigManageService {
                     .tz(zoneOffset)
                     .useTz(response.getData().getUseTimeZones())
                     .build());
+            if (licResponse.isSuccess() && licResponse.getData() != null) {
+                var licData = licResponse.getData();
+                var data = ret.getData();
+                data.setProduct(licData.getProductType() == null ? null : licData.getProductType().trim());
+                data.setLicenseEnd(licData.getTimeLimit() == null ? null
+                        : parseTimestamp(licData.getTimeLimit()).atZone(displayZone));
+                int analyticAvailable =
+                        licData.getPersonalControlChannels() == null ? 0 : licData.getPersonalControlChannels().getTotal();
+                int analyticUsed =
+                        licData.getPersonalControlChannels() == null ? 0 : licData.getPersonalControlChannels().getUsed();
+                data.setPcAnalyticInfo(String.format("%d из %d", analyticAvailable, analyticUsed));
+            }
         } else if (response.isSuccess()) {
             ret.setSuccess(false);
             ret.setErrorMessage("Empty response data");
@@ -126,6 +153,7 @@ public class MSCPConfigManageService {
                 HttpMethod.GET,
                 Map.of("login", creds.login(), "password", creds.passwordHash(), "responsetype", "json"),
                 null,
+                null,
                 new TypeReference<List<MSCPEventType>>() {
                 }
         ).orElse(apiClient.emptyErrorResponse());
@@ -133,7 +161,7 @@ public class MSCPConfigManageService {
 
     private MacroscopDataResponse<List<MacroscopEventTypeDto>> _parseEventTypes(MacroscopDataResponse<List<MSCPEventType>> response) {
         var ret = new MacroscopDataResponse<List<MacroscopEventTypeDto>>(response);
-        if (response.isSuccess() && response.getData() != null ) {
+        if (response.isSuccess() && response.getData() != null) {
             ret.setData(
                     response.getData().stream()
                             .map(r -> MacroscopEventTypeDto.builder()
@@ -164,7 +192,9 @@ public class MSCPConfigManageService {
                         "channelId", channelId,
                         "resolutionx", String.valueOf(apiProperties.getBigResolutionX()),
                         "streamtype", streamType
-                )
+                ),
+                null,
+                null
         ).orElse(apiClient.emptyErrorResponse());
     }
 
@@ -182,8 +212,10 @@ public class MSCPConfigManageService {
                         "channelId", channelId,
                         "resolutionx", String.valueOf(apiProperties.getBigResolutionX()),
                         "mode", "archive",
-                        "starttime",toMacroscopTime(ZonedDateTime.now())
-                )
+                        "starttime", toMacroscopTime(ZonedDateTime.now())
+                ),
+                null,
+                null
         ).orElse(apiClient.emptyErrorResponse());
     }
 

@@ -18,6 +18,14 @@ export interface MacroscopAgentConfigListDto {
 
 export interface MacroscopEvtAgentConfigDto {
     config?: MacroscopAgentConfigDto;
+    mode: string;
+}
+
+export interface MacroscopEvtAgentModeDto {
+    id: string;
+    set: boolean;
+    name: string;
+    description: string;
 }
 
 export interface MacroscopImgAgentConfigDto {
@@ -39,10 +47,13 @@ export interface MacroscopDataResponse<T = unknown> {
 
 export interface MacroscopServerInfoDto {
     id?: string;
+    product?: string;
     version?: string;
     responseDate?: string;
     tz?: string;
     useTz?: boolean;
+    licenseEnd?: string;
+    pcAnalyticInfo?: string;
 }
 
 export interface MacroscopChannelDto {

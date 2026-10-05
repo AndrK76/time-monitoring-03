@@ -176,6 +176,11 @@ public class MacroscopManageController {
         return service.getArchiveModes();
     }
 
+    @GetMapping("/misc/evt-agent-modes")
+    public List<MacroscopEvtAgentModeDto> getEvtAgentModes() {
+        return service.getEvtAgentModes();
+    }
+
     @PostMapping("/misc/server-info")
     public MacroscopDataResponse<MacroscopServerInfoDto> getServerInfoByCreds(
             @Valid @RequestBody MacroscopServerCredentials creds) {

@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, DestroyRef, inject, OnInit, signal, WritableSignal } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { Component, computed, DestroyRef, inject, OnInit, signal, WritableSignal } from '@angular/core';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -12,10 +12,10 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { addNewItemFlag, addOrigData, applyChanges, DialogService, hasChanges, hasOrigData, isNewItem, NotificationService, removeOrigData, SizeService, TableActionsInformerService } from '@mon3/sc';
 import { MacroscopManageService } from '../../../services/macroscop-manage.service';
 import { ErrorResponseResult, PermissionService, processResponseError } from '@mon3/sa';
-import { MacroscopAgentConfigListView, MacroscopAgentConfigView, MacroscopArchiveModeView, MacroscopChannelView, MacroscopEvtAgentConfigView } from '../macroscop-view.models';
+import { MacroscopAgentConfigListView, MacroscopAgentConfigView, MacroscopArchiveModeView, MacroscopChannelView, MacroscopEvtAgentConfigView, MacroscopEvtAgentModeView } from '../macroscop-view.models';
 import { authConstant } from '../../../auth-constants';
 import { distinctUntilChanged, finalize, forkJoin, map, Observable, of, switchMap, tap } from 'rxjs';
-import { createEmptyMacroscopAgentConfigView, macroscopAgentConfigDtoToView, macroscopAgentConfigListDtoToView, macroscopAgentConfigViewToListView, macroscopArchiveModeDtoToView, macroscopChannelDtoToView, macroscopChannelViewToDto, macroscopEvtAgentConfigDtoToView, macroscopEvtAgentConfigViewToDto } from '../macroscop-view.utils';
+import { createEmptyMacroscopAgentConfigView, macroscopAgentConfigDtoToView, macroscopAgentConfigListDtoToView, macroscopAgentConfigViewToListView, macroscopArchiveModeDtoToView, macroscopChannelDtoToView, macroscopChannelViewToDto, macroscopEvtAgentConfigDtoToView, macroscopEvtAgentConfigViewToDto, macroscopEvtAgentModeDtoToView, macroscopEvtAgentModeFromId } from '../macroscop-view.utils';
 import { EvtStructManageService } from '../../../services/evt-struct-manage.service';
 import { EvtAgentItemView } from '../../evt/evt-view.models';
 import { evtAgentItemDtoToView } from '../../evt/evt-view.utils';
@@ -70,6 +70,13 @@ export class MacroscopEvtEditorContainerComponent implements OnInit {
   backParams: WritableSignal<any> = signal(undefined);
   hasEvtChanges = signal(false);
   hasCfgChanges = signal(false);
+  hasModeChanges = computed(() => {
+    const cfg = this.evtConfig();
+    if (!cfg) return false;
+    const orig = (cfg as any)._orig as MacroscopEvtAgentConfigView | undefined;
+    if (!orig) return false;
+    return (orig.mode ?? null) !== (cfg.mode ?? null);
+  });
 
   id = signal<string | undefined>(undefined);
   agent = signal<EvtAgentItemView | undefined>(undefined);
@@ -78,6 +85,15 @@ export class MacroscopEvtEditorContainerComponent implements OnInit {
   configMap: Map<string, MacroscopAgentConfigView> = new Map();
   organizations = signal<OrgStructInfo[]>([]);
   archiveModes = signal<MacroscopArchiveModeView[]>([]);
+  evtAgentModes = signal<MacroscopEvtAgentModeView[]>([]);
+  availableModes = computed(() => {
+    const all = this.evtAgentModes();
+    const current = this.evtConfig()?.modeWithInfo;
+    if (current?.set === true) {
+      return all.filter(m => m.set === true);
+    }
+    return all;
+  });
 
   isSmallScreen = this.sizeService.isSmallScreen;
 
@@ -122,10 +138,11 @@ export class MacroscopEvtEditorContainerComponent implements OnInit {
   private buildForm(): void {
     this.formGroup = this.fb.group({
       config: [{ value: null as string | null, disabled: !this.canManageAnyConfig() }],
+      mode: [{ value: 'unknown' as string, disabled: false }, Validators.required],
       organization: [{ value: null as string | null, readonly: true }]
     });
     this.onEvtConfigChange();
-
+    this.onModeChange();
   }
 
   private initData(): void {
@@ -135,26 +152,29 @@ export class MacroscopEvtEditorContainerComponent implements OnInit {
 
     const canManage = this.canManageAnyConfig();
 
-    this.mainStructService.getOrganizations().pipe(
-      map(list => list.map(dto => orgStructListDtoToView(dto))),
-
-      switchMap(organizations => forkJoin({
-        organizations: of(organizations),
-        archiveModes: this.macroscopManageService.getArchiveModes().pipe(
-          map(list => list.map(dto => macroscopArchiveModeDtoToView(dto))),
-        ),
-        config: this.macroscopManageService.getEvtConfig(this.id()!).pipe(
-          map(dto => macroscopEvtAgentConfigDtoToView(dto))
-        ),
-        agent: this.evtStructManageService.getAgentById(this.id()!).pipe(
-          map(dto => evtAgentItemDtoToView(dto, undefined, organizations))
-        ),
-        configs: !canManage
-          ? of([])
-          : this.macroscopManageService.getConfigs().pipe(
-            map(list => list.map(dto => macroscopAgentConfigListDtoToView(dto)))),
-      })),
-
+    forkJoin({
+      organizations: this.mainStructService.getOrganizations().pipe(
+        map(list => list.map(dto => orgStructListDtoToView(dto)))),
+      archiveModes: this.macroscopManageService.getArchiveModes().pipe(
+        map(list => list.map(dto => macroscopArchiveModeDtoToView(dto)))),
+      evtAgentModes: this.macroscopManageService.getEvtAgentModes().pipe(
+        map(list => list.map(dto => macroscopEvtAgentModeDtoToView(dto)))),
+    }).pipe(
+      switchMap(({ organizations, archiveModes, evtAgentModes }) => {
+        this.evtAgentModes.set(evtAgentModes);
+        return forkJoin({
+          config: this.macroscopManageService.getEvtConfig(this.id()!).pipe(
+            map(dto => macroscopEvtAgentConfigDtoToView(dto, evtAgentModes))),
+          agent: this.evtStructManageService.getAgentById(this.id()!).pipe(
+            map(dto => evtAgentItemDtoToView(dto, undefined, organizations))),
+          configs: !canManage
+            ? of([])
+            : this.macroscopManageService.getConfigs().pipe(
+              map(list => list.map(dto => macroscopAgentConfigListDtoToView(dto)))),
+          organizations: of(organizations),
+          archiveModes: of(archiveModes as MacroscopArchiveModeView[]),
+        });
+      }),
       finalize(() => this.isLoading.set(false))
     ).subscribe({
       next: ({ organizations, archiveModes, config, agent, configs }) => {
@@ -164,7 +184,7 @@ export class MacroscopEvtEditorContainerComponent implements OnInit {
           return;
         }
         this.organizations.set(organizations);
-        this.archiveModes.set(archiveModes as MacroscopArchiveModeView[]);
+        this.archiveModes.set(archiveModes);
         this.agent.set(agent);
         this.configs.set(canManage ? configs : [macroscopAgentConfigViewToListView(config!.config!)]);
         this.formGroup.patchValue({ organization: agent.organization?.shortName ?? '' }, { emitEvent: false });
@@ -174,26 +194,34 @@ export class MacroscopEvtEditorContainerComponent implements OnInit {
     });
   }
 
-
   private afterLoad(config: MacroscopEvtAgentConfigView | undefined | null) {
     this.configMap.clear();
     this.hasCfgChanges.set(false);
     this.hasEvtChanges.set(false);
-    if (this.evtConfig()) this.evtConfig.set(removeOrigData<MacroscopEvtAgentConfigView>(this.evtConfig()!))
-    if (config && !hasOrigData<MacroscopEvtAgentConfigView>(config)) config = addOrigData<MacroscopEvtAgentConfigView>(config);
+    if (this.evtConfig()) this.evtConfig.set(removeOrigData<MacroscopEvtAgentConfigView>(this.evtConfig()!));
+    if (config && !hasOrigData<MacroscopEvtAgentConfigView>(config)) {
+      config = addOrigData<MacroscopEvtAgentConfigView>(config);
+    }
     this.evtConfig.set(config ?? undefined);
     this.afterLoadConfig(config?.config);
+
+    // Обновляем поле mode в форме (emitEvent: false, чтобы не дёргать onModeChange)
+    this.formGroup.patchValue({ mode: config?.mode ?? 'unknown' }, { emitEvent: false });
+
     if (config) {
-      this.hasEvtChanges.set(hasChanges<MacroscopEvtAgentConfigView>(config, (config as any)._orig));
+      this.hasEvtChanges.set(
+        hasChanges<MacroscopEvtAgentConfigView>(
+          config, (config as any)._orig, ['mode', 'modeWithInfo']));
     }
   }
 
   private loadData(): void {
     const modes = this.archiveModes();
+    const evtModes = this.evtAgentModes();
     this.isLoading.set(true);
     this.macroscopManageService.getEvtConfig(this.id()!).pipe(
       switchMap(dto => {
-        const view = macroscopEvtAgentConfigDtoToView(dto);
+        const view = macroscopEvtAgentConfigDtoToView(dto, evtModes);
         const cfgId = view.config?.id;
         if (!cfgId) return of(view);
         return this.macroscopManageService.getChannelsForConfig(cfgId).pipe(
@@ -258,19 +286,40 @@ export class MacroscopEvtEditorContainerComponent implements OnInit {
 
 
   private onEvtConfigChange(): void {
-    this.formGroup.valueChanges
+    this.formGroup.get('config')!.valueChanges
       .pipe(
-        //debounceTime(300),
         distinctUntilChanged(),
         takeUntilDestroyed(this.destroyRef)
       )
-      .subscribe(values => {
-        if (values.config !== this.evtConfig()?.config?.id) {
-          this.loadConfig(values.config);
+      .subscribe((configId: string | null) => {
+        if (!configId) {
+          this.afterLoadConfig(undefined);
+          return;
+        }
+        if (configId !== this.evtConfig()?.config?.id) {
+          this.loadConfig(configId);
         }
       });
   }
 
+  private onModeChange(): void {
+    this.formGroup.get('mode')!.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(mode => {
+        const cfg = this.evtConfig();
+        if (!cfg) return;
+        if (cfg.mode === mode) return;
+
+        const updated: MacroscopEvtAgentConfigView = {
+          ...cfg,
+          mode,
+          modeWithInfo: macroscopEvtAgentModeFromId(mode, this.evtAgentModes()),
+        } as MacroscopEvtAgentConfigView;
+        (updated as any)._orig = (cfg as any)._orig;
+
+        this.evtConfig.set(updated);
+      });
+  }
 
   onConfigChange = (newData: MacroscopAgentConfigView | undefined): void => {
     if (this.evtConfig()?.config && newData) {
@@ -348,22 +397,24 @@ export class MacroscopEvtEditorContainerComponent implements OnInit {
 
     const syncEvtBinding = (cfg: MacroscopAgentConfigView | undefined): Observable<MacroscopEvtAgentConfigView> => {
       const agentId = this.id()!;
+      const modes = this.evtAgentModes();
       if (!cfg) {
         return this.macroscopManageService.unbindEvtConfig(agentId)
-          .pipe(map(dto => macroscopEvtAgentConfigDtoToView(dto)));
+          .pipe(map(dto => macroscopEvtAgentConfigDtoToView(dto, modes)));
       }
       return this.macroscopManageService.bindEvtConfig(agentId, cfg.id)
-        .pipe(map(dto => macroscopEvtAgentConfigDtoToView(dto)));
-    }
+        .pipe(map(dto => macroscopEvtAgentConfigDtoToView(dto, modes)));
+    };
 
-    const updateEvtConfig = (cfg: MacroscopAgentConfigView): Observable<MacroscopEvtAgentConfigView> => {
+    const updateEvtConfig = (cfg: MacroscopAgentConfigView | undefined): Observable<MacroscopEvtAgentConfigView> => {
+      const modes = this.evtAgentModes();
       const patched: MacroscopEvtAgentConfigView = {
         ...currEvtCfg,
         config: cfg,
       } as MacroscopEvtAgentConfigView;
       const dto = macroscopEvtAgentConfigViewToDto(patched);
       return this.macroscopManageService.updateEvtConfig(this.id()!, dto)
-        .pipe(map(d => macroscopEvtAgentConfigDtoToView(d)));
+        .pipe(map(d => macroscopEvtAgentConfigDtoToView(d, modes)));
     };
 
     const currEvtCfg = this.evtConfig();
@@ -372,10 +423,11 @@ export class MacroscopEvtEditorContainerComponent implements OnInit {
     const currCfg = this.evtConfig()?.config;
     const isEvtChanged = this.hasEvtChanges();
     const isCfgChanged = this.hasCfgChanges();
+    const isModeChanged = this.hasModeChanges();
     const isNewCfg = !!currCfg && isNewItem(currCfg);
     const oldCfgId = currCfg?.id;
 
-    if (!isEvtChanged && !isCfgChanged) {
+    if (!isEvtChanged && !isCfgChanged && !isModeChanged) {
       this.notificationService.info('Нет изменений для сохранения');
       return;
     }
@@ -392,11 +444,10 @@ export class MacroscopEvtEditorContainerComponent implements OnInit {
           isEvtChanged ? syncEvtBinding(cfg) : of(null);
 
         const cfg$: Observable<MacroscopEvtAgentConfigView | null> =
-          (!isNewCfg && isCfgChanged && cfg)
+          (!isNewCfg && (isCfgChanged || isModeChanged))
             ? updateEvtConfig(cfg)
             : of(null);
 
-        // Каналы сохраняем только для существующего конфига с непустым списком.
         const channels$: Observable<MacroscopChannelView[] | null> =
           (!isNewCfg && cfg?.id && (cfg.channels?.length ?? 0) > 0)
             ? this.macroscopManageService.updateChannelsForConfig(
@@ -411,7 +462,7 @@ export class MacroscopEvtEditorContainerComponent implements OnInit {
         var res = evt ?? cfg ?? this.evtConfig() ?? undefined;
         if (channels && res?.config) res!.config!.channels = channels;
         return res;
-    }),
+      }),
       finalize(() => this.isSaving.set(false)),
       takeUntilDestroyed(this.destroyRef),
     ).subscribe({

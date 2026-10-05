@@ -19,6 +19,10 @@ public class MacroscopServerInfo {
     @Column(name = "server_id", length = 255)
     private String id;
 
+
+    @Column(name = "server_product", length = 255)
+    private String product;
+
     @Column(name = "server_version", length = 64)
     private String version;
 
@@ -31,12 +35,21 @@ public class MacroscopServerInfo {
     @Column(name = "server_use_tz")
     private Boolean useTz;
 
+    @Column(name = "license_end")
+    private OffsetDateTime licenseEnd;
+
+    @Column(name = "analytic_info", length = 255)
+    private String pcAnalyticInfo;
+
     public void fillFrom(MacroscopServerInfo other) {
         this.id = other.id;
+        this.product = other.product;
         this.version = other.version;
         this.responseDate = other.responseDate;
         this.tz = other.tz;
         this.useTz = other.useTz;
+        this.licenseEnd = other.licenseEnd;
+        this.pcAnalyticInfo = other.pcAnalyticInfo;
     }
 
     public boolean isEmpty() {

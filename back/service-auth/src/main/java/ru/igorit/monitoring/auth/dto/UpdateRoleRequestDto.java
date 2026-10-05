@@ -21,5 +21,6 @@ public class UpdateRoleRequestDto {
     @NotBlank(message = "Description is required")
     private String description;
 
+    @Builder.Default
     private List<String> permissions = new ArrayList<>();
 }

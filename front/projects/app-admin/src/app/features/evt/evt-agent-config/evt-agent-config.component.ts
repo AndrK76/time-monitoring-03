@@ -65,7 +65,7 @@ export class EvtAgentConfigComponent implements OnInit {
     const resError = processResponseError(err);
     this.hasError.set(true);
     this.error.set(resError);
-    setTimeout(() => this.processResponse(undefined), 1000);
+    setTimeout(() => this.processResponse(undefined), 3000);
   }
 
   private processResponse(res: any): void {

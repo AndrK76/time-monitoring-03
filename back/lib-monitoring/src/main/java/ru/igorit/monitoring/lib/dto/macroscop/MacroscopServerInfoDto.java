@@ -14,8 +14,11 @@ import java.time.ZonedDateTime;
 @AllArgsConstructor
 public class MacroscopServerInfoDto {
     private String     id;
+    private String product;
     private String version;
     private ZonedDateTime responseDate;
     private ZoneOffset tz;
     private boolean useTz;
+    private ZonedDateTime licenseEnd;
+    private String pcAnalyticInfo;
 }

@@ -69,6 +69,7 @@ public class MacroscopManageService {
         }
         var ret = _getEvtConfig(agentId);
         assert ret != null;
+
         if (ret.getConfig() == null) {
             if (dto.getConfig() != null) {
                 MacroscopAgentConfig cfg;
@@ -88,6 +89,17 @@ public class MacroscopManageService {
             }
             dto.setConfig(_updateStoredConfig(dto.getConfig(), ret.getConfig()));
         }
+
+        var newMode = MacroscopEvtAgentMode.byId(dto.getMode());
+        if (newMode == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unknown event mode: " + dto.getMode());
+        }
+        if (!Objects.equals(ret.getMode(), newMode)) {
+            ret.setMode(newMode);
+            ret.setUpdatedBy(extractUserId(getCurrentAuth()));
+            ret = evtConfigRepo.saveAndFlush(ret);
+        }
+        dto.setMode(ret.getMode() == null ? null : ret.getMode().name());
         return dto;
     }
 
@@ -105,7 +117,9 @@ public class MacroscopManageService {
         var cfg = _getConfig(configId);
         ret.setConfig(cfg);
         ret.setUpdatedBy(extractUserId(getCurrentAuth()));
-        return mapper.toDto(evtConfigRepo.save(ret));
+        var retDto = mapper.toDto(evtConfigRepo.save(ret));
+        retDto.setConfig(unmaskCreds(retDto.getConfig()));
+        return retDto;
     }
 
     @Transactional
@@ -175,7 +189,9 @@ public class MacroscopManageService {
         var cfg = _getConfig(configId);
         ret.setConfig(cfg);
         ret.setUpdatedBy(extractUserId(getCurrentAuth()));
-        return mapper.toDto(imgConfigRepo.save(ret));
+        var retDto = mapper.toDto(imgConfigRepo.save(ret));
+        retDto.setConfig(unmaskCreds(retDto.getConfig()));
+        return retDto;
     }
 
     @Transactional
@@ -491,10 +507,16 @@ public class MacroscopManageService {
                 .sorted(Comparator.comparing(MacroscopArchiveModeDto::id)).collect(Collectors.toList());
     }
 
-
     public List<MacroscopActivityEventTypeDto> getActivityEventTypes() {
         return Arrays.stream(MacroscopActivityEventType.values()).map(MacroscopActivityEventTypeDto::new)
                 .sorted(Comparator.comparing(MacroscopActivityEventTypeDto::id)).collect(Collectors.toList());
+    }
+
+    public List<MacroscopEvtAgentModeDto> getEvtAgentModes() {
+        return Arrays.stream(MacroscopEvtAgentMode.values())
+                .map(MacroscopEvtAgentModeDto::new)
+                .sorted(Comparator.comparing(MacroscopEvtAgentModeDto::id))
+                .toList();
     }
 
 
@@ -622,10 +644,13 @@ public class MacroscopManageService {
             var dtoInfo = dto.getServerInfo();
             var entityInfo = stored.getServerInfo();
             entityInfo.setId(dtoInfo.getId());
+            entityInfo.setProduct(dtoInfo.getProduct());
             entityInfo.setVersion(dtoInfo.getVersion());
             entityInfo.setResponseDate(TimeUtils.zonedToOffset(dtoInfo.getResponseDate()));
             entityInfo.setTz(TimeUtils.zoneOffsetToString(dtoInfo.getTz()));
             entityInfo.setUseTz(dtoInfo.isUseTz());
+            entityInfo.setLicenseEnd(TimeUtils.zonedToOffset(dtoInfo.getLicenseEnd()));
+            entityInfo.setPcAnalyticInfo(dtoInfo.getPcAnalyticInfo());
         }
         stored = configRepo.saveAndFlush(stored);
         return unmaskCreds(mapper.toDto(stored));

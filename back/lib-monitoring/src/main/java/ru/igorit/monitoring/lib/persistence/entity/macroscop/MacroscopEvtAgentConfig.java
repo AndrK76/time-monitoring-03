@@ -20,12 +20,17 @@ public class MacroscopEvtAgentConfig extends EvtAgentConfig {
     @JoinColumn(name = "config_id", nullable = true)
     private MacroscopAgentConfig config;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name="event_mode")
+    private MacroscopEvtAgentMode mode;
+
     public MacroscopEvtAgentConfig(EvtAgent agent) {
         super();
         if (agent != null) {
             this.setAgent(agent);
             agent.setConfig(this);
         }
+        this.setMode(MacroscopEvtAgentMode.unknown);
     }
 
 }
