@@ -11,7 +11,10 @@ import org.springframework.web.server.ResponseStatusException;
 import ru.igorit.monitoring.admin.service.MacroscopManageService;
 import ru.igorit.monitoring.common.dto.common.BinaryContent;
 import ru.igorit.monitoring.lib.dto.macroscop.*;
+import ru.igorit.monitoring.lib.persistence.entity.macroscop.MacroscopEvtAgentMode;
 
+import java.time.OffsetDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 @RestController
@@ -187,7 +190,6 @@ public class MacroscopManageController {
         return service.getServerInfoByCreds(creds);
     }
 
-
     @GetMapping("/misc/configs/{id}/channels")
     public MacroscopDataResponse<List<MacroscopChannelDto>> getAllowedChannels(@PathVariable("id") String configId) {
         return service.getAllowedChannels(configId);
@@ -216,6 +218,22 @@ public class MacroscopManageController {
         return service.getMacroscopEventTypes(configId);
     }
 
+    @GetMapping(value = "/misc/configs/{id}/channels/{channelId}/places",
+            params = "mode=" + MacroscopEvtAgentMode.NAME_BY_MOVING_DETECTOR)
+    public MacroscopDataResponse<List<MacroscopEvtPlaceDto>> getEvtPlacesInDetectorModeForConfigAndChannel(
+            @PathVariable(name = "id") String configId, @PathVariable(name = "channelId") String channelId
+    ) {
+        return service.getEvtPlacesInDetectorModeForConfigAndChannel(configId, channelId);
+    }
+
+    @GetMapping(value = "/misc/configs/{id}/channels/{channelId}/places",
+            params = "mode=" + MacroscopEvtAgentMode.NAME_BY_ANALYTIC)
+    public MacroscopDataResponse<MacroscopEvtActionPlacesResponseDto> getEvtPlacesInActionModeForChannel(
+            @PathVariable(name = "id") String configId, @PathVariable(name = "channelId") String channelId,
+            @RequestParam(name = "before", required = false) OffsetDateTime before) {
+        return service.getEvtPlacesInActionModeForChannel(configId, channelId,
+                before == null ? null : before.toZonedDateTime());
+    }
 
     private ResponseEntity<?> macroscopResultToResponseEntity(MacroscopDataResponse<BinaryContent> result) {
         if (!result.isSuccess() || result.getData() == null) {

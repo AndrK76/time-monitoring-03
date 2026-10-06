@@ -9,9 +9,14 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class EvtPlaceListDto {
+public class EvtPlaceDto {
     private String id;
+    private String type;
     private String name;
     private String internalName;
-    private String type;
+    private boolean used;
+    private boolean actual;
+    private boolean present;
+    private boolean deleted;
+
 }

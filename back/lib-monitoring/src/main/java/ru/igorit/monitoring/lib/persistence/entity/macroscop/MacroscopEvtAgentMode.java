@@ -16,6 +16,9 @@ public enum MacroscopEvtAgentMode {
     private final Boolean set;
     private final String description;
 
+    public static final String NAME_BY_ANALYTIC = "byAnalytic";
+    public static final String NAME_BY_MOVING_DETECTOR = "byMovingDetector";
+
     public static MacroscopEvtAgentMode byId(String id) {
         if (id == null) return null;
         return Arrays.stream(MacroscopEvtAgentMode.values())

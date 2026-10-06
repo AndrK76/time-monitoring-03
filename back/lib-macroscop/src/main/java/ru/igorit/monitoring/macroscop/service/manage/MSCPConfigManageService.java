@@ -7,8 +7,13 @@ import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import ru.igorit.monitoring.common.dto.common.BinaryContent;
 import ru.igorit.monitoring.lib.dto.macroscop.*;
+import ru.igorit.monitoring.lib.enums.EvtAgentType;
 import ru.igorit.monitoring.lib.persistence.entity.macroscop.MacroscopArchiveMode;
+import ru.igorit.monitoring.lib.persistence.entity.macroscop.MacroscopChannel;
+import ru.igorit.monitoring.lib.persistence.entity.macroscop.MacroscopEvtAgentMode;
+import ru.igorit.monitoring.lib.persistence.entity.macroscop.MacroscopEvtPlace;
 import ru.igorit.monitoring.macroscop.api.config.MacroscopApiProperties;
+import ru.igorit.monitoring.macroscop.api.dto.MSCPChannelSettings;
 import ru.igorit.monitoring.macroscop.api.dto.MSCPConfigResponse;
 import ru.igorit.monitoring.macroscop.api.dto.MSCPEventType;
 import ru.igorit.monitoring.macroscop.api.dto.MSCPLicenseInfo;
@@ -20,6 +25,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
 import static ru.igorit.monitoring.macroscop.api.utils.MacroscopParseUtils.*;
 
 @Service
@@ -159,7 +166,8 @@ public class MSCPConfigManageService {
         ).orElse(apiClient.emptyErrorResponse());
     }
 
-    private MacroscopDataResponse<List<MacroscopEventTypeDto>> _parseEventTypes(MacroscopDataResponse<List<MSCPEventType>> response) {
+    private MacroscopDataResponse<List<MacroscopEventTypeDto>> _parseEventTypes(
+            MacroscopDataResponse<List<MSCPEventType>> response) {
         var ret = new MacroscopDataResponse<List<MacroscopEventTypeDto>>(response);
         if (response.isSuccess() && response.getData() != null) {
             ret.setData(
@@ -219,4 +227,74 @@ public class MSCPConfigManageService {
         ).orElse(apiClient.emptyErrorResponse());
     }
 
+    public MacroscopDataResponse<List<MacroscopEvtPlaceDto>> getPlacesFromDetectorZoneFromChannelConfig(
+            MacroscopServerCredentials creds, String channelId) {
+        var response = _getChannelSettings(creds, channelId);
+        return _parsePlacesFromChannelSettings(channelId,response);
+    }
+
+    private MacroscopDataResponse<MSCPChannelSettings> _getChannelSettings(
+            MacroscopServerCredentials creds, String channelId) {
+        return apiClient.exchange(
+                MacroscopApiClient.Client.main,
+                creds.address() + apiProperties.getApi() + apiProperties.getChannelsSubApi() + "/" + channelId,
+                HttpMethod.GET,
+                null,
+                new MacroscopApiClient.AuthData(creds.login(), creds.passwordHash()),
+                null,
+                new TypeReference<MSCPChannelSettings>() {
+                }
+        ).orElse(apiClient.emptyErrorResponse());
+    }
+
+    private MacroscopDataResponse<List<MacroscopEvtPlaceDto>> _parsePlacesFromChannelSettings(
+            String channelId,
+            MacroscopDataResponse<MSCPChannelSettings> response) {
+        var ret = new MacroscopDataResponse<List<MacroscopEvtPlaceDto>>(response);
+        if (response.isSuccess() && response.getData() != null && response.getData().getAnalyzeSettings() != null
+                && response.getData().getAnalyzeSettings().getMotionDetectorSettings() != null
+                && response.getData().getAnalyzeSettings().getMotionDetectorSettings().getZones() != null) {
+            var enabled = FALSE.equals(response.getData().getDisabled());
+            var detectorEnabled = TRUE.equals(response.getData().getAnalyzeSettings().getMotionDetectorEnabled());
+            var generateEventEnabled = TRUE.equals(response.getData().getAnalyzeSettings().getMotionDetectorSettings().getGenerationOfEventMotionStartAndEndEnabled());
+            if (enabled && detectorEnabled && generateEventEnabled) {
+                ret.setData(response.getData().getAnalyzeSettings().getMotionDetectorSettings().getZones().stream()
+                        .map(v->MacroscopEvtPlaceDto.builder()
+                                .internalId(v.getId())
+                                .name(v.getName())
+                                .internalName(v.getName())
+                                .channelId(channelId)
+                                .actual(true)
+                                .present(true)
+                                .deleted(false)
+                                .type(EvtAgentType.Macroscop.name())
+                                .evtMode(MacroscopEvtAgentMode.byMovingDetector.name())
+                                .build()).toList());
+            } else {
+                ret.setData(List.of());
+                log.warn("_parsePlacesFromChannelSettings enabled={} detector={} generate={}",enabled,detectorEnabled,generateEventEnabled);
+            }
+            /*ret.setData(
+                    response.getData().stream()
+                            .map(r -> MacroscopEventTypeDto.builder()
+                                    .id(r.getId())
+                                    .name(r.getName())
+                                    .build()).toList()
+            );*/
+        } else if (response.isSuccess()) {
+            ret.setSuccess(false);
+            ret.setErrorMessage("Empty channel config response");
+        } else if (response.getData()==null || response.getData().getAnalyzeSettings() == null
+        || response.getData().getAnalyzeSettings().getMotionDetectorSettings() == null
+        || response.getData().getAnalyzeSettings().getMotionDetectorSettings().getZones() == null) {
+            ret.setSuccess(false);
+            ret.setErrorMessage("Incorrect channel config response");
+        }
+        return ret;
+    }
+
+    public MacroscopDataResponse<MacroscopEvtActionPlacesResponseDto> getPlacesFromAnalyticEventsForChannel(
+            MacroscopServerCredentials creds, MacroscopChannel channel, List<String> eventIds, ZonedDateTime before) {
+        return null;
+    }
 }

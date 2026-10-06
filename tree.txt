@@ -170,12 +170,19 @@
 |   |   |                           |   |   |-- MacroscopApiProperties.java
 |   |   |                           |   |   `-- MacroscopWebClientFactory.java
 |   |   |                           |   |-- dto
+|   |   |                           |   |   |-- MSCPActivityEvent.java
+|   |   |                           |   |   |-- MSCPActivityEventDetail.java
 |   |   |                           |   |   |-- MSCPChannel.java
+|   |   |                           |   |   |-- MSCPChannelAnalyticSettings.java
+|   |   |                           |   |   |-- MSCPChannelSettings.java
 |   |   |                           |   |   |-- MSCPConfigResponse.java
+|   |   |                           |   |   |-- MSCPEventRequest.java
 |   |   |                           |   |   |-- MSCPEventType.java
 |   |   |                           |   |   |-- MSCPLicenseInfo.java
 |   |   |                           |   |   |-- MSCPLicenseInfoChannelStat.java
 |   |   |                           |   |   |-- MSCPMobileServerInfo.java
+|   |   |                           |   |   |-- MSCPMotionDetectorSettings.java
+|   |   |                           |   |   |-- MSCPMotionDetectorZone.java
 |   |   |                           |   |   |-- MSCPResolution.java
 |   |   |                           |   |   |-- MSCPRtspServerInfo.java
 |   |   |                           |   |   |-- MSCPServer.java
@@ -209,6 +216,7 @@
 |   |   |                           |   |   |-- EvtAgentItemDto.java
 |   |   |                           |   |   |-- EvtAgentListDto.java
 |   |   |                           |   |   |-- EvtAgentTypeDto.java
+|   |   |                           |   |   |-- EvtPlaceDto.java
 |   |   |                           |   |   `-- EvtPlaceListDto.java
 |   |   |                           |   |-- img
 |   |   |                           |   |   |-- ImgAgentConfigDto.java
@@ -228,13 +236,17 @@
 |   |   |                           |   |   |-- MacroscopCredentialsDto.java
 |   |   |                           |   |   |-- MacroscopDataResponse.java
 |   |   |                           |   |   |-- MacroscopEventTypeDto.java
+|   |   |                           |   |   |-- MacroscopEvtActionPlacesResponseDto.java
 |   |   |                           |   |   |-- MacroscopEvtAgentConfigDto.java
 |   |   |                           |   |   |-- MacroscopEvtAgentModeDto.java
+|   |   |                           |   |   |-- MacroscopEvtPlaceDto.java
+|   |   |                           |   |   |-- MacroscopEvtPlaceListDto.java
 |   |   |                           |   |   |-- MacroscopImgAgentConfigDto.java
 |   |   |                           |   |   |-- MacroscopImgPlaceDto.java
 |   |   |                           |   |   |-- MacroscopImgPlaceListDto.java
 |   |   |                           |   |   |-- MacroscopServerCredentials.java
-|   |   |                           |   |   `-- MacroscopServerInfoDto.java
+|   |   |                           |   |   |-- MacroscopServerInfoDto.java
+|   |   |                           |   |   `-- MacroscopZoneInfoDto.java
 |   |   |                           |   |-- yclients
 |   |   |                           |   |   |-- YClientCredentialsDto.java
 |   |   |                           |   |   |-- YClientsAgentConfigDto.java
@@ -283,10 +295,12 @@
 |   |   |                               |   |   |-- MacroscopEvtAgent.java
 |   |   |                               |   |   |-- MacroscopEvtAgentConfig.java
 |   |   |                               |   |   |-- MacroscopEvtAgentMode.java
+|   |   |                               |   |   |-- MacroscopEvtPlace.java
 |   |   |                               |   |   |-- MacroscopImgAgent.java
 |   |   |                               |   |   |-- MacroscopImgAgentConfig.java
 |   |   |                               |   |   |-- MacroscopImgPlace.java
-|   |   |                               |   |   `-- MacroscopServerInfo.java
+|   |   |                               |   |   |-- MacroscopServerInfo.java
+|   |   |                               |   |   `-- MacroscopZoneInfo.java
 |   |   |                               |   `-- yclients
 |   |   |                               |       |-- YClientCredentials.java
 |   |   |                               |       |-- YClientsAgent.java
@@ -319,6 +333,7 @@
 |   |   |                                   |   |-- MacroscopEventTypeRepository.java
 |   |   |                                   |   |-- MacroscopEvtAgentConfigRepository.java
 |   |   |                                   |   |-- MacroscopEvtAgentRepository.java
+|   |   |                                   |   |-- MacroscopEvtPlaceRepository.java
 |   |   |                                   |   |-- MacroscopImgAgentConfigRepository.java
 |   |   |                                   |   |-- MacroscopImgAgentRepository.java
 |   |   |                                   |   `-- MacroscopImgPlaceRepository.java
@@ -396,6 +411,7 @@
 |   |   |       |                   |   |-- EvtManageService.java
 |   |   |       |                   |   |-- ImgManageService.java
 |   |   |       |                   |   |-- MacroscopManageService.java
+|   |   |       |                   |   |-- MacroscopManageServiceImpl.java
 |   |   |       |                   |   |-- StructManageService.java
 |   |   |       |                   |   |-- TestService.java
 |   |   |       |                   |   |-- UserEventsReceiveService.java
@@ -428,7 +444,9 @@
 |   |   |           |       |-- V01.23__add_unique_index_to_macroscop_event_types.sql
 |   |   |           |       |-- V01.24__add_audit_to_macroscop_event_types.sql
 |   |   |           |       |-- V01.25__add_license_and_product_to_macroscop_configs.sql
-|   |   |           |       `-- V01.26__add_event_mode_to_macroscop_evt_agent_configs.sql
+|   |   |           |       |-- V01.26__add_event_mode_to_macroscop_evt_agent_configs.sql
+|   |   |           |       |-- V01.27__add_macroscop_evt_places_columns.sql
+|   |   |           |       `-- V01.28__replace_available_with_used_in_evt_places.sql
 |   |   |           `-- application.yml
 |   |   |-- .properties
 |   |   `-- pom.xml
@@ -1131,4 +1149,4 @@
 |-- README.md
 `-- tree.txt
 
-367 directories, 764 files
+367 directories, 782 files

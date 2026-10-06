@@ -1,4 +1,4 @@
-package ru.igorit.monitoring.lib.dto.evt;
+package ru.igorit.monitoring.macroscop.api.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -6,12 +6,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@Builder
-@NoArgsConstructor
 @AllArgsConstructor
-public class EvtPlaceListDto {
+@NoArgsConstructor
+@Builder
+public class MSCPMotionDetectorZone {
     private String id;
     private String name;
-    private String internalName;
-    private String type;
 }

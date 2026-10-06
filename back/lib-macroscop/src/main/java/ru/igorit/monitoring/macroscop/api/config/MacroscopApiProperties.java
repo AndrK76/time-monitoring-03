@@ -13,6 +13,8 @@ public class MacroscopApiProperties {
     private String eventTypesApi = "/archive_event_types";
     private String webApi = "/webapi";
     private String licenseApi = "/license";
+    private String api = "/api";
+    private String channelsSubApi = "/channels";
     private int bigResolutionX = 1280;
     private int connectTimeout = 15000;
     private int responseTimeout = 15000;

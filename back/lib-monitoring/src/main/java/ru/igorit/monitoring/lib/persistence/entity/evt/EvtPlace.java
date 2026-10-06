@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import ru.igorit.monitoring.lib.enums.EvtAgentType;
+import ru.igorit.monitoring.lib.enums.ImgAgentType;
 
 import java.time.LocalDateTime;
 
@@ -24,12 +26,21 @@ public abstract class EvtPlace {
     @Column(length = 255)
     private String id;
 
-    @Column(name = "name",nullable = false, length = 2000)
+    @Column(name = "name", nullable = false, length = 2000)
     private String name;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "agent_id", nullable = false)
     private EvtAgent agent;
+
+    @Column(name = "used", nullable = false)
+    private Boolean used;
+
+    @Column(name = "present", nullable = false)
+    private Boolean present = true;
+
+    @Column(name = "deleted", nullable = false)
+    private Boolean deleted = false;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
@@ -45,6 +56,18 @@ public abstract class EvtPlace {
     @Column(name = "updated_by")
     private String updatedBy;
 
-    @Column(name = "available", nullable = false)
-    private Boolean available;
+
+    public EvtAgentType getType() {
+        DiscriminatorValue dv = getClass().getAnnotation(DiscriminatorValue.class);
+        return dv == null ? null : EvtAgentType.byDiscriminator(dv.value());
+    }
+
+    public boolean isActual() {
+        return Boolean.TRUE.equals(this.present) && !Boolean.TRUE.equals(this.deleted);
+    }
+
+    public abstract String getInternalName();
+
+    public abstract String getInternalId();
 }
+

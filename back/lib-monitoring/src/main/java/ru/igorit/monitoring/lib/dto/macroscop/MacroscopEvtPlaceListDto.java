@@ -1,4 +1,4 @@
-package ru.igorit.monitoring.lib.dto.evt;
+package ru.igorit.monitoring.lib.dto.macroscop;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,9 +9,13 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class EvtPlaceListDto {
+public class MacroscopEvtPlaceListDto {
     private String id;
     private String name;
     private String internalName;
-    private String type;
+    private String internalId;
+    private String evtMode;
+    private boolean used;
+    private boolean present;
+    private boolean deleted;
 }
