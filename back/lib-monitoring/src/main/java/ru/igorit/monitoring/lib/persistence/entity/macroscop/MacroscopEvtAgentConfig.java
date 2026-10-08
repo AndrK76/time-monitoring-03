@@ -15,6 +15,7 @@ import ru.igorit.monitoring.lib.persistence.entity.evt.EvtAgentConfig;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MacroscopEvtAgentConfig extends EvtAgentConfig {
+    public static int DEFAULT_SEARCH_DEPTH_IN_HOURS = 24;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "config_id", nullable = true)
@@ -24,12 +25,16 @@ public class MacroscopEvtAgentConfig extends EvtAgentConfig {
     @Column(name="event_mode")
     private MacroscopEvtAgentMode mode;
 
+    @Column(name = "search_depth_hours")
+    private Integer searchPlaceDepthInHours;
+
     public MacroscopEvtAgentConfig(EvtAgent agent) {
         super();
         if (agent != null) {
             this.setAgent(agent);
             agent.setConfig(this);
         }
+        this.setSearchPlaceDepthInHours(DEFAULT_SEARCH_DEPTH_IN_HOURS);
         this.setMode(MacroscopEvtAgentMode.unknown);
     }
 

@@ -1,14 +1,13 @@
 <div class="editor-container-wrapper">
 
-    <!-- Заголовок -->
     <div class="editor-header">
         <div class="editor-title">
-            <span>Настройка </span><span *ngIf="!isSmallScreen()">агента Macroscop: </span><span>{{ agent()?.name ??
+            <span>Настройка </span><span *ngIf="!isSmallScreen()">агента событий Macroscop: </span><span>{{
+                agent()?.name ??
                 '' }}</span>
         </div>
     </div>
 
-    <!-- Строка действий: ссылка слева, кнопки справа -->
     <div class="editor-header">
         <div class="action-button-group">
             <a mat-button class="table-action-btn back-button" matTooltip="К списку агентов" [routerLink]="backTarget()"
@@ -18,7 +17,6 @@
             </a>
         </div>
         <div class="action-button-group">
-
             <button mat-raised-button class="table-action-btn btn-success" (click)="callAdd()"
                 [disabled]="isLoading() || isSaving()" *ngIf="canManageAnyConfig()">
                 <mat-icon>add</mat-icon><span class="hide-on-small">Добавить</span>
@@ -34,7 +32,7 @@
                 <span class="hide-on-small">{{ isLoading() ? 'Загрузка...' : 'Перечитать' }}</span>
             </button>
             <button mat-raised-button color="primary" (click)="callSave()"
-                [disabled]="isLoading() ||isSaving() || hasError() || !(hasCfgChanges() || hasEvtChanges() || hasModeChanges())">
+                [disabled]="isLoading() || isSaving() || hasError() || !(hasCfgChanges() || hasEvtChanges())">
                 <mat-icon>save</mat-icon>
                 <span class="hide-on-small">Сохранить</span>
             </button>
@@ -88,12 +86,26 @@
         </div>
 
         <mat-divider class="section-divider"></mat-divider>
-
         @if (evtConfig()?.config) {
         <app-macroscop-config-editor [config]="evtConfig()!.config" [archiveModes]="archiveModes()"
             (valueChange)="onConfigChange($event)">
         </app-macroscop-config-editor>
         }
+
+        <mat-divider class="section-divider"></mat-divider>
+        <div class="editor-container" [formGroup]="formGroup">
+            <div class="form-row"><span class="label">Прочее</span></div>
+            <div class="form-row">
+                <mat-form-field appearance="outline">
+                    <mat-label>Глубина поиска мест (часов)</mat-label>
+                    <input matInput type="number" min="1" formControlName="searchPlaceDepthInHours"
+                        [readonly]="currentEvtMode() !== BY_ANALYTIC_MODE">
+                    @if (formGroup.get('searchPlaceDepthInHours')?.hasError('min')) {
+                    <mat-error>Значение должно быть больше 0</mat-error>
+                    }
+                </mat-form-field>
+            </div>
+        </div>
 
     </div>
     }

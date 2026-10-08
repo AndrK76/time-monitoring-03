@@ -15,4 +15,6 @@ public class MacroscopEvtAgentConfigDto {
 
     @NotBlank
     private String mode;
+
+    private int searchPlaceDepthInHours;
 }

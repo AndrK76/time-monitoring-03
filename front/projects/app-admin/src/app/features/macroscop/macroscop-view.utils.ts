@@ -107,6 +107,7 @@ export const macroscopEvtAgentConfigDtoToView = (
     return {
         config: dto.config ? macroscopAgentConfigDtoToView(dto.config) : undefined,
         mode: dto.mode,
+        searchPlaceDepthInHours: dto.searchPlaceDepthInHours ?? 24,
         modeWithInfo: macroscopEvtAgentModeFromId(dto.mode, allModes),
     } as MacroscopEvtAgentConfigView
 };
@@ -117,6 +118,7 @@ export const macroscopEvtAgentConfigViewToDto = (
     return {
         config: view.config ? macroscopAgentConfigViewToDto(view.config) : undefined,
         mode: view.mode,
+        searchPlaceDepthInHours: view.searchPlaceDepthInHours ?? 24,
     };
 };
 

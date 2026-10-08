@@ -9,25 +9,23 @@ import ru.igorit.monitoring.common.dto.common.BinaryContent;
 import ru.igorit.monitoring.lib.dto.macroscop.*;
 import ru.igorit.monitoring.lib.enums.EvtAgentType;
 import ru.igorit.monitoring.lib.persistence.entity.macroscop.MacroscopArchiveMode;
-import ru.igorit.monitoring.lib.persistence.entity.macroscop.MacroscopChannel;
 import ru.igorit.monitoring.lib.persistence.entity.macroscop.MacroscopEvtAgentMode;
-import ru.igorit.monitoring.lib.persistence.entity.macroscop.MacroscopEvtPlace;
 import ru.igorit.monitoring.macroscop.api.config.MacroscopApiProperties;
-import ru.igorit.monitoring.macroscop.api.dto.MSCPChannelSettings;
-import ru.igorit.monitoring.macroscop.api.dto.MSCPConfigResponse;
-import ru.igorit.monitoring.macroscop.api.dto.MSCPEventType;
-import ru.igorit.monitoring.macroscop.api.dto.MSCPLicenseInfo;
+import ru.igorit.monitoring.macroscop.api.dto.*;
 import ru.igorit.monitoring.macroscop.api.service.MacroscopApiClient;
 
+import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
-import static ru.igorit.monitoring.macroscop.api.utils.MacroscopParseUtils.*;
+import static ru.igorit.monitoring.macroscop.api.utils.MacroscopUtils.*;
 
 @Service
 @Log4j2
@@ -220,7 +218,7 @@ public class MSCPConfigManageService {
                         "channelId", channelId,
                         "resolutionx", String.valueOf(apiProperties.getBigResolutionX()),
                         "mode", "archive",
-                        "starttime", toMacroscopTime(ZonedDateTime.now())
+                        "starttime", toMacroscopParamTime(ZonedDateTime.now())
                 ),
                 null,
                 null
@@ -230,7 +228,7 @@ public class MSCPConfigManageService {
     public MacroscopDataResponse<List<MacroscopEvtPlaceDto>> getPlacesFromDetectorZoneFromChannelConfig(
             MacroscopServerCredentials creds, String channelId) {
         var response = _getChannelSettings(creds, channelId);
-        return _parsePlacesFromChannelSettings(channelId,response);
+        return _parsePlacesFromChannelSettings(channelId, response);
     }
 
     private MacroscopDataResponse<MSCPChannelSettings> _getChannelSettings(
@@ -259,7 +257,7 @@ public class MSCPConfigManageService {
             var generateEventEnabled = TRUE.equals(response.getData().getAnalyzeSettings().getMotionDetectorSettings().getGenerationOfEventMotionStartAndEndEnabled());
             if (enabled && detectorEnabled && generateEventEnabled) {
                 ret.setData(response.getData().getAnalyzeSettings().getMotionDetectorSettings().getZones().stream()
-                        .map(v->MacroscopEvtPlaceDto.builder()
+                        .map(v -> MacroscopEvtPlaceDto.builder()
                                 .internalId(v.getId())
                                 .name(v.getName())
                                 .internalName(v.getName())
@@ -272,29 +270,125 @@ public class MSCPConfigManageService {
                                 .build()).toList());
             } else {
                 ret.setData(List.of());
-                log.warn("_parsePlacesFromChannelSettings enabled={} detector={} generate={}",enabled,detectorEnabled,generateEventEnabled);
+                log.warn("_parsePlacesFromChannelSettings enabled={} detector={} generate={}", enabled, detectorEnabled, generateEventEnabled);
             }
-            /*ret.setData(
-                    response.getData().stream()
-                            .map(r -> MacroscopEventTypeDto.builder()
-                                    .id(r.getId())
-                                    .name(r.getName())
-                                    .build()).toList()
-            );*/
         } else if (response.isSuccess()) {
             ret.setSuccess(false);
-            ret.setErrorMessage("Empty channel config response");
-        } else if (response.getData()==null || response.getData().getAnalyzeSettings() == null
-        || response.getData().getAnalyzeSettings().getMotionDetectorSettings() == null
-        || response.getData().getAnalyzeSettings().getMotionDetectorSettings().getZones() == null) {
-            ret.setSuccess(false);
             ret.setErrorMessage("Incorrect channel config response");
+        } else {
+            ret.setSuccess(false);
+            ret.setErrorMessage(response.getErrorMessage());
         }
+        ret.setStatusCode(response.getStatusCode());
         return ret;
     }
 
     public MacroscopDataResponse<MacroscopEvtActionPlacesResponseDto> getPlacesFromAnalyticEventsForChannel(
-            MacroscopServerCredentials creds, MacroscopChannel channel, List<String> eventIds, ZonedDateTime before) {
-        return null;
+            MacroscopServerCredentials creds, String channel,
+            List<String> eventIds, ZonedDateTime before, int searchPlaceDepthInHours) {
+        var end = before == null ? ZonedDateTime.now() : before;
+        var start = end.minusHours(searchPlaceDepthInHours);
+        var done = false;
+        var ret = new MacroscopDataResponse<MacroscopEvtActionPlacesResponseDto>();
+        while (!done) {
+            var response = _getEventsOnChannelForPeriod(creds, channel, eventIds, start, end);
+            end = _populatePlacesFromAnalyticEventsForChannelFromEventsOnChannel(ret, response);
+            done = end == null;
+        }
+        if (ret.isSuccess() && ret.getData() != null) {
+            ret.getData().setLastTime(start.minusSeconds(1L));
+        }
+        return ret;
+    }
+
+    private MacroscopDataResponse<List<MSCPActivityEvent>> _getEventsOnChannelForPeriod(
+            MacroscopServerCredentials creds, String channel,
+            List<String> eventIds, ZonedDateTime start, ZonedDateTime end
+    ) {
+        var req = MSCPEventRequest.builder()
+                .startTimeUtc(toMacroscopBodyTime(start))
+                .endTimeUtc(toMacroscopBodyTime(end))
+                .searchFromBegin(false)
+                .searchLimit(apiProperties.getEventsQueryLimit())
+                .channelIds(List.of(channel))
+                .eventIds(eventIds)
+                .build();
+        return apiClient.exchange(
+                MacroscopApiClient.Client.main,
+                creds.address() + apiProperties.getArchiveEventsApi(),
+                HttpMethod.POST,
+                Map.of("login", creds.login(), "password", creds.passwordHash()),
+                new MacroscopApiClient.AuthData(creds.login(), creds.passwordHash()),
+                req,
+                new TypeReference<List<MSCPActivityEvent>>() {
+                }
+        ).orElse(apiClient.emptyErrorResponse());
+    }
+
+    private ZonedDateTime _populatePlacesFromAnalyticEventsForChannelFromEventsOnChannel(
+            MacroscopDataResponse<MacroscopEvtActionPlacesResponseDto> ret,
+            MacroscopDataResponse<List<MSCPActivityEvent>> response
+    ) {
+        ret.setStatusCode(response.getStatusCode());
+        ret.setSuccess(response.isSuccess());
+        if (!response.isSuccess()) {
+            ret.setErrorMessage(response.getErrorMessage());
+        }
+        if (response.getData() == null) {
+            ret.setSuccess(false);
+            ret.setErrorMessage("Invalid Events response");
+        }
+        if (!ret.isSuccess() || response.getData().isEmpty()) {
+            return null;
+        }
+        if (ret.getData() == null) {
+            ret.setData(new MacroscopEvtActionPlacesResponseDto());
+            ret.getData().setPlaces(new ArrayList<>());
+        }
+        var minTime = response.getData().stream()
+                .map(MSCPActivityEvent::getTimestamp)
+                .filter(Objects::nonNull)
+                .min(OffsetDateTime::compareTo)
+                .map(OffsetDateTime::toZonedDateTime)
+                .orElse(null);
+        var existingIds = ret.getData().getPlaces().stream()
+                .map(MacroscopEvtPlaceDto::getInternalId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+        response.getData().stream()
+                .filter(e -> e.getEvent() != null && e.getEvent().getZoneId() != null)
+                .forEach(e -> {
+                    var detail = e.getEvent();
+                    var zoneId = detail.getZoneId();
+                    var zoneName = extractZoneNameFromComment(e.getEventComment());
+                    if (existingIds.contains(zoneId)) return;
+                    var place = MacroscopEvtPlaceDto.builder()
+                            .internalId(zoneId)
+                            .name(zoneName)
+                            .internalName(zoneName)
+                            .type(EvtAgentType.Macroscop.name())
+                            .evtMode(MacroscopEvtAgentMode.byAnalytic.name())
+                            .channelId(e.getChannelId())
+                            .zoneInfo(MacroscopZoneInfoDto.builder()
+                                    .left(detail.getLeft())
+                                    .top(detail.getTop())
+                                    .width(detail.getWidth())
+                                    .height(detail.getHeight())
+                                    .build())
+                            .actual(true)
+                            .present(true)
+                            .deleted(false)
+                            .used(true)
+                            .build();
+
+                    ret.getData().getPlaces().add(place);
+                    existingIds.add(zoneId);
+                });
+
+
+        if (response.getData().size() < apiProperties.getEventsQueryLimit()) {
+            return null;
+        }
+        return minTime;
     }
 }

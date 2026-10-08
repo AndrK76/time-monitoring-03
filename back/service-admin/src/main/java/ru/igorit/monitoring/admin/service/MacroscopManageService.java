@@ -83,11 +83,11 @@ public interface MacroscopManageService {
 
 
     MacroscopDataResponse<List<MacroscopEvtPlaceDto>> getEvtPlacesInDetectorModeForConfigAndChannel(
-            String configId, String channelId
+            String agentId, String channelId
     );
 
     MacroscopDataResponse<MacroscopEvtActionPlacesResponseDto> getEvtPlacesInActionModeForChannel(
-            String configId, String channelId, ZonedDateTime before
+            String agentId, String channelId, ZonedDateTime before
     );
 
 

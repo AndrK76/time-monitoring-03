@@ -1,0 +1,1 @@
+ALTER TABLE macroscop_evt_agent_configs ADD COLUMN search_depth_hours INTEGER NOT NULL DEFAULT 24;

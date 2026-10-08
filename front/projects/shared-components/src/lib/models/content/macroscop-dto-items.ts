@@ -19,6 +19,7 @@ export interface MacroscopAgentConfigListDto {
 export interface MacroscopEvtAgentConfigDto {
     config?: MacroscopAgentConfigDto;
     mode: string;
+    searchPlaceDepthInHours: number;
 }
 
 export interface MacroscopEvtAgentModeDto {

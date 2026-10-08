@@ -128,6 +128,7 @@ security:
 logging:
   level:
     ru.igorit.monitoring: DEBUG
+    #ru.igorit.monitoring.macroscop.api.service: TRACE
     org.springframework.security: INFO
     #org.flywaydb: DEBUG
     org.hibernate.SQL: DEBUG

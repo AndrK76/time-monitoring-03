@@ -20,8 +20,8 @@ import java.net.URI;
 import java.util.Map;
 import java.util.Optional;
 
-import static ru.igorit.monitoring.macroscop.api.utils.MacroscopParseUtils.sanitizeMessage;
-import static ru.igorit.monitoring.macroscop.api.utils.MacroscopParseUtils.sanitizeResponse;
+import static ru.igorit.monitoring.macroscop.api.utils.MacroscopUtils.sanitizeMessage;
+import static ru.igorit.monitoring.macroscop.api.utils.MacroscopUtils.sanitizeResponse;
 
 @Component
 @Log4j2
@@ -214,9 +214,23 @@ public class MacroscopApiClient {
                     basicAuth.login(), basicAuth.password() == null ? "" : basicAuth.password()));
         }
 
-        return body != null ? spec.bodyValue(body) : spec;
+        if (body != null) {
+            logRequestBody(method, uri, body);
+            return spec.bodyValue(body);
+        }
+        return spec;
     }
 
+    private void logRequestBody(HttpMethod method, URI uri, Object body) {
+        if (!log.isTraceEnabled()) return;
+        try {
+            String json = objectMapper.writeValueAsString(body);
+            log.trace("Macroscop request body: {} {} -> {}", method, uri, json);
+        } catch (Exception e) {
+            log.warn("Macroscop request body: {} {} -> <unserializable {}: {}>",
+                    method, uri, body.getClass().getSimpleName(), e.getMessage());
+        }
+    }
 
     private MacroscopDataResponse<BinaryContent> binaryError(
             int statusCode, String message

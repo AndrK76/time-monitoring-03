@@ -218,15 +218,15 @@ public class MacroscopManageController {
         return service.getMacroscopEventTypes(configId);
     }
 
-    @GetMapping(value = "/misc/configs/{id}/channels/{channelId}/places",
+    @GetMapping(value = "/misc/evt-configs/{id}/channels/{channelId}/places",
             params = "mode=" + MacroscopEvtAgentMode.NAME_BY_MOVING_DETECTOR)
     public MacroscopDataResponse<List<MacroscopEvtPlaceDto>> getEvtPlacesInDetectorModeForConfigAndChannel(
-            @PathVariable(name = "id") String configId, @PathVariable(name = "channelId") String channelId
+            @PathVariable(name = "id") String agentId, @PathVariable(name = "channelId") String channelId
     ) {
-        return service.getEvtPlacesInDetectorModeForConfigAndChannel(configId, channelId);
+        return service.getEvtPlacesInDetectorModeForConfigAndChannel(agentId, channelId);
     }
 
-    @GetMapping(value = "/misc/configs/{id}/channels/{channelId}/places",
+    @GetMapping(value = "/misc/evt-configs/{id}/channels/{channelId}/places",
             params = "mode=" + MacroscopEvtAgentMode.NAME_BY_ANALYTIC)
     public MacroscopDataResponse<MacroscopEvtActionPlacesResponseDto> getEvtPlacesInActionModeForChannel(
             @PathVariable(name = "id") String configId, @PathVariable(name = "channelId") String channelId,

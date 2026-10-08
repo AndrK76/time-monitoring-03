@@ -27,6 +27,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static ru.igorit.monitoring.lib.persistence.entity.macroscop.MacroscopEvtAgentConfig.DEFAULT_SEARCH_DEPTH_IN_HOURS;
 import static ru.igorit.monitoring.macroscop.api.config.MacroscopApiConstants.ALT_STREAM;
 import static ru.igorit.monitoring.macroscop.api.config.MacroscopApiConstants.MAIN_STREAM;
 import static ru.igorit.monitoring.security.util.AuthInfoUtils.extractUserId;
@@ -99,12 +100,16 @@ public class MacroscopManageServiceImpl implements MacroscopManageService {
         if (newMode == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unknown event mode: " + dto.getMode());
         }
-        if (!Objects.equals(ret.getMode(), newMode)) {
+        if (!Objects.equals(ret.getMode(), newMode)
+                || !Objects.equals(ret.getSearchPlaceDepthInHours(), dto.getSearchPlaceDepthInHours())) {
             ret.setMode(newMode);
+            ret.setSearchPlaceDepthInHours(dto.getSearchPlaceDepthInHours());
             ret.setUpdatedBy(extractUserId(getCurrentAuth()));
             ret = evtConfigRepo.saveAndFlush(ret);
         }
         dto.setMode(ret.getMode() == null ? null : ret.getMode().name());
+        dto.setSearchPlaceDepthInHours(ret.getSearchPlaceDepthInHours() == null ? DEFAULT_SEARCH_DEPTH_IN_HOURS
+                : ret.getSearchPlaceDepthInHours());
         return dto;
     }
 
@@ -620,21 +625,29 @@ public class MacroscopManageServiceImpl implements MacroscopManageService {
     @PreAuthorize("@securityAccessUtils.isAllowedAllActions()")
     @Override
     public MacroscopDataResponse<List<MacroscopEvtPlaceDto>> getEvtPlacesInDetectorModeForConfigAndChannel(
-            String configId, String channelId) {
-        _checkAllowedConfigByOrg(configId);
-        var creds = _getCredsByConfigId(configId);
-        var channel = channelRepo.findByConfigIdAndMacroscopId(configId, channelId).orElseThrow(() ->
+            String agentId, String channelId) {
+        var evtCfg = _getEvtConfig(agentId);
+        if (evtCfg.getConfig() == null) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Event configuration contain Empty configuration");
+        }
+        var creds = _getCredsByConfigId(evtCfg.getConfig().getId());
+        var channel = channelRepo.findByConfigIdAndMacroscopId(evtCfg.getConfig().getId(), channelId).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "Channel not found"));
         return _getEvtPlacesInDetectorModeForConfigAndChannel(creds, channel);
     }
 
+    @Transactional(readOnly = true)
+    @PreAuthorize("@securityAccessUtils.isAllowedAllActions()")
     @Override
-    public MacroscopDataResponse<MacroscopEvtActionPlacesResponseDto> getEvtPlacesInActionModeForChannel(String configId, String channelId, ZonedDateTime before) {
-        _checkAllowedConfigByOrg(configId);
-        var creds = _getCredsByConfigId(configId);
-        var channel = channelRepo.findByConfigIdAndMacroscopId(configId, channelId).orElseThrow(() ->
+    public MacroscopDataResponse<MacroscopEvtActionPlacesResponseDto> getEvtPlacesInActionModeForChannel(String agentId, String channelId, ZonedDateTime before) {
+        var evtCfg = _getEvtConfig(agentId);
+        if (evtCfg.getConfig() == null) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Event configuration contain Empty configuration");
+        }
+        var creds = _getCredsByConfigId(evtCfg.getConfig().getId());
+        var channel = channelRepo.findByConfigIdAndMacroscopId(evtCfg.getConfig().getId(), channelId).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "Channel not found"));
-        return _getEvtPlacesInActionModeForChannel(creds, channel, before);
+        return _getEvtPlacesInActionModeForChannel(creds, channel, evtCfg, before);
     }
 
 
@@ -888,13 +901,14 @@ public class MacroscopManageServiceImpl implements MacroscopManageService {
     }
 
     private MacroscopDataResponse<MacroscopEvtActionPlacesResponseDto> _getEvtPlacesInActionModeForChannel(
-            MacroscopServerCredentials creds, MacroscopChannel channel, ZonedDateTime before) {
+            MacroscopServerCredentials creds, MacroscopChannel channel,
+            MacroscopEvtAgentConfig evtCfg, ZonedDateTime before) {
         assert channel != null;
         var channelId = channel.getMacroscopId();
         var ids = getEventTypeIds().entrySet().stream()
                 .filter(e -> e.getKey().isAnalytic())
                 .map(Map.Entry::getValue).toList();
-        return macroscopService.getPlacesFromAnalyticEventsForChannel(creds, channel, ids, before);
+        return macroscopService.getPlacesFromAnalyticEventsForChannel(creds, channelId, ids, before, evtCfg.getSearchPlaceDepthInHours());
     }
 
     private Map<MacroscopActivityEventType, String> getEventTypeIds() {

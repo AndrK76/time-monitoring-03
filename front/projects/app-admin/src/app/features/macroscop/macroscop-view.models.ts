@@ -49,6 +49,7 @@ export class MacroscopEvtAgentConfigView implements MacroscopEvtAgentConfigDto {
     constructor(
         public config: MacroscopAgentConfigView | undefined,
         public mode: string,
+        public searchPlaceDepthInHours: number,
         public modeWithInfo?: MacroscopEvtAgentModeView,
     ) { }
 }

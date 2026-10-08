@@ -2,7 +2,6 @@ package ru.igorit.monitoring.macroscop.api.utils;
 
 import lombok.extern.log4j.Log4j2;
 import ru.igorit.monitoring.macroscop.api.dto.MSCPChannel;
-import ru.igorit.monitoring.macroscop.service.manage.MSCPConfigManageService;
 
 import java.time.Instant;
 import java.time.ZoneOffset;
@@ -13,10 +12,12 @@ import java.util.List;
 import java.util.Objects;
 
 @Log4j2
-public class MacroscopParseUtils {
+public class MacroscopUtils {
 
     private static final DateTimeFormatter MACROSCOP_QUERY_TIME_FORMAT =
             DateTimeFormatter.ofPattern("dd.MM.yyyy+HH:mm:ss");
+    private static final DateTimeFormatter MACROSCOP_BODY_TIME_FORMAT =
+            DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss");
 
     public static ZoneOffset extractZoneOffset(List<MSCPChannel> channels) {
         if (channels == null || channels.isEmpty()) {
@@ -26,7 +27,7 @@ public class MacroscopParseUtils {
                 .map(MSCPChannel::getTimeZoneOffset)
                 .filter(Objects::nonNull)
                 .findFirst()
-                .map(MacroscopParseUtils::hoursToZoneOffset)
+                .map(MacroscopUtils::hoursToZoneOffset)
                 .orElse(null);
     }
 
@@ -69,9 +70,23 @@ public class MacroscopParseUtils {
                 .trim();
     }
 
-    public static String toMacroscopTime(ZonedDateTime time) {
+    public static String toMacroscopParamTime(ZonedDateTime time) {
         if (time == null) return null;
         return MACROSCOP_QUERY_TIME_FORMAT.format(time.withZoneSameInstant(ZoneOffset.UTC));
+    }
+
+    public static String toMacroscopBodyTime(ZonedDateTime time) {
+        if (time == null) return null;
+        return MACROSCOP_BODY_TIME_FORMAT.format(time.withZoneSameInstant(ZoneOffset.UTC));
+    }
+
+    private static final java.util.regex.Pattern ZONE_NAME_IN_COMMENT =
+            java.util.regex.Pattern.compile("'([^']+)'");
+
+    public static String extractZoneNameFromComment(String comment) {
+        if (comment == null) return null;
+        var m = ZONE_NAME_IN_COMMENT.matcher(comment);
+        return m.find() ? m.group(1) : null;
     }
 
 }
