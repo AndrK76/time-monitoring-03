@@ -4,11 +4,13 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import ru.igorit.monitoring.lib.dto.evt.*;
+import ru.igorit.monitoring.lib.dto.img.ImgPlaceListDto;
 import ru.igorit.monitoring.lib.enums.EvtAgentType;
 import ru.igorit.monitoring.lib.persistence.entity.evt.EvtAgentListProjection;
 import ru.igorit.monitoring.lib.persistence.entity.evt.EvtAgent;
 import ru.igorit.monitoring.lib.persistence.entity.evt.EvtAgentConfig;
 import ru.igorit.monitoring.lib.persistence.entity.evt.EvtPlace;
+import ru.igorit.monitoring.lib.persistence.entity.img.ImgPlace;
 
 @Mapper(componentModel = "spring")
 public interface EvtModelMapper {
@@ -29,8 +31,7 @@ public interface EvtModelMapper {
     @Mapping(target = "agentType", source = "item.agent", qualifiedByName = "agentTypeToString")
     EvtAgentConfigDto toDto(EvtAgentConfig item);
 
-    EvtPlaceListDto toDto(EvtPlace item);
-
+    EvtPlaceListDto toListDto(EvtPlace item);
 
     @Named("agentTypeToString")
     default String agentTypeToString(EvtAgent agent) {

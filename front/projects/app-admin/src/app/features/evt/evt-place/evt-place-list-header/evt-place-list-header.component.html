@@ -1,7 +1,7 @@
 <div class="standard-table-container">
     <mat-card>
         <mat-card-header>
-            <mat-card-title>Камеры: Места
+            <mat-card-title>События: Места
                 <span class="hide-on-small">{{ orgName() }}</span>
                 @if (selectedAgent(); as ag) {
                 <span class="hide-on-small"> / {{ ag.name }}</span>
@@ -19,7 +19,7 @@
             </mat-card-subtitle>
         </mat-card-header>
 
-        <mat-card-actions class="img-place-actions full-row">
+        <mat-card-actions class="evt-place-actions full-row">
             <div class="action-button-group">
                 @if (showBackLink()) {
                 <a mat-button matTooltip="К списку организаций" class="table-action-btn back-button"
@@ -85,6 +85,7 @@
             </div>
             }
         </mat-card-actions>
+
         <mat-card-content>
             @if (hasError()) {
             <div class="error-message">
@@ -101,8 +102,8 @@
             </div>
             } @else if (selectedAgent()) {
             @if (selectedAgent()!.agentType === 'Macroscop') {
-            <app-macroscop-img-place-list [agentId]="selectedAgent()!.id" [actions]="actions"
-                [showDeleted]="showDeleted()" [canFullActions]="canFullActions()"></app-macroscop-img-place-list>
+            <app-macroscop-evt-place-list [agentId]="selectedAgent()!.id" [actions]="actions"
+                [showDeleted]="showDeleted()" [canFullActions]="canFullActions()"></app-macroscop-evt-place-list>
             } @else {
             <div class="empty-state">
                 <mat-icon>info</mat-icon>
@@ -117,7 +118,7 @@
             } @else if (agents().length === 0) {
             <div class="empty-state">
                 <mat-icon>info</mat-icon>
-                <p>Для организации нет агентов камер</p>
+                <p>Для организации нет агентов событий</p>
             </div>
             } @else {
             <div class="empty-state">

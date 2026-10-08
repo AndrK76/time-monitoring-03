@@ -7,37 +7,35 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTable, MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { catchError, finalize, forkJoin, map, Observable, of } from 'rxjs';
+import { catchError, finalize, forkJoin, map, Observable, of, switchMap, tap } from 'rxjs';
 import {
-  DialogService, FilterRootComponent, isExpanded, isNewItem, MacroscopChannelListDto, NotificationService,
+  DialogService, FilterRootComponent, isExpanded, isNewItem, NotificationService,
   SaveDataResult, TableActionsInformerService, TableFilterInfo, TableFilterListValue, TableFilterType, TableManageService,
 } from '@mon3/sc';
 import { processResponseError } from '@mon3/sa';
 
 import { MacroscopManageService } from '../../../services/macroscop-manage.service';
-
-import { MacroscopPlaceInplaceEditorComponent } from './macroscop-place-inplace-editor/macroscop-place-inplace-editor.component';
-import { MacroscopImgPlaceView } from '../macroscop-view.models';
-import { createNewMacroscopPlace, macroscopImgPlaceDtoToView, macroscopImgPlaceListDtoToView, macroscopImgPlaceViewToDto } from '../macroscop-view.utils';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { MacroscopChannelView, MacroscopEvtAgentConfigView, MacroscopEvtPlaceView } from '../macroscop-view.models';
+import { macroscopChannelDtoToView, macroscopChannelListDtoToView, macroscopEvtAgentConfigDtoToView, macroscopEvtPlaceDtoToView, macroscopEvtPlaceListDtoToView, macroscopEvtPlaceViewToDto } from '../macroscop-view.utils';
+import { MacroscopEvtPlaceInplaceEditorComponent } from './macroscop-evt-place-inplace-editor/macroscop-evt-place-inplace-editor.component';
 
 @Component({
-  selector: 'app-macroscop-place-list',
+  selector: 'app-macroscop-evt-place-list',
   standalone: true,
   imports: [
     CommonModule, MatTableModule, MatCardModule, MatButtonModule, MatProgressSpinnerModule,
     MatIconModule, MatTooltipModule, MatSortModule,
-    FilterRootComponent, MacroscopPlaceInplaceEditorComponent,
+    FilterRootComponent, MacroscopEvtPlaceInplaceEditorComponent,
   ],
   providers: [TableManageService],
-  templateUrl: './macroscop-place-list.component.html',
-  styleUrl: './macroscop-place-list.component.scss'
+  templateUrl: './macroscop-evt-place-list.component.html',
+  styleUrl: './macroscop-evt-place-list.component.scss'
 })
-export class MacroscopPlaceListComponent implements OnInit, AfterViewInit {
+export class MacroscopEvtPlaceListComponent implements OnInit, AfterViewInit {
   private readonly dataService = inject(MacroscopManageService);
   private readonly dialogService = inject(DialogService);
   private readonly notificationService = inject(NotificationService);
-  private readonly tableManager = inject(TableManageService<MacroscopImgPlaceView>);
+  private readonly tableManager = inject(TableManageService<MacroscopEvtPlaceView>);
   private readonly destroyRef = inject(DestroyRef);
 
   agentId = input.required<string>();
@@ -55,31 +53,33 @@ export class MacroscopPlaceListComponent implements OnInit, AfterViewInit {
   error = this.tableManager.error;
   totalCount = this.tableManager.totalCount;
   isSmallScreen = this.tableManager.isSmallScreen;
-  allChannels = signal<MacroscopChannelListDto[]>([]);
-  freeChannels = signal<MacroscopChannelListDto[]>([]);
-  macroscopConfigId = signal<string | undefined>(undefined);
 
-  @ViewChild(MatTable) table!: MatTable<MacroscopImgPlaceView>;
+  evtConfig = signal<MacroscopEvtAgentConfigView | undefined>(undefined);
+  allChannels = signal<MacroscopChannelView[]>([]);
+
+  @ViewChild(MatTable) table!: MatTable<MacroscopEvtPlaceView>;
   @ViewChild(MatSort) sort!: MatSort;
   @ViewChild('tableWrapper') tableWrapper!: ElementRef<HTMLDivElement>;
 
-  displayedColumns = ['expand', 'used', 'name', 'internalName'];
-  trackById = (index: number, item: MacroscopImgPlaceView) => item.id;
-  itemId = (item: MacroscopImgPlaceView) => item.id;
+  displayedColumns = ['expand', 'used', 'name', 'channelName', 'internalName'];
+  trackById = (index: number, item: MacroscopEvtPlaceView) => item.id;
+  itemId = (item: MacroscopEvtPlaceView) => item.id;
 
   get isLoading() { return this.actions().isLoading; }
   get isSaving() { return this.actions().isSaving; }
+
   isLoadingScreenshot = signal(false);
 
   private currentAgentId = '';
+
 
   _yesNoSource: TableFilterListValue[] = [{ id: true, text: 'Да' }, { id: false, text: 'Нет' }];
   _filterConfig: Map<string, TableFilterInfo> = new Map([
     ['used', { key: 'used', type: TableFilterType.LIST, config: { dataSource: this._yesNoSource } }],
     ['name', { key: 'name', type: TableFilterType.TEXT }],
+    ['channelName', { key: 'channelName', type: TableFilterType.TEXT }],
     ['internalName', { key: 'internalName', type: TableFilterType.TEXT }],
   ]);
-
 
   constructor() {
     effect(() => {
@@ -114,87 +114,97 @@ export class MacroscopPlaceListComponent implements OnInit, AfterViewInit {
   }
 
   private performLoad(agentId: string, showDeleted: boolean): void {
+    const agentChanged = this.currentAgentId !== agentId;
     this.currentAgentId = agentId;
-    this.tableManager.doRefreshBase(() => this.loadData(agentId, showDeleted));
+    if (agentChanged) {
+      this.evtConfig.set(undefined);
+      this.allChannels.set([]);
+    }
+
+    this.tableManager.doRefreshBase(() => this.loadData(agentId, showDeleted, agentChanged));
   }
 
-  private loadData(agentId: string, showDeleted: boolean): void {
+  private loadData(agentId: string, showDeleted: boolean, agentChanged: boolean): void {
     this.isLoading.set(true);
     this.error.set(null);
 
-    forkJoin({
-      places: this.dataService.getImgPlacesForAgent(agentId, showDeleted),
-      channels: this.dataService.getActualChannelsForAgent(agentId),
-    }).pipe(
-      finalize(() => this.isLoading.set(false))
+    const ctx$ = agentChanged
+      ? forkJoin({
+        config: this.dataService.getEvtConfig(agentId).pipe(
+          map(dto => macroscopEvtAgentConfigDtoToView(dto))),
+        channels: this.dataService.getActualChannelsForEvtAgent(agentId).pipe(
+          map(list => list.map(c => macroscopChannelListDtoToView(c)))),
+      }).pipe(
+        tap(ctx => {
+          this.evtConfig.set(ctx.config);
+          this.allChannels.set(ctx.channels);
+        }),
+        catchError(err => {
+          const resError = processResponseError(err);
+          this.notificationService.error(
+            `Не удалось загрузить настройки агента Macroscop: ${resError.message}`);
+          return of({ config: undefined, channels: [] as MacroscopChannelView[] });
+        }),
+      )
+      : of({
+        config: this.evtConfig(), channels: this.allChannels(),
+      });
+
+    ctx$.pipe(
+      switchMap(ctx => this.dataService.getEvtPlacesForAgent(agentId, showDeleted).pipe(
+        map(places => ({ ctx, places })),
+      )),
+      finalize(() => this.isLoading.set(false)),
     ).subscribe({
-      next: ({ places, channels }) => {
-        this.allChannels.set(channels);
-        this.tableManager.setData(places.map(dto => macroscopImgPlaceListDtoToView(dto)));
+      next: ({ ctx, places }) => {
+        this.tableManager.setData(
+          places.map(dto => macroscopEvtPlaceListDtoToView(dto, ctx.channels)),
+        );
         this.render();
       },
       error: err => {
         const resError = processResponseError(err);
         this.notificationService.error(`Ошибка загрузки списка мест: ${resError.message}`);
-        this.allChannels.set([]);
         this.tableManager.setData([]);
       },
     });
-
-    this.dataService.getImgConfig(agentId).pipe(
-      takeUntilDestroyed(this.destroyRef),
-      catchError(() => of(undefined)),
-    ).subscribe(dto => this.macroscopConfigId.set(dto?.config?.id));
   }
 
-  loadItem = (item: MacroscopImgPlaceView): Observable<MacroscopImgPlaceView | undefined> => {
-    return this.dataService.getImgPlace(item.id).pipe(
-      map(dto => macroscopImgPlaceDtoToView(dto)),
+  loadItem = (item: MacroscopEvtPlaceView): Observable<MacroscopEvtPlaceView | undefined> => {
+    return this.dataService.getEvtPlace(item.id).pipe(
+      map(dto => macroscopEvtPlaceDtoToView(dto, this.allChannels())),
     );
   };
 
-  addItem = (item: MacroscopImgPlaceView): Observable<MacroscopImgPlaceView> => {
-    //console.log(`add: ${JSON.stringify(item)}`)
-    const req = macroscopImgPlaceViewToDto(item);
-    return this.dataService.addImgPlaceByAgent(this.currentAgentId, req)
-      .pipe(map(dto => macroscopImgPlaceDtoToView(dto)));
-    //return of(req).pipe(map(dto => macroscopImgPlaceDtoToView(dto)))
-  };
-
-  updateItem = (item: MacroscopImgPlaceView): Observable<MacroscopImgPlaceView> => {
-    //console.log(`update: ${JSON.stringify(item)}`)
+  updateItem = (item: MacroscopEvtPlaceView): Observable<MacroscopEvtPlaceView> => {
     if (item.undeleted) {
-      return this.dataService.restoreImgPlace(item.id)
-        .pipe(map(dto => macroscopImgPlaceDtoToView(dto)));
+      return this.dataService.restoreEvtPlace(item.id)
+        .pipe(map(dto => macroscopEvtPlaceDtoToView(dto)));
     }
-    const req = macroscopImgPlaceViewToDto(item);
-    return this.dataService.updateImgPlace(item.id, req)
-      .pipe(map(dto => macroscopImgPlaceDtoToView(dto)));
-    //return of(req).pipe(map(dto => macroscopImgPlaceDtoToView(dto)))
+    const req = macroscopEvtPlaceViewToDto(item);
+    return this.dataService.updateEvtPlace(item.id, req)
+      .pipe(map(dto => macroscopEvtPlaceDtoToView(dto)));
   };
 
-  deleteItem = (item: MacroscopImgPlaceView): Observable<void> => {
-    //console.log(`delete: ${JSON.stringify(item)}`)
-    return this.dataService.deleteImgPlace(item.id);
-    //return of()
-  }
+  deleteItem = (item: MacroscopEvtPlaceView): Observable<void> => {
+    return this.dataService.deleteEvtPlace(item.id);
+  };
 
   onFilterChange = (val: TableFilterInfo) => this.tableManager.onFilterChange(val);
   toggleFilter = (reset?: boolean) => this.tableManager.toggleFilter(reset);
 
   private render = (): void => this.table?.renderRows();
 
-  callSelect = (item: MacroscopImgPlaceView) => this.doSelect(item, true);
+  callSelect = (item: MacroscopEvtPlaceView) => this.doSelect(item, true);
 
   private callAdd(): void {
-    const newItem = createNewMacroscopPlace();
-    const usedIds = new Set(
-      this.dataSource.data.filter(p => !p.deleted).map(p => p.macroscopId)
-        .filter((id): id is string => !!id));
-    const free = this.allChannels().filter(c => !usedIds.has(c.macroscopId));
-    this.freeChannels.set(free);
-
-    this.tableManager.doAddBase(newItem, () => this.table.renderRows(), false, true);
+    //const newItem = createNewMacroscopEvtPlace();
+    // Заглушка: добавление evt-мест будет реализовано иначе (например, подтягиванием из Macroscop).
+    console.warn('[evt-place] Добавление мест пока не реализовано.', {
+      agentId: this.currentAgentId,
+      //draft: newItem,
+    });
+    this.notificationService.info('Добавление мест событий пока не реализовано');
   }
 
   callDelete(): void {
@@ -221,44 +231,44 @@ export class MacroscopPlaceListComponent implements OnInit, AfterViewInit {
     });
   }
 
-  private canDeleteItem = (item: MacroscopImgPlaceView | undefined): boolean => {
+  private canDeleteItem = (item: MacroscopEvtPlaceView | undefined): boolean => {
     if (!item) return false;
     if (this.canFullActions()) return true;
     return isNewItem(item);
   };
 
-  private doSelect = (item: MacroscopImgPlaceView | undefined, newState: boolean,
+  private doSelect = (item: MacroscopEvtPlaceView | undefined, newState: boolean,
     updateUrl: boolean = true, scrollTo: boolean = false) => {
     this.tableManager.doSelectBaseWithCollapse(
       item, newState, () => this.table.renderRows(), updateUrl, scrollTo, true, undefined);
   };
 
-  doLoadedItem = (item: MacroscopImgPlaceView | undefined) => {
+  doLoadedItem = (item: MacroscopEvtPlaceView | undefined) => {
     this.tableManager.doAfterLoadItem(item, () => this.table.renderRows());
   };
 
-  doUpdate = (item: MacroscopImgPlaceView) => {
+  doUpdate = (item: MacroscopEvtPlaceView) => {
     this.tableManager.doUpdateBase(item, () => this.render());
   };
 
-  doRestoreDeleted = (item: MacroscopImgPlaceView) => {
+  doRestoreDeleted = (item: MacroscopEvtPlaceView) => {
     item.undeleted = true;
     this.tableManager.doUpdateBase(item, () => this.render());
-  }
+  };
 
-  private doDelete = (item: MacroscopImgPlaceView) => {
+  private doDelete = (item: MacroscopEvtPlaceView) => {
     this.tableManager.doDeleteBase(item, () => this.render());
   };
 
   isExpanded = (index: number, item: any): boolean => isExpanded(item);
 
   private doSave(): void {
-    const resApply = (result: SaveDataResult<MacroscopImgPlaceView>) => {
+    const resApply = (result: SaveDataResult<MacroscopEvtPlaceView>) => {
       if (result.success) {
         this.tableManager.dataSource.data = this.dataSource.data.map(p => {
           if (p.undeleted) {
             const { undeleted, ...rest } = p;
-            return rest as MacroscopImgPlaceView;
+            return rest as MacroscopEvtPlaceView;
           }
           return p;
         });
@@ -270,43 +280,26 @@ export class MacroscopPlaceListComponent implements OnInit, AfterViewInit {
     };
     this.tableManager.doSaveBase(
       this.isSaving,
-      (item) => this.addItem(item),
+      undefined,                                // addItem — пока не реализуем
       (item) => this.updateItem(item),
       (item) => this.deleteItem(item),
       resApply
     );
   }
 
-  onCallGetChannelScreenShot(event: { mode: 'current' | 'archive'; place: MacroscopImgPlaceView }): void {
-    const configId = this.macroscopConfigId();
-    if (!configId) {
-      this.notificationService.error('Конфигурация Macroscop не привязана к агенту');
-      return;
-    }
-    if (!event.place.macroscopId) {
-      this.notificationService.error('Не выбран канал Macroscop');
-      return;
-    }
-
-    const loader$ = event.mode === 'archive'
-      ? this.dataService.getArchiveScreenshot(configId, event.place.macroscopId)
-      : this.dataService.getCurrentScreenshot(configId, event.place.macroscopId);
-
-    this.isLoadingScreenshot.set(true);
-    loader$.pipe(
-      takeUntilDestroyed(this.destroyRef),
-      finalize(() => this.isLoadingScreenshot.set(false)),
-    ).subscribe(result => {
-      if (result.success && result.data) {
-        this.dialogService.showImage(
-          result.data,
-          event.place.name ?? event.place.macroscopId,
-        );
-      } else {
-        this.notificationService.error(
-          result.errorMessage ?? 'Не удалось получить скриншот',
-        );
-      }
+  /**
+   * Заглушка для скриншотов evt-мест.
+   * Когда решим реализовать — понадобится макроскопный id канала
+   * (не путать с `channelId` из DTO, там DB-идентификатор), а также
+   * привязанный configId агента. Сейчас просто логируем, чтобы
+   * UI-поток кнопок был проверяем.
+   */
+  onCallGetChannelScreenShot(event: { mode: 'current' | 'archive'; place: MacroscopEvtPlaceView }): void {
+    console.warn('[evt-place] Запрос скриншота пока не реализован.', {
+      agentId: this.currentAgentId,
+      mode: event.mode,
+      place: event.place,
     });
+    this.notificationService.info('Получение скриншотов для мест событий пока не реализовано');
   }
 }

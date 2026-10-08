@@ -61,15 +61,21 @@ export const routes: Routes = [
   },
   {
     path: 'evt/agent-list',
-    loadComponent: () => import('./features/evt/evt-agent-list/evt-agent-list.component').then(m => m.EvtAgentListComponent),
+    loadComponent: () => import('./features/evt/evt-agent/evt-agent-list/evt-agent-list.component').then(m => m.EvtAgentListComponent),
     canActivate: [authGuard],
     data: authConstant('evt/agent-list')
   },
   {
     path: 'evt/agent',
-    loadComponent: () => import('./features/evt/evt-agent-config/evt-agent-config.component').then(m => m.EvtAgentConfigComponent),
+    loadComponent: () => import('./features/evt/evt-agent/evt-agent-config/evt-agent-config.component').then(m => m.EvtAgentConfigComponent),
     canActivate: [authGuard],
     data: authConstant('evt/agent')
+  },
+  {
+    path: 'evt/place-list',
+    loadComponent: () => import('./features/evt/evt-place/evt-place-list-header/evt-place-list-header.component').then(m => m.EvtPlaceListHeaderComponent),
+    canActivate: [authGuard],
+    data: authConstant('evt/place-list')
   },
   {
     path: 'img/agent-list',
@@ -87,7 +93,7 @@ export const routes: Routes = [
     path: 'img/place-list',
     loadComponent: () => import('./features/img/img-place/img-place-list-header/img-place-list-header.component').then(m => m.ImgPlaceListHeaderComponent),
     canActivate: [authGuard],
-    data: authConstant('crm/place-list')
+    data: authConstant('img/place-list')
   },
   {
     path: 'yclients/config-list',

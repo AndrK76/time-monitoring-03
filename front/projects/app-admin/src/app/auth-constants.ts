@@ -16,6 +16,7 @@ export const AUTH_CONSTANTS: Record<string, any> = {
 
     'evt/agent': { mode: 'or', groups: ['superuser', 'any_action_allow'] },
     'evt/agent-list': { mode: 'or', groups: ['superuser', 'any_action_allow'] },
+    'evt/place-list': { mode: 'or', groups: ['superuser', 'any_action_allow'] },
 
     'img/agent': { mode: 'or', groups: ['superuser', 'any_action_allow'] },
     'img/agent-list': { mode: 'or', groups: ['superuser', 'any_action_allow'] },
@@ -35,8 +36,9 @@ export const AUTH_CONSTANTS: Record<string, any> = {
     'anyOrgAllow': { mode: 'or', groups: ['superuser', 'any_org_allow'] },
     'structChangeOrg': { mode: 'or', groups: ['superuser', 'any_action_allow'] },
     'structModifyAgents': ['superuser'],
-    'imgPlaceAllActions': { mode: 'or', groups: ['superuser'] },
+    'evtPlaceAllActions': { mode: 'or', groups: ['superuser'] },
     'evtTypesAllCations': { mode: 'or', groups: ['superuser'] },
+    'imgPlaceAllActions': { mode: 'or', groups: ['superuser'] },
 
 }
 

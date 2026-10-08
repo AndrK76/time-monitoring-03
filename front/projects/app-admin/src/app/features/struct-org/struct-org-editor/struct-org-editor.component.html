@@ -105,6 +105,10 @@
                 <span>{{isSmallScreen()?'Услуги':'К списку услуг CRM'}}</span>
             </a>
             @if (!isSmallScreen()) {
+            <a mat-button class="editor-link" [routerLink]="['/evt/place-list']"
+                [queryParams]="{org: organization().id}">
+                <span>К списку мест событий</span>
+            </a>
             <a mat-button class="editor-link" [routerLink]="['/img/place-list']"
                 [queryParams]="{org: organization().id}">
                 <span>К списку мест камер</span>
@@ -112,6 +116,13 @@
             }
         </div>
         @if (isSmallScreen()) {
+        <div class="form-row">
+            <span class="label">События:</span>
+            <a mat-button class="editor-link" [routerLink]="['/evt/place-list']"
+                [queryParams]="{org: organization().id}">
+                <span>Места</span>
+            </a>
+        </div>
         <div class="form-row">
             <span class="label">Камеры:</span>
             <a mat-button class="editor-link" [routerLink]="['/img/place-list']"

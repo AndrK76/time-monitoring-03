@@ -16,17 +16,17 @@ import {
 } from '@mon3/sc';
 import { PermissionService } from '@mon3/sa';
 
-import { EvtStructManageService } from '../../../services/evt-struct-manage.service';
-import { MainStructManageService } from '../../../services/main-struct-manage.service';
-import { authConstant } from '../../../auth-constants';
-import { OrgStructInfo } from '../../struct-org/struct-org-view.models';
-import { orgStructListDtoToView } from '../../struct-org/struct-org-view.utils';
-import { EvtAgentItemView, EvtAgentTypeView } from '../evt-view.models';
+import { EvtStructManageService } from '../../../../services/evt-struct-manage.service';
+import { MainStructManageService } from '../../../../services/main-struct-manage.service';
+import { authConstant } from '../../../../auth-constants';
+import { OrgStructInfo } from '../../../struct-org/struct-org-view.models';
+import { orgStructListDtoToView } from '../../../struct-org/struct-org-view.utils';
+import { EvtAgentItemView, EvtAgentTypeView } from '../../evt-view.models';
 import { EvtAgentBindEditorComponent } from '../evt-agent-bind-editor/evt-agent-bind-editor.component';
 import {
   createNewEvtAgent, evtAgentItemDtoToView, evtAgentListDtoToView,
   evtAgentTypeDtoToView, evtAgentViewToItemDto, evtAgentViewToListDto
-} from '../evt-view.utils';
+} from '../../evt-view.utils';
 
 @Component({
   selector: 'app-evt-agent-list',

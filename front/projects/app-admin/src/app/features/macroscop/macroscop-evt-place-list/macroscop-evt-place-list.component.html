@@ -66,9 +66,19 @@
                         <td mat-cell *matCellDef="let row"> {{ row.name }} </td>
                     </ng-container>
 
+
+                    <ng-container matColumnDef="channelName">
+                        <th mat-header-cell *matHeaderCellDef>
+                            <sc-filter-root key="channelName" label="Камера" [showFilter]="showFilter()" [sort]="true"
+                                [config]="filterConfig().get('channelName')!"
+                                (change)="onFilterChange($event)"></sc-filter-root>
+                        </th>
+                        <td mat-cell *matCellDef="let row"> {{ row.channelName }} </td>
+                    </ng-container>
+
                     <ng-container matColumnDef="internalName">
                         <th mat-header-cell *matHeaderCellDef>
-                            <sc-filter-root key="internalName" label="Канал на сервере" [showFilter]="showFilter()"
+                            <sc-filter-root key="internalName" label="Зона камеры" [showFilter]="showFilter()"
                                 [sort]="true" [config]="filterConfig().get('internalName')!"
                                 (change)="onFilterChange($event)"></sc-filter-root>
                         </th>
@@ -78,10 +88,11 @@
                     <ng-container matColumnDef="editor">
                         <td mat-cell *matCellDef="let row" [attr.colspan]="displayedColumns.length">
                             <div class="editor-row" *ngIf="row._expanded">
-                                <app-macroscop-place-inplace-editor [placeData]="row" [loadItemFn]="loadItem"
-                                    [freeChannels]="freeChannels()" (change)="doUpdate($event)"
-                                    (restoreDeleted)="doRestoreDeleted($event)" (loaded)="doLoadedItem($event)"
-                                    (screenshotRequested)="onCallGetChannelScreenShot($event)"></app-macroscop-place-inplace-editor>
+                                <app-macroscop-evt-place-inplace-editor [placeData]="row" [loadItemFn]="loadItem"
+                                    (change)="doUpdate($event)" (restoreDeleted)="doRestoreDeleted($event)"
+                                    (loaded)="doLoadedItem($event)"
+                                    (screenshotRequested)="onCallGetChannelScreenShot($event)">
+                                </app-macroscop-evt-place-inplace-editor>
                             </div>
                         </td>
                     </ng-container>

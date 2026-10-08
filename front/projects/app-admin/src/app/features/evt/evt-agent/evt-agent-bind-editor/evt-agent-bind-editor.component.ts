@@ -15,10 +15,10 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DialogService, isNewItem, isNotFullLoadedItem } from '@mon3/sc';
 import { PermissionService } from '@mon3/sa';
 
-import { authConstant } from '../../../auth-constants';
-import { OrgStructInfo } from '../../struct-org/struct-org-view.models';
-import { EvtAgentItemView, EvtAgentTypeView } from '../evt-view.models';
-import { evtAgentTypeFromId, evtOrgStructFromId } from '../evt-view.utils';
+import { authConstant } from '../../../../auth-constants';
+import { OrgStructInfo } from '../../../struct-org/struct-org-view.models';
+import { EvtAgentItemView, EvtAgentTypeView } from '../../evt-view.models';
+import { evtAgentTypeFromId, evtOrgStructFromId } from '../../evt-view.utils';
 
 @Component({
   selector: 'app-evt-agent-bind-editor',

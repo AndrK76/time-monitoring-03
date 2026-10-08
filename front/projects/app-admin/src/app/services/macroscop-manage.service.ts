@@ -9,8 +9,11 @@ import {
   MacroscopChannelListDto,
   MacroscopDataResponse,
   MacroscopEventTypeDto,
+  MacroscopEvtActionPlacesResponseDto,
   MacroscopEvtAgentConfigDto,
   MacroscopEvtAgentModeDto,
+  MacroscopEvtPlaceDto,
+  MacroscopEvtPlaceListDto,
   MacroscopImgAgentConfigDto,
   MacroscopImgPlaceDto,
   MacroscopImgPlaceListDto,
@@ -82,6 +85,43 @@ export class MacroscopManageService {
   }
 
 
+  getEvtPlacesForAgent(agentId: string, showDeleted = false): Observable<MacroscopEvtPlaceListDto[]> {
+    return this.http.get<MacroscopEvtPlaceListDto[]>(
+      `${this.adminApiUrl}${this.MACROSCOP_CONTROLLER}/evt-agents/${agentId}/places`,
+      { params: { 'show-deleted': showDeleted } });
+  }
+
+  addEvtPlaceByAgent(agentId: string, dto: MacroscopEvtPlaceDto): Observable<MacroscopEvtPlaceDto> {
+    return this.http.post<MacroscopEvtPlaceDto>(
+      `${this.adminApiUrl}${this.MACROSCOP_CONTROLLER}/evt-agents/${agentId}/places`, dto);
+  }
+
+  getActualChannelsForEvtAgent(agentId: string): Observable<MacroscopChannelListDto[]> {
+    return this.http.get<MacroscopChannelListDto[]>(
+      `${this.adminApiUrl}${this.MACROSCOP_CONTROLLER}/evt-agents/${agentId}/actual-channels`);
+  }
+
+  getEvtPlace(id: string): Observable<MacroscopEvtPlaceDto> {
+    return this.http.get<MacroscopEvtPlaceDto>(
+      `${this.adminApiUrl}${this.MACROSCOP_CONTROLLER}/evt-places/${id}`);
+  }
+
+  updateEvtPlace(id: string, dto: MacroscopEvtPlaceDto): Observable<MacroscopEvtPlaceDto> {
+    return this.http.put<MacroscopEvtPlaceDto>(
+      `${this.adminApiUrl}${this.MACROSCOP_CONTROLLER}/evt-places/${id}`, dto);
+  }
+
+  deleteEvtPlace(id: string): Observable<void> {
+    return this.http.delete<void>(
+      `${this.adminApiUrl}${this.MACROSCOP_CONTROLLER}/evt-places/${id}`);
+  }
+
+  restoreEvtPlace(id: string): Observable<MacroscopEvtPlaceDto> {
+    return this.http.put<MacroscopEvtPlaceDto>(
+      `${this.adminApiUrl}${this.MACROSCOP_CONTROLLER}/evt-places/${id}/restore-deleted`, null);
+  }
+
+
   getImgPlacesForAgent(agentId: string, showDeleted = false): Observable<MacroscopImgPlaceListDto[]> {
     return this.http.get<MacroscopImgPlaceListDto[]>(
       `${this.adminApiUrl}${this.MACROSCOP_CONTROLLER}/img-agents/${agentId}/places`,
@@ -93,7 +133,7 @@ export class MacroscopManageService {
       `${this.adminApiUrl}${this.MACROSCOP_CONTROLLER}/img-agents/${agentId}/places`, dto);
   }
 
-  getActualChannelsForAgent(agentId: string): Observable<MacroscopChannelListDto[]> {
+  getActualChannelsForImgAgent(agentId: string): Observable<MacroscopChannelListDto[]> {
     return this.http.get<MacroscopChannelListDto[]>(
       `${this.adminApiUrl}${this.MACROSCOP_CONTROLLER}/img-agents/${agentId}/actual-channels`);
   }
@@ -183,6 +223,25 @@ export class MacroscopManageService {
     return this.http.get<MacroscopDataResponse<MacroscopChannelDto[]>>(
       `${this.adminApiUrl}${this.MACROSCOP_CONTROLLER}/misc/configs/${configId}/channels`);
   }
+
+  getEvtPlacesInDetectorModeForConfigAndChannel(
+    configId: string, channelId: string
+  ): Observable<MacroscopDataResponse<MacroscopEvtPlaceDto[]>> {
+    return this.http.get<MacroscopDataResponse<MacroscopEvtPlaceDto[]>>(
+      `${this.adminApiUrl}${this.MACROSCOP_CONTROLLER}/misc/evt-configs/${configId}/channels/${channelId}/places`,
+      { params: { mode: 'byMovingDetector' } });
+  }
+
+  getEvtPlacesInActionModeForChannel(
+    configId: string, channelId: string, before?: string
+  ): Observable<MacroscopDataResponse<MacroscopEvtActionPlacesResponseDto>> {
+    const params: Record<string, string> = { mode: 'byAnalytic' };
+    if (before) params['before'] = before;
+    return this.http.get<MacroscopDataResponse<MacroscopEvtActionPlacesResponseDto>>(
+      `${this.adminApiUrl}${this.MACROSCOP_CONTROLLER}/misc/evt-configs/${configId}/channels/${channelId}/places`,
+      { params });
+  }
+
 
   getArchiveModes(): Observable<MacroscopArchiveModeDto[]> {
     return this.http.get<MacroscopArchiveModeDto[]>(

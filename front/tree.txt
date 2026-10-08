@@ -134,18 +134,24 @@
 |   |   |   |   |   |   |-- crm-view.models.ts
 |   |   |   |   |   |   `-- crm-view.utils.ts
 |   |   |   |   |   |-- evt
-|   |   |   |   |   |   |-- evt-agent-bind-editor
-|   |   |   |   |   |   |   |-- evt-agent-bind-editor.component.html
-|   |   |   |   |   |   |   |-- evt-agent-bind-editor.component.scss
-|   |   |   |   |   |   |   `-- evt-agent-bind-editor.component.ts
-|   |   |   |   |   |   |-- evt-agent-config
-|   |   |   |   |   |   |   |-- evt-agent-config.component.html
-|   |   |   |   |   |   |   |-- evt-agent-config.component.scss
-|   |   |   |   |   |   |   `-- evt-agent-config.component.ts
-|   |   |   |   |   |   |-- evt-agent-list
-|   |   |   |   |   |   |   |-- evt-agent-list.component.html
-|   |   |   |   |   |   |   |-- evt-agent-list.component.scss
-|   |   |   |   |   |   |   `-- evt-agent-list.component.ts
+|   |   |   |   |   |   |-- evt-agent
+|   |   |   |   |   |   |   |-- evt-agent-bind-editor
+|   |   |   |   |   |   |   |   |-- evt-agent-bind-editor.component.html
+|   |   |   |   |   |   |   |   |-- evt-agent-bind-editor.component.scss
+|   |   |   |   |   |   |   |   `-- evt-agent-bind-editor.component.ts
+|   |   |   |   |   |   |   |-- evt-agent-config
+|   |   |   |   |   |   |   |   |-- evt-agent-config.component.html
+|   |   |   |   |   |   |   |   |-- evt-agent-config.component.scss
+|   |   |   |   |   |   |   |   `-- evt-agent-config.component.ts
+|   |   |   |   |   |   |   `-- evt-agent-list
+|   |   |   |   |   |   |       |-- evt-agent-list.component.html
+|   |   |   |   |   |   |       |-- evt-agent-list.component.scss
+|   |   |   |   |   |   |       `-- evt-agent-list.component.ts
+|   |   |   |   |   |   |-- evt-place
+|   |   |   |   |   |   |   `-- evt-place-list-header
+|   |   |   |   |   |   |       |-- evt-place-list-header.component.html
+|   |   |   |   |   |   |       |-- evt-place-list-header.component.scss
+|   |   |   |   |   |   |       `-- evt-place-list-header.component.ts
 |   |   |   |   |   |   |-- evt-view.models.ts
 |   |   |   |   |   |   `-- evt-view.utils.ts
 |   |   |   |   |   |-- img
@@ -198,6 +204,14 @@
 |   |   |   |   |   |   |   |-- macroscop-evt-editor-container.component.html
 |   |   |   |   |   |   |   |-- macroscop-evt-editor-container.component.scss
 |   |   |   |   |   |   |   `-- macroscop-evt-editor-container.component.ts
+|   |   |   |   |   |   |-- macroscop-evt-place-list
+|   |   |   |   |   |   |   |-- macroscop-evt-place-inplace-editor
+|   |   |   |   |   |   |   |   |-- macroscop-evt-place-inplace-editor.component.html
+|   |   |   |   |   |   |   |   |-- macroscop-evt-place-inplace-editor.component.scss
+|   |   |   |   |   |   |   |   `-- macroscop-evt-place-inplace-editor.component.ts
+|   |   |   |   |   |   |   |-- macroscop-evt-place-list.component.html
+|   |   |   |   |   |   |   |-- macroscop-evt-place-list.component.scss
+|   |   |   |   |   |   |   `-- macroscop-evt-place-list.component.ts
 |   |   |   |   |   |   |-- macroscop-evttype-list
 |   |   |   |   |   |   |   |-- macroscop-evttype-inplace-editor
 |   |   |   |   |   |   |   |   |-- macroscop-evttype-inplace-editor.component.html
@@ -210,14 +224,14 @@
 |   |   |   |   |   |   |   |-- macroscop-img-editor-container.component.html
 |   |   |   |   |   |   |   |-- macroscop-img-editor-container.component.scss
 |   |   |   |   |   |   |   `-- macroscop-img-editor-container.component.ts
-|   |   |   |   |   |   |-- macroscop-place-list
-|   |   |   |   |   |   |   |-- macroscop-place-inplace-editor
-|   |   |   |   |   |   |   |   |-- macroscop-place-inplace-editor.component.html
-|   |   |   |   |   |   |   |   |-- macroscop-place-inplace-editor.component.scss
-|   |   |   |   |   |   |   |   `-- macroscop-place-inplace-editor.component.ts
-|   |   |   |   |   |   |   |-- macroscop-place-list.component.html
-|   |   |   |   |   |   |   |-- macroscop-place-list.component.scss
-|   |   |   |   |   |   |   `-- macroscop-place-list.component.ts
+|   |   |   |   |   |   |-- macroscop-img-place-list
+|   |   |   |   |   |   |   |-- macroscop-img-place-inplace-editor
+|   |   |   |   |   |   |   |   |-- macroscop-img-place-inplace-editor.component.html
+|   |   |   |   |   |   |   |   |-- macroscop-img-place-inplace-editor.component.scss
+|   |   |   |   |   |   |   |   `-- macroscop-img-place-inplace-editor.component.ts
+|   |   |   |   |   |   |   |-- macroscop-img-place-list.component.html
+|   |   |   |   |   |   |   |-- macroscop-img-place-list.component.scss
+|   |   |   |   |   |   |   `-- macroscop-img-place-list.component.ts
 |   |   |   |   |   |   |-- macroscop-view.models.ts
 |   |   |   |   |   |   `-- macroscop-view.utils.ts
 |   |   |   |   |   |-- struct-org
@@ -262,6 +276,8 @@
 |   |   |   |   |       |   `-- yc-service-list.component.ts
 |   |   |   |   |       |-- yclients-view.models.ts
 |   |   |   |   |       `-- yclients-view.utils.ts
+|   |   |   |   |-- pipes
+|   |   |   |   |   `-- macroscop-zone-info.pipe.ts
 |   |   |   |   |-- services
 |   |   |   |   |   |-- crm-struct-manage.service.ts
 |   |   |   |   |   |-- evt-struct-manage.service.ts
@@ -556,4 +572,4 @@
 |-- tsconfig.json
 `-- tsconfig.prod.json
 
-154 directories, 402 files
+160 directories, 412 files

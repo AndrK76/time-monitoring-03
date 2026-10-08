@@ -6,13 +6,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.igorit.monitoring.admin.service.EvtManageService;
-import ru.igorit.monitoring.lib.dto.crm.CrmAgentConfigDto;
-import ru.igorit.monitoring.lib.dto.crm.CrmAgentItemDto;
-import ru.igorit.monitoring.lib.dto.crm.CrmAgentListDto;
-import ru.igorit.monitoring.lib.dto.evt.EvtAgentConfigDto;
-import ru.igorit.monitoring.lib.dto.evt.EvtAgentItemDto;
-import ru.igorit.monitoring.lib.dto.evt.EvtAgentListDto;
-import ru.igorit.monitoring.lib.dto.evt.EvtAgentTypeDto;
+import ru.igorit.monitoring.lib.dto.evt.*;
+import ru.igorit.monitoring.lib.dto.img.ImgPlaceListDto;
 
 import java.util.List;
 
@@ -76,6 +71,11 @@ public class EvtManageController {
             @PathVariable("id") String agentId,
             @RequestParam(name = "org") String orgId) {
         return service.bindAgent(agentId, orgId);
+    }
+
+    @GetMapping("/agents/{id}/places")
+    public List<EvtPlaceListDto>  getPlacesForAgent(@PathVariable(name = "id") String agentId) {
+        return service.getPlacesForAgent(agentId);
     }
 
     @GetMapping({"/configs/{id}"})

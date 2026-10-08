@@ -4,6 +4,7 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -13,34 +14,32 @@ import { finalize, forkJoin, map } from 'rxjs';
 import { ErrorResponseResult, PermissionService, processResponseError } from '@mon3/sa';
 import { SizeService, TableActionsInformerService } from '@mon3/sc';
 
-import { ImgStructManageService } from '../../../../services/img-struct-manage.service';
+import { EvtStructManageService } from '../../../../services/evt-struct-manage.service';
 import { MainStructManageService } from '../../../../services/main-struct-manage.service';
 import { OrgStructInfo } from '../../../struct-org/struct-org-view.models';
 import { orgStructListDtoToView } from '../../../struct-org/struct-org-view.utils';
-import { ImgAgentItemView, ImgAgentTypeView } from '../../img-view.models';
-import { imgAgentListDtoToView, imgAgentTypeDtoToView } from '../../img-view.utils';
-import { MacroscopImgPlaceListComponent } from '../../../macroscop/macroscop-img-place-list/macroscop-img-place-list.component';
+import { EvtAgentItemView, EvtAgentTypeView } from '../../evt-view.models';
+import { evtAgentListDtoToView, evtAgentTypeDtoToView } from '../../evt-view.utils';
+import { MacroscopEvtPlaceListComponent } from '../../../macroscop/macroscop-evt-place-list/macroscop-evt-place-list.component';
 import { authConstant } from '../../../../auth-constants';
-import { MatCheckboxModule } from '@angular/material/checkbox';
 
 @Component({
-  selector: 'app-img-place-list-header',
+  selector: 'app-evt-place-list-header',
   standalone: true,
   imports: [
     CommonModule, RouterModule, ReactiveFormsModule,
-    MatButtonModule, MatCardModule, MatFormFieldModule, MatIconModule,
+    MatButtonModule, MatCardModule, MatCheckboxModule, MatFormFieldModule, MatIconModule,
     MatProgressSpinnerModule, MatSelectModule, MatTooltipModule,
-    MatCheckboxModule,
-    MacroscopImgPlaceListComponent,
+    MacroscopEvtPlaceListComponent,
   ],
   providers: [TableActionsInformerService],
-  templateUrl: './img-place-list-header.component.html',
-  styleUrl: './img-place-list-header.component.scss'
+  templateUrl: './evt-place-list-header.component.html',
+  styleUrl: './evt-place-list-header.component.scss'
 })
-export class ImgPlaceListHeaderComponent implements OnInit {
+export class EvtPlaceListHeaderComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
-  private readonly imgService = inject(ImgStructManageService);
+  private readonly evtService = inject(EvtStructManageService);
   private readonly mainStructService = inject(MainStructManageService);
   private readonly permissionService = inject(PermissionService);
   private readonly sizeService = inject(SizeService);
@@ -51,15 +50,15 @@ export class ImgPlaceListHeaderComponent implements OnInit {
   error = signal<ErrorResponseResult>({});
 
   orgId = signal<string | undefined>(undefined);
-  agents = signal<ImgAgentItemView[]>([]);
-  selectedAgent = signal<ImgAgentItemView | undefined>(undefined);
+  agents = signal<EvtAgentItemView[]>([]);
+  selectedAgent = signal<EvtAgentItemView | undefined>(undefined);
   showBackLink = signal<boolean>(false);
 
   canFullActions = signal(false);
   showDeleted = signal(false);
 
   organizations = signal<OrgStructInfo[]>([]);
-  agentTypes = signal<ImgAgentTypeView[]>([]);
+  agentTypes = signal<EvtAgentTypeView[]>([]);
 
   orgSelect = new FormControl<string | undefined>(undefined);
   agentSelect = new FormControl<string | undefined>(undefined);
@@ -75,7 +74,6 @@ export class ImgPlaceListHeaderComponent implements OnInit {
   agentSelectDisabled = computed(() => this.agents().length <= 1);
   isSmallScreen = this.sizeService.isSmallScreen;
 
-
   constructor() {
     effect(() => {
       const shouldDisable = this.agentSelectDisabled();
@@ -85,7 +83,7 @@ export class ImgPlaceListHeaderComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.canFullActions.set(this.permissionService.checkPermissions(authConstant('imgPlaceAllActions')));
+    this.canFullActions.set(this.permissionService.checkPermissions(authConstant('evtPlaceAllActions')));
     const orgParam = this.route.snapshot.queryParamMap.get('org') ?? undefined;
     const idParam = this.route.snapshot.queryParamMap.get('id') ?? undefined;
     this.showBackLink.set(!!orgParam);
@@ -108,8 +106,8 @@ export class ImgPlaceListHeaderComponent implements OnInit {
     forkJoin({
       organizations: this.mainStructService.getOrganizations().pipe(
         map(list => list.map(dto => orgStructListDtoToView(dto)))),
-      types: this.imgService.getAgentTypes().pipe(
-        map(list => list.map(dto => imgAgentTypeDtoToView(dto)))),
+      types: this.evtService.getAgentTypes().pipe(
+        map(list => list.map(dto => evtAgentTypeDtoToView(dto)))),
     }).pipe(
       finalize(() => this.isLoading.set(false))
     ).subscribe({
@@ -129,9 +127,9 @@ export class ImgPlaceListHeaderComponent implements OnInit {
     forkJoin({
       organizations: this.mainStructService.getOrganizations().pipe(
         map(list => list.map(dto => orgStructListDtoToView(dto)))),
-      types: this.imgService.getAgentTypes().pipe(
-        map(list => list.map(dto => imgAgentTypeDtoToView(dto)))),
-      agents: this.imgService.getAgentsByOrganization(orgId),
+      types: this.evtService.getAgentTypes().pipe(
+        map(list => list.map(dto => evtAgentTypeDtoToView(dto)))),
+      agents: this.evtService.getAgentsByOrganization(orgId),
     }).pipe(
       finalize(() => this.isLoading.set(false))
     ).subscribe({
@@ -140,7 +138,7 @@ export class ImgPlaceListHeaderComponent implements OnInit {
         this.agentTypes.set(types);
 
         const agentViews = agents.map(dto =>
-          imgAgentListDtoToView(dto, types, organizations));
+          evtAgentListDtoToView(dto, types, organizations));
         this.agents.set(agentViews);
 
         const target = agentId
@@ -170,9 +168,9 @@ export class ImgPlaceListHeaderComponent implements OnInit {
     this.hasError.set(false);
     this.error.set({});
 
-    this.imgService.getAgentsByOrganization(orgId).pipe(
+    this.evtService.getAgentsByOrganization(orgId).pipe(
       map(list => list.map(dto =>
-        imgAgentListDtoToView(dto, this.agentTypes(), this.organizations()))),
+        evtAgentListDtoToView(dto, this.agentTypes(), this.organizations()))),
       finalize(() => this.isLoading.set(false))
     ).subscribe({
       next: agents => {
@@ -192,7 +190,7 @@ export class ImgPlaceListHeaderComponent implements OnInit {
     if (agent) this.applyAgent(agent);
   }
 
-  private applyAgent(agent: ImgAgentItemView): void {
+  private applyAgent(agent: EvtAgentItemView): void {
     this.selectedAgent.set(agent);
     this.agentSelect.setValue(agent.id);
     this.actions.triggerReload(agent.id);

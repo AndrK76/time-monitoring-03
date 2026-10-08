@@ -42,7 +42,9 @@ public class MacroscopManageServiceImpl implements MacroscopManageService {
     private final MacroscopModelMapper mapper;
     private final MacroscopEvtAgentConfigRepository evtConfigRepo;
     private final MacroscopImgAgentConfigRepository imgConfigRepo;
+    private final MacroscopEvtPlaceRepository evtPlaceRepo;
     private final MacroscopImgPlaceRepository imgPlaceRepo;
+    private final MacroscopEvtAgentRepository evtAgentRepo;
     private final MacroscopImgAgentRepository imgAgentRepo;
     private final MacroscopAgentConfigRepository configRepo;
     private final MacroscopChannelRepository channelRepo;
@@ -223,6 +225,145 @@ public class MacroscopManageServiceImpl implements MacroscopManageService {
         return mapper.toDto(ret);
     }
 
+    @Transactional(readOnly = true)
+    @PreAuthorize("@securityAccessUtils.isAllowedAllActions()")
+    @Override
+    public List<MacroscopEvtPlaceListDto> getEvtPlacesForAgent(String agentId, boolean showDeleted) {
+        if (!sa.isSuperUser() && showDeleted) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "This action not allowed");
+        }
+        var cfg = _getEvtConfig(agentId);
+        var modeName = cfg.getMode() == null ? MacroscopEvtAgentMode.unknown.name() : cfg.getMode().name();
+
+        return evtPlaceRepo.findByAgentId(agentId).stream()
+                .filter(f -> showDeleted || !Boolean.TRUE.equals(f.getDeleted()))
+                .map(item -> {
+                    var dto = mapper.toListDto(item);
+                    dto.setEvtMode(modeName);
+                    return dto;
+                })
+                .sorted(Comparator.comparing(MacroscopEvtPlaceListDto::getChannelId)
+                        .thenComparing(MacroscopEvtPlaceListDto::getName)
+                        .thenComparing(MacroscopEvtPlaceListDto::getId))
+                .toList();
+    }
+
+    @Transactional
+    @PreAuthorize("@securityAccessUtils.isAllowedAllActions()")
+    @Override
+    public MacroscopEvtPlaceDto addEvtPlaceByAgent(String agentId, MacroscopEvtPlaceDto dto) {
+        evtService.getAgent(agentId);
+        var agent = evtAgentRepo.findById(agentId).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Agent not found"));
+        var cfg = _getEvtConfig(agentId);
+        assert cfg != null;
+        if (cfg.getConfig() == null) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Macroscop config for agent not bounded");
+        }
+        if (evtPlaceRepo.findByAgentId(agentId).stream()
+                .anyMatch(f -> Objects.equals(dto.getInternalId(), f.getInternalId()))) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Place for channel with id=" + dto.getInternalId() + " already exists");
+        }
+        var channel = channelRepo.findByConfigIdAndMacroscopId(cfg.getConfig().getId(), dto.getChannelId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Channel not found"));
+        var ret = new MacroscopEvtPlace();
+        ret.setName(dto.getName() == null ? dto.getInternalName() : dto.getName());
+        ret.setAgent(agent);
+        ret.setPresent(channel.getExists() && channel.getEnabled());
+        ret.setDeleted(false);
+        ret.setUsed(channel.getUsed());
+        ret.setChannel(channel);
+        ret.setOrigChannelId(channel.getMacroscopId());
+        ret.setMacroscopZoneId(dto.getInternalId());
+        ret.setMacroscopZoneName(dto.getInternalName());
+        if (dto.getZoneInfo() != null) {
+            var info = dto.getZoneInfo();
+            ret.setZoneInfo(new MacroscopZoneInfo(info.getLeft(), info.getTop(), info.getWidth(), info.getHeight()));
+        }
+        ret.setCreatedBy(extractUserId(getCurrentAuth()));
+        ret = evtPlaceRepo.saveAndFlush(ret);
+        var res = mapper.toDto(ret);
+        res.setEvtMode(cfg.getMode() == null ? MacroscopEvtAgentMode.unknown.name() : cfg.getMode().name());
+        return res;
+    }
+
+    @Transactional(readOnly = true)
+    @PreAuthorize("@securityAccessUtils.isAllowedAllActions()")
+    @Override
+    public List<MacroscopChannelListDto> getActualChannelsForEvtAgent(String agentId) {
+        var cfg = _getEvtConfig(agentId);
+        if (cfg.getConfig() == null) {
+            return List.of();
+        }
+        return channelRepo.findByConfigId(cfg.getConfig().getId()).stream()
+                .map(mapper::toListDto)
+                .filter((MacroscopChannelListDto::isExists))
+                .filter((MacroscopChannelListDto::isUsed))
+                .filter((MacroscopChannelListDto::isEnabled))
+                .sorted(Comparator.comparing(MacroscopChannelListDto::getName)
+                        .thenComparing(MacroscopChannelListDto::getId))
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    @PreAuthorize("@securityAccessUtils.isAllowedAllActions()")
+    @Override
+    public MacroscopEvtPlaceDto getEvtPlace(String id) {
+        var ret = evtPlaceRepo.findById(id).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "place not found"));
+        var cfg = _getEvtConfig(ret.getAgent().getId());
+        var res = mapper.toDto(ret);
+        res.setEvtMode(cfg.getMode() == null ? MacroscopEvtAgentMode.unknown.name() : cfg.getMode().name());
+        return res;
+    }
+
+    @Transactional
+    @PreAuthorize("@securityAccessUtils.isAllowedAllActions()")
+    @Override
+    public MacroscopEvtPlaceDto updateEvtPlace(String id, MacroscopEvtPlaceDto dto) {
+        var ret = evtPlaceRepo.findById(id).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "place not found"));
+        var cfg = _getEvtConfig(ret.getAgent().getId());
+        if (Boolean.TRUE.equals(ret.getDeleted())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Place deleted");
+        }
+        ret.setName(dto.getName());
+        ret.setUsed(dto.isUsed());
+        ret.setUpdatedBy(extractUserId(getCurrentAuth()));
+        ret = evtPlaceRepo.saveAndFlush(ret);
+        var res = mapper.toDto(ret);
+        res.setEvtMode(cfg.getMode() == null ? MacroscopEvtAgentMode.unknown.name() : cfg.getMode().name());
+        return res;
+    }
+
+    @Transactional
+    @PreAuthorize("@securityAccessUtils.isSuperUser()")
+    @Override
+    public void markEvtPlaceAsDeleted(String id) {
+        evtPlaceRepo.findById(id).ifPresent(place -> {
+            place.setDeleted(true);
+            place.setUpdatedBy(extractUserId(getCurrentAuth()));
+            evtPlaceRepo.saveAndFlush(place);
+        });
+    }
+
+    @Transactional
+    @PreAuthorize("@securityAccessUtils.isSuperUser()")
+    @Override
+    public MacroscopEvtPlaceDto restoreDeletedEvtPlace(String id) {
+        var place = evtPlaceRepo.findById(id).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "place not found"));
+        if (Boolean.TRUE.equals(place.getDeleted())) {
+            place.setDeleted(false);
+            place.setUpdatedBy(extractUserId(getCurrentAuth()));
+            place = evtPlaceRepo.saveAndFlush(place);
+        }
+        var cfg = _getEvtConfig(place.getAgent().getId());
+        var res =  mapper.toDto(place);
+        res.setEvtMode(cfg.getMode() == null ? MacroscopEvtAgentMode.unknown.name() : cfg.getMode().name());
+        return res;
+    }
+
 
     @Transactional(readOnly = true)
     @PreAuthorize("@securityAccessUtils.isAllowedAllActions()")
@@ -273,7 +414,7 @@ public class MacroscopManageServiceImpl implements MacroscopManageService {
     @Transactional(readOnly = true)
     @PreAuthorize("@securityAccessUtils.isAllowedAllActions()")
     @Override
-    public List<MacroscopChannelListDto> getActualChannelsForAgent(String agentId) {
+    public List<MacroscopChannelListDto> getActualChannelsForImgAgent(String agentId) {
         var cfg = _getImgConfig(agentId);
         if (cfg.getConfig() == null) {
             return List.of();
@@ -319,7 +460,7 @@ public class MacroscopManageServiceImpl implements MacroscopManageService {
     @Transactional
     @PreAuthorize("@securityAccessUtils.isSuperUser()")
     @Override
-    public void markPlaceAsDeleted(String id) {
+    public void markImgPlaceAsDeleted(String id) {
         imgPlaceRepo.findById(id).ifPresent(place -> {
             place.setDeleted(true);
             place.setUpdatedBy(extractUserId(getCurrentAuth()));
@@ -330,7 +471,7 @@ public class MacroscopManageServiceImpl implements MacroscopManageService {
     @Transactional
     @PreAuthorize("@securityAccessUtils.isSuperUser()")
     @Override
-    public MacroscopImgPlaceDto restoreDeletedPlace(String id) {
+    public MacroscopImgPlaceDto restoreDeletedImgPlace(String id) {
         var place = imgPlaceRepo.findById(id).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "place not found"));
         if (Boolean.TRUE.equals(place.getDeleted())) {

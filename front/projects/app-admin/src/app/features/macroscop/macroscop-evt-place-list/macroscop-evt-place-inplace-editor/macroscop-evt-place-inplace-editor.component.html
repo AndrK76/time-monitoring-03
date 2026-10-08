@@ -1,0 +1,75 @@
+<div class="editor-container">
+    <form [formGroup]="form" class="editor-form">
+        <div class="form-row">
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Наименование</mat-label>
+                <input matInput formControlName="name" [readonly]="deleted" (change)="$event.stopPropagation()">
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Канал (камера)</mat-label>
+                <input matInput formControlName="channelName" readonly>
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Зона камеры</mat-label>
+                <input matInput formControlName="internalName" readonly>
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Координаты</mat-label>
+                <input matInput [value]="placeData().zoneInfo | macroscopZoneInfo" readonly>
+            </mat-form-field>
+        </div>
+
+        <!--<div class="form-row">
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Id зоны</mat-label>
+                <input matInput formControlName="internalId" readonly>
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Id канала</mat-label>
+                <input matInput formControlName="channelId" readonly>
+            </mat-form-field>
+        </div>-->
+
+        <div class="form-row">
+            <div class='full-width second-info'>
+                <mat-checkbox formControlName="used">Используется</mat-checkbox>
+
+                @if (deleted || !present || placeData().channelId) {
+                <span class="spacer"></span>
+                }
+
+                @if (placeData().channelId) {
+                <div class="action-button-group">
+                    <button mat-icon-button type="button" matTooltip="Текущий скриншот"
+                        (click)="callGetCurrentScreenshot()" class="screenshot-link">
+                        <mat-icon>photo_camera</mat-icon>
+                    </button>
+                    <button mat-icon-button type="button" matTooltip="Последний из архива"
+                        (click)="callGetArchiveScreenshot()" class="screenshot-link">
+                        <mat-icon>photo_library</mat-icon>
+                    </button>
+                </div>
+                }
+
+                @if (deleted) {
+                <div class="action-button-group">
+                    <button mat-stroked-button class="table-action-btn btn-success" type="button"
+                        (click)="callRestore()">
+                        <mat-icon>restore</mat-icon>
+                        <span class="hide-on-small">Восстановить</span>
+                    </button>
+                </div>
+                }
+
+                @if (!present && !deleted) {
+                <span class="missing-hint">Отсутствует на сервере</span>
+                }
+            </div>
+
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Id места</mat-label>
+                <input matInput formControlName="placeId">
+            </mat-form-field>
+        </div>
+    </form>
+</div>

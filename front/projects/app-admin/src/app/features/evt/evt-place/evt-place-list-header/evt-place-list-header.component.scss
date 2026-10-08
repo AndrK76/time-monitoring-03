@@ -1,0 +1,24 @@
+:host {
+    display: block;
+    height: 100%;
+}
+
+.evt-place-actions {
+    justify-content: flex-start;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.org-select,
+.agent-select {
+    min-width: 18rem;
+    max-width: 24rem;
+}
+
+.show-deleted-checkbox {
+    display: inline-flex;
+    align-items: center;
+    margin: 0 8px;
+    align-self: center;
+    padding-bottom: 4px;
+}

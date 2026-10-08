@@ -4,14 +4,19 @@ import {
     MacroscopAgentConfigListDto,
     MacroscopArchiveModeDto,
     MacroscopChannelDto,
+    MacroscopChannelListDto,
     MacroscopChannelStreamDto,
     MacroscopCredentialsDto,
     MacroscopEventTypeDto,
+    MacroscopEvtActionPlacesResponseDto,
     MacroscopEvtAgentConfigDto,
     MacroscopEvtAgentModeDto,
+    MacroscopEvtPlaceDto,
+    MacroscopEvtPlaceListDto,
     MacroscopImgAgentConfigDto,
     MacroscopImgPlaceDto,
     MacroscopImgPlaceListDto,
+    MacroscopZoneInfoDto,
 } from '@mon3/sc';
 import {
     MacroscopActivityEventTypeView,
@@ -24,9 +29,12 @@ import {
     MacroscopEventTypeView,
     MacroscopEvtAgentConfigView,
     MacroscopEvtAgentModeView,
+    MacroscopEvtPlaceListView,
+    MacroscopEvtPlaceView,
     MacroscopImgAgentConfigView,
     MacroscopImgPlaceListView,
     MacroscopImgPlaceView,
+    MacroscopZoneInfoView,
 } from './macroscop-view.models';
 
 export const macroscopCredentialsDtoToView = (
@@ -271,6 +279,26 @@ export const macroscopChannelViewToDto = (
     };
 };
 
+export const macroscopChannelListDtoToView = (
+    dto: MacroscopChannelListDto
+): MacroscopChannelView => {
+
+    return {
+        macroscopId: dto.macroscopId,
+        enabled: dto.enabled,
+        exists: dto.exists,
+        used: dto.used,
+        archivingEnabled: true,
+        archiveAllowed: true,
+        realtimeAllowed: true,
+        soundAllowed: true,
+        id: dto.id,
+        name: dto.name,
+        device: dto.device,
+
+    } as MacroscopChannelView;
+};
+
 export const macroscopArchiveModeFromId = (
     id: string | undefined,
     allModes: MacroscopArchiveModeView[] | undefined
@@ -338,3 +366,88 @@ export const macroscopEventTypeViewToDto = (view: MacroscopEventTypeView): Macro
         activityTypeId: view.activityTypeId,
     };
 };
+
+
+export const macroscopZoneInfoDtoToView = (dto: MacroscopZoneInfoDto | undefined): MacroscopZoneInfoView | undefined => {
+    if (!dto) return undefined;
+    return new MacroscopZoneInfoView(dto.left, dto.top, dto.width, dto.height);
+};
+
+export const macroscopZoneInfoViewToDto = (view: MacroscopZoneInfoView | undefined): MacroscopZoneInfoDto | undefined => {
+    if (!view) return undefined;
+    return {
+        left: view.left,
+        top: view.top,
+        width: view.width,
+        height: view.height,
+    };
+};
+
+export const macroscopChannelFromId = (
+    id: string | undefined,
+    allChannels: MacroscopChannelView[] | undefined
+): MacroscopChannelView | undefined => {
+    if (id === undefined || !allChannels) return undefined;
+    return allChannels.find(m => m.id === id);
+};
+
+export const macroscopEvtPlaceListDtoToView = (dto: MacroscopEvtPlaceListDto,
+    channels?: MacroscopChannelView[],
+): MacroscopEvtPlaceView => {
+    return {
+        id: dto.id,
+        type: 'Macroscop',
+        name: dto.name,
+        internalName: dto.internalName,
+        internalId: dto.internalId,
+        channelId: dto.channelId,
+        channelName: macroscopChannelFromId(dto?.channelId, channels)?.name,
+        zoneInfo: undefined,
+        used: dto.used,
+        actual: false,
+        present: dto.present,
+        deleted: dto.deleted,
+        evtMode: dto.evtMode,
+    } as MacroscopEvtPlaceView;
+};
+
+export const macroscopEvtPlaceDtoToView = (dto: MacroscopEvtPlaceDto,
+    channels?: MacroscopChannelView[],): MacroscopEvtPlaceView => {
+    return {
+        id: dto.id,
+        type: dto.type,
+        name: dto.name,
+        channelId: dto.channelId,
+        channelName: macroscopChannelFromId(dto?.channelId, channels)?.name,
+        internalName: dto.internalName,
+        internalId: dto.internalId,
+        zoneInfo: macroscopZoneInfoDtoToView(dto.zoneInfo),
+        used: dto.used,
+        actual: dto.actual,
+        present: dto.present,
+        deleted: dto.deleted,
+        evtMode: dto.evtMode,
+    } as MacroscopEvtPlaceView;
+};
+
+export const macroscopEvtPlaceViewToDto = (
+    view: MacroscopEvtPlaceView
+): MacroscopEvtPlaceDto => {
+    return {
+        id: view.id,
+        type: view.type,
+        name: view.name,
+        internalName: view.internalName,
+        internalId: view.internalId,
+        channelId: view.channelId,
+        zoneInfo: macroscopZoneInfoViewToDto(view.zoneInfo),
+        used: view.used,
+        actual: view.actual,
+        present: view.present,
+        deleted: view.deleted,
+        evtMode: view.evtMode,
+    };
+};
+
+
+

@@ -8,44 +8,42 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatIconModule } from '@angular/material/icon';
-import { DialogService, isNewItem, isNotFullLoadedItem, MacroscopChannelListDto } from '@mon3/sc';
-import { MacroscopImgPlaceView } from '../../macroscop-view.models';
-import { MatSelectModule } from '@angular/material/select';
+import { DialogService, isNewItem, isNotFullLoadedItem } from '@mon3/sc';
+import { MacroscopEvtPlaceView } from '../../macroscop-view.models';
+import { MacroscopZoneInfoPipe } from '../../../../pipes/macroscop-zone-info.pipe';
 
 @Component({
-  selector: 'app-macroscop-place-inplace-editor',
+  selector: 'app-macroscop-evt-place-inplace-editor',
   standalone: true,
   imports: [
     CommonModule, ReactiveFormsModule,
-    MatFormFieldModule, MatInputModule, MatCheckboxModule,
-    MatIconModule, MatButtonModule, MatSelectModule,
+    MatFormFieldModule, MatInputModule, MatCheckboxModule, MatIconModule, MatButtonModule,
+    MacroscopZoneInfoPipe,
   ],
-  templateUrl: './macroscop-place-inplace-editor.component.html',
-  styleUrl: './macroscop-place-inplace-editor.component.scss'
+  templateUrl: './macroscop-evt-place-inplace-editor.component.html',
+  styleUrl: './macroscop-evt-place-inplace-editor.component.scss'
 })
-export class MacroscopPlaceInplaceEditorComponent implements OnInit {
-  placeData = input.required<MacroscopImgPlaceView>();
-  loadItemFn = input<(item: MacroscopImgPlaceView) => Observable<MacroscopImgPlaceView | undefined>>();
-  freeChannels = input<MacroscopChannelListDto[]>([]);
+export class MacroscopEvtPlaceInplaceEditorComponent implements OnInit {
+  placeData = input.required<MacroscopEvtPlaceView>();
+  loadItemFn = input<(item: MacroscopEvtPlaceView) => Observable<MacroscopEvtPlaceView | undefined>>();
   get isNew(): boolean { return isNewItem(this.data); }
 
-  change = output<MacroscopImgPlaceView>();
-  loaded = output<MacroscopImgPlaceView>();
-  restoreDeleted = output<MacroscopImgPlaceView>();
-  screenshotRequested = output<{ mode: 'current' | 'archive'; place: MacroscopImgPlaceView }>();
+  change = output<MacroscopEvtPlaceView>();
+  loaded = output<MacroscopEvtPlaceView>();
+  restoreDeleted = output<MacroscopEvtPlaceView>();
+  screenshotRequested = output<{ mode: 'current' | 'archive'; place: MacroscopEvtPlaceView }>();
 
   private readonly fb = inject(FormBuilder);
   private readonly destroyRef = inject(DestroyRef);
   private readonly dialogService = inject(DialogService);
 
   form!: FormGroup;
-  data!: MacroscopImgPlaceView;
+  data!: MacroscopEvtPlaceView;
 
-  canDelete = (): boolean => isNewItem(this.data);
+
 
   get present(): boolean { return this.form?.get('present')?.value ?? false; }
   get deleted(): boolean { return this.form?.get('deleted')?.value ?? false; }
-  get showChannelSelect(): boolean { return this.isNew && !this.form?.get('macroscopId')?.value; }
 
   ngOnInit(): void {
     this.data = this.placeData();
@@ -58,9 +56,10 @@ export class MacroscopPlaceInplaceEditorComponent implements OnInit {
     const isDeleted = this.data.deleted === true;
     this.form = this.fb.group({
       name: [{ value: this.data.name ?? '', disabled: false }],
-      internalName: [{ value: this.data.internalName ?? '', disabled: false }],
-      macroscopId: [{ value: this.data.macroscopId ?? '', disabled: false }],
       channelId: [{ value: this.data.channelId ?? '', disabled: false }],
+      channelName: [{ value: this.data.channelName ?? '', disabled: false }],
+      internalId: [{ value: this.data.internalId ?? '', disabled: false }],
+      internalName: [{ value: this.data.internalName ?? '', disabled: false }],
       placeId: [{ value: this.data.id ?? '', disabled: true }],
       used: [{ value: this.data.used ?? false, disabled: isDeleted }],
       present: [{ value: this.data.present ?? false, disabled: true }],
@@ -72,9 +71,10 @@ export class MacroscopPlaceInplaceEditorComponent implements OnInit {
     const isDeleted = this.data.deleted === true;
     this.form.patchValue({
       name: this.data.name ?? '',
-      internalName: this.data.internalName ?? '',
-      macroscopId: this.data.macroscopId ?? '',
       channelId: this.data.channelId ?? '',
+      channelName: this.data.channelName ?? '',
+      internalId: this.data.internalId ?? '',
+      internalName: this.data.internalName ?? '',
       placeId: this.data.id ?? '',
       used: this.data.used ?? false,
       present: this.data.present ?? false,
@@ -104,20 +104,15 @@ export class MacroscopPlaceInplaceEditorComponent implements OnInit {
   }
 
   private listenToChanges(): void {
-
     const emitChange = (): void => {
       const values = this.form.getRawValue();
-      const updated: MacroscopImgPlaceView = {
+      const updated: MacroscopEvtPlaceView = {
         ...this.data,
         name: values.name,
-        internalName: values.internalName,
-        macroscopId: values.macroscopId,
-        channelId: values.channelId,
-        present: values.present,
         used: values.used,
       };
       this.change.emit(updated);
-    }
+    };
 
     this.form.valueChanges
       .pipe(
@@ -127,18 +122,6 @@ export class MacroscopPlaceInplaceEditorComponent implements OnInit {
         takeUntilDestroyed(this.destroyRef)
       )
       .subscribe(() => emitChange());
-    this.form.get('macroscopId')!.valueChanges
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((macroscopId: string) => {
-        if (!macroscopId) return;
-        const ch = this.freeChannels().find(c => c.macroscopId === macroscopId);
-        if (!ch) return;
-        this.form.patchValue({ internalName: ch.name ?? '' }, { emitEvent: false });
-        this.form.patchValue({ name: ch.name ?? '' }, { emitEvent: false });
-        this.form.patchValue({ present: ch.exists ?? false }, { emitEvent: false });
-        this.form.patchValue({ channelId: ch.id }, { emitEvent: false });
-        emitChange();
-      });
   }
 
   callRestore(): void {
@@ -148,7 +131,6 @@ export class MacroscopPlaceInplaceEditorComponent implements OnInit {
       }
     });
   }
-
 
   callGetCurrentScreenshot(): void {
     this.screenshotRequested.emit({ mode: 'current', place: this.placeData() });

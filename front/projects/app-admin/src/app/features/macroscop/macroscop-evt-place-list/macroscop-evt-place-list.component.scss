@@ -1,0 +1,38 @@
+:host {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.mat-mdc-table .mat-column-expand {
+    flex: 0 0 3rem !important;
+    width: 3rem !important;
+    min-width: 3rem !important;
+    max-width: 3rem !important;
+    padding-left: 4px !important;
+    padding-right: 4px !important;
+    text-align: center;
+
+    .deleted-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+        line-height: 18px;
+        color: var(--warn-color, #f44336);
+        vertical-align: middle;
+    }
+}
+
+.mat-mdc-table .mat-column-used {
+    flex: 0 0 4rem !important;
+    width: 4rem !important;
+    min-width: 4rem !important;
+    max-width: 6rem !important;
+    white-space: nowrap;
+}
+
+.mat-column-name,
+.mat-column-internalName,
+.mat-column-channelName {
+    min-width: 15rem;
+}

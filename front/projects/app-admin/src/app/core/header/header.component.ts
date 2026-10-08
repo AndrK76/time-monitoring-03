@@ -79,6 +79,7 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewInit {
           label: 'События', route: '/evt',
           children: [
             { label: 'Агенты', route: '/evt/agent-list' },
+            { label: 'Места', route: '/evt/place-list' },
             {
               label: 'Macroscop', route: '/macroscop',
               children: [

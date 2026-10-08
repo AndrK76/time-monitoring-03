@@ -189,7 +189,7 @@
 |   |                           |   |-- service
 |   |                           |   |   `-- MacroscopApiClient.java
 |   |                           |   `-- utils
-|   |                           |       `-- MacroscopParseUtils.java
+|   |                           |       `-- MacroscopUtils.java
 |   |                           `-- service
 |   |                               `-- manage
 |   |                                   `-- MSCPConfigManageService.java
@@ -445,7 +445,8 @@
 |   |           |       |-- V01.25__add_license_and_product_to_macroscop_configs.sql
 |   |           |       |-- V01.26__add_event_mode_to_macroscop_evt_agent_configs.sql
 |   |           |       |-- V01.27__add_macroscop_evt_places_columns.sql
-|   |           |       `-- V01.28__replace_available_with_used_in_evt_places.sql
+|   |           |       |-- V01.28__replace_available_with_used_in_evt_places.sql
+|   |           |       `-- V01.29__add_search_depth_to_macroscop_evt_agent_configs.sql
 |   |           `-- application.yml
 |   |-- .properties
 |   `-- pom.xml
@@ -551,4 +552,4 @@
 |-- pom.xml
 `-- tree.txt
 
-198 directories, 353 files
+198 directories, 354 files

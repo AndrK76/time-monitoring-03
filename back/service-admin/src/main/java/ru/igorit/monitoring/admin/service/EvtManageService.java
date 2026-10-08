@@ -11,19 +11,18 @@ import ru.igorit.monitoring.admin.mapper.EventCommandMapper;
 import ru.igorit.monitoring.admin.mapper.EvtModelMapper;
 import ru.igorit.monitoring.common.dto.command.auth.OrganizationInfoChangedEventCommandDto;
 import ru.igorit.monitoring.common.enums.command.CommandMessageType;
-import ru.igorit.monitoring.lib.dto.evt.EvtAgentConfigDto;
-import ru.igorit.monitoring.lib.dto.evt.EvtAgentItemDto;
-import ru.igorit.monitoring.lib.dto.evt.EvtAgentListDto;
-import ru.igorit.monitoring.lib.dto.evt.EvtAgentTypeDto;
+import ru.igorit.monitoring.lib.dto.evt.*;
 import ru.igorit.monitoring.lib.enums.EvtAgentType;
 import ru.igorit.monitoring.lib.persistence.entity.common.Organization;
-import ru.igorit.monitoring.lib.persistence.entity.evt.EvtAgentListProjection;
 import ru.igorit.monitoring.lib.persistence.entity.evt.EvtAgent;
+import ru.igorit.monitoring.lib.persistence.entity.evt.EvtAgentListProjection;
 import ru.igorit.monitoring.lib.persistence.entity.macroscop.MacroscopEvtAgent;
 import ru.igorit.monitoring.lib.persistence.entity.macroscop.MacroscopEvtAgentConfig;
 import ru.igorit.monitoring.lib.persistence.repository.common.OrganizationRepository;
 import ru.igorit.monitoring.lib.persistence.repository.evt.EvtAgentConfigRepository;
 import ru.igorit.monitoring.lib.persistence.repository.evt.EvtAgentRepository;
+import ru.igorit.monitoring.lib.persistence.repository.evt.EvtPlaceRepository;
+import ru.igorit.monitoring.lib.persistence.repository.img.ImgPlaceRepository;
 import ru.igorit.monitoring.rabbit.service.CommandSender;
 import ru.igorit.monitoring.security.util.SecurityAccessUtils;
 
@@ -39,6 +38,7 @@ public class EvtManageService {
     private final EvtModelMapper evtModelMapper;
     private final EvtAgentRepository agentRepo;
     private final EvtAgentConfigRepository cfgRepo;
+    private final EvtPlaceRepository placeRepo;
     private final OrganizationRepository commonOrgRepo;
     private final SecurityAccessUtils sa;
     private final CommandSender commandSender;
@@ -177,6 +177,17 @@ public class EvtManageService {
     @PreAuthorize("@securityAccessUtils.isSuperUser()")
     public EvtAgentItemDto bindAgent(String agentId, String orgId) {
         return evtModelMapper.toDto(_bindAgent(agentId, orgId));
+    }
+
+    @Transactional(readOnly = true)
+    @PreAuthorize("@securityAccessUtils.isAllowedAllActions()")
+    public List<EvtPlaceListDto> getPlacesForAgent(String agentId) {
+        getAgent(agentId);
+        return placeRepo.findByAgentId(agentId).stream()
+                .filter(f->!Boolean.TRUE.equals(f.getDeleted()))
+                .map(evtModelMapper::toListDto)
+                .sorted(Comparator.comparing(EvtPlaceListDto::getName).thenComparing(EvtPlaceListDto::getId))
+                .toList();
     }
 
     @Transactional

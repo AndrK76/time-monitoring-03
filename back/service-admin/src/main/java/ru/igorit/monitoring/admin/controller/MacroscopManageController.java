@@ -14,7 +14,6 @@ import ru.igorit.monitoring.lib.dto.macroscop.*;
 import ru.igorit.monitoring.lib.persistence.entity.macroscop.MacroscopEvtAgentMode;
 
 import java.time.OffsetDateTime;
-import java.time.ZonedDateTime;
 import java.util.List;
 
 @RestController
@@ -35,7 +34,6 @@ public class MacroscopManageController {
         return service.updateEvtConfig(agentId, dto);
     }
 
-
     @PutMapping(value = "/evt-configs/{id}/bind", params = {"cfg"})
     public MacroscopEvtAgentConfigDto bindEvtToConfig(@PathVariable("id") String agentId,
                                                       @RequestParam(name = "cfg") String configId) {
@@ -46,6 +44,7 @@ public class MacroscopManageController {
     public MacroscopEvtAgentConfigDto unbindEvtFromConfig(@PathVariable("id") String agentId) {
         return service.unbindEvtConfig(agentId);
     }
+
 
     @GetMapping({"/img-configs/{id}"})
     public MacroscopImgAgentConfigDto getImgConfig(@PathVariable("id") String agentId) {
@@ -58,7 +57,6 @@ public class MacroscopManageController {
         return service.updateImgConfig(agentId, dto);
     }
 
-
     @PutMapping(value = "/img-configs/{id}/bind", params = {"cfg"})
     public MacroscopImgAgentConfigDto bindImgToConfig(@PathVariable("id") String agentId,
                                                       @RequestParam(name = "cfg") String configId) {
@@ -68,6 +66,49 @@ public class MacroscopManageController {
     @PutMapping(value = "/img-configs/{id}/unbind")
     public MacroscopImgAgentConfigDto unbindImgFromConfig(@PathVariable("id") String agentId) {
         return service.unbindImgConfig(agentId);
+    }
+
+
+    @GetMapping(value = {"/evt-agents/{id}/places"})
+    public List<MacroscopEvtPlaceListDto> getEvtPlacesForAgent(
+            @PathVariable(name = "id") String agentId,
+            @RequestParam(name = "show-deleted", required = false, defaultValue = "false") boolean showDeleted) {
+        return service.getEvtPlacesForAgent(agentId, showDeleted);
+    }
+
+    @PostMapping("/evt-agents/{id}/places")
+    public MacroscopEvtPlaceDto addEvtPlaceByAgent(
+            @PathVariable(name = "id") String agentId,
+            @Valid @RequestBody MacroscopEvtPlaceDto dto) {
+        return service.addEvtPlaceByAgent(agentId, dto);
+    }
+
+    @GetMapping("/evt-agents/{id}/actual-channels")
+    public List<MacroscopChannelListDto> getActualChannelsForEvtAgent(@PathVariable(name = "id") String agentId) {
+        return service.getActualChannelsForEvtAgent(agentId);
+    }
+
+    @GetMapping("/evt-places/{id}")
+    public MacroscopEvtPlaceDto getEvtPlace(@PathVariable(name = "id") String id) {
+        return service.getEvtPlace(id);
+    }
+
+    @PutMapping("/evt-places/{id}")
+    public MacroscopEvtPlaceDto updateEvtPlace(
+            @PathVariable(name = "id") String id,
+            @Valid @RequestBody MacroscopEvtPlaceDto dto) {
+        return service.updateEvtPlace(id, dto);
+    }
+
+    @DeleteMapping("/evt-places/{id}")
+    public ResponseEntity<?> deleteEvtPlace(@PathVariable(name = "id") String id) {
+        service.markEvtPlaceAsDeleted(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/evt-places/{id}/restore-deleted")
+    public MacroscopEvtPlaceDto restoreEvtPlace(@PathVariable(name = "id") String id) {
+        return service.restoreDeletedEvtPlace(id);
     }
 
     @GetMapping(value = {"/img-agents/{id}/places"})
@@ -86,23 +127,12 @@ public class MacroscopManageController {
 
     @GetMapping("/img-agents/{id}/actual-channels")
     public List<MacroscopChannelListDto> getActualChannelsForAgent(@PathVariable(name = "id") String agentId) {
-        return service.getActualChannelsForAgent(agentId);
+        return service.getActualChannelsForImgAgent(agentId);
     }
 
     @GetMapping("/img-places/{id}")
     public MacroscopImgPlaceDto getImgPlace(@PathVariable(name = "id") String id) {
         return service.getImgPlace(id);
-    }
-
-    @DeleteMapping("/img-places/{id}")
-    public ResponseEntity<?> deleteImgPlace(@PathVariable(name = "id") String id) {
-        service.markPlaceAsDeleted(id);
-        return ResponseEntity.noContent().build();
-    }
-
-    @PutMapping("/img-places/{id}/restore-deleted")
-    public MacroscopImgPlaceDto restoreImgPlace(@PathVariable(name = "id") String id) {
-        return service.restoreDeletedPlace(id);
     }
 
     @PutMapping("/img-places/{id}")
@@ -111,6 +141,18 @@ public class MacroscopManageController {
             @Valid @RequestBody MacroscopImgPlaceDto dto) {
         return service.updateImgPlace(id, dto);
     }
+
+    @DeleteMapping("/img-places/{id}")
+    public ResponseEntity<?> deleteImgPlace(@PathVariable(name = "id") String id) {
+        service.markImgPlaceAsDeleted(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/img-places/{id}/restore-deleted")
+    public MacroscopImgPlaceDto restoreImgPlace(@PathVariable(name = "id") String id) {
+        return service.restoreDeletedImgPlace(id);
+    }
+
 
     @GetMapping({"/configs", "/configs/"})
     public List<MacroscopAgentConfigListDto> getConfigs() {
@@ -152,6 +194,7 @@ public class MacroscopManageController {
         return service.updateChannelsForConfig(configId, dto);
     }
 
+
     @GetMapping({"/event-types", "/event-types/"})
     public List<MacroscopEventTypeDto> getEventTypes() {
         return service.getEventTypes();
@@ -164,9 +207,9 @@ public class MacroscopManageController {
     }
 
 
-    @GetMapping("/misc/configs/{id}/server-info")
-    public MacroscopDataResponse<MacroscopServerInfoDto> getServerInfo(@PathVariable("id") String configId) {
-        return service.getServerInfo(configId);
+    @GetMapping("/misc/archive-modes")
+    public List<MacroscopArchiveModeDto> getArchiveModes() {
+        return service.getArchiveModes();
     }
 
     @GetMapping("/misc/activity-event-types")
@@ -174,14 +217,14 @@ public class MacroscopManageController {
         return service.getActivityEventTypes();
     }
 
-    @GetMapping("/misc/archive-modes")
-    public List<MacroscopArchiveModeDto> getArchiveModes() {
-        return service.getArchiveModes();
-    }
-
     @GetMapping("/misc/evt-agent-modes")
     public List<MacroscopEvtAgentModeDto> getEvtAgentModes() {
         return service.getEvtAgentModes();
+    }
+
+    @GetMapping("/misc/configs/{id}/server-info")
+    public MacroscopDataResponse<MacroscopServerInfoDto> getServerInfo(@PathVariable("id") String configId) {
+        return service.getServerInfo(configId);
     }
 
     @PostMapping("/misc/server-info")

@@ -127,3 +127,42 @@ export interface MacroscopEventTypeDto {
     name?: string;
     activityTypeId?: string;
 }
+
+export interface MacroscopEvtPlaceListDto {
+    id: string;
+    name: string;
+    channelId: string;
+    internalName: string;
+    internalId: string;
+    evtMode?: string;
+    used: boolean;
+    present: boolean;
+    deleted: boolean;
+}
+
+export interface MacroscopEvtPlaceDto {
+    id: string;
+    type: string;
+    name: string;
+    internalName: string;
+    internalId: string;
+    evtMode?: string;
+    channelId: string;
+    zoneInfo?: MacroscopZoneInfoDto;
+    used: boolean;
+    actual: boolean;
+    present: boolean;
+    deleted: boolean;
+}
+
+export interface MacroscopZoneInfoDto {
+    left?: number;
+    top?: number;
+    width?: number;
+    height?: number;
+}
+
+export interface MacroscopEvtActionPlacesResponseDto {
+    lastTime?: string;
+    places: MacroscopEvtPlaceDto[];
+}

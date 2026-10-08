@@ -8,7 +8,7 @@ import { Observable, map, finalize } from 'rxjs';
 import { ErrorResponseResult, processResponseError } from '@mon3/sa';
 import { EvtAgentConfigDto, EvtAgentListDto } from '@mon3/sc';
 
-import { EvtStructManageService } from '../../../services/evt-struct-manage.service';
+import { EvtStructManageService } from '../../../../services/evt-struct-manage.service';
 
 @Component({
   selector: 'app-evt-agent-config',

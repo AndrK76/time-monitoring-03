@@ -7,12 +7,16 @@ import {
     MacroscopChannelStreamDto,
     MacroscopCredentialsDto,
     MacroscopEventTypeDto,
+    MacroscopEvtActionPlacesResponseDto,
     MacroscopEvtAgentConfigDto,
     MacroscopEvtAgentModeDto,
+    MacroscopEvtPlaceDto,
+    MacroscopEvtPlaceListDto,
     MacroscopImgAgentConfigDto,
     MacroscopImgPlaceDto,
     MacroscopImgPlaceListDto,
     MacroscopServerInfoDto,
+    MacroscopZoneInfoDto,
 } from '@mon3/sc';
 
 export class MacroscopCredentialsView implements MacroscopCredentialsDto {
@@ -145,4 +149,47 @@ export class MacroscopEventTypeView implements MacroscopEventTypeDto {
         public activityTypeId: string | undefined,
         public activityType: MacroscopActivityEventTypeView | undefined,
     ) { }
+}
+
+export class MacroscopZoneInfoView implements MacroscopZoneInfoDto {
+    constructor(
+        public left?: number,
+        public top?: number,
+        public width?: number,
+        public height?: number,
+    ) { }
+}
+
+export class MacroscopEvtPlaceListView implements MacroscopEvtPlaceListDto {
+    constructor(
+        public id: string,
+        public name: string,
+        public channelId: string,
+        public channelName: string,
+        public internalName: string,
+        public internalId: string,
+        public used: boolean,
+        public present: boolean,
+        public deleted: boolean,
+        public evtMode?: string,
+    ) { }
+}
+
+export class MacroscopEvtPlaceView implements MacroscopEvtPlaceDto {
+    constructor(
+        public id: string,
+        public type: string,
+        public name: string,
+        public channelId: string,
+        public channelName: string,
+        public internalName: string,
+        public internalId: string,
+        public used: boolean,
+        public actual: boolean,
+        public present: boolean,
+        public deleted: boolean,
+        public zoneInfo?: MacroscopZoneInfoView,
+        public evtMode?: string,
+    ) { }
+    undeleted?: boolean;
 }

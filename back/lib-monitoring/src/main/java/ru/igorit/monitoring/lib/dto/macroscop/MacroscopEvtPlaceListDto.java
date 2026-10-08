@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 public class MacroscopEvtPlaceListDto {
     private String id;
     private String name;
+    private String channelId;
     private String internalName;
     private String internalId;
     private String evtMode;

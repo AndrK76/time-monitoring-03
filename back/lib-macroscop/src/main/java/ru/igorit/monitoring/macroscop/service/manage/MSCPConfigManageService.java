@@ -17,10 +17,7 @@ import ru.igorit.monitoring.macroscop.api.service.MacroscopApiClient;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.lang.Boolean.FALSE;
@@ -267,7 +264,7 @@ public class MSCPConfigManageService {
                                 .deleted(false)
                                 .type(EvtAgentType.Macroscop.name())
                                 .evtMode(MacroscopEvtAgentMode.byMovingDetector.name())
-                                .build()).toList());
+                                .build()).sorted().toList());
             } else {
                 ret.setData(List.of());
                 log.warn("_parsePlacesFromChannelSettings enabled={} detector={} generate={}", enabled, detectorEnabled, generateEventEnabled);
@@ -296,6 +293,10 @@ public class MSCPConfigManageService {
             done = end == null;
         }
         if (ret.isSuccess() && ret.getData() != null) {
+            var places = ret.getData().getPlaces();
+            if (places != null && !places.isEmpty()) {
+                places.sort(Comparator.naturalOrder());
+            }
             ret.getData().setLastTime(start.minusSeconds(1L));
         }
         return ret;
@@ -378,7 +379,6 @@ public class MSCPConfigManageService {
                             .actual(true)
                             .present(true)
                             .deleted(false)
-                            .used(true)
                             .build();
 
                     ret.getData().getPlaces().add(place);

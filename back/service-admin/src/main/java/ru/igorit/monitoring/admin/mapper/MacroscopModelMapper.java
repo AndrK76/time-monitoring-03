@@ -7,6 +7,7 @@ import org.mapstruct.Named;
 import ru.igorit.monitoring.common.util.Md5Hasher;
 import ru.igorit.monitoring.common.util.TimeUtils;
 import ru.igorit.monitoring.lib.dto.macroscop.*;
+import ru.igorit.monitoring.lib.enums.EvtAgentType;
 import ru.igorit.monitoring.lib.persistence.entity.macroscop.*;
 
 import java.time.OffsetDateTime;
@@ -63,6 +64,16 @@ public interface MacroscopModelMapper {
 
     MacroscopChannelStream fromDto(MacroscopChannelStreamDto dto);
 
+    @Mapping(target = "evtMode",      ignore = true)
+    @Mapping(target = "channelId", source = "item.channel.id")
+    MacroscopEvtPlaceListDto toListDto(MacroscopEvtPlace item);
+
+    @Mapping(target = "channelId",    source = "channel.id")
+    @Mapping(target = "type",         source = "type", qualifiedByName = "evtAgentTypeToString")
+    @Mapping(target = "evtMode",      ignore = true)
+    MacroscopEvtPlaceDto toDto(MacroscopEvtPlace item);
+
+
     MacroscopImgPlaceListDto toListDto(MacroscopImgPlace item);
 
     @Mapping(target = "macroscopId", source = "origChannelId")
@@ -116,6 +127,11 @@ public interface MacroscopModelMapper {
 
     @Named("activityEventTypeToString")
     default String activityEventTypeToString(MacroscopActivityEventType type) {
+        return type == null ? null : type.name();
+    }
+
+    @Named("evtAgentTypeToString")
+    default String evtAgentTypeToString(EvtAgentType type) {
         return type == null ? null : type.name();
     }
 
