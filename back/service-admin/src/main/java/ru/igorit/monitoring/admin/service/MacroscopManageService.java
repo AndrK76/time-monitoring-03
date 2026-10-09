@@ -27,6 +27,7 @@ public interface MacroscopManageService {
     MacroscopEvtPlaceDto updateEvtPlace(String id, MacroscopEvtPlaceDto dto);
     void markEvtPlaceAsDeleted(String id);
     MacroscopEvtPlaceDto restoreDeletedEvtPlace(String id);
+    void applyZoneChangeAt(String placeId, MacroscopZoneInfoDto newInfo, ZonedDateTime at);
 
     //img-places (/img-agents/{}/img-places)
     List<MacroscopImgPlaceListDto> getImgPlacesForAgent(String agentId, boolean showDeleted);

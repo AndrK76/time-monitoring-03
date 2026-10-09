@@ -31,7 +31,8 @@ public class MacroscopEvtPlace extends EvtPlace {
     @Column(name = "macroscop_zone_name", nullable = false, length = 255)
     private String macroscopZoneName;
 
-    @Embedded
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST, optional = true)
+    @JoinColumn(name = "current_zone_id")
     private MacroscopZoneInfo zoneInfo;
 
     @Override

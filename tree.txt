@@ -336,7 +336,8 @@
 |   |   |                                   |   |-- MacroscopEvtPlaceRepository.java
 |   |   |                                   |   |-- MacroscopImgAgentConfigRepository.java
 |   |   |                                   |   |-- MacroscopImgAgentRepository.java
-|   |   |                                   |   `-- MacroscopImgPlaceRepository.java
+|   |   |                                   |   |-- MacroscopImgPlaceRepository.java
+|   |   |                                   |   `-- MacroscopZoneInfoRepository.java
 |   |   |                                   `-- yclients
 |   |   |                                       |-- YClientsAgentConfigRepository.java
 |   |   |                                       |-- YClientsAgentRepository.java
@@ -447,7 +448,8 @@
 |   |   |           |       |-- V01.26__add_event_mode_to_macroscop_evt_agent_configs.sql
 |   |   |           |       |-- V01.27__add_macroscop_evt_places_columns.sql
 |   |   |           |       |-- V01.28__replace_available_with_used_in_evt_places.sql
-|   |   |           |       `-- V01.29__add_search_depth_to_macroscop_evt_agent_configs.sql
+|   |   |           |       |-- V01.29__add_search_depth_to_macroscop_evt_agent_configs.sql
+|   |   |           |       `-- V01.30__extract_zone_info_from_evt_places.sql
 |   |   |           `-- application.yml
 |   |   |-- .properties
 |   |   `-- pom.xml
@@ -785,6 +787,10 @@
 |   |   |   |   |   |   |   |   |-- macroscop-evt-editor-container.component.scss
 |   |   |   |   |   |   |   |   `-- macroscop-evt-editor-container.component.ts
 |   |   |   |   |   |   |   |-- macroscop-evt-place-list
+|   |   |   |   |   |   |   |   |-- macroscop-evt-place-add-dialog
+|   |   |   |   |   |   |   |   |   |-- macroscop-evt-place-add-dialog.component.html
+|   |   |   |   |   |   |   |   |   |-- macroscop-evt-place-add-dialog.component.scss
+|   |   |   |   |   |   |   |   |   `-- macroscop-evt-place-add-dialog.component.ts
 |   |   |   |   |   |   |   |   |-- macroscop-evt-place-inplace-editor
 |   |   |   |   |   |   |   |   |   |-- macroscop-evt-place-inplace-editor.component.html
 |   |   |   |   |   |   |   |   |   |-- macroscop-evt-place-inplace-editor.component.scss
@@ -1166,4 +1172,4 @@
 |-- README.md
 `-- tree.txt
 
-373 directories, 793 files
+374 directories, 798 files

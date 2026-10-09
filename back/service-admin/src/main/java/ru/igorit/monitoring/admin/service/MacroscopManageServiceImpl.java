@@ -29,6 +29,7 @@ import java.util.stream.Stream;
 
 import static java.lang.Boolean.TRUE;
 import static ru.igorit.monitoring.lib.persistence.entity.macroscop.MacroscopEvtAgentConfig.DEFAULT_SEARCH_DEPTH_IN_HOURS;
+import static ru.igorit.monitoring.lib.persistence.entity.macroscop.MacroscopZoneInfo._zoneDiffers;
 import static ru.igorit.monitoring.macroscop.api.config.MacroscopApiConstants.ALT_STREAM;
 import static ru.igorit.monitoring.macroscop.api.config.MacroscopApiConstants.MAIN_STREAM;
 import static ru.igorit.monitoring.security.util.AuthInfoUtils.extractUserId;
@@ -50,6 +51,7 @@ public class MacroscopManageServiceImpl implements MacroscopManageService {
     private final MacroscopAgentConfigRepository configRepo;
     private final MacroscopChannelRepository channelRepo;
     private final MacroscopEventTypeRepository eventTypeRepo;
+    private final MacroscopZoneInfoRepository zoneInfoRepo;
     private final ImgManageService imgService;
     private final EvtManageService evtService;
     private final SecurityAccessUtils sa;
@@ -286,10 +288,7 @@ public class MacroscopManageServiceImpl implements MacroscopManageService {
         ret.setDeleted(false);
         ret.setMacroscopZoneId(dto.getInternalId());
         ret.setMacroscopZoneName(dto.getInternalName());
-        if (dto.getZoneInfo() != null) {
-            var info = dto.getZoneInfo();
-            ret.setZoneInfo(new MacroscopZoneInfo(info.getLeft(), info.getTop(), info.getWidth(), info.getHeight()));
-        }
+        _applyZoneChange(ret, dto.getZoneInfo(), ZonedDateTime.now());
         ret = evtPlaceRepo.saveAndFlush(ret);
         var res = mapper.toDto(ret);
         res.setEvtMode(cfg.getMode() == null ? MacroscopEvtAgentMode.unknown.name() : cfg.getMode().name());
@@ -338,6 +337,7 @@ public class MacroscopManageServiceImpl implements MacroscopManageService {
         }
         ret.setName(dto.getName());
         ret.setUsed(dto.isUsed());
+        _applyZoneChange(ret, dto.getZoneInfo(), ZonedDateTime.now());
         ret.setUpdatedBy(extractUserId(getCurrentAuth()));
         ret = evtPlaceRepo.saveAndFlush(ret);
         var res = mapper.toDto(ret);
@@ -371,6 +371,15 @@ public class MacroscopManageServiceImpl implements MacroscopManageService {
         var res =  mapper.toDto(place);
         res.setEvtMode(cfg.getMode() == null ? MacroscopEvtAgentMode.unknown.name() : cfg.getMode().name());
         return res;
+    }
+
+    @Override
+    @Transactional
+    public void applyZoneChangeAt(String placeId, MacroscopZoneInfoDto newInfo, ZonedDateTime at) {
+        var place = evtPlaceRepo.findById(placeId).orElseThrow(() ->
+                new ResponseStatusException(HttpStatus.NOT_FOUND, "place not found"));
+        _applyZoneChange(place, newInfo, at);
+        evtPlaceRepo.saveAndFlush(place);
     }
 
 
@@ -1067,6 +1076,34 @@ public class MacroscopManageServiceImpl implements MacroscopManageService {
                     .collect(Collectors.toMap(MacroscopEventType::getType, MacroscopEventType::getId)));
         }
         return eventTypeIds;
+    }
+
+    private void _applyZoneChange(MacroscopEvtPlace place,
+                                  MacroscopZoneInfoDto newInfo,
+                                  ZonedDateTime at) {
+        var current = place.getZoneInfo();
+        var incoming = newInfo == null ? null
+                : new MacroscopZoneInfo(null, place,
+                newInfo.getLeft(), newInfo.getTop(),
+                newInfo.getWidth(), newInfo.getHeight(),
+                at, null);
+
+        if (current == null && incoming == null) return;
+        if (current != null && incoming != null && !_zoneDiffers(current, incoming)) return;
+
+        if (current != null) {
+            current.setValidTo(at);
+            zoneInfoRepo.saveAndFlush(current);
+        }
+
+        if (incoming != null) {
+            incoming.setPlace(place);
+            incoming.setValidFrom(at);
+            incoming.setValidTo(null);
+            place.setZoneInfo(incoming);
+        } else {
+            place.setZoneInfo(null);
+        }
     }
 
 }
