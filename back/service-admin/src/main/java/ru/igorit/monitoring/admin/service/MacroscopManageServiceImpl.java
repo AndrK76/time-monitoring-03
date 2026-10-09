@@ -27,6 +27,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static java.lang.Boolean.TRUE;
 import static ru.igorit.monitoring.lib.persistence.entity.macroscop.MacroscopEvtAgentConfig.DEFAULT_SEARCH_DEPTH_IN_HOURS;
 import static ru.igorit.monitoring.macroscop.api.config.MacroscopApiConstants.ALT_STREAM;
 import static ru.igorit.monitoring.macroscop.api.config.MacroscopApiConstants.MAIN_STREAM;
@@ -236,7 +237,7 @@ public class MacroscopManageServiceImpl implements MacroscopManageService {
         var modeName = cfg.getMode() == null ? MacroscopEvtAgentMode.unknown.name() : cfg.getMode().name();
 
         return evtPlaceRepo.findByAgentId(agentId).stream()
-                .filter(f -> showDeleted || !Boolean.TRUE.equals(f.getDeleted()))
+                .filter(f -> showDeleted || !TRUE.equals(f.getDeleted()))
                 .map(item -> {
                     var dto = mapper.toListDto(item);
                     dto.setEvtMode(modeName);
@@ -260,27 +261,35 @@ public class MacroscopManageServiceImpl implements MacroscopManageService {
         if (cfg.getConfig() == null) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Macroscop config for agent not bounded");
         }
-        if (evtPlaceRepo.findByAgentId(agentId).stream()
+        MacroscopEvtPlace ret = null;
+        var existed = evtPlaceRepo.findByAgentId(agentId);
+        if (existed.stream()
                 .anyMatch(f -> Objects.equals(dto.getInternalId(), f.getInternalId()))) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Place for channel with id=" + dto.getInternalId() + " already exists");
+            ret = evtPlaceRepo.findByMacroscopZoneId(dto.getInternalId()).orElseThrow();
+            if (!TRUE.equals(ret.getDeleted())) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Place for channel with id=" + dto.getInternalId() + " already exists");
+            }
+            ret.setUpdatedBy(extractUserId(getCurrentAuth()));
+        } else {
+            var channel = channelRepo.findByConfigIdAndId(cfg.getConfig().getId(), dto.getChannelId())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Channel not found"));
+            ret = new MacroscopEvtPlace();
+            ret.setAgent(agent);
+            ret.setCreatedBy(extractUserId(getCurrentAuth()));
+            ret.setPresent(channel.getExists() && channel.getEnabled());
+            ret.setUsed(channel.getUsed());
+            ret.setChannel(channel);
+            ret.setOrigChannelId(channel.getMacroscopId());
         }
-        var channel = channelRepo.findByConfigIdAndMacroscopId(cfg.getConfig().getId(), dto.getChannelId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Channel not found"));
-        var ret = new MacroscopEvtPlace();
+
         ret.setName(dto.getName() == null ? dto.getInternalName() : dto.getName());
-        ret.setAgent(agent);
-        ret.setPresent(channel.getExists() && channel.getEnabled());
         ret.setDeleted(false);
-        ret.setUsed(channel.getUsed());
-        ret.setChannel(channel);
-        ret.setOrigChannelId(channel.getMacroscopId());
         ret.setMacroscopZoneId(dto.getInternalId());
         ret.setMacroscopZoneName(dto.getInternalName());
         if (dto.getZoneInfo() != null) {
             var info = dto.getZoneInfo();
             ret.setZoneInfo(new MacroscopZoneInfo(info.getLeft(), info.getTop(), info.getWidth(), info.getHeight()));
         }
-        ret.setCreatedBy(extractUserId(getCurrentAuth()));
         ret = evtPlaceRepo.saveAndFlush(ret);
         var res = mapper.toDto(ret);
         res.setEvtMode(cfg.getMode() == null ? MacroscopEvtAgentMode.unknown.name() : cfg.getMode().name());
@@ -324,7 +333,7 @@ public class MacroscopManageServiceImpl implements MacroscopManageService {
         var ret = evtPlaceRepo.findById(id).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "place not found"));
         var cfg = _getEvtConfig(ret.getAgent().getId());
-        if (Boolean.TRUE.equals(ret.getDeleted())) {
+        if (TRUE.equals(ret.getDeleted())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Place deleted");
         }
         ret.setName(dto.getName());
@@ -353,7 +362,7 @@ public class MacroscopManageServiceImpl implements MacroscopManageService {
     public MacroscopEvtPlaceDto restoreDeletedEvtPlace(String id) {
         var place = evtPlaceRepo.findById(id).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "place not found"));
-        if (Boolean.TRUE.equals(place.getDeleted())) {
+        if (TRUE.equals(place.getDeleted())) {
             place.setDeleted(false);
             place.setUpdatedBy(extractUserId(getCurrentAuth()));
             place = evtPlaceRepo.saveAndFlush(place);
@@ -374,7 +383,7 @@ public class MacroscopManageServiceImpl implements MacroscopManageService {
         }
         imgService.getAgent(agentId);
         return imgPlaceRepo.findByAgentId(agentId).stream()
-                .filter(f -> showDeleted || !Boolean.TRUE.equals(f.getDeleted()))
+                .filter(f -> showDeleted || !TRUE.equals(f.getDeleted()))
                 .map(mapper::toListDto)
                 .sorted(Comparator.comparing(MacroscopImgPlaceListDto::getName).thenComparing(MacroscopImgPlaceListDto::getId))
                 .toList();
@@ -447,7 +456,7 @@ public class MacroscopManageServiceImpl implements MacroscopManageService {
         var ret = imgPlaceRepo.findById(id).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "place not found"));
         imgService.getAgent(ret.getAgent().getId());
-        if (Boolean.TRUE.equals(ret.getDeleted())) {
+        if (TRUE.equals(ret.getDeleted())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Place deleted");
         }
         ret.setName(dto.getName());
@@ -474,7 +483,7 @@ public class MacroscopManageServiceImpl implements MacroscopManageService {
     public MacroscopImgPlaceDto restoreDeletedImgPlace(String id) {
         var place = imgPlaceRepo.findById(id).orElseThrow(() ->
                 new ResponseStatusException(HttpStatus.NOT_FOUND, "place not found"));
-        if (Boolean.TRUE.equals(place.getDeleted())) {
+        if (TRUE.equals(place.getDeleted())) {
             place.setDeleted(false);
             place.setUpdatedBy(extractUserId(getCurrentAuth()));
             place = imgPlaceRepo.saveAndFlush(place);
@@ -557,7 +566,7 @@ public class MacroscopManageServiceImpl implements MacroscopManageService {
                     var dto = dtoMap.get(stored.getMacroscopId());
                     if (dto == null) return null;
                     if (!dto.isExists()) {
-                        if (!Boolean.TRUE.equals(stored.getExists())) return null;
+                        if (!TRUE.equals(stored.getExists())) return null;
                         stored.setExists(false);
                         stored.setUsed(false);
                         stored.setUpdatedBy(creatorId);
@@ -1011,14 +1020,14 @@ public class MacroscopManageServiceImpl implements MacroscopManageService {
             boolean dirty = false;
 
             // present = exists && enabled — та же формула, что в addImgPlaceByAgent
-            boolean newPresent = Boolean.TRUE.equals(ch.getExists())
-                    && Boolean.TRUE.equals(ch.getEnabled());
+            boolean newPresent = TRUE.equals(ch.getExists())
+                    && TRUE.equals(ch.getEnabled());
             if (!Objects.equals(place.getPresent(), newPresent)) {
                 place.setPresent(newPresent);
                 dirty = true;
             }
             if (Boolean.FALSE.equals(ch.getUsed())
-                    && Boolean.TRUE.equals(place.getUsed())) {
+                    && TRUE.equals(place.getUsed())) {
                 place.setUsed(false);
                 dirty = true;
             }

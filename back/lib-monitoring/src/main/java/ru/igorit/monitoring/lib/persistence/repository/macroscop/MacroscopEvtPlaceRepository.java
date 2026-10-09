@@ -6,10 +6,14 @@ import ru.igorit.monitoring.lib.persistence.entity.macroscop.MacroscopEvtPlace;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 public interface MacroscopEvtPlaceRepository extends JpaRepository<MacroscopEvtPlace, String> {
     @EntityGraph(attributePaths = "channel")
     List<MacroscopEvtPlace> findByAgentId(String agentId);
 
     List<MacroscopEvtPlace> findByChannelIdIn(Collection<String> channelIds);
+
+    @EntityGraph(attributePaths = "channel")
+    Optional<MacroscopEvtPlace> findByMacroscopZoneId(String id);
 }

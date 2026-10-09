@@ -9,3 +9,10 @@
     max-height: 70vh;
     display: block;
 }
+
+.screenshot-canvas {
+    max-width: 100%;
+    max-height: 80vh;
+    display: block;
+    object-fit: contain;
+}

@@ -7,17 +7,21 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTable, MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { catchError, finalize, forkJoin, map, Observable, of, switchMap, tap } from 'rxjs';
+import { catchError, config, finalize, forkJoin, map, Observable, of, switchMap, tap } from 'rxjs';
 import {
+  compareNullable,
   DialogService, FilterRootComponent, isExpanded, isNewItem, NotificationService,
-  SaveDataResult, TableActionsInformerService, TableFilterInfo, TableFilterListValue, TableFilterType, TableManageService,
+  SaveDataResult, ShowImageRectangle, TableActionsInformerService, TableFilterInfo, TableFilterListValue, TableFilterType, TableManageService,
 } from '@mon3/sc';
 import { processResponseError } from '@mon3/sa';
 
 import { MacroscopManageService } from '../../../services/macroscop-manage.service';
-import { MacroscopChannelView, MacroscopEvtAgentConfigView, MacroscopEvtPlaceView } from '../macroscop-view.models';
-import { macroscopChannelDtoToView, macroscopChannelListDtoToView, macroscopEvtAgentConfigDtoToView, macroscopEvtPlaceDtoToView, macroscopEvtPlaceListDtoToView, macroscopEvtPlaceViewToDto } from '../macroscop-view.utils';
+import { MacroscopChannelView, MacroscopEvtAgentConfigView, MacroscopEvtPlaceView, MacroscopZoneInfoView } from '../macroscop-view.models';
+import { macroscopChannelListDtoToView, macroscopEvtAgentConfigDtoToView, macroscopEvtPlaceDtoToView, macroscopEvtPlaceListDtoToView, macroscopEvtPlaceViewToDto } from '../macroscop-view.utils';
 import { MacroscopEvtPlaceInplaceEditorComponent } from './macroscop-evt-place-inplace-editor/macroscop-evt-place-inplace-editor.component';
+import { MatDialog } from '@angular/material/dialog';
+import { MacroscopEvtPlaceAddDialogComponent, MacroscopEvtPlaceAddDialogData, MacroscopEvtPlaceAddDialogResult } from './macroscop-evt-place-add-dialog/macroscop-evt-place-add-dialog.component';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-macroscop-evt-place-list',
@@ -37,6 +41,7 @@ export class MacroscopEvtPlaceListComponent implements OnInit, AfterViewInit {
   private readonly notificationService = inject(NotificationService);
   private readonly tableManager = inject(TableManageService<MacroscopEvtPlaceView>);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly matDialog = inject(MatDialog);
 
   agentId = input.required<string>();
   actions = input.required<TableActionsInformerService>();
@@ -157,9 +162,16 @@ export class MacroscopEvtPlaceListComponent implements OnInit, AfterViewInit {
       finalize(() => this.isLoading.set(false)),
     ).subscribe({
       next: ({ ctx, places }) => {
-        this.tableManager.setData(
-          places.map(dto => macroscopEvtPlaceListDtoToView(dto, ctx.channels)),
-        );
+        const sorted = places
+          .map(dto => macroscopEvtPlaceListDtoToView(dto, ctx.channels))
+          .sort((a, b) =>
+            compareNullable(a.name, b.name)
+            || compareNullable(a.channelName, b.channelName)
+            || compareNullable(a.channelId, b.channelId)
+            || compareNullable(a.internalName, b.internalName)
+            || compareNullable(a.internalId, b.internalId)
+          );
+        this.tableManager.setData(sorted);
         this.render();
       },
       error: err => {
@@ -174,6 +186,14 @@ export class MacroscopEvtPlaceListComponent implements OnInit, AfterViewInit {
     return this.dataService.getEvtPlace(item.id).pipe(
       map(dto => macroscopEvtPlaceDtoToView(dto, this.allChannels())),
     );
+  };
+
+  addItem = (item: MacroscopEvtPlaceView): Observable<MacroscopEvtPlaceView> => {
+    const req = macroscopEvtPlaceViewToDto(item);
+    //console.log(`add: ${JSON.stringify(req)}`)
+    return this.dataService.addEvtPlaceByAgent(this.currentAgentId, req)
+      .pipe(map(dto => macroscopEvtPlaceDtoToView(dto, this.allChannels())));
+    //return of(req).pipe(map(dto => macroscopEvtPlaceDtoToView(dto, this.allChannels())))
   };
 
   updateItem = (item: MacroscopEvtPlaceView): Observable<MacroscopEvtPlaceView> => {
@@ -198,13 +218,37 @@ export class MacroscopEvtPlaceListComponent implements OnInit, AfterViewInit {
   callSelect = (item: MacroscopEvtPlaceView) => this.doSelect(item, true);
 
   private callAdd(): void {
-    //const newItem = createNewMacroscopEvtPlace();
-    // Заглушка: добавление evt-мест будет реализовано иначе (например, подтягиванием из Macroscop).
-    console.warn('[evt-place] Добавление мест пока не реализовано.', {
-      agentId: this.currentAgentId,
-      //draft: newItem,
-    });
-    this.notificationService.info('Добавление мест событий пока не реализовано');
+    const cfg = this.evtConfig();
+    const agentId = this.agentId();
+    if (!cfg || !agentId) {
+      this.notificationService.error('Не привязана конфигурация сервера Macroscop');
+      return;
+    }
+    const channels = this.allChannels();
+    if (channels.length === 0) {
+      this.notificationService.error('Нет доступных каналов Macroscop');
+      return;
+    }
+
+    this.matDialog.open<MacroscopEvtPlaceAddDialogComponent,
+      MacroscopEvtPlaceAddDialogData,
+      MacroscopEvtPlaceAddDialogResult>(
+        MacroscopEvtPlaceAddDialogComponent,
+        {
+          width: '640px',
+          maxWidth: '95vw',
+          disableClose: true,
+          data: {
+            agentId,
+            mode: cfg.mode,
+            searchPlaceDepthInHours: cfg.searchPlaceDepthInHours ?? 24,
+            channels,
+          },
+        },
+      ).afterClosed().subscribe((result: MacroscopEvtPlaceAddDialogResult) => {
+        if (!result) return;
+        this.doAdd(result);
+      });
   }
 
   callDelete(): void {
@@ -262,6 +306,77 @@ export class MacroscopEvtPlaceListComponent implements OnInit, AfterViewInit {
 
   isExpanded = (index: number, item: any): boolean => isExpanded(item);
 
+  private doAdd(result: MacroscopEvtPlaceView[]): void {
+
+    const zoneInfoEquals = (a: MacroscopZoneInfoView | undefined, b: MacroscopZoneInfoView | undefined,): boolean => {
+      if (a === b) return true;
+      if (!a || !b) return false;
+      return a.left === b.left
+        && a.top === b.top
+        && a.width === b.width
+        && a.height === b.height;
+    }
+
+    const macroscopChannelId = result[0].channelId;
+    const channel = this.allChannels().find(c => c.macroscopId === macroscopChannelId);
+    if (!channel || !channel.id) {
+      this.notificationService.error(
+        'Не удалось определить сохранённый канал Macroscop для результата поиска');
+      return;
+    }
+
+    const savedChannelId = channel.id;
+    const savedChannelName = channel.name ?? channel.macroscopId;
+
+    const existing = this.dataSource.data.filter(p => p.channelId === savedChannelId);
+    const existingByInternalId = new Map(existing.map(p => [p.internalId, p] as const));
+    const resultByInternalId = new Map(result.map(p => [p.internalId, p] as const));
+
+    // 1. Существующие, которые найдены заново — обновляем internalName и zoneInfo при расхождении
+    existing.forEach(item => {
+      const found = resultByInternalId.get(item.internalId);
+      if (!found) return;
+
+      const internalNameChanged = item.internalName !== found.internalName;
+      const zoneChanged = !zoneInfoEquals(item.zoneInfo, found.zoneInfo);
+      if (!internalNameChanged && !zoneChanged) return;
+
+      this.tableManager.doUpdateBase(
+        {
+          ...item,
+          internalName: found.internalName,
+          zoneInfo: found.zoneInfo,
+        },
+        () => this.render(),
+      );
+    });
+
+    // 2. Найденные, которых нет у нас — добавляем
+    result.forEach(found => {
+      if (existingByInternalId.has(found.internalId)) return;
+      const newItem: MacroscopEvtPlaceView = {
+        ...found,
+        id: 'temp-' + found.internalId,
+        channelId: savedChannelId,
+        channelName: savedChannelName,
+        used: true,
+      };
+      this.tableManager.doAddBase(newItem, () => this.render(), false, true);
+    });
+    // 3. Существующие, которых не нашли — present = false
+    existing.forEach(item => {
+      if (resultByInternalId.has(item.internalId)) return;
+      if (!item.present) return;
+
+      this.tableManager.doUpdateBase(
+        { ...item, present: false, actual: false },
+        () => this.render(),
+      );
+    });
+
+    this.render();
+  }
+
   private doSave(): void {
     const resApply = (result: SaveDataResult<MacroscopEvtPlaceView>) => {
       if (result.success) {
@@ -280,26 +395,44 @@ export class MacroscopEvtPlaceListComponent implements OnInit, AfterViewInit {
     };
     this.tableManager.doSaveBase(
       this.isSaving,
-      undefined,                                // addItem — пока не реализуем
+      (item) => this.addItem(item),
       (item) => this.updateItem(item),
       (item) => this.deleteItem(item),
       resApply
     );
   }
 
-  /**
-   * Заглушка для скриншотов evt-мест.
-   * Когда решим реализовать — понадобится макроскопный id канала
-   * (не путать с `channelId` из DTO, там DB-идентификатор), а также
-   * привязанный configId агента. Сейчас просто логируем, чтобы
-   * UI-поток кнопок был проверяем.
-   */
   onCallGetChannelScreenShot(event: { mode: 'current' | 'archive'; place: MacroscopEvtPlaceView }): void {
-    console.warn('[evt-place] Запрос скриншота пока не реализован.', {
-      agentId: this.currentAgentId,
-      mode: event.mode,
-      place: event.place,
+    const configId = this.evtConfig()?.config?.id;
+    const channelId = this.allChannels().find(c => c.id === event.place.channelId)?.macroscopId;
+    if (!configId) {
+      this.notificationService.warning('Не определена конфигурация Macroscop');
+      return;
+    }
+    if (!channelId) {
+      this.notificationService.warning('Не указан канал Macroscop');
+      return;
+    }
+    this.isLoadingScreenshot.set(true);
+    this.dataService.getCurrentScreenshot(configId, channelId).pipe(
+      takeUntilDestroyed(this.destroyRef),
+      finalize(() => this.isLoadingScreenshot.set(false)),
+    ).subscribe(result => {
+      if (result.success && result.data) {
+        const zone: ShowImageRectangle | undefined = event.place.zoneInfo ? {
+          left: event.place.zoneInfo.left ?? 0,
+          top: event.place.zoneInfo.top ?? 0,
+          width: event.place.zoneInfo.width ?? 0,
+          height: event.place.zoneInfo.height ?? 0,
+        } : undefined;
+        this.dialogService.showImage(
+          result.data, event.place.name ?? 'Фото', { greenRectangle: zone }
+        );
+      } else {
+        this.notificationService.error(
+          result.errorMessage ?? 'Не удалось получить фото',
+        );
+      }
     });
-    this.notificationService.info('Получение скриншотов для мест событий пока не реализовано');
   }
 }

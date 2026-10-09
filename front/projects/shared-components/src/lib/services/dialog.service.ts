@@ -8,7 +8,7 @@ import { ChangePasswordDialogData, ChangePasswordDialogResult } from '../compone
 import { ChangePasswordDialogComponent } from '../components/change-password-dialog/change-password-dialog.component';
 import { LoginDialogData, LoginDialogResult } from '../components/login-dialog/login-dialog.model';
 import { LoginDialogComponent } from '../components/login-dialog/login-dialog.component';
-import { ShowImageDialogComponent } from '../components/show-image-dialog/show-image-dialog.component';
+import { ShowImageDialogComponent, ShowImageRectangle } from '../components/show-image-dialog/show-image-dialog.component';
 import { SelectValueDialogComponent, SelectValueDialogData, SelectValueDialogResult } from '../components/select-value-dialog/select-value-dialog.component';
 
 @Injectable({ providedIn: 'root' })
@@ -54,10 +54,12 @@ export class DialogService {
     }
 
 
-    showImage(blob: Blob, title: string): Observable<void> {
+    showImage(blob: Blob, title: string, addInfo?: any): Observable<void> {
         const url = URL.createObjectURL(blob);
+        const greenRectangles: ShowImageRectangle[] | undefined =
+            addInfo?.greenRectangles ?? (addInfo?.greenRectangle ? [addInfo.greenRectangle] : undefined);
         const dialogRef = this.dialog.open(ShowImageDialogComponent, {
-            data: { url, title },
+            data: { url: url, title: title, greenRectangles: greenRectangles },
             maxWidth: '95vw',
             maxHeight: '95vh',
             autoFocus: false,

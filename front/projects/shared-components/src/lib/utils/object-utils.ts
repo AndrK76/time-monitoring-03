@@ -330,3 +330,16 @@ export function isArrayEqualByKeys<T>(
 }
 
 
+/**
+ * Сравнивает два тироковых значения, которые могут быть пустыми
+ * @param a - первое значение или null/undefined
+ * @param b - второе значение или null/undefined
+ * @returns 0 - равны, 1 - второе больше, -1 - первое больше
+ */
+export function compareNullable(a: string | undefined | null, b: string | undefined | null): number {
+    if (a == null && b == null) return 0;
+    if (a == null) return 1;
+    if (b == null) return -1;
+    return a.localeCompare(b, 'ru', { sensitivity: 'base' });
+}
+

@@ -13,4 +13,7 @@ public interface MacroscopChannelRepository extends JpaRepository<MacroscopChann
 
     @EntityGraph(attributePaths = "streams")
     Optional<MacroscopChannel> findByConfigIdAndMacroscopId(String configId, String macroscopId);
+
+    @EntityGraph(attributePaths = "streams")
+    Optional<MacroscopChannel> findByConfigIdAndId(String configId, String id);
 }

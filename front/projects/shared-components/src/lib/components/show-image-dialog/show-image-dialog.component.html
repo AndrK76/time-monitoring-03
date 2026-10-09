@@ -1,6 +1,7 @@
 <h2 mat-dialog-title>{{ data.title }}</h2>
 <mat-dialog-content class="dialog-content">
-    <img [src]="data.url" alt="Скриншот" class="screenshot-img" />
+    <!--<img [src]="data.url" alt="Скриншот" class="screenshot-img" />-->
+    <canvas #canvas class="screenshot-canvas"></canvas>
 </mat-dialog-content>
 <mat-dialog-actions align="end">
     <button mat-button mat-dialog-close>

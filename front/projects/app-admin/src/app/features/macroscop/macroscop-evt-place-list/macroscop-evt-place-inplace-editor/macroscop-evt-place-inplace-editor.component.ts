@@ -132,11 +132,7 @@ export class MacroscopEvtPlaceInplaceEditorComponent implements OnInit {
     });
   }
 
-  callGetCurrentScreenshot(): void {
+  callGetScreenshot(): void {
     this.screenshotRequested.emit({ mode: 'current', place: this.placeData() });
-  }
-
-  callGetArchiveScreenshot(): void {
-    this.screenshotRequested.emit({ mode: 'archive', place: this.placeData() });
   }
 }

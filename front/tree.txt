@@ -205,6 +205,10 @@
 |   |   |   |   |   |   |   |-- macroscop-evt-editor-container.component.scss
 |   |   |   |   |   |   |   `-- macroscop-evt-editor-container.component.ts
 |   |   |   |   |   |   |-- macroscop-evt-place-list
+|   |   |   |   |   |   |   |-- macroscop-evt-place-add-dialog
+|   |   |   |   |   |   |   |   |-- macroscop-evt-place-add-dialog.component.html
+|   |   |   |   |   |   |   |   |-- macroscop-evt-place-add-dialog.component.scss
+|   |   |   |   |   |   |   |   `-- macroscop-evt-place-add-dialog.component.ts
 |   |   |   |   |   |   |   |-- macroscop-evt-place-inplace-editor
 |   |   |   |   |   |   |   |   |-- macroscop-evt-place-inplace-editor.component.html
 |   |   |   |   |   |   |   |   |-- macroscop-evt-place-inplace-editor.component.scss
@@ -572,4 +576,4 @@
 |-- tsconfig.json
 `-- tsconfig.prod.json
 
-160 directories, 412 files
+161 directories, 415 files

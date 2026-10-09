@@ -1,0 +1,70 @@
+<h2 mat-dialog-title>Добавление мест событий</h2>
+
+<mat-dialog-content class="add-dialog-content">
+
+    <!-- Выбор канала + кнопка Найти -->
+    <div class="channel-row">
+        <mat-form-field appearance="outline" class="channel-select" subscriptSizing="dynamic">
+            <mat-label>Канал (камера)</mat-label>
+            <mat-select [(ngModel)]="selectedChannelId" (selectionChange)="onChannelChange($event.value)"
+                [disabled]="isSearching()">
+                @for (c of data.channels; track c.macroscopId) {
+                <mat-option [value]="c.macroscopId">{{ c.name ?? c.macroscopId }}</mat-option>
+                }
+            </mat-select>
+        </mat-form-field>
+
+        <button mat-raised-button color="primary" class="find-btn" (click)="find()"
+            [disabled]="!selectedChannelId || isSearching()">
+            <mat-icon>search</mat-icon>
+            <span>Найти</span>
+        </button>
+    </div>
+
+    <!-- Индикатор загрузки -->
+    @if (isSearching()) {
+    <div class="loading-row">
+        <mat-spinner diameter="28"></mat-spinner>
+        <span>Поиск...</span>
+    </div>
+    }
+
+    <!-- Результаты -->
+    @if (places().length > 0) {
+    <div class="places-block">
+        <div class="places-header">
+            Найдено: {{ places().length }}
+        </div>
+        <mat-divider></mat-divider>
+        <div class="places-list">
+            @for (p of places(); track p.internalId) {
+            <div class="place-item">
+                <mat-icon class="place-icon">place</mat-icon>
+                <span class="place-name">{{ p.internalName }}</span>
+            </div>
+            }
+        </div>
+    </div>
+    } @else if (!isSearching() && searched()) {
+    <div class="empty-state">
+        <mat-icon>info</mat-icon>
+        <span>Ничего не найдено</span>
+    </div>
+    }
+
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+
+    <button mat-raised-button color="primary" (click)="onOk()" [disabled]="places().length === 0">Выбрать</button>
+
+    @if (isAnalyticMode()) {
+    <button mat-raised-button class="continue-btn" (click)="continueSearch()" [disabled]="!canContinue()">
+        <mat-icon>search</mat-icon>
+        <span>Продолжить поиск</span>
+    </button>
+    }
+
+    <button mat-button (click)="onCancel()">Отмена</button>
+
+</mat-dialog-actions>

@@ -5,15 +5,15 @@
                 <mat-label>Наименование</mat-label>
                 <input matInput formControlName="name" [readonly]="deleted" (change)="$event.stopPropagation()">
             </mat-form-field>
-            <mat-form-field appearance="outline" class="full-width">
+            <mat-form-field appearance="outline">
                 <mat-label>Канал (камера)</mat-label>
                 <input matInput formControlName="channelName" readonly>
             </mat-form-field>
-            <mat-form-field appearance="outline" class="full-width">
+            <mat-form-field appearance="outline">
                 <mat-label>Зона камеры</mat-label>
                 <input matInput formControlName="internalName" readonly>
             </mat-form-field>
-            <mat-form-field appearance="outline" class="full-width">
+            <mat-form-field appearance="outline">
                 <mat-label>Координаты</mat-label>
                 <input matInput [value]="placeData().zoneInfo | macroscopZoneInfo" readonly>
             </mat-form-field>
@@ -40,13 +40,9 @@
 
                 @if (placeData().channelId) {
                 <div class="action-button-group">
-                    <button mat-icon-button type="button" matTooltip="Текущий скриншот"
-                        (click)="callGetCurrentScreenshot()" class="screenshot-link">
+                    <button mat-icon-button type="button" matTooltip="Фото места"
+                        (click)="callGetScreenshot()" class="screenshot-link">
                         <mat-icon>photo_camera</mat-icon>
-                    </button>
-                    <button mat-icon-button type="button" matTooltip="Последний из архива"
-                        (click)="callGetArchiveScreenshot()" class="screenshot-link">
-                        <mat-icon>photo_library</mat-icon>
                     </button>
                 </div>
                 }
